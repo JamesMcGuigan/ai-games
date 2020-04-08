@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -16,6 +16,7 @@
 In search.py, you will implement generic search algorithms which are called by
 Pacman agents (in searchAgents.py).
 """
+from typing import Union, List, Dict, Tuple
 
 import util
 
@@ -72,7 +73,13 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
-def depthFirstSearch(problem):
+
+def depthFirstSearch(
+        problem: SearchProblem,
+        state:   Tuple[int]            = None,
+        actions: List[str]             = None,
+        visited: Dict[Tuple[int],bool] = None
+) -> Union[List[str], bool]:
     """
     Search the deepest nodes in the search tree first.
 
@@ -86,8 +93,30 @@ def depthFirstSearch(problem):
     print "Is the start a goal?", problem.isGoalState(problem.getStartState())
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    state   = state   or problem.getStartState()
+    actions = actions or []
+    visited = visited or {}
+    visited[state] = True
+
+    if problem.isGoalState(state):
+        # problem._visited = {}  # Reset visited for `-l trickySearch`
+        return actions
+    else:
+        successors = problem.getSuccessors(state)                  # getSuccessors() adds state to problem._visited
+        for (next_state, next_action, next_cost) in successors:
+            if next_state in visited: continue                     # avoid searching already explored states
+
+            ### add the next action to the list, and see if this path finds the goal, else backtrack
+            next_actions = actions + [next_action]
+            next_actions = depthFirstSearch(problem, next_state, next_actions, visited)
+            if next_actions == False:
+                continue
+            else:
+                return next_actions  # return and save results
+
+        ### if len(successors) == 0 or all successors returned false
+        return False  # backtrack
+
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""

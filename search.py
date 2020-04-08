@@ -16,7 +16,7 @@
 In search.py, you will implement generic search algorithms which are called by
 Pacman agents (in searchAgents.py).
 """
-from typing import Union, List, Dict, Tuple
+from typing import Union, List, Dict, Tuple, Callable
 
 import util
 
@@ -63,6 +63,27 @@ class SearchProblem:
         util.raiseNotDefined()
 
 
+
+def distanceHeuristic(state, problem: SearchProblem=None):
+    """
+    Compute the manhattanDistance() to the goal, if defined
+    NOTE: problem.goal is not defined in unit tests
+    """
+    if problem and hasattr(problem, 'goal'):
+        return util.manhattanDistance(state, problem.goal)
+    else:
+        return 0
+
+
+def nullHeuristic(state, problem=None):
+    """
+    A heuristic function estimates the cost from the current state to the nearest
+    goal in the provided SearchProblem.  This heuristic is trivial.
+    """
+    return 0
+
+
+
 def tinyMazeSearch(problem):
     """
     Returns a sequence of moves that solves tinyMaze.  For any other maze, the
@@ -74,12 +95,19 @@ def tinyMazeSearch(problem):
     return  [s, s, w, s, w, w, s, w]
 
 
+# python autograder.py -q q1
+# python pacman.py -l tinyMaze   -p SearchAgent -a fn=dfs
+# python pacman.py -l mediumMaze -p SearchAgent -a fn=dfs
+# python pacman.py -l bigMaze    -p SearchAgent -a fn=dfs
+# find layouts -name '*Maze*' | perl -p -e 's!^.*/|\..*$!!g' | xargs -L1 python pacman.py -p SearchAgent -a fn=dfs -l
+# Mazes: bigMaze contoursMaze mediumDottedMaze mediumMaze mediumScaryMaze openMaze smallMaze testMaze tinyMaze
 def depthFirstSearch(
-        problem: SearchProblem,
-        state:   Tuple[int]            = None,
-        actions: List[str]             = None,
-        visited: Dict[Tuple[int],bool] = None
-) -> Union[List[str], bool]:
+        problem:   SearchProblem,
+        state:     Union[str,Tuple[int]] = None,  # Tuple[int] for runtime, str for unit tests
+        actions:   List[str]             = None,
+        visited:   Dict[Tuple[int],bool] = None,
+        heuristic: Callable[ [Union[str,Tuple[int]], SearchProblem], int] = None
+        ) -> Union[List[str], bool]:
     """
     Search the deepest nodes in the search tree first.
 
@@ -99,23 +127,62 @@ def depthFirstSearch(
     visited[state] = True
 
     if problem.isGoalState(state):
-        # problem._visited = {}  # Reset visited for `-l trickySearch`
         return actions
     else:
-        successors = problem.getSuccessors(state)                  # getSuccessors() adds state to problem._visited
+        successors = problem.getSuccessors(state)
+
+        ### Greedy Depth First Search
+        def sort_fn(successor):
+            # Will sort by lowest cost first, then add the cost of the (optional) heuristic
+            # NOTE: problem.goal is not defined in unit tests
+            (state, action, cost) = successor
+            if callable(heuristic):
+                cost += heuristic(state, problem)
+            return cost
+        successors = sorted(successors, key=sort_fn)
+
+        ### Recursively traverse search tree
         for (next_state, next_action, next_cost) in successors:
-            if next_state in visited: continue                     # avoid searching already explored states
+            if next_state in visited: continue    # avoid searching already explored states
 
             ### add the next action to the list, and see if this path finds the goal, else backtrack
             next_actions = actions + [next_action]
-            next_actions = depthFirstSearch(problem, next_state, next_actions, visited)
-            if next_actions == False:
-                continue
+            next_actions = depthFirstSearch(
+                problem   = problem,
+                state     = next_state,
+                actions   = next_actions,
+                visited   = visited,
+                heuristic = heuristic,
+            )
+            if next_actions == False:  # we have hit a dead end
+                continue               # try the next available path
             else:
-                return next_actions  # return and save results
+                return next_actions    # return and save results
 
         ### if len(successors) == 0 or all successors returned false
-        return False  # backtrack
+        return False                   # backtrack
+
+
+
+# python pacman.py -l tinyMaze   -p SearchAgent -a fn=gdfs
+# python pacman.py -l mediumMaze -p SearchAgent -a fn=gdfs
+# python pacman.py -l bigMaze    -p SearchAgent -a fn=gdfs
+# find layouts -name '*Maze*' | perl -p -e 's!^.*/|\..*$!!g' | xargs -L1 python pacman.py -p SearchAgent -a fn=gdfs -l
+# Mazes: bigMaze contoursMaze mediumDottedMaze mediumMaze mediumScaryMaze openMaze smallMaze testMaze tinyMaze
+def greedyDepthFirstSearch(
+        problem: SearchProblem,
+        state:   Tuple[int]            = None,
+        actions: List[str]             = None,
+        visited: Dict[Tuple[int],bool] = None,
+) -> Union[List[str], bool]:
+    return depthFirstSearch(
+        problem   = problem,
+        state     = state,
+        actions   = actions,
+        visited   = visited,
+        heuristic = distanceHeuristic
+    )
+
 
 
 def breadthFirstSearch(problem):
@@ -123,17 +190,14 @@ def breadthFirstSearch(problem):
     "*** YOUR CODE HERE ***"
     util.raiseNotDefined()
 
+
+
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
     util.raiseNotDefined()
 
-def nullHeuristic(state, problem=None):
-    """
-    A heuristic function estimates the cost from the current state to the nearest
-    goal in the provided SearchProblem.  This heuristic is trivial.
-    """
-    return 0
+
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
@@ -142,7 +206,8 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
 
 # Abbreviations
-bfs = breadthFirstSearch
-dfs = depthFirstSearch
+bfs   = breadthFirstSearch
+dfs   = depthFirstSearch
+gdfs  = greedyDepthFirstSearch
 astar = aStarSearch
-ucs = uniformCostSearch
+ucs   = uniformCostSearch

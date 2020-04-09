@@ -255,7 +255,7 @@ def greedyBreadthFirstSearch(
     )
 
 
-
+# python autograder.py -q q3
 # python pacman.py -l mediumMaze       -p SearchAgent -a fn=ucs
 # python pacman.py -l mediumDottedMaze -p StayEastSearchAgent
 # python pacman.py -l mediumScaryMaze  -p StayWestSearchAgent
@@ -265,16 +265,17 @@ def uniformCostSearch(
         heuristic:    Callable[ [Union[str,Tuple[int]], SearchProblem], int] = None,
 ) -> Union[List[str], bool]:
     """Search the node of least total cost first."""
-    state    = problem.getStartState()
-    frontier = util.PriorityQueue()
-    visited  = {}
-    visited[state] = True
+    state      = problem.getStartState()
+    frontier   = util.PriorityQueue()
+    visited    = { state: True }
+    path_costs = { state: (0, []) }
 
-    frontier.push((state, [], 0), 0)  # initialize root node, and add as first item in the queue
+    frontier.push(state, 0)  # initialize root node, and add as first item in the queue
 
     while not frontier.isEmpty():
-        (state, action_path, path_cost) = frontier.pop()    # inspect next shortest path
-        visited[state] = True                               # only mark as visited once removed from the frontier
+        state = frontier.pop()    # inspect next shortest path
+        visited[state] = True     # only mark as visited once removed from the frontier
+        (cost, action_path) = path_costs[state]
 
         # Uniform cost search must wait for node to be removed from frontier to guarantee least cost
         if problem.isGoalState(state):
@@ -284,21 +285,19 @@ def uniformCostSearch(
         for (child_state, child_action, edge_cost) in successors:
             if child_state in visited: continue  # avoid searching already explored states
 
-            child_path      = action_path + [ child_action ]   # store path and cost for later retrieval
-            child_path_cost = path_cost + edge_cost
+            child_path      = action_path + [ child_action ]
+            child_path_cost = cost + edge_cost
             heuristic_cost  = child_path_cost + (heuristic(state, problem) if callable(heuristic) else 0)
 
             # Check to see if an existing path to this node has already been found
-            previous = frontier.find(lambda store: store[0] == child_state)
-            if previous:
-                (prev_state, prev_path, prev_path_cost) = previous
-                if prev_path_cost > child_path_cost:
-                    frontier.delete(previous)  # remove more expensive path from frontier
-                else:
-                    continue                   # child_path is more expensive, skip to next successor
+            # Compare actual costs and not heuristic costs - which may be different
+            if child_state in path_costs:
+                prev_cost, prev_path = path_costs[child_state]
+                if prev_cost <= child_path_cost:
+                    continue  # child is worst than existing, skip to next successor
 
-            # QUESTION: Should the child_path be stored in the Queue, or in a separate paths dictionary?
-            frontier.push( (child_state, child_path, child_path_cost), heuristic_cost)  # process frontier in path_cost order
+            path_costs[child_state] = (child_path_cost, child_path)   # store path + cost in dict rather than Queue
+            frontier.update( child_state, heuristic_cost )            # process frontier in heuristic_cost order
     else:
         return False  # uniformCostSearch() is unsolvable
 

@@ -273,7 +273,9 @@ def uniformCostSearch(
 
     frontier.push(state, 0)           # initialize root node, and add as first item in the queue
 
+    loop = 0
     while not frontier.isEmpty():
+        loop += 1
         state = frontier.pop()        # inspect next shortest path
         visited[state] = True         # only mark as visited once removed from the frontier
         (cost, action_path) = path_costs[state]
@@ -283,7 +285,12 @@ def uniformCostSearch(
             return action_path
 
         successors = problem.getSuccessors(state)
-        random.shuffle(successors)                           # move semi-diagonally in open spaces
+
+        ### python ./pacman.py -p SearchAgent -a fn=astar,prob=CornersProblem,heuristic=cornersHeuristicNull -q -l bigCorners
+        ### Nodes Expanded | default=7949 | reversed %2 = 7907 | random.shuffle = 7869-7949
+        if loop %2: successors = reversed(successors)      # move semi-diagonally in open spaces
+        # random.shuffle(successors)                       # move semi-diagonally in open spaces
+
         for (child_state, child_action, edge_cost) in successors:
             if child_state in visited: continue              # avoid searching already explored states
 

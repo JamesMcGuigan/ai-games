@@ -16,6 +16,7 @@
 In search.py, you will implement generic search algorithms which are called by
 Pacman agents (in searchAgents.py).
 """
+import random
 from typing import Union, List, Dict, Tuple, Callable
 
 import util
@@ -262,20 +263,20 @@ def greedyBreadthFirstSearch(
 # python pacman.py -l mediumScaryMaze  -p StayWestSearchAgent
 # find layouts -name '*Maze*' | grep -v Dotted | perl -p -e 's!^.*/|\..*$!!g' | xargs -t -L1 python pacman.py -p SearchAgent -a fn=ucs -l
 def uniformCostSearch(
-        problem: SearchProblem,
-        heuristic:    Callable[ [Union[str,Tuple[int]], SearchProblem], int] = None,
+        problem:   SearchProblem,
+        heuristic: Callable[ [Union[str,Tuple[int]], SearchProblem], int] = None,
 ) -> Union[List[str], bool]:
     """Search the node of least total cost first."""
     state      = problem.getStartState()
     frontier   = util.PriorityQueue()
-    visited    = { state: True }
-    path_costs = { state: (0, []) }
+    visited    = { state: True }      # True once removed from the frontier
+    path_costs = { state: (0, []) }   # cost, path_actions
 
-    frontier.push(state, 0)  # initialize root node, and add as first item in the queue
+    frontier.push(state, 0)           # initialize root node, and add as first item in the queue
 
     while not frontier.isEmpty():
-        state = frontier.pop()    # inspect next shortest path
-        visited[state] = True     # only mark as visited once removed from the frontier
+        state = frontier.pop()        # inspect next shortest path
+        visited[state] = True         # only mark as visited once removed from the frontier
         (cost, action_path) = path_costs[state]
 
         # Uniform cost search must wait for node to be removed from frontier to guarantee least cost
@@ -283,12 +284,13 @@ def uniformCostSearch(
             return action_path
 
         successors = problem.getSuccessors(state)
+        random.shuffle(successors)                           # move semi-diagonally in open spaces
         for (child_state, child_action, edge_cost) in successors:
-            if child_state in visited: continue  # avoid searching already explored states
+            if child_state in visited: continue              # avoid searching already explored states
 
             child_path      = action_path + [ child_action ]
             child_path_cost = cost + edge_cost
-            heuristic_cost  = child_path_cost + (heuristic(state, problem) if callable(heuristic) else 0)
+            heuristic_cost  = child_path_cost + (heuristic(child_state, problem) if callable(heuristic) else 0)
 
             # Check to see if an existing path to this node has already been found
             # Compare actual costs and not heuristic costs - which may be different
@@ -303,11 +305,14 @@ def uniformCostSearch(
         return False  # uniformCostSearch() is unsolvable
 
 
-
+# python pacman.py -l openMaze  -p SearchAgent -a fn=astar
+# find layouts -name '*Maze*' | grep -v Dotted | perl -p -e 's!^.*/|\..*$!!g' | xargs -t -L1 python pacman.py -p SearchAgent -a fn=ucs -l
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    return uniformCostSearch(
+        problem   = problem,
+        heuristic = heuristic,
+    )
 
 
 # Abbreviations

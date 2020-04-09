@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -40,6 +40,7 @@ from game import Actions
 import util
 import time
 import search
+from copy import copy, deepcopy
 
 class GoWestAgent(Agent):
     "An agent that goes West until it can't."
@@ -262,10 +263,17 @@ def euclideanHeuristic(position, problem, info={}):
     xy2 = problem.goal
     return ( (xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2 ) ** 0.5
 
+
+
 #####################################################
 # This portion is incomplete.  Time to write code!  #
 #####################################################
 
+
+# find layouts -name '*Corners*' | perl -p -e 's!^.*/|\..*$!!g' | xargs -t -L1 python pacman.py -p SearchAgent -a fn=dfs,prob=CornersProblem -l
+# find layouts -name '*Corners*' | perl -p -e 's!^.*/|\..*$!!g' | xargs -t -L1 python pacman.py -p SearchAgent -a fn=bfs,prob=CornersProblem -l
+# find layouts -name '*Corners*' | perl -p -e 's!^.*/|\..*$!!g' | xargs -t -L1 python pacman.py -p SearchAgent -a fn=ucs,prob=CornersProblem -l
+# find layouts -name '*Corners*' | perl -p -e 's!^.*/|\..*$!!g' | xargs -t -L1 python pacman.py -p SearchAgent -a fn=astar,prob=CornersProblem -l
 class CornersProblem(search.SearchProblem):
     """
     This search problem finds paths through all four corners of a layout.
@@ -287,22 +295,26 @@ class CornersProblem(search.SearchProblem):
         self._expanded = 0 # DO NOT CHANGE; Number of search nodes expanded
         # Please add any code here which you would like to use
         # in initializing the problem
-        "*** YOUR CODE HERE ***"
+        # self.goals = { corner: False for corner in self.corners }
+        # self.goal = self.corners[0]
+
 
     def getStartState(self):
         """
         Returns the start state (in your state space, not the full Pacman state
         space)
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return ( self.startingPosition, copy(self.corners))
+
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        position, corners = state
+        return len(corners) == 0
+
+
 
     def getSuccessors(self, state):
         """
@@ -314,20 +326,24 @@ class CornersProblem(search.SearchProblem):
             state, 'action' is the action required to get there, and 'stepCost'
             is the incremental cost of expanding to that successor
         """
-
+        position, corners = state
         successors = []
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             # Add a successor state to the successor list if the action is legal
             # Here's a code snippet for figuring out whether a new position hits a wall:
-            #   x,y = currentPosition
-            #   dx, dy = Actions.directionToVector(action)
-            #   nextx, nexty = int(x + dx), int(y + dy)
-            #   hitsWall = self.walls[nextx][nexty]
-
-            "*** YOUR CODE HERE ***"
+            x,y          = position
+            dx, dy       = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            hitsWall     = self.walls[nextx][nexty]
+            if not hitsWall:
+                new_position = ( nextx, nexty )
+                new_corners  = tuple([ corner for corner in corners if corner != new_position ])
+                new_state    = ( new_position, new_corners )
+                successors.append( (new_state, action, 1) )
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
+
 
     def getCostOfActions(self, actions):
         """
@@ -338,7 +354,7 @@ class CornersProblem(search.SearchProblem):
         x,y= self.startingPosition
         for action in actions:
             dx, dy = Actions.directionToVector(action)
-            x, y = int(x + dx), int(y + dy)
+            x, y   = int(x + dx), int(y + dy)
             if self.walls[x][y]: return 999999
         return len(actions)
 
@@ -455,6 +471,8 @@ def foodHeuristic(state, problem):
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
     return 0
+
+
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"

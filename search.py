@@ -108,7 +108,7 @@ def depthFirstSearch(
         actions:   List[str]             = None,
         visited:   Dict[Tuple[int],bool] = None,
         heuristic: Callable[ [Union[str,Tuple[int]], SearchProblem], int] = None
-) -> Union[List[str], bool]:
+) -> List[str]:
     """
     Search the deepest nodes in the search tree first.
 
@@ -145,7 +145,6 @@ def depthFirstSearch(
         ### Recursively traverse search tree
         for (next_state, next_action, next_cost) in successors:
             if next_state in visited: continue    # avoid searching already explored states
-
             ### add the next action to the list, and see if this path finds the goal, else backtrack
             next_actions = actions + [next_action]
             next_actions = depthFirstSearch(
@@ -155,20 +154,20 @@ def depthFirstSearch(
                 visited   = visited,
                 heuristic = heuristic,
             )
-            if next_actions == False:  # we have hit a dead end
+            if not next_actions:       # have we have hit a dead end
                 continue               # try the next available path
             else:
                 return next_actions    # return and save results
 
         ### if len(successors) == 0 or all successors returned false
-        return False                   # backtrack
+        return []                      # backtrack
 
 
 
 # python pacman.py -l tinyMaze   -p SearchAgent -a fn=gdfs
 # python pacman.py -l mediumMaze -p SearchAgent -a fn=gdfs
 # python pacman.py -l bigMaze    -p SearchAgent -a fn=gdfs
-# find layouts -name '*Maze*' | grep -v Dotted | grep -v Dotted | perl -p -e 's!^.*/|\..*$!!g' | xargs -t -L1 python pacman.py -p SearchAgent -a fn=gdfs -l
+# find layouts -name '*Corners*' | perl -p -e 's!^.*/|\..*$!!g' | xargs -t -L1 python pacman.py -p SearchAgent -a fn=gdfs -l
 # Mazes: bigMaze contoursMaze mediumDottedMaze mediumMaze mediumScaryMaze openMaze smallMaze testMaze tinyMaze
 def greedyDepthFirstSearch(
         problem: SearchProblem,
@@ -194,7 +193,7 @@ def greedyDepthFirstSearch(
 def breadthFirstSearch(
         problem:      SearchProblem,
         heuristic:    Callable[ [Union[str,Tuple[int]], SearchProblem], int] = None,
-) -> Union[List[str], bool]:
+) -> List[str]:
     """
     Search the shallowest nodes in the search tree first.
 
@@ -239,7 +238,7 @@ def breadthFirstSearch(
             # if problem.isGoalState(child_state):
             #     return child_path
     else:
-        return False  # breadthFirstSearch() is unsolvable
+        return []  # breadthFirstSearch() is unsolvable
 
 
 
@@ -265,7 +264,7 @@ def greedyBreadthFirstSearch(
 def uniformCostSearch(
         problem:   SearchProblem,
         heuristic: Callable[ [Union[str,Tuple[int]], SearchProblem], int] = None,
-) -> Union[List[str], bool]:
+) -> List[str]:
     """Search the node of least total cost first."""
     state      = problem.getStartState()
     frontier   = util.PriorityQueue()
@@ -302,7 +301,7 @@ def uniformCostSearch(
             path_costs[child_state] = (child_path_cost, child_path)   # store path + cost in dict rather than Queue
             frontier.update( child_state, heuristic_cost )            # process frontier in heuristic_cost order
     else:
-        return False  # uniformCostSearch() is unsolvable
+        return []  # uniformCostSearch() is unsolvable
 
 
 # python pacman.py -l openMaze  -p SearchAgent -a fn=astar,heuristic=manhattanHeuristic

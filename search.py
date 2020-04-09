@@ -305,8 +305,8 @@ def uniformCostSearch(
         return False  # uniformCostSearch() is unsolvable
 
 
-# python pacman.py -l openMaze  -p SearchAgent -a fn=astar
-# find layouts -name '*Maze*' | grep -v Dotted | perl -p -e 's!^.*/|\..*$!!g' | xargs -t -L1 python pacman.py -p SearchAgent -a fn=ucs -l
+# python pacman.py -l openMaze  -p SearchAgent -a fn=astar,heuristic=manhattanHeuristic
+# find layouts -name '*Maze*' | grep -v Dotted | perl -p -e 's!^.*/|\..*$!!g' | xargs -t -L1 python pacman.py -p SearchAgent -a fn=astar,heuristic=manhattanHeuristic -l
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     return uniformCostSearch(

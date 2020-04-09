@@ -30,6 +30,8 @@ import sys
 import inspect
 import heapq, random
 import io
+from typing import Callable, Any, Union
+
 
 
 class FixedRandom:
@@ -179,7 +181,7 @@ class PriorityQueue(Queue):
         self.heap = []
         self.count = 0
 
-    def push(self, item, priority):
+    def push(self, item, priority=0):
         entry = (priority, self.count, item)
         heapq.heappush(self.heap, entry)
         self.count += 1
@@ -190,6 +192,19 @@ class PriorityQueue(Queue):
 
     def isEmpty(self):
         return len(self.heap) == 0
+
+    def find( self, function: Callable[[Any], bool] ) -> Union[Any, None]:
+        for index, (priority, count, item) in enumerate(self.heap):
+            if function(item):
+                return item
+        return None
+
+    def delete(self, item):
+        for index, (p, c, i) in enumerate(self.heap):
+            if i == item:
+                del self.heap[index]
+                heapq.heapify(self.heap)
+                break
 
     def update(self, item, priority):
         # If item already in priority queue with higher priority, update its priority and rebuild the heap.

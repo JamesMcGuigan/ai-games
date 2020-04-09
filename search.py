@@ -107,7 +107,7 @@ def depthFirstSearch(
         actions:   List[str]             = None,
         visited:   Dict[Tuple[int],bool] = None,
         heuristic: Callable[ [Union[str,Tuple[int]], SearchProblem], int] = None
-        ) -> Union[List[str], bool]:
+) -> Union[List[str], bool]:
     """
     Search the deepest nodes in the search tree first.
 
@@ -191,8 +191,8 @@ def greedyDepthFirstSearch(
 # find layouts -name '*Maze*' | grep -v Dotted | perl -p -e 's!^.*/|\..*$!!g' | xargs -t -L1 python pacman.py -p SearchAgent -a fn=bfs -l
 # Mazes: bigMaze contoursMaze mediumDottedMaze mediumMaze mediumScaryMaze openMaze smallMaze testMaze tinyMaze
 def breadthFirstSearch(
-        problem:   SearchProblem,
-        heuristic: Callable[ [Union[str,Tuple[int]], SearchProblem], int] = None
+        problem:      SearchProblem,
+        heuristic:    Callable[ [Union[str,Tuple[int]], SearchProblem], int] = None,
 ) -> Union[List[str], bool]:
     """
     Search the shallowest nodes in the search tree first.
@@ -228,10 +228,14 @@ def breadthFirstSearch(
         for (child_state, child_action, child_cost) in problem.getSuccessors(state):
             if child_state in visited: continue  # avoid searching already explored states
 
-            visited[child_state] = True                                            # mark as seen
-            child_path  = action_path + [ child_action ]                           # store path for later retrieval
-            child_cost += heuristic(state, problem) if callable(heuristic) else 0  # greedy breadth first search
-            frontier.push( (child_state, child_path), child_cost )
+            visited[child_state] = True                                           # mark as seen
+            child_path = action_path + [ child_action ]                           # store path for later retrieval
+            priority   = heuristic(state, problem) if callable(heuristic) else 0  # greedy breadth first search
+            frontier.push( (child_state, child_path), priority )
+
+            # breadthFirstSearch() can terminate early with shortest path when ignoring path cost
+            if problem.isGoalState(child_state):
+                return action_path
     else:
         return False  # breadthFirstSearch() is unsolvable
 
@@ -243,7 +247,7 @@ def breadthFirstSearch(
 # find layouts -name '*Maze*' | grep -v Dotted | perl -p -e 's!^.*/|\..*$!!g' | xargs -t -L1 python pacman.py -p SearchAgent -a fn=gbfs -l
 # Mazes: bigMaze contoursMaze mediumDottedMaze mediumMaze mediumScaryMaze openMaze smallMaze testMaze tinyMaze
 def greedyBreadthFirstSearch(
-        problem: SearchProblem,
+        problem: SearchProblem
 ) -> Union[List[str], bool]:
     return breadthFirstSearch(
         problem   = problem,
@@ -252,10 +256,51 @@ def greedyBreadthFirstSearch(
 
 
 
-def uniformCostSearch(problem):
+# python pacman.py -l mediumMaze       -p SearchAgent -a fn=ucs
+# python pacman.py -l mediumDottedMaze -p StayEastSearchAgent
+# python pacman.py -l mediumScaryMaze  -p StayWestSearchAgent
+# find layouts -name '*Maze*' | grep -v Dotted | perl -p -e 's!^.*/|\..*$!!g' | xargs -t -L1 python pacman.py -p SearchAgent -a fn=ucs -l
+def uniformCostSearch(
+        problem: SearchProblem,
+        heuristic:    Callable[ [Union[str,Tuple[int]], SearchProblem], int] = None,
+) -> Union[List[str], bool]:
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    state    = problem.getStartState()
+    frontier = util.PriorityQueue()
+    visited  = {}
+    visited[state] = True
+
+    frontier.push((state, [], 0), 0)  # initialize root node, and add as first item in the queue
+
+    while not frontier.isEmpty():
+        (state, action_path, path_cost) = frontier.pop()    # inspect next shortest path
+        visited[state] = True                               # only mark as visited once removed from the frontier
+
+        # Uniform cost search must wait for node to be removed from frontier to guarantee least cost
+        if problem.isGoalState(state):
+            return action_path
+
+        successors = problem.getSuccessors(state)
+        for (child_state, child_action, edge_cost) in successors:
+            if child_state in visited: continue  # avoid searching already explored states
+
+            child_path      = action_path + [ child_action ]   # store path and cost for later retrieval
+            child_path_cost = path_cost + edge_cost
+            heuristic_cost  = child_path_cost + (heuristic(state, problem) if callable(heuristic) else 0)
+
+            # Check to see if an existing path to this node has already been found
+            previous = frontier.find(lambda store: store[0] == child_state)
+            if previous:
+                (prev_state, prev_path, prev_path_cost) = previous
+                if prev_path_cost > child_path_cost:
+                    frontier.delete(previous)  # remove more expensive path from frontier
+                else:
+                    continue                   # child_path is more expensive, skip to next successor
+
+            # QUESTION: Should the child_path be stored in the Queue, or in a separate paths dictionary?
+            frontier.push( (child_state, child_path, child_path_cost), heuristic_cost)  # process frontier in path_cost order
+    else:
+        return False  # uniformCostSearch() is unsolvable
 
 
 

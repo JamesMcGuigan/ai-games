@@ -99,7 +99,7 @@ def tinyMazeSearch(problem):
 # python pacman.py -l tinyMaze   -p SearchAgent -a fn=dfs
 # python pacman.py -l mediumMaze -p SearchAgent -a fn=dfs
 # python pacman.py -l bigMaze    -p SearchAgent -a fn=dfs
-# find layouts -name '*Maze*' | perl -p -e 's!^.*/|\..*$!!g' | xargs -L1 python pacman.py -p SearchAgent -a fn=dfs -l
+# find layouts -name '*Maze*' | grep -v Dotted | perl -p -e 's!^.*/|\..*$!!g' | xargs -t -L1 python pacman.py -p SearchAgent -a fn=dfs -l
 # Mazes: bigMaze contoursMaze mediumDottedMaze mediumMaze mediumScaryMaze openMaze smallMaze testMaze tinyMaze
 def depthFirstSearch(
         problem:   SearchProblem,
@@ -167,7 +167,7 @@ def depthFirstSearch(
 # python pacman.py -l tinyMaze   -p SearchAgent -a fn=gdfs
 # python pacman.py -l mediumMaze -p SearchAgent -a fn=gdfs
 # python pacman.py -l bigMaze    -p SearchAgent -a fn=gdfs
-# find layouts -name '*Maze*' | perl -p -e 's!^.*/|\..*$!!g' | xargs -L1 python pacman.py -p SearchAgent -a fn=gdfs -l
+# find layouts -name '*Maze*' | grep -v Dotted | grep -v Dotted | perl -p -e 's!^.*/|\..*$!!g' | xargs -t -L1 python pacman.py -p SearchAgent -a fn=gdfs -l
 # Mazes: bigMaze contoursMaze mediumDottedMaze mediumMaze mediumScaryMaze openMaze smallMaze testMaze tinyMaze
 def greedyDepthFirstSearch(
         problem: SearchProblem,
@@ -184,11 +184,71 @@ def greedyDepthFirstSearch(
     )
 
 
+# python autograder.py -q q2
+# python pacman.py -l tinyMaze   -p SearchAgent -a fn=bfs
+# python pacman.py -l mediumMaze -p SearchAgent -a fn=bfs
+# python pacman.py -l bigMaze    -p SearchAgent -a fn=bfs
+# find layouts -name '*Maze*' | grep -v Dotted | perl -p -e 's!^.*/|\..*$!!g' | xargs -t -L1 python pacman.py -p SearchAgent -a fn=bfs -l
+# Mazes: bigMaze contoursMaze mediumDottedMaze mediumMaze mediumScaryMaze openMaze smallMaze testMaze tinyMaze
+def breadthFirstSearch(
+        problem:   SearchProblem,
+        heuristic: Callable[ [Union[str,Tuple[int]], SearchProblem], int] = None
+) -> Union[List[str], bool]:
+    """
+    Search the shallowest nodes in the search tree first.
 
-def breadthFirstSearch(problem):
-    """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # https://en.wikipedia.org/wiki/Breadth-first_search
+    procedure BFS(G, start_v) is
+        let Q be a queue
+        label start_v as discovered
+        Q.enqueue(start_v)
+        while Q is not empty do
+            v := Q.dequeue()
+            if v is the goal then
+                return v
+            for all edges from v to w in G.adjacentEdges(v) do
+                if w is not labeled as discovered then
+                    label w as discovered
+                    w.parent := v
+                    Q.enqueue(w)
+    """
+    state    = problem.getStartState()
+    frontier = util.PriorityQueue()
+    visited  = {}
+    visited[state] = True
+
+    frontier.push((state, []), 0)  # initialize root node, and add as first item in the queue
+
+    while not frontier.isEmpty():
+        (state, action_path) = frontier.pop()    # inspect next shortest path
+
+        if problem.isGoalState(state):
+            return action_path
+
+        for (child_state, child_action, child_cost) in problem.getSuccessors(state):
+            if child_state in visited: continue  # avoid searching already explored states
+
+            visited[child_state] = True                                            # mark as seen
+            child_path  = action_path + [ child_action ]                           # store path for later retrieval
+            child_cost += heuristic(state, problem) if callable(heuristic) else 0  # greedy breadth first search
+            frontier.push( (child_state, child_path), child_cost )
+    else:
+        return False  # breadthFirstSearch() is unsolvable
+
+
+
+# python pacman.py -l tinyMaze   -p SearchAgent -a fn=gdfs
+# python pacman.py -l mediumMaze -p SearchAgent -a fn=gdfs
+# python pacman.py -l bigMaze    -p SearchAgent -a fn=gdfs
+# find layouts -name '*Maze*' | grep -v Dotted | perl -p -e 's!^.*/|\..*$!!g' | xargs -t -L1 python pacman.py -p SearchAgent -a fn=gbfs -l
+# Mazes: bigMaze contoursMaze mediumDottedMaze mediumMaze mediumScaryMaze openMaze smallMaze testMaze tinyMaze
+def greedyBreadthFirstSearch(
+        problem: SearchProblem,
+) -> Union[List[str], bool]:
+    return breadthFirstSearch(
+        problem   = problem,
+        heuristic = distanceHeuristic
+    )
 
 
 
@@ -207,6 +267,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
 # Abbreviations
 bfs   = breadthFirstSearch
+gbfs  = greedyBreadthFirstSearch
 dfs   = depthFirstSearch
 gdfs  = greedyDepthFirstSearch
 astar = aStarSearch

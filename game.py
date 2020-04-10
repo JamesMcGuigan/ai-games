@@ -198,7 +198,8 @@ class Grid:
     def __eq__(self, other):
         ### Optimization: self.data = np.array()
         if other == None: return False
-        return np.array_equiv(self.data, other.data)
+        return self.data.tobytes() == other.data.tobytes()   # costs  1% of runtime
+        # return np.array_equiv(self.data, other.data)       # costs 26% of runtime
 
         ### Old Code
         # return self.data == other.data
@@ -241,18 +242,23 @@ class Grid:
         ### Old Code
         # return sum([x.count(item) for x in self.data])
 
+    _asListCache = {}  # reduces function runtime from 39.2% -> 2.8%
     def asList(self, key = True) -> List[Tuple[int]]:
-        list = [
-            (x,y)
-            for x in range(self.width)
-            for y in range(self.height)
-            if self[x][y] == key
-        ]
-        ### Old Code
-        # for x in range(self.width):
-        #     for y in range(self.height):
-        #         if self[x][y] == key: list.append( (x,y) )
-        return list
+        hash = self.data.tobytes()  # hash changes when food gets eaten
+        if not hash in self._asListCache:
+            list = [
+                (x,y)
+                for x in range(self.width)
+                for y in range(self.height)
+                if self[x][y] == key
+            ]
+            ### Old Code
+            # list = []
+            # for x in range(self.width):
+            #     for y in range(self.height):
+            #         if self[x][y] == key: list.append( (x,y) )
+            self._asListCache[hash] = list  # only store last entry in list
+        return self._asListCache[hash]
 
     def asTuple(self):
         return tuple(sorted(self.asList()))

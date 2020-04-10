@@ -104,10 +104,10 @@ def tinyMazeSearch(problem):
 # Mazes: bigMaze contoursMaze mediumDottedMaze mediumMaze mediumScaryMaze openMaze smallMaze testMaze tinyMaze
 def depthFirstSearch(
         problem:   SearchProblem,
+        heuristic: Callable[ [Union[str,Tuple[int]], SearchProblem], int] = None,
         state:     Union[str,Tuple[int]] = None,  # Tuple[int] for runtime, str for unit tests
         actions:   List[str]             = None,
         visited:   Dict[Tuple[int],bool] = None,
-        heuristic: Callable[ [Union[str,Tuple[int]], SearchProblem], int] = None
 ) -> List[str]:
     """
     Search the deepest nodes in the search tree first.
@@ -149,10 +149,10 @@ def depthFirstSearch(
             next_actions = actions + [next_action]
             next_actions = depthFirstSearch(
                 problem   = problem,
+                heuristic = heuristic,
                 state     = next_state,
                 actions   = next_actions,
                 visited   = visited,
-                heuristic = heuristic,
             )
             if not next_actions:       # have we have hit a dead end
                 continue               # try the next available path
@@ -177,10 +177,10 @@ def greedyDepthFirstSearch(
 ) -> Union[List[str], bool]:
     return depthFirstSearch(
         problem   = problem,
+        heuristic = distanceHeuristic,
         state     = state,
         actions   = actions,
         visited   = visited,
-        heuristic = distanceHeuristic
     )
 
 
@@ -304,9 +304,13 @@ def uniformCostSearch(
                 prev_cost, prev_path = path_costs[child_state]
                 if prev_cost <= child_path_cost:
                     continue  # child is worst than existing, skip to next successor
+                # process frontier in heuristic_cost order
+                frontier.update( child_state, heuristic_cost )        # frontier.update() is expensive = 52% runtime
+            else:
+                frontier.push(   child_state, heuristic_cost )        # frontier.push()   is cheap     =  2% runtime
 
             path_costs[child_state] = (child_path_cost, child_path)   # store path + cost in dict rather than Queue
-            frontier.update( child_state, heuristic_cost )            # process frontier in heuristic_cost order
+
     else:
         return []  # uniformCostSearch() is unsolvable
 

@@ -19,6 +19,8 @@ dependencies:
 - tqdm=4.19.4
 - pip:
   #  - jupyterlab=1.2.6
+  - sortedcontainers
+  - sortedcollections
   - udacity-pa>=0.2
   - pygame==1.9.6
   - z3-solver

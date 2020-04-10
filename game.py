@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -20,10 +20,16 @@
 # John DeNero (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
 # For more info, see http://inst.eecs.berkeley.edu/~cs188/sp09/pacman.html
 
-from util import *
-import time, os
-import traceback
 import sys
+import time
+import traceback
+from typing import List, Tuple
+
+import numpy as np
+
+from util import *
+
+
 
 #######################
 # Parts worth reading #
@@ -171,9 +177,10 @@ class Grid:
         if initialValue not in [False, True]: raise Exception('Grids can only contain booleans')
         self.CELLS_PER_INT = 30
 
-        self.width = width
+        ### Optimization: self.data = np.array()
+        self.width  = width
         self.height = height
-        self.data = [[initialValue for y in range(height)] for x in range(width)]
+        self.data   = np.array([[initialValue for y in range(height)] for x in range(width)])
         if bitRepresentation:
             self._unpackBits(bitRepresentation)
 
@@ -189,8 +196,12 @@ class Grid:
         return '\n'.join([''.join(x) for x in out])
 
     def __eq__(self, other):
+        ### Optimization: self.data = np.array()
         if other == None: return False
-        return self.data == other.data
+        return np.array_equiv(self.data, other.data)
+
+        ### Old Code
+        # return self.data == other.data
 
     def __hash__(self):
         # return hash(str(self))
@@ -204,8 +215,12 @@ class Grid:
         return hash(h)
 
     def copy(self):
+        ### Optimization: self.data = np.array()
         g = Grid(self.width, self.height)
-        g.data = [x[:] for x in self.data]
+        g.data = np.copy(self.data)
+
+        ### Old Code
+        # g.data = [x[:] for x in self.data]
         return g
 
     def deepCopy(self):
@@ -216,15 +231,31 @@ class Grid:
         g.data = self.data
         return g
 
-    def count(self, item =True ):
-        return sum([x.count(item) for x in self.data])
+    def count(self, item=True ):
+        ### Optimization: self.data = np.array()
+        if item == True:
+            return np.count_nonzero(self.data)
+        else:
+            np.prod(self.data.shape) - np.count_nonzero(self.data)
 
-    def asList(self, key = True):
-        list = []
-        for x in range(self.width):
-            for y in range(self.height):
-                if self[x][y] == key: list.append( (x,y) )
+        ### Old Code
+        # return sum([x.count(item) for x in self.data])
+
+    def asList(self, key = True) -> List[Tuple[int]]:
+        list = [
+            (x,y)
+            for x in range(self.width)
+            for y in range(self.height)
+            if self[x][y] == key
+        ]
+        ### Old Code
+        # for x in range(self.width):
+        #     for y in range(self.height):
+        #         if self[x][y] == key: list.append( (x,y) )
         return list
+
+    def asTuple(self):
+        return tuple(sorted(self.asList()))
 
     def packBits(self):
         """
@@ -550,7 +581,6 @@ class Game:
     def mute(self, agentIndex):
         if not self.muteAgents: return
         global OLD_STDOUT, OLD_STDERR
-        import io
         OLD_STDOUT = sys.stdout
         OLD_STDERR = sys.stderr
         sys.stdout = self.agentOutput[agentIndex]

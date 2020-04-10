@@ -44,6 +44,9 @@ from copy import copy, deepcopy
 
 from heuristicsPosition import manhattanHeuristic, euclideanHeuristic
 from heuristicsCorners import *
+from heuristicsCorners import cornersHeuristic
+from heuristicsFood import *
+from heuristicsFood import foodHeuristic
 
 class GoWestAgent(Agent):
     "An agent that goes West until it can't."
@@ -411,43 +414,18 @@ class FoodSearchProblem:
 
 
 
+# Boards: bigSafeSearch, bigSearch, boxSearch, greedySearch, mediumSafeSearch, mediumSearch, oddSearch, openSearch
+#         smallSafeSearch, smallSearch, testSearch, tinySafeSearch, tinySearch, trickySearch
+# python pacman.py -l testSearch   -p AStarFoodSearchAgent
+# python pacman.py -l trickySearch -p AStarFoodSearchAgent
+# find ./layouts -name '*Search*' | perl -p -e 's!^.*/|\..*$!!g' | xargs -t -L1 python pacman.py -p AStarFoodSearchAgent -l
 class AStarFoodSearchAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
     def __init__(self):
-        self.searchFunction = lambda prob: search.aStarSearch(prob, foodHeuristic)
+        ### Modying this function doesn't affect the autograder
+        self.searchFunction = lambda prob: search.aStarSearch(prob, foodHeuristic)                   # trickySearch = nodes expanded: 13898 + cost of  60 in 25.0 seconds
+        # self.searchFunction = lambda prob: search.depthFirstSearch(prob, heuristic=foodHeuristic)  # trickySearch = nodes expanded:   337 + cost of 223 in  0.4 seconds
         self.searchType = FoodSearchProblem
-
-def foodHeuristic(state, problem):
-    """
-    Your heuristic for the FoodSearchProblem goes here.
-
-    This heuristic must be consistent to ensure correctness.  First, try to come
-    up with an admissible heuristic; almost all admissible heuristics will be
-    consistent as well.
-
-    If using A* ever finds a solution that is worse uniform cost search finds,
-    your heuristic is *not* consistent, and probably not admissible!  On the
-    other hand, inadmissible or inconsistent heuristics may find optimal
-    solutions, so be careful.
-
-    The state is a tuple ( pacmanPosition, foodGrid ) where foodGrid is a Grid
-    (see game.py) of either True or False. You can call foodGrid.asList() to get
-    a list of food coordinates instead.
-
-    If you want access to info like walls, capsules, etc., you can query the
-    problem.  For example, problem.walls gives you a Grid of where the walls
-    are.
-
-    If you want to *store* information to be reused in other calls to the
-    heuristic, there is a dictionary called problem.heuristicInfo that you can
-    use. For example, if you only want to count the walls once and store that
-    value, try: problem.heuristicInfo['wallCount'] = problem.walls.count()
-    Subsequent calls to this heuristic can access
-    problem.heuristicInfo['wallCount']
-    """
-    position, foodGrid = state
-    "*** YOUR CODE HERE ***"
-    return 0
 
 
 

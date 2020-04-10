@@ -69,11 +69,12 @@
 # Path found with total cost of 162 in 0.2 seconds - Search nodes expanded: 7907 - Scores: 378.0 - bigCorners - cornersHeuristicNull
 from functools import lru_cache
 from itertools import permutations
-from typing import List, Union
+from typing import Tuple, Union
 
 import numpy as np
 
-from heuristicsPosition import manhattanHeuristic, euclideanHeuristic
+from heuristicsPosition import euclideanHeuristic, manhattanHeuristic
+
 
 
 def cornerDistances(state, type='manhatten'):
@@ -83,8 +84,9 @@ def cornerDistances(state, type='manhatten'):
     raise Exception('cornerDistances() - undefined type: ' + str(type))
 
 
+# NOTE: This is only optimized for short lists
 @lru_cache(None)
-def shortestPathBetweenCorners(corners: List[tuple]) -> Union[float,int]:
+def shortestPathBetweenCorners(corners: Tuple[tuple]) -> Union[float,int]:
     if len(corners) == 2: return manhattanHeuristic(corners[0], corners[1])
     if len(corners) == 1: return 0
     if len(corners) == 0: return 0
@@ -95,7 +97,7 @@ def shortestPathBetweenCorners(corners: List[tuple]) -> Union[float,int]:
         path_costs[path] = sum([
             manhattanHeuristic(path[n], path[n+1])
             for n in range(0, len(path)-1)
-            ])
+        ])
     min_cost = min(path_costs.values())
     return min_cost
 

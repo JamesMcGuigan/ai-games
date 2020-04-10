@@ -73,21 +73,21 @@ from typing import Tuple, Union
 
 import numpy as np
 
-from heuristicsPosition import euclideanHeuristic, manhattanHeuristic
+from heuristicsPosition import euclideanDistance, manhattanDistance
 
 
 
 def cornerDistances(state, type='manhatten'):
     (position, corners) = state
-    if type == 'manhatten': return [ manhattanHeuristic(position, corner) for corner in corners ]
-    if type == 'euclidean': return [ euclideanHeuristic(position, corner) for corner in corners ]
+    if type == 'manhatten': return [ manhattanDistance(position, corner) for corner in corners ]
+    if type == 'euclidean': return [ euclideanDistance(position, corner) for corner in corners ]
     raise Exception('cornerDistances() - undefined type: ' + str(type))
 
 
 # NOTE: This is only optimized for short lists
 @lru_cache(None)
 def shortestPathBetweenCorners(corners: Tuple[tuple]) -> Union[float,int]:
-    if len(corners) == 2: return manhattanHeuristic(corners[0], corners[1])
+    if len(corners) == 2: return manhattanDistance(corners[0], corners[1])
     if len(corners) == 1: return 0
     if len(corners) == 0: return 0
 
@@ -95,7 +95,7 @@ def shortestPathBetweenCorners(corners: Tuple[tuple]) -> Union[float,int]:
     for path in permutations(corners):
         if reversed(path) in path_costs: continue  # reversed cost is same as forward cost
         path_costs[path] = sum([
-            manhattanHeuristic(path[n], path[n+1])
+            manhattanDistance(path[n], path[n+1])
             for n in range(0, len(path)-1)
         ])
     min_cost = min(path_costs.values())
@@ -158,7 +158,7 @@ def cornersHeuristicCornersPath(state, problem, function=np.min):
     if len(corners) == 0: return 0
 
     cost = function([
-        manhattanHeuristic(position, corner) + shortestPathBetweenCorners(corners)
+        manhattanDistance(position, corner) + shortestPathBetweenCorners(corners)
         for corner in corners
         ])
     return cost

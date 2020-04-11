@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -13,13 +13,15 @@
 
 
 import re
-import testClasses
 import textwrap
 
 # import project specific code
 import layout
 import pacman
+import testClasses
 from search import SearchProblem
+
+
 
 # helper function for printing solutions in solution files
 def wrap_solution(solution):
@@ -57,17 +59,20 @@ class GraphSearch(SearchProblem):
     def __init__(self, graph_text):
         self.expanded_states = []
         lines = graph_text.split('\n')
+
         r = re.match('start_state:(.*)', lines[0])
         if r == None:
             print("Broken graph:")
             print('"""%s"""' % graph_text)
-            raise Exception("GraphSearch graph specification start_state not found or incorrect on line:" + l)
+            raise Exception("GraphSearch graph specification start_state not found or incorrect on line: " + lines[0])
         self.start_state = r.group(1).strip()
+
         r = re.match('goal_states:(.*)', lines[1])
         if r == None:
             print("Broken graph:")
             print('"""%s"""' % graph_text)
-            raise Exception("GraphSearch graph specification goal_states not found or incorrect on line:" + l)
+            raise Exception("GraphSearch graph specification goal_states not found or incorrect on line: " + lines[1])
+
         goals = r.group(1).split()
         self.goals = list(map(str.strip, goals))
         self.successors = {}

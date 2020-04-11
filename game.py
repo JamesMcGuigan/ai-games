@@ -19,9 +19,6 @@
 # purposes. The Pacman AI projects were developed at UC Berkeley, primarily by
 # John DeNero (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
 # For more info, see http://inst.eecs.berkeley.edu/~cs188/sp09/pacman.html
-
-import sys
-import time
 import traceback
 from typing import List, Tuple
 
@@ -511,6 +508,8 @@ class GameStateData:
             return '>'
         return '<'
 
+
+    # noinspection PyUnreachableCode
     def _ghostStr( self, dir ):
         return 'G'
         if dir == Directions.NORTH:
@@ -542,6 +541,7 @@ class GameStateData:
         self._eaten = [False for a in self.agentStates]
 
 try:
+    # noinspection PyUnresolvedReferences
     import boinc
     _BOINC_ENABLED = True
 except:
@@ -658,8 +658,8 @@ class Game:
                 if self.catchExceptions:
                     try:
                         timed_func = TimeoutFunction(agent.observationFunction, int(self.rules.getMoveTimeout(agentIndex)))
+                        start_time = time.time()
                         try:
-                            start_time = time.time()
                             observation = timed_func(self.state.deepCopy())
                         except TimeoutFunctionException:
                             skip_action = True
@@ -685,6 +685,7 @@ class Game:
                         start_time = time.time()
                         if skip_action:
                             raise TimeoutFunctionException()
+                        # noinspection PyUnboundLocalVariable
                         action = timed_func( observation )
                     except TimeoutFunctionException:
                         print("Agent %d timed out on a single move!" % agentIndex, file=sys.stderr)

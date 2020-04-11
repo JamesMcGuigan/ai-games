@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -12,17 +12,19 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
-from game import Agent
-from game import Actions
-from game import Directions
-import random
-from util import manhattanDistance
 import util
+from game import Actions, Agent, Directions
+from util import manhattanDistance
+
+
 
 class GhostAgent( Agent ):
     def __init__( self, index ):
+        super().__init__(index)
         self.index = index
 
+
+    # noinspection PyTypeChecker
     def getAction( self, state ):
         dist = self.getDistribution(state)
         if len(dist) == 0:
@@ -45,6 +47,7 @@ class RandomGhost( GhostAgent ):
 class DirectionalGhost( GhostAgent ):
     "A ghost that prefers to rush Pacman, or flee when scared."
     def __init__( self, index, prob_attack=0.8, prob_scaredFlee=0.8 ):
+        super().__init__(index)
         self.index = index
         self.prob_attack = prob_attack
         self.prob_scaredFlee = prob_scaredFlee

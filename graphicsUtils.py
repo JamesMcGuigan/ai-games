@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -12,14 +12,12 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
-import sys
-import math
-import random
-import string
-import time
-import types
-import tkinter
 import os.path
+import sys
+import time
+import tkinter
+
+
 
 _Windows = sys.platform == 'win32'  # True if on Win95/98/NT
 
@@ -398,5 +396,5 @@ if __name__ == '__main__':
     ghost_shape = [(x * 10 + 20, y * 10 + 20) for x, y in ghost_shape]
     g = polygon(ghost_shape, formatColor(1, 1, 1))
     move_to(g, (50, 50))
-    circle((150, 150), 20, formatColor(0.7, 0.3, 0.0), endpoints=[15, - 15])
+    circle((150, 150), 20, formatColor(0.7, 0.3, 0.0), endpoints=[15, - 15], fillColor='black')
     sleep(2)

@@ -84,10 +84,11 @@ class SearchAgent(Agent):
     Note: You should NOT change any code in SearchAgent
     """
 
-    def __init__(self, fn='depthFirstSearch', prob='PositionSearchProblem', heuristic='nullHeuristic'):
+    def __init__( self, fn='depthFirstSearch', prob='PositionSearchProblem', heuristic='nullHeuristic' ):
         # Warning: some advanced Python magic is employed below to find the right functions and problems
 
         # Get the search function from the name and heuristic
+        super().__init__()
         if fn not in dir(search):
             raise AttributeError(fn + ' is not a search function in search.py.')
         func = getattr(search, fn)
@@ -155,7 +156,8 @@ class StayEastSearchAgent(SearchAgent):
 
     The cost function for stepping into a position (x,y) is 1/2^x.
     """
-    def __init__(self):
+    def __init__( self ):
+        super().__init__()
         self.searchFunction = search.uniformCostSearch
         costFn = lambda pos: .5 ** pos[0]
         self.searchType = lambda state: PositionSearchProblem(state, costFn, (1, 1), None, False)
@@ -167,7 +169,8 @@ class StayWestSearchAgent(SearchAgent):
 
     The cost function for stepping into a position (x,y) is 2^x.
     """
-    def __init__(self):
+    def __init__( self ):
+        super().__init__()
         self.searchFunction = search.uniformCostSearch
         costFn = lambda pos: 2 ** pos[0]
         self.searchType = lambda state: PositionSearchProblem(state, costFn)
@@ -182,7 +185,8 @@ class StayWestSearchAgent(SearchAgent):
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
-    def __init__(self):
+    def __init__( self ):
+        super().__init__()
         self.searchFunction = lambda prob: search.aStarSearch(prob, cornersHeuristic)
         self.searchType = CornersProblem
 
@@ -195,8 +199,9 @@ class AStarCornersAgent(SearchAgent):
 # find ./layouts -name '*Search*' | perl -p -e 's!^.*/|\..*$!!g' | xargs -t -L1 python pacman.py -p AStarFoodSearchAgent -l
 class AStarFoodSearchAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
-    def __init__(self):
+    def __init__( self ):
         ### Modying this function doesn't affect the autograder
+        super().__init__()
         self.searchFunction = lambda prob: search.aStarSearch(prob, foodHeuristic)                   # trickySearch = nodes expanded: 13898 + cost of  60 in 25.0 seconds
         # self.searchFunction = lambda prob: search.depthFirstSearch(prob, heuristic=foodHeuristic)  # trickySearch = nodes expanded:   337 + cost of 223 in  0.4 seconds
         self.searchType = FoodSearchProblem
@@ -254,9 +259,10 @@ class AnyFoodSearchProblem(PositionSearchProblem):
     method.
     """
 
-    def __init__(self, gameState):
+    def __init__( self, gameState ):
         "Stores information from the gameState.  You don't need to change this."
         # Store the food for later reference
+        super().__init__(gameState)
         self.food = gameState.getFood()
 
         # Store info for the PositionSearchProblem (no need to change this)

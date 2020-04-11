@@ -240,7 +240,7 @@ class Grid:
         # return sum([x.count(item) for x in self.data])
 
     _asListCache = {}  # reduces function runtime from 39.2% -> 2.8%
-    def asList(self, key = True) -> List[Tuple[int]]:
+    def asList(self, key = True) -> List[Tuple[int,int]]:
         hash = self.data.tobytes()  # hash changes when food gets eaten
         if not hash in self._asListCache:
             list = [

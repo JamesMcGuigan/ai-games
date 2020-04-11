@@ -44,10 +44,10 @@ def tinyMazeSearch(problem):
 # Mazes: bigMaze contoursMaze mediumDottedMaze mediumMaze mediumScaryMaze openMaze smallMaze testMaze tinyMaze
 def depthFirstSearch(
         problem:   SearchProblem,
-        heuristic: Callable[ [Union[str,Tuple[int]], SearchProblem], int] = None,
-        state:     Union[str,Tuple[int]] = None,  # Tuple[int] for runtime, str for unit tests
+        heuristic: Callable[ [Union[str,Tuple[int,int]], SearchProblem], int] = None,
+        state:     Union[str,Tuple[int,int]] = None,  # Tuple[int,int] for runtime, str for unit tests
         actions:   List[str]             = None,
-        visited:   Dict[Tuple[int],bool] = None,
+        visited:   Dict[Tuple[int,int],bool] = None,
 ) -> List[str]:
     """
     Search the deepest nodes in the search tree first.
@@ -111,9 +111,9 @@ def depthFirstSearch(
 # Mazes: bigMaze contoursMaze mediumDottedMaze mediumMaze mediumScaryMaze openMaze smallMaze testMaze tinyMaze
 def greedyDepthFirstSearch(
         problem: SearchProblem,
-        state:   Tuple[int]            = None,
+        state:   Tuple[int,int]            = None,
         actions: List[str]             = None,
-        visited: Dict[Tuple[int],bool] = None,
+        visited: Dict[Tuple[int,int],bool] = None,
 ) -> Union[List[str], bool]:
     return depthFirstSearch(
         problem   = problem,
@@ -132,7 +132,7 @@ def greedyDepthFirstSearch(
 # Mazes: bigMaze contoursMaze mediumDottedMaze mediumMaze mediumScaryMaze openMaze smallMaze testMaze tinyMaze
 def breadthFirstSearch(
         problem:      SearchProblem,
-        heuristic:    Callable[ [Union[str,Tuple[int]], SearchProblem], int] = None,
+        heuristic:    Callable[ [Union[str,Tuple[int,int]], SearchProblem], int] = None,
 ) -> List[str]:
     """
     Search the shallowest nodes in the search tree first.
@@ -203,7 +203,7 @@ def greedyBreadthFirstSearch(
 # find layouts -name '*Maze*' | grep -v Dotted | perl -p -e 's!^.*/|\..*$!!g' | xargs -t -L1 python pacman.py -p SearchAgent -a fn=ucs -l
 def uniformCostSearch(
         problem:   SearchProblem,
-        heuristic: Callable[ [Union[str,Tuple[int]], SearchProblem], int] = None,
+        heuristic: Callable[ [Union[str,Tuple[int,int]], SearchProblem], int] = None,
 ) -> List[str]:
     """Search the node of least total cost first."""
     state      = problem.getStartState()

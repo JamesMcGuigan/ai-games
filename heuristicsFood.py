@@ -28,7 +28,7 @@ def updateDistanceCache(goals: Union[FrozenSet,Tuple], distance=manhattanDistanc
 
 
 @lru_cache(2**16)
-def getClosestGoalCost(source: Tuple[int], goals: Union[FrozenSet,Tuple], distance=manhattanDistance) -> (int, Tuple[int]):
+def getClosestGoalCost(source: Tuple[int,int], goals: Union[FrozenSet,Tuple], distance=manhattanDistance) -> (int, Tuple[int,int]):
     if len(goals) == 0: return (0, source)
     if len(goals) == 1: return (distance(source, list(goals)[0]), list(goals)[0])
 
@@ -45,7 +45,7 @@ def getClosestGoalCost(source: Tuple[int], goals: Union[FrozenSet,Tuple], distan
 
 
 @lru_cache(2**16)
-def getClosestGoalPath(source: Tuple[int], goals: Union[FrozenSet,Tuple], distance=manhattanDistance) -> (int, List[Tuple[int]]):
+def getClosestGoalPath(source: Tuple[int,int], goals: Union[FrozenSet,Tuple], distance=manhattanDistance) -> (int, List[Tuple[int,int]]):
     goals = frozenset(goals) - {source}
 
     if len(goals) == 0: return (0, [])

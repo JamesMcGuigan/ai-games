@@ -16,72 +16,11 @@
 In search.py, you will implement generic search algorithms which are called by
 Pacman agents (in searchAgents.py).
 """
-import random
-from typing import Union, List, Dict, Tuple, Callable
+from typing import Callable, Dict, List, Tuple, Union
 
 import util
-
-class SearchProblem:
-    """
-    This class outlines the structure of a search problem, but doesn't implement
-    any of the methods (in object-oriented terminology: an abstract class).
-
-    You do not need to change anything in this class, ever.
-    """
-
-    def getStartState(self):
-        """
-        Returns the start state for the search problem.
-        """
-        util.raiseNotDefined()
-
-    def isGoalState(self, state):
-        """
-          state: Search state
-
-        Returns True if and only if the state is a valid goal state.
-        """
-        util.raiseNotDefined()
-
-    def getSuccessors(self, state):
-        """
-          state: Search state
-
-        For a given state, this should return a list of triples, (successor,
-        action, stepCost), where 'successor' is a successor to the current
-        state, 'action' is the action required to get there, and 'stepCost' is
-        the incremental cost of expanding to that successor.
-        """
-        util.raiseNotDefined()
-
-    def getCostOfActions(self, actions):
-        """
-         actions: A list of actions to take
-
-        This method returns the total cost of a particular sequence of actions.
-        The sequence must be composed of legal moves.
-        """
-        util.raiseNotDefined()
-
-
-
-def distanceHeuristic(state, problem: SearchProblem=None):
-    """
-    Compute the manhattanDistance() to the goal, if defined
-    NOTE: problem.goal is not defined in unit tests
-    """
-    if problem and hasattr(problem, 'goal'):
-        return util.manhattanDistance(state, problem.goal)
-    else:
-        return 0
-
-
-def nullHeuristic(state, problem=None):
-    """
-    A heuristic function estimates the cost from the current state to the nearest
-    goal in the provided SearchProblem.  This heuristic is trivial.
-    """
-    return 0
+from heuristicsPosition import manhattanHeuristic, nullHeuristic
+from searchProblems import SearchProblem
 
 
 
@@ -177,7 +116,7 @@ def greedyDepthFirstSearch(
 ) -> Union[List[str], bool]:
     return depthFirstSearch(
         problem   = problem,
-        heuristic = distanceHeuristic,
+        heuristic = manhattanHeuristic,
         state     = state,
         actions   = actions,
         visited   = visited,
@@ -252,7 +191,7 @@ def greedyBreadthFirstSearch(
 ) -> Union[List[str], bool]:
     return breadthFirstSearch(
         problem   = problem,
-        heuristic = distanceHeuristic
+        heuristic = manhattanHeuristic
     )
 
 

@@ -36,14 +36,13 @@ Good luck and happy searching!
 """
 
 import time
-from copy import copy
 
-from game import Actions, Agent, Directions
+import search
+from game import Agent, Directions
 from heuristicsCorners import cornersHeuristic
 from heuristicsFood import foodHeuristic, getClosestGoalCost
-from heuristicsPosition import *
 from heuristicsPosition import euclideanHeuristic, manhattanHeuristic, nullHeuristic
-from searchProblems import FoodSearchProblem, PositionSearchProblem
+from searchProblems import CornersProblem, FoodSearchProblem, PositionSearchProblem
 
 
 
@@ -179,97 +178,6 @@ class StayWestSearchAgent(SearchAgent):
 #####################################################
 # This portion is incomplete.  Time to write code!  #
 #####################################################
-
-# python pacman.py -l bigCorners -p AStarCornersAgent -z 0.5
-# find layouts -name '*Corners*' | perl -p -e 's!^.*/|\..*$!!g' | xargs -t -L1 python pacman.py -p SearchAgent -a fn=dfs,prob=CornersProblem -l
-# find layouts -name '*Corners*' | perl -p -e 's!^.*/|\..*$!!g' | xargs -t -L1 python pacman.py -p SearchAgent -a fn=bfs,prob=CornersProblem -l
-# find layouts -name '*Corners*' | perl -p -e 's!^.*/|\..*$!!g' | xargs -t -L1 python pacman.py -p SearchAgent -a fn=ucs,prob=CornersProblem -l
-# find layouts -name '*Corners*' | perl -p -e 's!^.*/|\..*$!!g' | xargs -t -L1 python pacman.py -p SearchAgent -a fn=astar,prob=CornersProblem -l
-class CornersProblem(search.SearchProblem):
-    """
-    This search problem finds paths through all four corners of a layout.
-
-    You must select a suitable state space and successor function
-    """
-
-    def __init__(self, startingGameState):
-        """
-        Stores the walls, pacman's starting position and corners.
-        """
-        self.walls = startingGameState.getWalls()
-        self.startingPosition = startingGameState.getPacmanPosition()
-        top, right = self.walls.height-2, self.walls.width-2
-        self.corners = ((1,1), (1,top), (right, 1), (right, top))
-        for corner in self.corners:
-            if not startingGameState.hasFood(*corner):
-                print('Warning: no food in corner ' + str(corner))
-        self._expanded = 0 # DO NOT CHANGE; Number of search nodes expanded
-        # Please add any code here which you would like to use
-        # in initializing the problem
-        # self.goals = { corner: False for corner in self.corners }
-        # self.goal = self.corners[0]
-
-
-    def getStartState(self):
-        """
-        Returns the start state (in your state space, not the full Pacman state
-        space)
-        """
-        return ( self.startingPosition, copy(self.corners))
-
-
-    def isGoalState(self, state):
-        """
-        Returns whether this search state is a goal state of the problem.
-        """
-        position, corners = state
-        return len(corners) == 0
-
-
-
-    def getSuccessors(self, state):
-        """
-        Returns successor states, the actions they require, and a cost of 1.
-
-         As noted in search.py:
-            For a given state, this should return a list of triples, (successor,
-            action, stepCost), where 'successor' is a successor to the current
-            state, 'action' is the action required to get there, and 'stepCost'
-            is the incremental cost of expanding to that successor
-        """
-        position, corners = state
-        successors = []
-        for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
-            # Add a successor state to the successor list if the action is legal
-            # Here's a code snippet for figuring out whether a new position hits a wall:
-            x,y          = position
-            dx, dy       = Actions.directionToVector(action)
-            nextx, nexty = int(x + dx), int(y + dy)
-            hitsWall     = self.walls[nextx][nexty]
-            if not hitsWall:
-                new_position = ( nextx, nexty )
-                new_corners  = tuple([ corner for corner in corners if corner != new_position ])
-                new_state    = ( new_position, new_corners )
-                successors.append( (new_state, action, 1) )
-
-        self._expanded += 1 # DO NOT CHANGE
-        return successors
-
-
-    def getCostOfActions(self, actions):
-        """
-        Returns the cost of a particular sequence of actions.  If those actions
-        include an illegal move, return 999999.  This is implemented for you.
-        """
-        if actions == None: return 999999
-        x,y= self.startingPosition
-        for action in actions:
-            dx, dy = Actions.directionToVector(action)
-            x, y   = int(x + dx), int(y + dy)
-            if self.walls[x][y]: return 999999
-        return len(actions)
-
-
 
 
 class AStarCornersAgent(SearchAgent):

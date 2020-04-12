@@ -178,7 +178,8 @@ class Grid:
         ### Optimization: self.data = np.array()
         self.width  = width
         self.height = height
-        self.data   = np.array([[initialValue for y in range(height)] for x in range(width)])
+        # self.data = np.array([[initialValue for y in range(height)] for x in range(width)])
+        self.data   = np.full((width, height), initialValue)
         if bitRepresentation:
             self._unpackBits(bitRepresentation)
 

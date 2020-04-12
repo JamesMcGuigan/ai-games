@@ -23,6 +23,7 @@ import traceback
 from typing import List, Tuple
 
 import numpy as np
+import xxhash
 
 from util import *
 
@@ -202,15 +203,17 @@ class Grid:
         # return self.data == other.data
 
     def __hash__(self):
-        # return hash(str(self))
-        base = 1
-        h = 0
-        for l in self.data:
-            for i in l:
-                if i:
-                    h += base
-                base *= 2
-        return hash(h)
+        return xxhash.xxh32_intdigest(self.data)
+
+        ### Optimization: hash taking 50% of runtime
+        # base = 1
+        # h = 0
+        # for l in self.data:
+        #     for i in l:
+        #         if i:
+        #             h += base
+        #         base *= 2
+        # return hash(h)
 
     def copy(self):
         ### Optimization: self.data = np.array()
@@ -241,7 +244,8 @@ class Grid:
 
     _asListCache = {}  # reduces function runtime from 39.2% -> 2.8%
     def asList(self, key = True) -> List[Tuple[int,int]]:
-        hash = self.data.tobytes()  # hash changes when food gets eaten
+        # hash = self.data.tobytes()               # hash changes when food gets eaten
+        hash = xxhash.xxh32_hexdigest(self.data)   # may potentially cause hash collisions???
         if not hash in self._asListCache:
             list = [
                 (x,y)

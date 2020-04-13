@@ -40,16 +40,11 @@ import time
 import search
 from game import Agent, Directions
 from heuristicsCorners import cornersHeuristic
-from heuristicsFood import getClosestGoalCost
+from heuristicsFood import foodHeuristic, getClosestGoalCost
 from heuristicsPosition import euclideanHeuristic, manhattanHeuristic, nullHeuristic
-from searchProblems import CornersProblem, PositionSearchProblem
+from searchProblems import CornersProblem, FoodSearchProblem, PositionSearchProblem
 
-
-
-# autograder.py requires heuristics to be defined in this file
-nullHeuristic((0,0),(1,1))
-manhattanHeuristic((0,0),(1,1))
-euclideanHeuristic((0,0),(1,1))
+_namespace = [ nullHeuristic, manhattanHeuristic, euclideanHeuristic, foodHeuristic, FoodSearchProblem ]
 
 
 class GoWestAgent(Agent):

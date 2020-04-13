@@ -22,9 +22,11 @@ from typing import Callable, Dict, List, Tuple, Union
 import numpy as np
 
 import util
-from heuristicsPosition import manhattanDistance, manhattanHeuristic, nullHeuristic
+from heuristicsCorners import cornersHeuristic
+from heuristicsPosition import manhattanDistance, manhattanHeuristic, nullHeuristic, euclideanDistance
 from searchProblems import PositionSearchProblem, SearchProblem
 
+_namespace = [ manhattanDistance, euclideanDistance, cornersHeuristic ]
 
 
 def tinyMazeSearch(problem):

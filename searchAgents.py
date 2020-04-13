@@ -38,9 +38,9 @@ Good luck and happy searching!
 import time
 
 import search
-from game import Agent, Directions
+from game import Agent, Directions, manhattanDistance
 from heuristicsCorners import cornersHeuristic
-from heuristicsFood import foodHeuristic, getClosestGoalCost
+from heuristicsFood import foodHeuristic
 from heuristicsPosition import euclideanHeuristic, manhattanHeuristic, nullHeuristic
 from searchProblems import CornersProblem, FoodSearchProblem, PositionSearchProblem
 
@@ -269,7 +269,13 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         self.costFn     = lambda x: 1
         self._visited, self._visitedlist, self._expanded = {}, [], 0 # DO NOT CHANGE
 
-        self.cost, self.goal = getClosestGoalCost(self.startState, frozenset(gameState.getFood().asList()))
+        foodList  = gameState.getFood().asList()
+        distances = sorted([
+            (manhattanDistance(self.startState, food), food)
+            for food in foodList
+        ])
+        self.cost, self.goal = min(distances)
+        pass
 
     def isGoalState(self, state):
         """

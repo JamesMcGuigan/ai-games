@@ -40,9 +40,9 @@ import time
 import search
 from game import Agent, Directions
 from heuristicsCorners import cornersHeuristic
-from heuristicsFood import foodHeuristic, getClosestGoalCost
+from heuristicsFood import getClosestGoalCost
 from heuristicsPosition import euclideanHeuristic, manhattanHeuristic, nullHeuristic
-from searchProblems import CornersProblem, FoodSearchProblem, PositionSearchProblem
+from searchProblems import CornersProblem, PositionSearchProblem
 
 
 
@@ -84,7 +84,7 @@ class SearchAgent(Agent):
     Note: You should NOT change any code in SearchAgent
     """
 
-    def __init__( self, fn='depthFirstSearch', prob='PositionSearchProblem', heuristic='nullHeuristic' ):
+    def __init__( self, fn='depthFirstSearch', prob='PositionSearchProblem', heuristic='nullHeuristic', verbose=False ):
         # Warning: some advanced Python magic is employed below to find the right functions and problems
 
         # Get the search function from the name and heuristic
@@ -102,7 +102,8 @@ class SearchAgent(Agent):
                 heur = getattr(search, heuristic)
             else:
                 raise AttributeError(heuristic + ' is not a function in searchAgents.py or search.py.')
-            print(('[SearchAgent] using function %s and heuristic %s' % (fn, heuristic)))
+
+            if verbose: print(('[SearchAgent] using function %s and heuristic %s' % (fn, heuristic)))
             # Note: this bit of Python trickery combines the search algorithm and the heuristic
             self.searchFunction = lambda x: func(x, heuristic=heur)
 
@@ -110,7 +111,8 @@ class SearchAgent(Agent):
         if prob not in list(globals().keys()) or not prob.endswith('Problem'):
             raise AttributeError(prob + ' is not a search problem type in SearchAgents.py.')
         self.searchType = globals()[prob]
-        print(('[SearchAgent] using problem type ' + prob))
+
+        if verbose: print(('[SearchAgent] using problem type ' + prob))
 
     def registerInitialState(self, state):
         """
@@ -201,10 +203,11 @@ class AStarFoodSearchAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
     def __init__( self ):
         ### Modying this function doesn't affect the autograder
-        super().__init__()
-        self.searchFunction = lambda prob: search.aStarSearch(prob, foodHeuristic)                   # trickySearch = nodes expanded: 13898 + cost of  60 in 25.0 seconds
+        super().__init__(fn='aStarSearch', prob='FoodSearchProblem', heuristic='foodHeuristic', verbose=False)
+
+        # self.searchFunction = lambda prob: search.aStarSearch(prob, foodHeuristic)                   # trickySearch = nodes expanded: 13898 + cost of  60 in 25.0 seconds
         # self.searchFunction = lambda prob: search.depthFirstSearch(prob, heuristic=foodHeuristic)  # trickySearch = nodes expanded:   337 + cost of 223 in  0.4 seconds
-        self.searchType = FoodSearchProblem
+        # self.searchType = FoodSearchProblem
 
 
 

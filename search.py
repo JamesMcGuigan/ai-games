@@ -19,8 +19,10 @@ Pacman agents (in searchAgents.py).
 from functools import lru_cache
 from typing import Callable, Dict, List, Tuple, Union
 
+import numpy as np
+
 import util
-from heuristicsPosition import manhattanHeuristic, nullHeuristic
+from heuristicsPosition import manhattanDistance, manhattanHeuristic, nullHeuristic
 from searchProblems import PositionSearchProblem, SearchProblem
 
 
@@ -110,14 +112,15 @@ def depthFirstSearch(
 # find layouts -name '*Corners*' | perl -p -e 's!^.*/|\..*$!!g' | xargs -t -L1 python pacman.py -p SearchAgent -a fn=gdfs -l
 # Mazes: bigMaze contoursMaze mediumDottedMaze mediumMaze mediumScaryMaze openMaze smallMaze testMaze tinyMaze
 def greedyDepthFirstSearch(
-        problem: SearchProblem,
-        state:   Tuple[int,int]            = None,
-        actions: List[str]             = None,
-        visited: Dict[Tuple[int,int],bool] = None,
+        problem:   SearchProblem,
+        heuristic  = manhattanHeuristic,
+        state:     Tuple[int,int]            = None,
+        actions:   List[str]                 = None,
+        visited:   Dict[Tuple[int,int],bool] = None,
 ) -> Union[List[str], bool]:
     return depthFirstSearch(
         problem   = problem,
-        heuristic = manhattanHeuristic,
+        heuristic = heuristic,
         state     = state,
         actions   = actions,
         visited   = visited,
@@ -278,7 +281,7 @@ ucs   = uniformCostSearch
 
 
 @lru_cache(2**16)
-def mazeDistance(point1, point2, gameState):
+def mazeDistance(point1, point2, gameState, algorithm=gdfs, heuristic=manhattanHeuristic, visualize=False):
     """
     Returns the maze distance between any two points, using the search functions
     you have already built. The gameState can be any game state -- Pacman's
@@ -288,13 +291,27 @@ def mazeDistance(point1, point2, gameState):
 
     This might be a useful helper function for your ApproximateSearchAgent.
     """
+
     try:
         x1, y1 = point1
         x2, y2 = point2
-        walls = gameState.getWalls()
-        assert not walls[x1][y1], 'point1 is a wall: ' + str(point1)
-        assert not walls[x2][y2], 'point2 is a wall: ' + str(point2)
-        prob = PositionSearchProblem(gameState, start=point1, goal=point2, warn=False, visualize=False)
-        return len(bfs(prob))
+        walls  = gameState.getWalls()
+        # assert not walls[x1][y1], 'point1 is a wall: ' + str(point1)
+        # assert not walls[x2][y2], 'point2 is a wall: ' + str(point2)
+
+        # Optimization: zero distance
+        if point1 == point2:
+            return 0
+
+        # Optimization: If there are no walls between points A and B, then we can shortcut to manhattanDistance
+        box = walls[ min(x1,x2):max(x1,x2)+1, min(y1,y2):max(y1,y2)+1 ]
+        if np.count_nonzero( box ) == 0:
+            return manhattanDistance(point1, point2)
+        else:
+            problem = PositionSearchProblem(gameState, start=point1, goal=point2, warn=False, visualize=visualize)
+            actions = algorithm(problem, heuristic=heuristic)
+            return len(actions)
+        # problem = PositionSearchProblem(gameState, start=point1, goal=point2, warn=False, visualize=False)
+        # return len( aStarSearch(problem, heuristic=manhattanHeuristic) )
     except:
         return 0

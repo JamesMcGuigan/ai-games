@@ -26,3 +26,4 @@ dependencies:
   #  - z3-solver
   - bionic
   - xxhash
+  - orderedset

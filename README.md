@@ -8,6 +8,19 @@ You only need to modify `search.py` and `searchAgents.py`, and you only need to 
 You can run all of the test cases on your code by opening a terminal and executing the command:
 ```
 $ python autograder.py
+
+Provisional grades
+==================
+Question q1: 3/3
+Question q2: 3/3
+Question q3: 3/3
+Question q4: 3/3
+Question q5: 3/3
+Question q6: 3/3
+Question q7: 5/4
+Question q8: 3/3
+------------------
+Total: 26/25
 ```
 You can also run individual test cases by executing the command (you can replace "q1" with any of the choices q1-q8):
 

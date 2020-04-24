@@ -57,12 +57,16 @@ all_nqueens(N, Solutions) :-
 print_nqueens(N)                     :- nqueens(N, Queens),        print_board(N, Queens).
 print_nqueens(N, 'all')              :- all_nqueens(N, Solutions), print_nqueens(N, Solutions).
 print_nqueens(N, [Queens|Remaining]) :- print_count(Remaining),    print_board(N, Queens),    print_nqueens(N, Remaining).
-print_nqueens(N, []).
+print_nqueens(_, []).
 
-print_count(Remaining) :- length(Remaining, Count), Count1 is Count + 1, write(Count1), nl.
+print_count(Remaining) :- length(Remaining, Count), Count1 is Count + 1, nl, write(Count1), nl.
 print_board(N, [[_,Q] | Queens]) :- print_line(N, '-'), print_line(N, '|', Q), print_board(N, Queens).
-print_board(N, []) :- print_line(N, '-').
+print_board(N, [])  :- print_line(N, '-').
 print_line(0,'-')   :- write('-'), nl.
 print_line(N,'-')   :- write('----'), N1 is N-1, print_line(N1,'-').
 print_line(0,'|',_) :- write('|'), nl.
 print_line(N,'|',Q) :- write('|'), (( Q == N ) -> write(' Q ') ; write('   ')), N1 is N-1, print_line(N1,'|',Q).
+
+:- initialization main.
+main :-
+    print_nqueens(8).

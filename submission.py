@@ -3,14 +3,14 @@
 ##### 
 ##### ./kaggle_compile.py ./src_james/submission.py --save
 ##### 
-##### 2020-05-08 22:51:52+01:00
+##### 2020-05-08 23:04:44+01:00
 ##### 
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### 
-##### * master 82abe81 Implement basic object model
+##### * master 170f81c [ahead 1] DataModel | implement submission.py + submission.csv pipeline
 ##### 
-##### 82abe81cd017fcfb82cdc6639298a911721c1c3e
+##### 170f81c444f3c2470473cd92cd8072d8fbec4d7e
 ##### 
 ##### Wrote: ./submission.py
 
@@ -136,9 +136,9 @@ class Dataset(UserList):
         return clock
 
     def to_csv(self):
-        csv = []
+        csv = ['output_id,output']
         for task in self:
-            csv.append(task.to_csv())
+            csv.append(task.to_csv_line())
         return "\n".join(csv)
 
     def write_submission(self, filename='submission.csv'):
@@ -167,11 +167,11 @@ class Task(UserDict):
     def object_id(self, index=0) -> str:
         return re.sub('^.*/|\.json$', '', self.filename) + '_' + str(index)
 
-    def to_csv(self) -> str:
+    def to_csv_line(self) -> str:
         # TODO: We actually need to iterate over the list of potential solutions
         csv = []
         for i, problem in enumerate(self['test']):
-            csv.append( self.object_id(i) + ',' + problem.to_csv() )
+            csv.append(self.object_id(i) + ',' + problem.to_csv_string())
         return "\n".join(csv)
 
     @staticmethod
@@ -238,10 +238,10 @@ class Problem(UserDict):
     @property
     def task(self) -> Task: return self.spec.task
 
-    def to_csv(self) -> str:
+    def to_csv_string(self) -> str:
         # TODO: Do we need to consider a range of possible solutions?
-        if self['solution']: return self['solution'].to_csv()
-        else:                return self['input'].to_csv()
+        if self['solution']: return self['solution'].to_csv_string()
+        else:                return self['input'].to_csv_string()
 
 
 ### Grid: An individual grid represented as a numpy arra
@@ -261,7 +261,7 @@ class Grid():
     def task(self) -> Task: return self.problem.spec.task
 
     # Source: https://www.kaggle.com/c/abstraction-and-reasoning-challenge/overview/evaluation
-    def to_csv(self) -> str:
+    def to_csv_string(self) -> str:
         # noinspection PyTypeChecker
         str_pred = str([ row for row in self.data.astype('int8').tolist() ])
         str_pred = str_pred.replace(', ', '')
@@ -279,8 +279,8 @@ class Grid():
 ##### START ./src_james/submission.py
 #####
 
-# from src_james.settings import settings
 # from src_james.DataModel import Dataset, Competition
+# from src_james.settings import settings
 
 if __name__ == '__main__':
 
@@ -316,13 +316,13 @@ if __name__ == '__main__':
 ##### 
 ##### ./kaggle_compile.py ./src_james/submission.py --save
 ##### 
-##### 2020-05-08 22:51:52+01:00
+##### 2020-05-08 23:04:44+01:00
 ##### 
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### 
-##### * master 82abe81 Implement basic object model
+##### * master 170f81c [ahead 1] DataModel | implement submission.py + submission.csv pipeline
 ##### 
-##### 82abe81cd017fcfb82cdc6639298a911721c1c3e
+##### 170f81c444f3c2470473cd92cd8072d8fbec4d7e
 ##### 
 ##### Wrote: ./submission.py

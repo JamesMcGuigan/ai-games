@@ -1,3 +1,6 @@
 .ipynb_checkpoints
 ARC
 *.pyc
+
+venv/
+venv_windows/

@@ -5,16 +5,15 @@ import os
 import re
 import subprocess
 import sys
-import time
 from typing import List
 
 parser = argparse.ArgumentParser(
     description='Compile a list of python files into a Kaggle compatable script: \n' +
-                './kaggle_compile.py [script_files.py] > output_file.py'
+                './kaggle_compile.py [script_files.py] --save'
 )
 parser.add_argument('files', nargs='+',                                help='list of files to parse' )
 parser.add_argument('--python-path', default='.',                      help='directory to search for local namespace imports')
-parser.add_argument('--output-dir',  default='./data_output/scripts/', help='directory to write output if --save')
+parser.add_argument('--output-dir',  default='./',                     help='directory to write output if --save')
 parser.add_argument('--save',        action='store_true',              help='should file be saved to disk')
 parser.add_argument('--commit',      action='store_true',              help='should saved file be commited to git')
 args, unknown = parser.parse_known_args()  # Ignore extra CLI args passed in by Kaggle

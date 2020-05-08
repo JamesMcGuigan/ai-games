@@ -25,6 +25,7 @@ pywavelets==1.1.1         # via scikit-image
 scikit-image==0.16.2      # via -r requirements.in
 scikit-learn==0.22.2.post1  # via sklearn
 scipy==1.4.1              # via scikit-image, scikit-learn
+simplejson==3.17.0        # via -r requirements.in
 six==1.14.0               # via cycler, python-dateutil
 sklearn==0.0              # via -r requirements.in
 toolz==0.10.0             # via cytoolz

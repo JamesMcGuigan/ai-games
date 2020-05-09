@@ -6,12 +6,12 @@ settings = {}
 if os.environ.get('KAGGLE_KERNEL_RUN_TYPE'):
     settings['dir'] = {
         "data":        "../input/abstraction-and-reasoning-challenge/",
-        "logs":        "./logs",
+        "output":      "./",
     }
 else:
     settings['dir'] = {
         "data":        "./input",
-        "logs":        "./logs",
+        "output":      "./submission",
     }
 
 ####################

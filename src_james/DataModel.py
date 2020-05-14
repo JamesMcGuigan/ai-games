@@ -1,14 +1,15 @@
 import json
 import time
-from collections import UserDict, UserList
+from collections import UserDict, UserList, defaultdict
 from itertools import chain
-from typing import Dict, List, Union, Any
 
 import glob2
 import numpy as np
+from typing import Any, Dict, List, Union
 
 from src_james.CSV import CSV
 from src_james.settings import settings
+
 
 
 # Conceptual Mapping
@@ -20,7 +21,17 @@ from src_james.settings import settings
 # - Grid:        An individual grid represented as a numpy array
 
 
-class Competition(UserDict):
+class Hashed:
+    __hash_counts = defaultdict(int)
+    def __init__(self):
+        self.__id   = f"{self.__class__.__name__}#{self.__hash_counts[self.__class__.__name__]}"
+        self.__hash = hash(self.__id)
+        self.__hash_counts[self.__class__.__name__] += 1
+    def __hash__(self):
+        return self.__hash
+
+
+class Competition(UserDict, Hashed):
     """ Competition: The collection of all Dataset in the competition """
 
     def __init__(self):
@@ -52,7 +63,7 @@ class Competition(UserDict):
 
 
 
-class Dataset(UserList):
+class Dataset(UserList, Hashed):
     """ Dataset: An array of all Tasks in the competition """
 
     def __init__(self, directory: str, name: str = ''):
@@ -99,7 +110,7 @@ class Dataset(UserList):
         return list(chain(*[task.test_outputs for task in self.data]))
 
 
-class Task(UserDict):
+class Task(UserDict, Hashed):
     """ Task: The entire contents of a json file, outputs 1-3 lines of CSV """
 
     def __init__(self, filename: str, dataset: Dataset):
@@ -139,7 +150,7 @@ class Task(UserDict):
         return 0  # TODO: implement
 
 
-class ProblemSet(UserList):
+class ProblemSet(UserList, Hashed):
     """ ProblemSet: An array of either test or training Problems """
 
     def __init__(self, test_or_train: str, input_outputs: List[Dict[str, np.ndarray]], task: Task):
@@ -163,7 +174,7 @@ class ProblemSet(UserList):
 
 
 
-class Problem(UserDict):
+class Problem(UserDict, Hashed):
     """ Problem: An input + output Grid pair """
 
     dtype = 'int8'

@@ -1,7 +1,12 @@
 # DOCS: https://www.kaggle.com/WinningModelDocumentationGuidelines
 import os
+import pathlib
+root_dir = pathlib.Path(__file__).parent.parent.absolute()
 
-settings = {}
+settings = {
+    'vebose': True,
+    'debug': True,
+}
 
 if os.environ.get('KAGGLE_KERNEL_RUN_TYPE'):
     settings['dir'] = {
@@ -10,8 +15,8 @@ if os.environ.get('KAGGLE_KERNEL_RUN_TYPE'):
     }
 else:
     settings['dir'] = {
-        "data":        "./input",
-        "output":      "./submission",
+        "data":        os.path.join(root_dir, "./input"),
+        "output":      os.path.join(root_dir, "./submission"),
     }
 
 ####################

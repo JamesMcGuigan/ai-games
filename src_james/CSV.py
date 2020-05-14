@@ -1,15 +1,16 @@
 import os
 import re
-from typing import Union, List
+from typing import List, Union
 
 import numpy as np
 
 from src_james.settings import settings
 
 
+
 class CSV:
-    @staticmethod
-    def write_submission(dataset: 'Dataset', filename='submission.csv'):
+    @classmethod
+    def write_submission(cls, dataset: 'Dataset', filename='submission.csv'):
         csv        = CSV.to_csv(dataset)
         line_count = len(csv.split('\n'))
         filename   = os.path.join(settings['dir']['output'], filename)
@@ -17,33 +18,33 @@ class CSV:
             file.write(csv)
             print(f"\nwrote: {filename} | {line_count} lines")
 
-    @staticmethod
-    def object_id(filename, index=0) -> str:
+    @classmethod
+    def object_id(cls, filename, index=0) -> str:
         return re.sub('^.*/|\.json$', '', filename) + '_' + str(index)
 
-    @staticmethod
-    def to_csv(dataset: 'Dataset'):
+    @classmethod
+    def to_csv(cls, dataset: 'Dataset'):
         csv = ['output_id,output']
         for task in dataset:
             csv.append(CSV.to_csv_line(task))
         return "\n".join(csv)
 
-    @staticmethod
-    def to_csv_line(task: 'Task') -> str:
+    @classmethod
+    def to_csv_line(cls, task: 'Task') -> str:
         csv = []
-        for i, problem in enumerate(task['test']):
-            line = ",".join([
-                CSV.object_id(task.filename, i),
-                CSV.problem_to_csv_string(problem)
-            ])
-            csv.append(line)
+        for test_index, problem in enumerate(task['test']):
+            if not problem.get('solution', None): continue
+            solutions = {
+                cls.grid_to_csv_string(solution)
+                for solution in problem['solution']
+            }
+            for sol_index, solution_csv in enumerate(solutions):
+                line = ",".join([
+                    cls.object_id(task.filename, test_index+sol_index),
+                    solution_csv
+                ])
+                csv.append(line)
         return "\n".join(csv)
-
-    @staticmethod
-    def problem_to_csv_string(problem: 'Problem') -> str:
-        # TODO: Do we need to consider a range of possible solutions?
-        if problem['solution']: return CSV.grid_to_csv_string( problem.data['solution'] )
-        else:                   return CSV.grid_to_csv_string( problem.data['input']    )
 
     # Source: https://www.kaggle.com/c/abstraction-and-reasoning-challenge/overview/evaluation
     @staticmethod

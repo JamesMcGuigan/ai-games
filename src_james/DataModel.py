@@ -1,11 +1,13 @@
 import json
+import os
+import re
 import time
 from collections import UserDict, UserList, defaultdict
 from itertools import chain
+from typing import Any, Dict, List, Union
 
 import glob2
 import numpy as np
-from typing import Any, Dict, List, Union
 
 from src_james.CSV import CSV
 from src_james.settings import settings
@@ -71,6 +73,7 @@ class Dataset(UserList, Hashed):
         self.name       = name
         self.directory  = directory
         self.filenames  = glob2.glob( self.directory + '/**/*.json' )
+        self.filenames  = [ Task.format_filename(filename) for filename in self.filenames ]
         assert len(self.filenames), f'invalid directory: {directory}'
         self.data       = [Task(filename, self) for filename in self.filenames]
         self.time_taken = 0
@@ -113,16 +116,19 @@ class Dataset(UserList, Hashed):
 class Task(UserDict, Hashed):
     """ Task: The entire contents of a json file, outputs 1-3 lines of CSV """
 
-    def __init__(self, filename: str, dataset: Dataset):
+    def __init__(self, filename: str, dataset: Dataset = None):
         super().__init__()
-        self.filename: str     = filename
-        self.dataset:  Dataset = dataset
 
-        self.raw  = self.read_file(self.filename)
+        self.filename: str = self.format_filename(filename)
+        self.raw  = self.read_file( os.path.join(settings['dir']['data'], self.filename) )
         self.data = {
-            test_or_train: ProblemSet(test_or_train, input_outputs, self)
+            test_or_train: ProblemSet(input_outputs, test_or_train, self)
             for test_or_train, input_outputs in self.raw.items()
         }
+
+    @classmethod
+    def format_filename(cls, filename):
+        return re.sub(r'^(.*/)?(\w+/\w+\.json)$', r'\2', filename)
 
     @staticmethod
     def read_file(filename: str) -> Dict[str,List[Dict[str,np.ndarray]]]:
@@ -153,12 +159,15 @@ class Task(UserDict, Hashed):
 class ProblemSet(UserList, Hashed):
     """ ProblemSet: An array of either test or training Problems """
 
-    def __init__(self, test_or_train: str, input_outputs: List[Dict[str, np.ndarray]], task: Task):
+    def __init__(self, input_outputs: List[Dict[str, np.ndarray]], test_or_train: str, task: Task):
         super().__init__()
         self.task:          Task                       = task
         self.test_or_train: str                        = test_or_train
         self.raw:           List[Dict[str,np.ndarray]] = input_outputs
         self.data:          List[Problem]              = [ Problem(problem, self) for problem in self.raw ]
+
+    @property
+    def filename(self): return self.task.filename
 
     @property
     def inputs(self) -> List[np.ndarray]:
@@ -185,9 +194,12 @@ class Problem(UserDict, Hashed):
         self.raw:        Dict[str,np.ndarray] = problem
         self.data = {
             "input":    np.array(problem['input']).astype(self.dtype),
-            "output":   np.array(problem['input']).astype(self.dtype) if 'output' in problem else None,
-            "solution": None
+            "output":   np.array(problem['output']).astype(self.dtype) if 'output' in problem else None,
+            "solution": []
         }
         self.grids:  List[np.ndarray] = [ self.data[label]
                                           for label in ['input','output']
                                           if self.data[label] is not None ]
+
+    @property
+    def filename(self): return self.task.filename

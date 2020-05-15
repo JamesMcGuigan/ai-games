@@ -27,6 +27,7 @@ scikit-image
 
 # Visualiation
 matplotlib
+jupyter
 
 # Functional Programming
 cytoolz

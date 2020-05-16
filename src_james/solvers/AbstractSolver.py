@@ -216,7 +216,7 @@ class AbstractSolver(Hashed):
         return rules[0] if len(rules) else None
 
 
-    def solve( self, task: Task, context={}, max_solutions=np.inf ) -> List[Rule]:
+    def solve( self, task: Task, context: Union[Dict,UserDict]={}, max_solutions=np.inf ) -> List[Rule]:
         problemset = task['train']
         inputs     = [ self.preprocess(problem) for problem in problemset.inputs  ]
         outputs    = [ self.preprocess(problem) for problem in problemset.outputs ]
@@ -224,7 +224,7 @@ class AbstractSolver(Hashed):
         assert len(inputs) == len(outputs)
 
         valid_rules = []
-        context = Context(problemset[0], inputs[0])
+        context = Context(problemset[0], inputs[0], **context)
         for function in self.functions:
             argument_permutations = Rule.argument_permutations(function, context, self.arguments)
             for arguments in argument_permutations:

@@ -5,7 +5,7 @@ root_dir = pathlib.Path(__file__).parent.parent.absolute()
 
 settings = {
     'verbose': True,
-    'debug': True,
+    'debug':   not os.environ.get('KAGGLE_KERNEL_RUN_TYPE'),
 }
 
 if os.environ.get('KAGGLE_KERNEL_RUN_TYPE'):

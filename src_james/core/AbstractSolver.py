@@ -3,9 +3,9 @@ from typing import Any, Callable, Dict, List, Union
 
 import numpy as np
 
-from src_james.DataModel import Hashed, Problem, Task
-from src_james.solvers.Context import Context
-from src_james.solvers.Rule import Rule
+from src_james.core.Context import Context
+from src_james.core.DataModel import Hashed, Problem, Task
+from src_james.core.Rule import Rule
 
 
 

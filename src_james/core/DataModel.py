@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Union
 import glob2
 import numpy as np
 
-from src_james.CSV import CSV
+from src_james.core.CSV import CSV
 from src_james.settings import settings
 
 

@@ -2,7 +2,7 @@ from typing import List, Tuple, Union
 
 import numpy as np
 
-from src_james.DataModel import Problem, ProblemSet, Task
+from src_james.core.DataModel import Problem, ProblemSet, Task
 
 
 

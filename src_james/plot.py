@@ -3,9 +3,9 @@
 import matplotlib.pyplot as plt
 from matplotlib import colors
 
-
 # Modified from: https://www.kaggle.com/zaharch/visualizing-all-tasks-updated
-from src_james.DataModel import Task
+from src_james.core.DataModel import Task
+
 
 
 def plot_one(task, ax, i,train_or_test,input_or_output):
@@ -39,11 +39,13 @@ def plot_task(task: Task, scale=2):
     fig, axs = plt.subplots(2, num_train, figsize=(scale*num_train,scale*2))
     if filename: fig.suptitle(filename)
 
+    i = 0
     for i in range(len(task['train'])):
         plot_one(task, axs[0,i],i,'train','input')
         plot_one(task, axs[1,i],i,'train','output')
 
     axs[0,i+1].axis('off'); axs[1,i+1].axis('off')
+    j = 0
     for j in range(len(task['test'])):
         plot_one(task, axs[0,i+2+j],j,'test','input')
         plot_one(task, axs[1,i+2+j],j,'test','output')

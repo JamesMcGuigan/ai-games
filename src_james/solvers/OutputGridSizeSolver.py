@@ -5,9 +5,9 @@ from typing import Any, Tuple
 
 import numpy as np
 
-from src_james.DataModel import Competition, Task
+from src_james.core.AbstractSolver import AbstractSolver
+from src_james.core.DataModel import Competition, Task
 from src_james.heuristics.Queries import Query
-from src_james.solvers.AbstractSolver import AbstractSolver
 from src_james.solvers.old.OutputGridSolver import OutputGridSizeTransforms
 
 

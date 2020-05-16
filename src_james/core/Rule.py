@@ -6,9 +6,9 @@ from typing import Any, Callable, DefaultDict, Dict, List, Tuple, Type, Union
 
 from sympy import Symbol, symbols
 
-from src_james.DataModel import Problem
+from src_james.core.Context import Context
+from src_james.core.DataModel import Problem
 from src_james.settings import settings
-from src_james.solvers.Context import Context
 
 
 

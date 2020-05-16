@@ -2,7 +2,7 @@ from collections import UserDict
 
 import numpy as np
 
-from src_james.DataModel import Problem
+from src_james.core.DataModel import Problem
 
 
 

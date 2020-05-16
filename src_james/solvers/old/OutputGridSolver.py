@@ -6,7 +6,7 @@ from typing import Any, Callable, Tuple, Union
 import numpy as np
 import pydash as py
 
-from src_james.DataModel import Competition, ProblemSet, Task
+from src_james.core.DataModel import Competition, ProblemSet, Task
 from src_james.heuristics.Queries import Query
 
 

@@ -30,18 +30,6 @@ class Context(UserDict):
         }
 
 
-# class RuleSet(UserList):
-#     def __init__( self, *args ):
-#         for rule in args: assert isinstance(rule, Rule)
-#         super().__init__(*args)
-#
-#     def __call__(self, input: np.ndarray, *args, **kwargs):
-#         output = np.copy(input)
-#         for rule in self.data:
-#             output = rule(output, *args, **kwargs)
-#         return output
-
-
 class Rule(object):
     def __init__(self, function: Callable, arguments={}):
         self.function  = function
@@ -126,22 +114,6 @@ class Rule(object):
         arguments = " ".join( f"{k}={v}" for k,v in arguments.items() )
         return f'<Rule {self.function.__name__}({arguments})>'
 
-# class RuleSetSolver(object):
-#     def __init__(self,
-#                  name:       str                = '',
-#                  preprocess: Callable           = None,
-#                  functions:  List[Callable]     = [],
-#                  arguments:  List[Any,Callable] = [],
-#     ):
-#         self.name       = name
-#         self.preprocess = deepcopy(preprocess)  or self.preprocess
-#         self.functions  = deepcopy(functions)   or self.functions
-#         self.arguments  = deepcopy(arguments)   or self.arguments
-#
-#     def solve( self, inputs: List[Any], outputs: List[Any], context={} ):
-#         pass
-
-
 
 
 class AbstractSolver(Hashed):
@@ -158,22 +130,10 @@ class AbstractSolver(Hashed):
         return input
 
 
-    # def create_context( self, problem: Problem, *args, **kwargs ) -> Dict[Union[str,int], Any]:
-    #     arg_dict = { str(index): arg for index,arg in enumerate(args) }
-    #     context  = {
-    #         **arg_dict,
-    #         "input":      problem['input'],
-    #         "problem":    problem,
-    #         "problemset": problem.problemset,
-    #         "task":       problem.task,
-    #         **kwargs,
-    #     }
-    #     return context
-
-
     def solve_one( self, task: Task, context={} ) -> Union[Rule,None]:
         rules = self.solve(task, context, max_solutions=1)
         return rules[0] if len(rules) else None
+
 
     def solve( self, task: Task, context={}, max_solutions=np.inf ) -> List[Rule]:
         problemset = task['train']
@@ -204,6 +164,7 @@ class AbstractSolver(Hashed):
                         return valid_rules
         return valid_rules
 
+
     @classmethod
     def group_context_by_type( cls, context: Union[Dict,UserDict] ) -> DefaultDict[Type,List[Any]]:
         grouped = defaultdict(list)
@@ -213,6 +174,7 @@ class AbstractSolver(Hashed):
                 if item in grouped[type]: continue
                 grouped[type].append( symbols(name) )
         return grouped
+
 
     @classmethod
     def group_by_type( cls, collection: List[Any] ) -> DefaultDict[Type,List[Any]]:
@@ -309,6 +271,7 @@ class AbstractSolver(Hashed):
                 is_valid = False
                 break
         return is_valid
+
 
 
 class AbstractOutputGridSizeSolver(AbstractSolver):

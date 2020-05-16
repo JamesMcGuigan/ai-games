@@ -64,7 +64,7 @@ class Rule(object):
                         argument = context[name]
 
                 # Resolve arguments[key]
-                if AbstractSolver.isinstance(argument, parameter.annotation):
+                if cls.isinstance(argument, parameter.annotation):
                     if callable(argument):
                         kwargs[key] = cls.call_with_context(argument, context)
                     else:
@@ -76,7 +76,7 @@ class Rule(object):
             if key in kwargs: continue  # already solved
             options = []
             for name in context.keys():
-                if AbstractSolver.isinstance(context[name], parameter.annotation):
+                if cls.isinstance(context[name], parameter.annotation):
                     if context[name] not in options:
                         options.append( context[name] )
             if len(options) == 1:
@@ -113,57 +113,6 @@ class Rule(object):
                 traceback.print_exception(type(exception), exception, exception.__traceback__)
                 print('-'*20)
             return None
-
-
-
-class AbstractSolver(Hashed):
-    functions = []
-    arguments = []
-
-
-    def __init__( self ):
-        super().__init__()
-        self.cache: Dict[str,Rule] = {}
-
-
-    def preprocess( self, input: np.ndarray ) -> Any:
-        return input
-
-
-    def solve_one( self, task: Task, context={} ) -> Union[Rule,None]:
-        rules = self.solve(task, context, max_solutions=1)
-        return rules[0] if len(rules) else None
-
-
-    def solve( self, task: Task, context={}, max_solutions=np.inf ) -> List[Rule]:
-        problemset = task['train']
-        inputs     = [ self.preprocess(problem) for problem in problemset.inputs  ]
-        outputs    = [ self.preprocess(problem) for problem in problemset.outputs ]
-        assert len(inputs)
-        assert len(inputs) == len(outputs)
-
-        valid_rules = []
-        context = Context(problemset[0], inputs[0])
-        for function in self.functions:
-            argument_permutations = self.argument_permutations(function, context, self.arguments)
-            for arguments in argument_permutations:
-                rule = Rule(function, arguments)
-                rule_is_valid = True
-                for index in range(len(inputs)):
-                    input    = inputs[index]
-                    context  = Context(problemset[index], input)   # TODO: create context class
-                    actual   = rule.__call__( context=context )
-                    expected = outputs[index]
-                    if not np.array_equal(actual, expected):
-                        rule_is_valid = False
-                        break
-                if rule_is_valid:
-                    valid_rules.append(rule)
-                    # Only need to check this when len(valid_rules) has changed
-                    if max_solutions and max_solutions <= len(valid_rules):
-                        return valid_rules
-        return valid_rules
-
 
     @classmethod
     def group_context_by_type( cls, context: Union[Dict,UserDict] ) -> DefaultDict[Type,List[Any]]:
@@ -246,6 +195,55 @@ class AbstractSolver(Hashed):
         # https://stackoverflow.com/questions/15211568/combine-python-dictionary-permutations-into-list-of-dictionaries
         permutations = [ dict(zip(arg_options, options)) for options in product(*arg_options.values()) ]
         return permutations
+
+
+class AbstractSolver(Hashed):
+    functions = []
+    arguments = []
+
+
+    def __init__( self ):
+        super().__init__()
+        self.cache: Dict[str,Rule] = {}
+
+
+    def preprocess( self, input: np.ndarray ) -> Any:
+        return input
+
+
+    def solve_one( self, task: Task, context={} ) -> Union[Rule,None]:
+        rules = self.solve(task, context, max_solutions=1)
+        return rules[0] if len(rules) else None
+
+
+    def solve( self, task: Task, context={}, max_solutions=np.inf ) -> List[Rule]:
+        problemset = task['train']
+        inputs     = [ self.preprocess(problem) for problem in problemset.inputs  ]
+        outputs    = [ self.preprocess(problem) for problem in problemset.outputs ]
+        assert len(inputs)
+        assert len(inputs) == len(outputs)
+
+        valid_rules = []
+        context = Context(problemset[0], inputs[0])
+        for function in self.functions:
+            argument_permutations = Rule.argument_permutations(function, context, self.arguments)
+            for arguments in argument_permutations:
+                rule = Rule(function, arguments)
+                rule_is_valid = True
+                for index in range(len(inputs)):
+                    input    = inputs[index]
+                    context  = Context(problemset[index], input)   # TODO: create context class
+                    actual   = rule.__call__( context=context )
+                    expected = outputs[index]
+                    if not np.array_equal(actual, expected):
+                        rule_is_valid = False
+                        break
+                if rule_is_valid:
+                    valid_rules.append(rule)
+                    # Only need to check this when len(valid_rules) has changed
+                    if max_solutions and max_solutions <= len(valid_rules):
+                        return valid_rules
+        return valid_rules
 
 
     def predict( self, problem: Problem ) -> Any:

@@ -29,6 +29,15 @@ class Context(UserDict):
             **kwargs,
         }
 
+    def __str__(self):
+        output = {}
+        for key, value in self.data.items():
+            if   isinstance(value, np.ndarray):        output[key] = np.array(value.shape)
+            elif hasattr(self.data[key], '__dict__'):  output[key] = type(value)
+            else:                                      output[key] = value
+        return str(output)
+
+
 
 class Rule(object):
     def __init__(self, function: Callable, arguments={}):
@@ -50,37 +59,41 @@ class Rule(object):
 
 
     @classmethod
-    def kwargs_from_context( cls, function, context: Context, arguments={}):
+    def kwargs_from_context( cls, function, context: Context, arguments={}, strict=False):
         signature = inspect.signature(function)
         kwargs    = {}
         for key, parameter in signature.parameters.items():
-            if key in arguments.keys():
-                argument = arguments[key]
+            if key not in arguments.keys(): continue
+            argument = arguments[key]
 
-                # Resolve argument symbols from context
-                if isinstance(argument, Symbol):
-                    name = argument.name
-                    if name in context:
-                        argument = context[name]
+            # Resolve argument symbols from context
+            if isinstance(argument, Symbol):
+                name = argument.name
+                if name in context:
+                    argument = context[name]
 
-                # Resolve arguments[key]
-                if cls.isinstance(argument, parameter.annotation):
-                    if callable(argument):
-                        kwargs[key] = cls.call_with_context(argument, context)
-                    else:
-                        kwargs[key] = argument
-                    continue
+            # Resolve arguments[key]
+            if cls.isinstance(argument, parameter.annotation):
+                if callable(argument):
+                    kwargs[key] = cls.call_with_context(argument, context)
+                else:
+                    kwargs[key] = argument
+                continue
 
-        # See if we can typematch from context - but only if we get a single typematch
+        # See if we can typematch from context - strict means enforcing a unique typematch
+        seen = set()
+        context_by_type = cls.group_context_by_type(context)
         for key, parameter in signature.parameters.items():
-            if key in kwargs: continue  # already solved
-            options = []
-            for name in context.keys():
-                if cls.isinstance(context[name], parameter.annotation):
-                    if context[name] not in options:
-                        options.append( context[name] )
-            if len(options) == 1:
-                kwargs[key] = list(options)[0]
+            if key in kwargs:                                              continue  # already solved
+            if parameter.annotation not in context_by_type:                continue
+            if strict and len(context_by_type[parameter.annotation]) != 1: continue
+            for symbol in context_by_type[parameter.annotation]:
+                if symbol in seen:             continue
+                if symbol.name not in context: continue
+                seen.add(symbol)
+                kwargs[key] = context[symbol.name]
+                break
+
 
         for key, parameter in signature.parameters.items():
             if not key in kwargs and parameter.default is parameter.empty:
@@ -127,7 +140,6 @@ class Rule(object):
         for name, item in context.items():
             types = cls.types(item)
             for type in types:
-                if item in grouped[type]: continue
                 grouped[type].append( symbols(name) )
         return grouped
 

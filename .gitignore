@@ -4,3 +4,7 @@ ARC
 
 venv/
 venv_windows/
+
+wip/
+*.wip
+*.wip.*

@@ -3,14 +3,15 @@
 ##### 
 ##### ./submission/kaggle_compile.py ./src_james/submission.py
 ##### 
-##### 2020-05-09 14:52:57+01:00
+##### 2020-05-15 00:59:31+01:00
 ##### 
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### 
-##### * master b9c62b4 DataModel | fix submission.csv output
+#####   james-wip c81cf89 Solvers | work in progress - broken
+##### * master    9c1db78 [ahead 5] settings.py | bugfix: settings['dir']['data'] fixed in DataModel.py
 ##### 
-##### b9c62b45833937397db7d6b902e889bbc980d7b6
+##### 9c1db78a7c884975a0d5a8d132425fdf243533a4
 ##### 
 
 #####
@@ -19,8 +20,13 @@
 
 # DOCS: https://www.kaggle.com/WinningModelDocumentationGuidelines
 import os
+import pathlib
+root_dir = pathlib.Path(__file__).parent.parent.absolute()
 
-settings = {}
+settings = {
+    'vebose': True,
+    'debug': True,
+}
 
 if os.environ.get('KAGGLE_KERNEL_RUN_TYPE'):
     settings['dir'] = {
@@ -29,8 +35,8 @@ if os.environ.get('KAGGLE_KERNEL_RUN_TYPE'):
     }
 else:
     settings['dir'] = {
-        "data":        "./input",
-        "output":      "./submission",
+        "data":        os.path.join(root_dir, "./input"),
+        "output":      os.path.join(root_dir, "./submission"),
     }
 
 ####################
@@ -51,15 +57,17 @@ if __name__ == '__main__':
 
 import os
 import re
+from typing import List, Union
+
 import numpy as np
-from typing import Union, List
 
 # from src_james.settings import settings
 
 
+
 class CSV:
-    @staticmethod
-    def write_submission(dataset: 'Dataset', filename='submission.csv'):
+    @classmethod
+    def write_submission(cls, dataset: 'Dataset', filename='submission.csv'):
         csv        = CSV.to_csv(dataset)
         line_count = len(csv.split('\n'))
         filename   = os.path.join(settings['dir']['output'], filename)
@@ -67,33 +75,33 @@ class CSV:
             file.write(csv)
             print(f"\nwrote: {filename} | {line_count} lines")
 
-    @staticmethod
-    def object_id(filename, index=0) -> str:
+    @classmethod
+    def object_id(cls, filename, index=0) -> str:
         return re.sub('^.*/|\.json$', '', filename) + '_' + str(index)
 
-    @staticmethod
-    def to_csv(dataset: 'Dataset'):
+    @classmethod
+    def to_csv(cls, dataset: 'Dataset'):
         csv = ['output_id,output']
         for task in dataset:
             csv.append(CSV.to_csv_line(task))
         return "\n".join(csv)
 
-    @staticmethod
-    def to_csv_line(task: 'Task') -> str:
+    @classmethod
+    def to_csv_line(cls, task: 'Task') -> str:
         csv = []
-        for i, problem in enumerate(task['test']):
-            line = ",".join([
-                CSV.object_id(task.filename, i),
-                CSV.problem_to_csv_string(problem)
-            ])
-            csv.append(line)
+        for test_index, problem in enumerate(task['test']):
+            if not problem.get('solution', None): continue
+            solutions = {
+                cls.grid_to_csv_string(solution)
+                for solution in problem['solution']
+            }
+            for sol_index, solution_csv in enumerate(solutions):
+                line = ",".join([
+                    cls.object_id(task.filename, test_index+sol_index),
+                    solution_csv
+                ])
+                csv.append(line)
         return "\n".join(csv)
-
-    @staticmethod
-    def problem_to_csv_string(problem: 'Problem') -> str:
-        # TODO: Do we need to consider a range of possible solutions?
-        if problem['solution']: return CSV.grid_to_csv_string( problem.data['solution'] )
-        else:                   return CSV.grid_to_csv_string( problem.data['input']    )
 
     # Source: https://www.kaggle.com/c/abstraction-and-reasoning-challenge/overview/evaluation
     @staticmethod
@@ -117,16 +125,19 @@ class CSV:
 #####
 
 import json
+import os
+import re
 import time
-from collections import UserDict, UserList
+from collections import UserDict, UserList, defaultdict
 from itertools import chain
-from typing import Dict, List, Union, Any
+from typing import Any, Dict, List, Union
 
 import glob2
 import numpy as np
 
 # from src_james.CSV import CSV
 # from src_james.settings import settings
+
 
 
 # Conceptual Mapping
@@ -138,7 +149,17 @@ import numpy as np
 # - Grid:        An individual grid represented as a numpy array
 
 
-class Competition(UserDict):
+class Hashed:
+    __hash_counts = defaultdict(int)
+    def __init__(self):
+        self.__id   = f"{self.__class__.__name__}#{self.__hash_counts[self.__class__.__name__]}"
+        self.__hash = hash(self.__id)
+        self.__hash_counts[self.__class__.__name__] += 1
+    def __hash__(self):
+        return self.__hash
+
+
+class Competition(UserDict, Hashed):
     """ Competition: The collection of all Dataset in the competition """
 
     def __init__(self):
@@ -170,7 +191,7 @@ class Competition(UserDict):
 
 
 
-class Dataset(UserList):
+class Dataset(UserList, Hashed):
     """ Dataset: An array of all Tasks in the competition """
 
     def __init__(self, directory: str, name: str = ''):
@@ -178,6 +199,7 @@ class Dataset(UserList):
         self.name       = name
         self.directory  = directory
         self.filenames  = glob2.glob( self.directory + '/**/*.json' )
+        self.filenames  = [ Task.format_filename(filename) for filename in self.filenames ]
         assert len(self.filenames), f'invalid directory: {directory}'
         self.data       = [Task(filename, self) for filename in self.filenames]
         self.time_taken = 0
@@ -217,19 +239,22 @@ class Dataset(UserList):
         return list(chain(*[task.test_outputs for task in self.data]))
 
 
-class Task(UserDict):
+class Task(UserDict, Hashed):
     """ Task: The entire contents of a json file, outputs 1-3 lines of CSV """
 
-    def __init__(self, filename: str, dataset: Dataset):
+    def __init__(self, filename: str, dataset: Dataset = None):
         super().__init__()
-        self.filename: str     = filename
-        self.dataset:  Dataset = dataset
 
-        self.raw  = self.read_file(self.filename)
+        self.filename: str = self.format_filename(filename)
+        self.raw  = self.read_file( os.path.join(settings['dir']['data'], self.filename) )
         self.data = {
-            test_or_train: ProblemSet(test_or_train, input_outputs, self)
+            test_or_train: ProblemSet(input_outputs, test_or_train, self)
             for test_or_train, input_outputs in self.raw.items()
         }
+
+    @classmethod
+    def format_filename(cls, filename):
+        return re.sub(r'^(.*/)?(\w+/\w+\.json)$', r'\2', filename)
 
     @staticmethod
     def read_file(filename: str) -> Dict[str,List[Dict[str,np.ndarray]]]:
@@ -257,15 +282,18 @@ class Task(UserDict):
         return 0  # TODO: implement
 
 
-class ProblemSet(UserList):
+class ProblemSet(UserList, Hashed):
     """ ProblemSet: An array of either test or training Problems """
 
-    def __init__(self, test_or_train: str, input_outputs: List[Dict[str, np.ndarray]], task: Task):
+    def __init__(self, input_outputs: List[Dict[str, np.ndarray]], test_or_train: str, task: Task):
         super().__init__()
         self.task:          Task                       = task
         self.test_or_train: str                        = test_or_train
         self.raw:           List[Dict[str,np.ndarray]] = input_outputs
         self.data:          List[Problem]              = [ Problem(problem, self) for problem in self.raw ]
+
+    @property
+    def filename(self): return self.task.filename
 
     @property
     def inputs(self) -> List[np.ndarray]:
@@ -281,7 +309,7 @@ class ProblemSet(UserList):
 
 
 
-class Problem(UserDict):
+class Problem(UserDict, Hashed):
     """ Problem: An input + output Grid pair """
 
     dtype = 'int8'
@@ -292,12 +320,15 @@ class Problem(UserDict):
         self.raw:        Dict[str,np.ndarray] = problem
         self.data = {
             "input":    np.array(problem['input']).astype(self.dtype),
-            "output":   np.array(problem['input']).astype(self.dtype) if 'output' in problem else None,
-            "solution": None
+            "output":   np.array(problem['output']).astype(self.dtype) if 'output' in problem else None,
+            "solution": []
         }
         self.grids:  List[np.ndarray] = [ self.data[label]
                                           for label in ['input','output']
                                           if self.data[label] is not None ]
+
+    @property
+    def filename(self): return self.task.filename
 
 
 #####
@@ -345,12 +376,13 @@ if __name__ == '__main__':
 ##### 
 ##### ./submission/kaggle_compile.py ./src_james/submission.py
 ##### 
-##### 2020-05-09 14:52:57+01:00
+##### 2020-05-15 00:59:31+01:00
 ##### 
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### 
-##### * master b9c62b4 DataModel | fix submission.csv output
+#####   james-wip c81cf89 Solvers | work in progress - broken
+##### * master    9c1db78 [ahead 5] settings.py | bugfix: settings['dir']['data'] fixed in DataModel.py
 ##### 
-##### b9c62b45833937397db7d6b902e889bbc980d7b6
+##### 9c1db78a7c884975a0d5a8d132425fdf243533a4
 ##### 

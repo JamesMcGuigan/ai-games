@@ -20,6 +20,7 @@ simplejson
 numpy
 pandas
 sklearn
+sympy
 
 # Image Manipulation
 opencv-python

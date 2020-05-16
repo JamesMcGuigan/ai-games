@@ -19,7 +19,7 @@ class Query:
 
     @classmethod
     def grid_size_ratio_problemset(cls, problemset: ProblemSet) -> Union[Tuple[int,int], None]:
-        ratios = cls.grid_size_ratios(problemset)
+        ratios = cls.grid_size_ratios_problemset(problemset)
         return ratios[0] if len(ratios) == 1 else None
 
     @classmethod
@@ -32,4 +32,4 @@ class Query:
 
     @classmethod
     def unique_colors(cls, input: np.ndarray) -> int:
-        return np.count_nonzero(np.bincount(input)[1:])
+        return np.count_nonzero(np.bincount(input.flatten())[1:])

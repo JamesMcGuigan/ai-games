@@ -5,7 +5,6 @@ from typing import Any, Callable, Tuple, Union
 
 import numpy as np
 import pydash as py
-from src_james.solvers.wip.Rule import Rule
 
 from src_james.DataModel import Competition, ProblemSet, Task
 from src_james.heuristics.Queries import Query
@@ -35,7 +34,7 @@ class Rule:
         guess = self.__call__(input)
         return np.equal(guess, output)
 
-    def __call__(self, input: np.ndarray):
+    def __call__(self, input: Any):
         if callable(self.input_transform):
             input = self.input_transform(input)
 
@@ -62,8 +61,8 @@ class Rule:
 
 class OutputGridSizeTransforms:
     @classmethod
-    def same_as_input(cls, input: np.ndarray) -> Tuple[int,int]:
-        return input.shape
+    def identity( cls, input: Tuple[int, int] ) -> Tuple[int, int]:
+        return input
 
     @classmethod
     def fixed_size(cls, size: Union[int, Tuple[int,int]]) -> Tuple[int,int]:
@@ -72,13 +71,18 @@ class OutputGridSizeTransforms:
         return size
 
     @classmethod
-    def ratio(cls, input: np.ndarray, ratio: Union[int, Tuple[int,int]]) -> Tuple[int,int]:
-        if isinstance(ratio, (int,float)):
-            ratio = (float(ratio), float(ratio))
-        return (
-            int( input[0] * ratio[0] ),
-            int( input[1] * ratio[1] ),
-        )
+    def ratio(cls, input: Union[np.ndarray,Tuple[int,int]], ratio: Union[int, float, Tuple[int,int]]) -> Tuple[int,int]:
+        if ratio is None:                   return (0,0)
+        if isinstance(input, np.ndarray):   input = input.shape
+        if isinstance(ratio, (int,float)):  ratio = (ratio, ratio)
+        try:
+            return (
+                int(input[0] * ratio[0]),
+                int(input[1] * ratio[1]),
+            )
+        except:
+            return (0,0)
+
 
 
 
@@ -86,7 +90,7 @@ class OutputGridSizeSolver:
     cache = {}
     dtype: Tuple[int,int].__origin__
     functions = [
-        OutputGridSizeTransforms.same_as_input,
+        OutputGridSizeTransforms.identity,
         OutputGridSizeTransforms.fixed_size,
         OutputGridSizeTransforms.ratio,
     ]
@@ -99,7 +103,8 @@ class OutputGridSizeSolver:
     def __init__(self):
         pass
 
-    def equals(self, input: Tuple[int,int], output: Tuple[int,int]):
+    @classmethod
+    def equals(cls, input: Tuple[int,int], output: Tuple[int,int]):
         return input == output
 
     def fit_predict(self, task: Task):

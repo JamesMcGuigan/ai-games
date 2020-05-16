@@ -4,7 +4,7 @@ import pathlib
 root_dir = pathlib.Path(__file__).parent.parent.absolute()
 
 settings = {
-    'vebose': True,
+    'verbose': True,
     'debug': True,
 }
 

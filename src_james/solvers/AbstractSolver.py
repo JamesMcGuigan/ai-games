@@ -94,25 +94,32 @@ class Rule(object):
     @classmethod
     def call_with_context(cls, function, context: Context, arguments: Dict={} ) -> Any:
         kwargs = cls.kwargs_from_context(function, context, arguments)
-        if kwargs is None: return None
+        output = None
         try:
-            output = function(**kwargs)
-            return output
+            if kwargs is not None:
+                output = function(**kwargs)
         except TypeError as exception:
-            #kwargs = cls.kwargs_from_context(function, context, arguments)
-            pass   # kwargs didn't resolve all required arguments - ignore
+            if settings['debug']: cls.print_exception(exception, function, kwargs, arguments, context)
         except Exception as exception:
-            #kwargs = cls.kwargs_from_context(function, context, arguments)
-            if settings['debug']:
-                print('-'*20)
-                print(f"Exception: {cls.__name__}.call_with_context()")
-                print(f"function={function}")
-                print(f"kwargs={kwargs}")
-                #print(f"arguments={arguments}")
-                #print(f"context={context}")
-                traceback.print_exception(type(exception), exception, exception.__traceback__)
-                print('-'*20)
-            return None
+            if settings['debug']: cls.print_exception(exception, function, kwargs, arguments, context)
+
+        if output is None and settings['debug']:
+            kwargs = cls.kwargs_from_context(function, context, arguments)
+        return output
+
+
+    @classmethod
+    def print_exception(cls, exception, function=None, kwargs=None, arguments=None, context=None ):
+        if settings['debug']:
+            print('-'*20)
+            print(f"Exception: {cls.__name__}.call_with_context()")
+            print(f"function={function}")
+            print(f"kwargs={kwargs}")
+            #print(f"arguments={arguments}")
+            #print(f"context={context}")
+            traceback.print_exception(type(exception), exception, exception.__traceback__)
+            print('-'*20)
+
 
     @classmethod
     def group_context_by_type( cls, context: Union[Dict,UserDict] ) -> DefaultDict[Type,List[Any]]:

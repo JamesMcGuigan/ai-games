@@ -37,6 +37,18 @@ class Rule(object):
         # self.context   = context
 
 
+    def __call__(self, context: Union[Problem,Context]) -> Any:
+        if not isinstance(context, Context): context = Context(context)
+        output  = self.call_with_context(self.function, context, self.arguments)
+        return output
+
+    def __repr__(self):
+        arguments = { key: value.__name__ if hasattr(value, '__name__') else str(value)
+                      for key, value in self.arguments.items() }
+        arguments = " ".join( f"{k}={v}" for k,v in arguments.items() )
+        return f'<Rule {self.function.__name__}({arguments})>'
+
+
     @classmethod
     def kwargs_from_context( cls, function, context: Context, arguments={}):
         signature = inspect.signature(function)
@@ -101,18 +113,6 @@ class Rule(object):
                 traceback.print_exception(type(exception), exception, exception.__traceback__)
                 print('-'*20)
             return None
-
-
-    def __call__(self, context: Union[Problem,Context]) -> Any:
-        if not isinstance(context, Context): context = Context(context)
-        output  = self.call_with_context(self.function, context, self.arguments)
-        return output
-
-    def __repr__(self):
-        arguments = { key: value.__name__ if hasattr(value, '__name__') else str(value)
-                      for key, value in self.arguments.items() }
-        arguments = " ".join( f"{k}={v}" for k,v in arguments.items() )
-        return f'<Rule {self.function.__name__}({arguments})>'
 
 
 

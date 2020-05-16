@@ -185,7 +185,7 @@ class AbstractSolver(Hashed):
         valid_rules = []
         context = Context(problemset[0], inputs[0])
         for function in self.functions:
-            argument_permutations = self.argument_permutations(function, context)
+            argument_permutations = self.argument_permutations(function, context, self.arguments)
             for arguments in argument_permutations:
                 rule = Rule(function, arguments)
                 rule_is_valid = True
@@ -252,20 +252,22 @@ class AbstractSolver(Hashed):
         return any([ a_type == b_type for a_type, b_type in product(a_types, b_types) ])
 
 
-    def argument_permutations(self, function: Callable, context: Context):
+    @classmethod
+    def argument_permutations(cls, function: Callable, context: Context, arguments=[]):
         arg_options = defaultdict(list)
         parameters  = inspect.signature(function).parameters
         if len(parameters) == 0: return []
 
-        arguments_by_type = self.group_by_type(self.arguments)
-        context_by_type   = self.group_context_by_type(context)
+        arguments_by_type = cls.group_by_type(arguments)
+        context_by_type   = cls.group_context_by_type(context)
         for index, (key, parameter) in enumerate(parameters.items()):
             index      = str(index)  # create_context() stores numbers as strings, and symbols() requires a string
             annotation = parameters[key].annotation
-            for annotation_type in self.types(annotation):
+            for annotation_type in cls.types(annotation):
+
                 # Type input as first parameter
                 if index in context:
-                    if self.isinstance(context[index], annotation_type):
+                    if cls.isinstance(context[index], annotation_type):
                         arg_options[key].append( symbols(index) )
                         continue
 

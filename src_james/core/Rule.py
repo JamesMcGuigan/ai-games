@@ -4,10 +4,9 @@ from collections import UserDict, defaultdict
 from itertools import product
 from typing import Any, Callable, DefaultDict, Dict, List, Tuple, Type, Union
 
-from sympy import Symbol, symbols
-
 from src_james.core.Context import Context
 from src_james.core.DataModel import Problem
+from src_james.core.Symbol import Symbol
 from src_james.settings import settings
 
 
@@ -113,7 +112,7 @@ class Rule(object):
         for name, item in context.items():
             types = cls.types(item)
             for type in types:
-                grouped[type].append( symbols(name) )
+                grouped[type].append( Symbol(name) )
         return grouped
 
 
@@ -171,7 +170,7 @@ class Rule(object):
                 # Type input as first parameter
                 if index in context:
                     if cls.isinstance(context[index], annotation_type):
-                        arg_options[key].append( symbols(index) )
+                        arg_options[key].append( Symbol(index) )
                         continue
 
                 # Add from context by type

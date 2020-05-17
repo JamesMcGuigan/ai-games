@@ -2,7 +2,7 @@ import json
 import os
 import re
 import time
-from collections import UserDict, UserList, defaultdict
+from collections import UserDict, UserList
 from itertools import chain
 from typing import Any, Dict, List, Union
 
@@ -23,17 +23,7 @@ from src_james.settings import settings
 # - Grid:        An individual grid represented as a numpy array
 
 
-class Hashed:
-    __hash_counts = defaultdict(int)
-    def __init__(self):
-        self.__id   = f"{self.__class__.__name__}#{self.__hash_counts[self.__class__.__name__]}"
-        self.__hash = hash(self.__id)
-        self.__hash_counts[self.__class__.__name__] += 1
-    def __hash__(self):
-        return self.__hash
-
-
-class Competition(UserDict, Hashed):
+class Competition(UserDict):
     """ Competition: The collection of all Dataset in the competition """
 
     def __init__(self):
@@ -65,7 +55,7 @@ class Competition(UserDict, Hashed):
 
 
 
-class Dataset(UserList, Hashed):
+class Dataset(UserList):
     """ Dataset: An array of all Tasks in the competition """
 
     def __init__(self, directory: str, name: str = ''):
@@ -113,7 +103,7 @@ class Dataset(UserList, Hashed):
         return list(chain(*[task.test_outputs for task in self.data]))
 
 
-class Task(UserDict, Hashed):
+class Task(UserDict):
     """ Task: The entire contents of a json file, outputs 1-3 lines of CSV """
 
     def __init__(self, filename: str, dataset: Dataset = None):
@@ -156,7 +146,7 @@ class Task(UserDict, Hashed):
         return 0  # TODO: implement
 
 
-class ProblemSet(UserList, Hashed):
+class ProblemSet(UserList):
     """ ProblemSet: An array of either test or training Problems """
 
     def __init__(self, input_outputs: List[Dict[str, np.ndarray]], test_or_train: str, task: Task):
@@ -183,12 +173,14 @@ class ProblemSet(UserList, Hashed):
 
 
 
-class Problem(UserDict, Hashed):
+class Problem(UserDict):
     """ Problem: An input + output Grid pair """
-
+    _hash_seed = 0  # hash('Problem')
     dtype = 'int8'
     def __init__(self, problem: Dict[str,np.ndarray], problemset: ProblemSet):
         super().__init__()
+        self._hash = self.__class__._hash_seed = self.__class__._hash_seed + 1
+
         self.problemset: ProblemSet           = problemset
         self.task:       Task                 = problemset.task
         self.raw:        Dict[str,np.ndarray] = problem
@@ -203,3 +195,6 @@ class Problem(UserDict, Hashed):
 
     @property
     def filename(self): return self.task.filename
+
+    def __hash__(self):
+        return self._hash

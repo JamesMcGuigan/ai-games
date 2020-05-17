@@ -4,12 +4,12 @@ from typing import Any, Callable, Dict, List, Union
 import numpy as np
 
 from src_james.core.Context import Context
-from src_james.core.DataModel import Hashed, Problem, Task
+from src_james.core.DataModel import Problem, Task
 from src_james.core.Rule import Rule
 
 
 
-class AbstractSolver(Hashed):
+class AbstractSolver:
     functions = []
     arguments = []
 
@@ -43,7 +43,7 @@ class AbstractSolver(Hashed):
                 rule_is_valid = True
                 for index in range(len(inputs)):
                     input    = inputs[index]
-                    context  = Context(problemset[index], input)   # TODO: create context class
+                    context  = Context(problemset[index], input)
                     actual   = rule.__call__( context=context )
                     expected = outputs[index]
                     if not np.array_equal(actual, expected):

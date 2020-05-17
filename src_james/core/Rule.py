@@ -1,8 +1,9 @@
 import inspect
 import traceback
 from collections import UserDict, defaultdict
+from functools import lru_cache
 from itertools import product
-from typing import Any, Callable, DefaultDict, Dict, List, Tuple, Type, Union
+from typing import Any, Callable, DefaultDict, Dict, List, Set, Tuple, Type, Union
 
 from src_james.core.Context import Context
 from src_james.core.DataModel import Problem
@@ -107,6 +108,7 @@ class Rule(object):
 
 
     @classmethod
+    @lru_cache(1024)  # Profiler: expensive function
     def group_context_by_type( cls, context: Union[Dict,UserDict] ) -> DefaultDict[Type,List[Any]]:
         grouped = defaultdict(list)
         for name, item in context.items():
@@ -117,13 +119,12 @@ class Rule(object):
 
 
     @classmethod
-    def group_by_type( cls, collection: List[Any] ) -> DefaultDict[Type,List[Any]]:
-        grouped = defaultdict(list)
+    def group_by_type( cls, collection: List[Any] ) -> DefaultDict[Type,Set[Any]]:
+        grouped = defaultdict(set)
         for item in collection:
             types = cls.types(item)
             for type in types:
-                if item in grouped[type]: continue
-                grouped[type].append(item)
+                grouped[type].add(item)
         return grouped
 
 
@@ -135,15 +136,31 @@ class Rule(object):
         return types
 
 
-    # noinspection PyTypeChecker
+
     @classmethod
     def type( cls, input: Any ) -> Union[Type, Tuple[Type]]:
+        # Profiler: was 20% now 13% of runtime - selectively cache functions
+        if callable(input):
+            hkey = hash(input)
+            if hkey not in cls._type_cache:
+                cls._type_cache[hkey] = cls._type(input)
+            return cls._type_cache[hkey]
+        else:
+            return cls._type(input)
+
+
+    _type_cache = {}
+
+
+    # noinspection PyTypeChecker
+    @classmethod
+    def _type( cls, input: Any ) -> Union[Type, Tuple[Type]]:
         # https://stackoverflow.com/questions/45957615/check-a-variable-against-union-type-at-runtime-in-python-3-6
         if isinstance(input, Type):       return input
         if hasattr(input, '__origin__'):
-            if input.__origin__ == Union: return tuple( cls.type(arg) for arg in input.__args__ ) # Union[int,str] -> (<class 'int'>, <class 'str'>)
+            if input.__origin__ == Union: return tuple( cls._type(arg) for arg in input.__args__ )  # Union[int,str] -> (<class 'int'>, <class 'str'>)
             else:                         return input.__origin__  # Tuple[int,int] -> <class 'tuple'>
-        if callable(input):               return cls.type( inspect.signature(input).return_annotation )
+        if callable(input):               return cls.type( cls.inspect_signature(input).return_annotation )
         else:                             return type(input)
 
 
@@ -153,13 +170,17 @@ class Rule(object):
         b_types = cls.types(b)
         return any([ a_type == b_type for a_type, b_type in product(a_types, b_types) ])
 
+    @staticmethod
+    @lru_cache(None)
+    def inspect_signature( input: Callable ):
+        return inspect.signature(input)
 
     @classmethod
     def argument_permutations(cls, function: Callable, context: Context, arguments=[]):
-        arg_options = defaultdict(list)
-        parameters  = inspect.signature(function).parameters
+        parameters  = cls.inspect_signature(function).parameters
         if len(parameters) == 0: return []
-
+        parameters        = dict(parameters)
+        arg_options       = defaultdict(list)
         arguments_by_type = cls.group_by_type(arguments)
         context_by_type   = cls.group_context_by_type(context)
         for index, (key, parameter) in enumerate(parameters.items()):

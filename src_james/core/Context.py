@@ -8,12 +8,15 @@ from src_james.core.DataModel import Problem, Task
 
 
 class Context(UserDict):
+    _hash_seed = 0
     excluded_keys  = { 'output', 'solution', 'raw', 'dtype', *dir(UserDict()), *dir(UserList()) }
     excluded_types = ( str,int,float,tuple,list,set,np.ndarray,type,Task )
     autoresolve    = ( 'input', 'task', 'filename', 'problemset', 'grids', 'outputs', 'test_or_train', 'inputs' )
 
     def __init__( self, problem: Problem, *args, **kwargs ):
         super().__init__(**kwargs)
+        self._hash = self.__class__._hash_seed = self.__class__._hash_seed + 1
+
         #if len(args) == 0 and 'input' in problem: args = [ problem['input'] ]
         arg_dict   = { str(index): arg for index,arg in enumerate(args) }
         self.data  = {
@@ -27,6 +30,9 @@ class Context(UserDict):
 
         # assert not self.expand(recurse=True)    # auto-resolve (very slow)
         pass
+
+    def __hash__(self):
+        return self._hash
 
     def expand( self ) -> Set[str]:
         start_keys = set(self.data.keys())

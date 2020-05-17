@@ -10,10 +10,12 @@ class Symbol:
         return cls.instances[name]
 
     def __init__(self, name: str):
-        self.name = str(name)
+        self.name   = str(name)
+        self.__hash = None
 
     def __repr__(self):
         return f"Symbol({self.name})"
 
     def __hash__(self):
-        return hash(self.name)
+        self.__hash = self.__hash or hash(self.name)
+        return self.__hash

@@ -13,10 +13,10 @@ from src_james.settings import settings
 
 
 class Rule(object):
-    def __init__(self, function: Callable, arguments={}):
+    def __init__(self, function: Callable, arguments: Dict = None):
         self.function  = function
-        self.arguments = arguments
-        # self.context   = context
+        self.arguments = arguments or dict()
+        self._hash     = hash(self.function) + hash(tuple(self.arguments.items()))
 
 
     def __call__(self, context: Union[Problem,Context]) -> Any:
@@ -30,6 +30,14 @@ class Rule(object):
         arguments = " ".join( f"{k}={v}" for k,v in arguments.items() )
         return f'<Rule {self.function.__name__}({arguments})>'
 
+    def __hash__(self):
+        return self._hash
+
+    def __eq__(self, other):
+        if not isinstance(other, Rule):        return False
+        if self.function  != other.function:   return False
+        if self.arguments != other.arguments:  return False   # compare by value - https://stackoverflow.com/questions/4527942/comparing-two-dictionaries-and-checking-how-many-key-value-pairs-are-equal
+        return True
 
     @classmethod
     def kwargs_from_context( cls, function, context: Context, arguments={}, strict=False):

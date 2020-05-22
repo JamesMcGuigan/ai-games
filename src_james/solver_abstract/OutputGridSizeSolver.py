@@ -5,10 +5,10 @@ from typing import Any, Tuple
 
 import numpy as np
 
-from src_james.abstract_solver.old.OutputGridSolver import OutputGridSizeTransforms
 from src_james.core.AbstractSolver import AbstractSolver
 from src_james.core.DataModel import Competition, Task
 from src_james.heuristics.Queries import Query
+from src_james.solver_abstract.old.OutputGridSolver import OutputGridSizeTransforms
 
 
 class OutputGridSizeSolver(AbstractSolver):

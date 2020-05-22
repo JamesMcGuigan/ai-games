@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 
 ##### 
-##### ./submission/kaggle_compile.py ./src_james/original/main.py
+##### ./submission/kaggle_compile.py ./src_james/solver_multimodel/main.py
 ##### 
-##### 2020-05-22 22:41:08+01:00
+##### 2020-05-22 23:08:15+01:00
 ##### 
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### 
 #####   james-wip c81cf89 Solvers | work in progress - broken
-##### * master    08f4dab import original notebook codebase
+##### * master    c960e68 rename src_james.abstract_solver -> src_james.solver_abstract
 ##### 
-##### 08f4dabd9a073fb1d962168fed1d5751eae5572a
+##### c960e6898895b59d404692ce02f026b2d07d9042
 ##### 
 
 #####
@@ -136,7 +136,6 @@ import numpy as np
 
 # from src_james.core.CSV import CSV
 # from src_james.settings import settings
-
 
 
 # Conceptual Mapping
@@ -383,7 +382,6 @@ from matplotlib import colors
 # from src_james.core.DataModel import Task
 
 
-
 def plot_one(task, ax, i,train_or_test,input_or_output):
     cmap = colors.ListedColormap(
         ['#000000', '#0074D9','#FF4136','#2ECC40','#FFDC00',
@@ -426,7 +424,7 @@ def plot_task(task: Task, scale=2):
         plot_one(task, axs[0,i+2+j],j,'test','input')
         plot_one(task, axs[1,i+2+j],j,'test','output')
 
-    if 'solutions' in task:
+    if len(task['solutions']):
         axs[0,i+j+3].axis('off'); axs[1,i+j+3].axis('off')
         for k in range(len(task['solutions'])):
             plot_one(task, axs[0,i+j+4+k],k,'solutions','input')
@@ -440,7 +438,7 @@ def plot_task(task: Task, scale=2):
 #####
 
 #####
-##### START src_james/original/Solver.py
+##### START src_james/solver_multimodel/Solver.py
 #####
 
 from copy import deepcopy
@@ -451,7 +449,6 @@ import numpy as np
 
 # from src_james.core.DataModel import Problem
 # from src_james.plot import plot_task
-
 
 
 class Solver():
@@ -591,19 +588,18 @@ class Solver():
 
 
 #####
-##### END   src_james/original/Solver.py
+##### END   src_james/solver_multimodel/Solver.py
 #####
 
 #####
-##### START src_james/original/GeometrySolver.py
+##### START src_james/solver_multimodel/GeometrySolver.py
 #####
 
 from itertools import combinations, product
 
 import numpy as np
 
-# from src_james.original.Solver import Solver
-
+# from src_james.solver_multimodel.Solver import Solver
 
 
 class GeometrySolver(Solver):
@@ -659,18 +655,17 @@ class GeometrySolver(Solver):
 
 
 #####
-##### END   src_james/original/GeometrySolver.py
+##### END   src_james/solver_multimodel/GeometrySolver.py
 #####
 
 #####
-##### START src_james/original/ZoomSolver.py
+##### START src_james/solver_multimodel/ZoomSolver.py
 #####
 
 import cv2
 import skimage.measure
 
-# from src_james.original.Solver import Solver
-
+# from src_james.solver_multimodel.Solver import Solver
 
 
 class ZoomSolver(Solver):
@@ -705,11 +700,11 @@ class ZoomSolver(Solver):
 
 
 #####
-##### END   src_james/original/ZoomSolver.py
+##### END   src_james/solver_multimodel/ZoomSolver.py
 #####
 
 #####
-##### START src_james/original/functions.py
+##### START src_james/solver_multimodel/functions.py
 #####
 
 import numpy as np
@@ -859,18 +854,17 @@ def make_tuple(args):
 
 
 #####
-##### END   src_james/original/functions.py
+##### END   src_james/solver_multimodel/functions.py
 #####
 
 #####
-##### START src_james/original/BorderSolver.py
+##### START src_james/solver_multimodel/BorderSolver.py
 #####
 
 import numpy as np
 
-# from src_james.original.Solver import Solver
-# from src_james.original.functions import count_colors, count_squares, max_color, max_color_1d, min_color, min_color_1d
-
+# from src_james.solver_multimodel.Solver import Solver
+# from src_james.solver_multimodel.functions import *
 
 
 class BorderSolver(Solver):
@@ -924,14 +918,14 @@ class BorderSolver(Solver):
 
 
 #####
-##### END   src_james/original/BorderSolver.py
+##### END   src_james/solver_multimodel/BorderSolver.py
 #####
 
 #####
-##### START src_james/original/DoNothingSolver.py
+##### START src_james/solver_multimodel/DoNothingSolver.py
 #####
 
-# from src_james.original.Solver import Solver
+# from src_james.solver_multimodel.Solver import Solver
 
 
 
@@ -941,18 +935,17 @@ class DoNothingSolver(Solver):
 
 
 #####
-##### END   src_james/original/DoNothingSolver.py
+##### END   src_james/solver_multimodel/DoNothingSolver.py
 #####
 
 #####
-##### START src_james/original/SingleColorSolver.py
+##### START src_james/solver_multimodel/SingleColorSolver.py
 #####
 
 import numpy as np
 
-# from src_james.original.Solver import Solver
-# from src_james.original.functions import count_colors, count_squares, max_color, max_color_1d, min_color, min_color_1d
-
+# from src_james.solver_multimodel.Solver import Solver
+# from src_james.solver_multimodel.functions import *
 
 
 class SingleColorSolver(Solver):
@@ -999,21 +992,20 @@ class SingleColorSolver(Solver):
 
 
 #####
-##### END   src_james/original/SingleColorSolver.py
+##### END   src_james/solver_multimodel/SingleColorSolver.py
 #####
 
 #####
-##### START src_james/original/TessellationSolver.py
+##### START src_james/solver_multimodel/TessellationSolver.py
 #####
 
 import inspect
 from itertools import product
 
-# from src_james.original.GeometrySolver import GeometrySolver
-# from src_james.original.ZoomSolver import ZoomSolver
-# from src_james.original.functions import *
-# from src_james.original.functions import crop_inner, crop_outer
-
+# from src_james.solver_multimodel.GeometrySolver import GeometrySolver
+# from src_james.solver_multimodel.ZoomSolver import ZoomSolver
+# from src_james.solver_multimodel.functions import *
+# from src_james.solver_multimodel.functions import crop_inner, crop_outer
 
 
 class TessellationSolver(GeometrySolver):
@@ -1151,22 +1143,22 @@ class TessellationSolver(GeometrySolver):
 
 
 #####
-##### END   src_james/original/TessellationSolver.py
+##### END   src_james/solver_multimodel/TessellationSolver.py
 #####
 
 #####
-##### START src_james/original/solvers.py
+##### START src_james/solver_multimodel/solvers.py
 #####
 
 from typing import List
 
-# from src_james.original.BorderSolver import BorderSolver
-# from src_james.original.DoNothingSolver import DoNothingSolver
-# from src_james.original.GeometrySolver import GeometrySolver
-# from src_james.original.SingleColorSolver import SingleColorSolver
-# from src_james.original.Solver import Solver
-# from src_james.original.TessellationSolver import TessellationSolver
-# from src_james.original.ZoomSolver import ZoomSolver
+# from src_james.solver_multimodel.BorderSolver import BorderSolver
+# from src_james.solver_multimodel.DoNothingSolver import DoNothingSolver
+# from src_james.solver_multimodel.GeometrySolver import GeometrySolver
+# from src_james.solver_multimodel.SingleColorSolver import SingleColorSolver
+# from src_james.solver_multimodel.Solver import Solver
+# from src_james.solver_multimodel.TessellationSolver import TessellationSolver
+# from src_james.solver_multimodel.ZoomSolver import ZoomSolver
 
 solvers: List[Solver] = [
     DoNothingSolver(),
@@ -1179,20 +1171,18 @@ solvers: List[Solver] = [
 
 
 #####
-##### END   src_james/original/solvers.py
+##### END   src_james/solver_multimodel/solvers.py
 #####
 
 #####
-##### START ./src_james/original/main.py
+##### START ./src_james/solver_multimodel/main.py
 #####
 
 import os
 import time
 
 # from src_james.core.DataModel import Competition
-# from src_james.original.solvers import solvers
-
-
+# from src_james.solver_multimodel.solvers import solvers
 
 time_start   = time.perf_counter()
 competition  = Competition()
@@ -1217,19 +1207,19 @@ for key, value in competition.score().items(): print(f'{key.rjust(11)}: {value}'
 
 
 #####
-##### END   ./src_james/original/main.py
+##### END   ./src_james/solver_multimodel/main.py
 #####
 
 ##### 
-##### ./submission/kaggle_compile.py ./src_james/original/main.py
+##### ./submission/kaggle_compile.py ./src_james/solver_multimodel/main.py
 ##### 
-##### 2020-05-22 22:41:08+01:00
+##### 2020-05-22 23:08:15+01:00
 ##### 
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### 
 #####   james-wip c81cf89 Solvers | work in progress - broken
-##### * master    08f4dab import original notebook codebase
+##### * master    c960e68 rename src_james.abstract_solver -> src_james.solver_abstract
 ##### 
-##### 08f4dabd9a073fb1d962168fed1d5751eae5572a
+##### c960e6898895b59d404692ce02f026b2d07d9042
 ##### 

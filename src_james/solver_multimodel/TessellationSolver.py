@@ -4,7 +4,6 @@ from itertools import product
 from src_james.solver_multimodel.GeometrySolver import GeometrySolver
 from src_james.solver_multimodel.ZoomSolver import ZoomSolver
 from src_james.solver_multimodel.functions import *
-from src_james.solver_multimodel.functions import crop_inner, crop_outer
 
 
 class TessellationSolver(GeometrySolver):

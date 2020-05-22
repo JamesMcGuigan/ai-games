@@ -1,7 +1,8 @@
 import numpy as np
 
-from src_james.original.Solver import Solver
-from src_james.original.functions import count_colors, count_squares, max_color, max_color_1d, min_color, min_color_1d
+from src_james.solver_multimodel.Solver import Solver
+from src_james.solver_multimodel.functions import count_colors, count_squares, max_color, max_color_1d, min_color, \
+    min_color_1d
 
 
 class SingleColorSolver(Solver):

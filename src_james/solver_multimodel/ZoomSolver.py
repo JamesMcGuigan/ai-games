@@ -1,8 +1,7 @@
 import cv2
 import skimage.measure
 
-from src_james.original.Solver import Solver
-
+from src_james.solver_multimodel.Solver import Solver
 
 
 class ZoomSolver(Solver):

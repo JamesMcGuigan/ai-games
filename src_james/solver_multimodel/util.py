@@ -5,7 +5,6 @@ from glob import glob
 import numpy as np
 
 
-
 def load_tasks(task_files):
     if isinstance(task_files, str): task_files = glob(task_files)
 

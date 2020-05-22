@@ -2,7 +2,7 @@ import os
 import time
 
 from src_james.core.DataModel import Competition
-from src_james.original.solvers import solvers
+from src_james.solver_multimodel.solvers import solvers
 
 time_start   = time.perf_counter()
 competition  = Competition()

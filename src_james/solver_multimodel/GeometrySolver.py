@@ -2,7 +2,7 @@ from itertools import combinations, product
 
 import numpy as np
 
-from src_james.original.Solver import Solver
+from src_james.solver_multimodel.Solver import Solver
 
 
 class GeometrySolver(Solver):

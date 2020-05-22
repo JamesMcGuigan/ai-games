@@ -10,7 +10,6 @@ from src_james.core.DataModel import Competition, ProblemSet, Task
 from src_james.heuristics.Queries import Query
 
 
-
 # from pydash import group_by
 
 # NOTE: This is getting half way to the level of abstraction required, but we need to go to the next level of inception

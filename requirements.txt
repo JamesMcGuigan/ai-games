@@ -13,16 +13,18 @@ cytoolz==0.10.1           # via -r requirements.in
 decorator==4.4.2          # via ipython, networkx, traitlets
 defusedxml==0.6.0         # via nbconvert
 entrypoints==0.3          # via nbconvert
+fastcache==1.1.0          # via -r requirements.in
 glob2==0.7                # via -r requirements.in
+imagecodecs==2020.2.18    # via tifffile
 imageio==2.8.0            # via scikit-image
 importlib-metadata==1.6.0  # via jsonschema
-ipykernel==5.2.1          # via ipywidgets, jupyter, jupyter-console, notebook, qtconsole
+ipykernel==5.3.0          # via ipywidgets, jupyter, jupyter-console, notebook, qtconsole
 ipython-genutils==0.2.0   # via nbformat, notebook, qtconsole, traitlets
 ipython==7.14.0           # via ipykernel, ipywidgets, jupyter-console
 ipywidgets==7.5.1         # via jupyter
 jedi==0.17.0              # via ipython
 jinja2==2.11.2            # via nbconvert, notebook
-joblib==0.14.1            # via scikit-learn
+joblib==0.15.1            # via scikit-learn
 jsonschema==3.2.0         # via nbformat
 jupyter-client==6.1.3     # via ipykernel, jupyter-console, notebook, qtconsole
 jupyter-console==6.1.0    # via jupyter
@@ -37,9 +39,9 @@ nbconvert==5.6.1          # via jupyter, notebook
 nbformat==5.0.6           # via ipywidgets, nbconvert, notebook
 networkx==2.4             # via scikit-image
 notebook==6.0.3           # via jupyter, widgetsnbextension
-numpy==1.18.4             # via -r requirements.in, imageio, matplotlib, opencv-python, pandas, pywavelets, scikit-learn, scipy
+numpy==1.18.4             # via -r requirements.in, imagecodecs, imageio, matplotlib, opencv-python, pandas, pywavelets, scikit-image, scikit-learn, scipy, tifffile
 opencv-python==4.2.0.34   # via -r requirements.in
-packaging==20.3           # via bleach
+packaging==20.4           # via bleach
 pandas==1.0.3             # via -r requirements.in
 pandocfilters==1.4.2      # via nbconvert
 parso==0.7.0              # via jedi
@@ -59,16 +61,18 @@ pywavelets==1.1.1         # via scikit-image
 pyzmq==19.0.1             # via jupyter-client, notebook, qtconsole
 qtconsole==4.7.4          # via jupyter
 qtpy==1.9.0               # via qtconsole
-scikit-image==0.16.2      # via -r requirements.in
-scikit-learn==0.22.2.post1  # via sklearn
+scikit-image==0.17.2      # via -r requirements.in
+scikit-learn==0.23.1      # via sklearn
 scipy==1.4.1              # via scikit-image, scikit-learn
 send2trash==1.5.0         # via notebook
 simplejson==3.17.0        # via -r requirements.in
-six==1.14.0               # via bleach, cycler, jsonschema, packaging, pyrsistent, python-dateutil, traitlets
+six==1.15.0               # via bleach, cycler, jsonschema, packaging, pyrsistent, python-dateutil, traitlets
 sklearn==0.0              # via -r requirements.in
 sympy==1.5.1              # via -r requirements.in
 terminado==0.8.3          # via notebook
 testpath==0.4.4           # via nbconvert
+threadpoolctl==2.0.0      # via scikit-learn
+tifffile==2020.5.11       # via scikit-image
 toolz==0.10.0             # via cytoolz
 tornado==6.0.4            # via ipykernel, jupyter-client, notebook, terminado
 tqdm==4.46.0              # via -r requirements.in

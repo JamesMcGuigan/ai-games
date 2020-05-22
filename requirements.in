@@ -33,3 +33,4 @@ jupyter
 # Functional Programming
 cytoolz
 pydash
+fastcache

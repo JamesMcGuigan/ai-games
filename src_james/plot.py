@@ -49,7 +49,7 @@ def plot_task(task: Task, scale=2):
         plot_one(task, axs[0,i+2+j],j,'test','input')
         plot_one(task, axs[1,i+2+j],j,'test','output')
 
-    if 'solutions' in task:
+    if len(task['solutions']):
         axs[0,i+j+3].axis('off'); axs[1,i+j+3].axis('off')
         for k in range(len(task['solutions'])):
             plot_one(task, axs[0,i+j+4+k],k,'solutions','input')

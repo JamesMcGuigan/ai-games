@@ -5,7 +5,6 @@ import numpy as np
 from src_james.original.Solver import Solver
 
 
-
 class GeometrySolver(Solver):
     optimise = True
     verbose  = True
@@ -26,14 +25,14 @@ class GeometrySolver(Solver):
         return self.is_task_shape_ratio_unchanged(task)  # grids must remain the exact same size
 
     def test(self, task):
-        if task['file'] in self.cache: return True
+        if task.filename in self.cache: return True
 
         max_roll = (self.task_grid_max_dim(task) + 1) // 2
         for key, (function, arglist) in self.actions.items():
             if function == np.roll: arglist = product(range(-max_roll,max_roll),[0,1])
             for args in arglist:
                 if self.is_lambda_valid(task, function, *args):
-                    self.cache[task['file']] = (function, args)
+                    self.cache[task.filename] = (function, args)
                     if self.verbose: print(function, args)
                     return True
 
@@ -45,7 +44,7 @@ class GeometrySolver(Solver):
             for args1, args2 in product(arglist1, arglist2):
                 function = lambda grid, args1, args2: function1(function2(grid, *args2), *args1)
                 if self.is_lambda_valid(task, function, *(args1,args2)):
-                    self.cache[task['file']] = (function, (args1,args2))
+                    self.cache[task.filename] = (function, (args1,args2))
                     if self.verbose: print(function, (args1,args2))
                     return True
         return False

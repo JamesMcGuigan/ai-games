@@ -4,7 +4,6 @@
 #
 #    pip-compile
 #
-appnope==0.1.0            # via ipykernel, ipython
 attrs==19.3.0             # via jsonschema
 backcall==0.1.0           # via ipython
 bleach==3.1.5             # via nbconvert

@@ -1,10 +1,11 @@
 from copy import deepcopy
 from itertools import chain
+from typing import List, Dict
 
 import numpy as np
 
+from src_james.core.DataModel import Problem
 from src_james.plot import plot_task
-
 
 
 class Solver():
@@ -28,15 +29,19 @@ class Solver():
         return True
 
     @staticmethod
-    def solve_lambda(_task_, _function_, *args, **kwargs):
-        solution = []
-        for index, spec in enumerate(_task_['test']):
-            output = _function_(spec['input'], *args, **kwargs)
-            solution.append({
-                "input":  spec['input'],
-                "output": output
-                })
-        return solution
+    def solve_lambda(_task_, _function_, *args, _inplace_=False, **kwargs) -> List[Dict[str,Problem]]:
+        solutions = []
+        for index, problem in enumerate(_task_['test']):
+            output = _function_(problem['input'], *args, **kwargs)
+            output.flags.writeable = False
+            solution = Problem({
+                "input":  problem['input'],
+                "output": output,
+            }, problemset=_task_['test'])
+            solutions.append(problem)
+        if _inplace_:
+            _task_['solutions'] += solutions
+        return solutions
 
     def action(self, grid, task=None, *args):
         """This is the primary method this needs to be defined"""
@@ -49,36 +54,36 @@ class Solver():
 
     def test(self, task):
         """test if the given action correctly solves the task"""
-        args = self.cache.get(task['file'], ())
+        args = self.cache.get(task.filename, ())
         return self.is_lambda_valid(task, self.action, *args, task=task)
 
-    def solve(self, task, force=False):
+    def solve(self, task, force=False, inplace=True):
         """solve test case and persist"""
         try:
             if self.detect(task) or force:    # may generate cache
                 if self.test(task) or force:  # may generate cache
-                    args     = self.cache.get(task['file'], ())
+                    args     = self.cache.get(task.filename, ())
                     if self.verbose and args:
                         print('solved: ', self.__class__.__name__, args)
                     if isinstance(args, dict):
-                        solution = self.solve_lambda(task, self.action, **args, task=task)
+                        solutions = self.solve_lambda(task, self.action, **args, task=task, _inplace_=True)
                     else:
-                        solution = self.solve_lambda(task, self.action, *args, task=task)
-                    task['solution'] = solution  # TODO: fix for multiple test outputs
-                    return solution
+                        solutions = self.solve_lambda(task, self.action,  *args, task=task, _inplace_=True )
+                    return solutions
         except Exception as exception:
             if self.debug: raise exception
         return None
 
     def solve_all(self, tasks, plot=False, solve_detects=False):
         count = 0
-        for filename, task in tasks.items():
+        for task in tasks:
             if self.detect(task):
                 solution = self.solve(task, force=solve_detects)
                 if solution or (solve_detects and self.test(task)):
                     count += 1
+                    # solution = self.solve(task, force=solve_detects)
                     if plot == True:
-                        plot_task(filename)
+                        plot_task(task)
         return count
 
     def plot(self, tasks):
@@ -120,7 +125,7 @@ class Solver():
         ratios = set([
             Solver.grid_shape_ratio(spec.get('input',[]), spec.get('output',[]))
             for spec in Solver.loop_specs(task, 'train')
-            ])
+        ])
         # ratios = set([ int(ratio) if ratio.is_integer() else ratio for ratio in chain(*ratios) ])
         return ratios
 

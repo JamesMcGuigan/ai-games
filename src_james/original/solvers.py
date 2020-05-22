@@ -1,17 +1,12 @@
 from typing import List
 
-from .BorderSolver import BorderSolver
-from .DoNothingSolver import DoNothingSolver
-from .GeometrySolver import GeometrySolver
-from .SingleColorSolver import SingleColorSolver
-from .Solver import Solver
-from .TessellationSolver import TessellationSolver
-
-
-
-# from .ZoomSolver import ZoomSolver
-
-
+from src_james.original.BorderSolver import BorderSolver
+from src_james.original.DoNothingSolver import DoNothingSolver
+from src_james.original.GeometrySolver import GeometrySolver
+from src_james.original.SingleColorSolver import SingleColorSolver
+from src_james.original.Solver import Solver
+from src_james.original.TessellationSolver import TessellationSolver
+from src_james.original.ZoomSolver import ZoomSolver
 
 solvers: List[Solver] = [
     DoNothingSolver(),
@@ -19,5 +14,5 @@ solvers: List[Solver] = [
     GeometrySolver(),
     SingleColorSolver(),
     TessellationSolver(),
-    # ZoomSolver(),
+    ZoomSolver(),
 ]

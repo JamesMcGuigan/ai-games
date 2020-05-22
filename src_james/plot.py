@@ -7,7 +7,6 @@ from matplotlib import colors
 from src_james.core.DataModel import Task
 
 
-
 def plot_one(task, ax, i,train_or_test,input_or_output):
     cmap = colors.ListedColormap(
         ['#000000', '#0074D9','#FF4136','#2ECC40','#FFDC00',
@@ -34,7 +33,7 @@ def plot_task(task: Task, scale=2):
     filename = task.filename
 
     num_train = len(task['train']) + len(task['test']) + 1
-    if 'solution' in task: num_train += len(task['solution']) + 1
+    if len(task['solutions']): num_train += len(task['solutions']) + 1
 
     fig, axs = plt.subplots(2, num_train, figsize=(scale*num_train,scale*2))
     if filename: fig.suptitle(filename)
@@ -50,10 +49,10 @@ def plot_task(task: Task, scale=2):
         plot_one(task, axs[0,i+2+j],j,'test','input')
         plot_one(task, axs[1,i+2+j],j,'test','output')
 
-    if 'solution' in task:
+    if 'solutions' in task:
         axs[0,i+j+3].axis('off'); axs[1,i+j+3].axis('off')
-        for k in range(len(task['solution'])):
-            plot_one(task, axs[0,i+j+4+k],k,'solution','input')
-            plot_one(task, axs[1,i+j+4+k],k,'solution','output')
+        for k in range(len(task['solutions'])):
+            plot_one(task, axs[0,i+j+4+k],k,'solutions','input')
+            plot_one(task, axs[1,i+j+4+k],k,'solutions','output')
 
     plt.show()

@@ -7,7 +7,6 @@ from src_james.original.functions import *
 from src_james.original.functions import crop_inner, crop_outer
 
 
-
 class TessellationSolver(GeometrySolver):
     verbose = True
     debug   = False
@@ -76,7 +75,7 @@ class TessellationSolver(GeometrySolver):
 
     # TODO: hieraracharical nesting of solves and solutions/rules array generator
     def test(self, task):
-        if task['file'] in self.cache: return True
+        if task.filename in self.cache: return True
         for (preprocess,p_arg),(transform,t_arg),(query,q_arg) in self.loop_options():
             kwargs = {
                 "preprocess": preprocess,
@@ -87,7 +86,7 @@ class TessellationSolver(GeometrySolver):
                 "q_arg":      q_arg,
                 }
             if self.is_lambda_valid(task, self.action, **kwargs, task=task):
-                self.cache[task['file']] = kwargs
+                self.cache[task.filename] = kwargs
                 if self.verbose: print(self.action, kwargs)
                 return True
         return False

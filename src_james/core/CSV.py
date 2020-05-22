@@ -1,11 +1,9 @@
 import os
 import re
-from typing import List, Union
 
 import numpy as np
 
 from src_james.settings import settings
-
 
 
 class CSV:
@@ -26,31 +24,32 @@ class CSV:
     def to_csv(cls, dataset: 'Dataset'):
         csv = ['output_id,output']
         for task in dataset:
-            csv.append(CSV.to_csv_line(task))
+            line = CSV.to_csv_line(task)
+            if line: csv.append(line)
         return "\n".join(csv)
 
     @classmethod
     def to_csv_line(cls, task: 'Task') -> str:
         csv = []
-        for test_index, problem in enumerate(task['test']):
-            if not problem.get('solution', None): continue
-            solutions = {
-                cls.grid_to_csv_string(solution)
-                for solution in problem['solution']
-            }
-            for sol_index, solution_csv in enumerate(solutions):
-                line = ",".join([
-                    cls.object_id(task.filename, test_index+sol_index),
-                    solution_csv
-                ])
-                csv.append(line)
+        solutions = set({
+            cls.grid_to_csv_string(problem['output'])
+            for problem in task['solutions']
+        })
+        for index, solution_csv in enumerate(solutions):
+            if not solution_csv: continue
+            line = ",".join([
+                cls.object_id(task.filename, index),
+                solution_csv
+            ])
+            csv.append(line)
         return "\n".join(csv)
 
     # Source: https://www.kaggle.com/c/abstraction-and-reasoning-challenge/overview/evaluation
+    # noinspection PyTypeChecker
     @staticmethod
-    def grid_to_csv_string(grid: Union[List[List[int]], np.ndarray]) -> str:
-        if isinstance(grid, np.ndarray):
-            grid = grid.astype('int8').tolist()
+    def grid_to_csv_string(grid: np.ndarray) -> str:
+        if grid is None: return None
+        grid = np.array(grid).astype('int8').tolist()
         str_pred = str([ row for row in grid ])
         str_pred = str_pred.replace(', ', '')
         str_pred = str_pred.replace('[[', '|')

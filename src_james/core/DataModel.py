@@ -13,7 +13,6 @@ from src_james.core.CSV import CSV
 from src_james.settings import settings
 
 
-
 # Conceptual Mapping
 # - Competition: The collection of all Dataset in the competition
 # - Dataset:     An array of all Tasks in the competition
@@ -47,8 +46,12 @@ class Competition(UserDict):
 
     def score(self) -> Dict[str,Any]:
         score = { name: dataset.score() for name, dataset in self.data.items() }
-        score['time'] = Dataset.to_clock(self.time_taken)
+        score['time'] = Dataset.format_clock(self.time_taken)
         return score
+
+    @classmethod
+    def format_clock(cls, time_taken: float) -> str:
+        return Dataset.format_clock(time_taken)
 
     def __str__(self):
         return "\n".join([ f"{key:11s}: {value}" for key, value in self.score().items() ])
@@ -68,6 +71,17 @@ class Dataset(UserList):
         self.data       = [Task(filename, self) for filename in self.filenames]
         self.time_taken = 0
 
+    def __repr__(self):
+        return f'<{self.__class__.__name__}:{self.directory}>'
+
+    def __hash__(self):
+        return hash(self.directory)
+
+    def __eq__(self, other):
+        if not isinstance(other, Dataset): return False
+        return self.directory == other.directory
+
+
     def solve(self) -> 'Dataset':
         time_start = time.perf_counter()
         for task in self:
@@ -79,13 +93,13 @@ class Dataset(UserList):
         score = {}
         score['correct'] = sum([task.score() for task in self])
         score['total']   = len(self.test_outputs)
-        score['error']   = round(1 - score['correct'] / score['total']) if score['total'] else 0
-        score['time']    = self.to_clock(self.time_taken)
+        score['error']   = round(1 - score['correct'] / score['total'],4) if score['total'] else 0
+        score['time']    = self.format_clock(self.time_taken)
         score['name']    = self.name
         return score
 
-    @staticmethod
-    def to_clock(time_taken: float) -> str:
+    @classmethod
+    def format_clock(cls, time_taken: float) -> str:
         hours   = time_taken // (60 * 60)
         minutes = time_taken // (60)
         seconds = time_taken % 60
@@ -115,6 +129,13 @@ class Task(UserDict):
             test_or_train: ProblemSet(input_outputs, test_or_train, self)
             for test_or_train, input_outputs in self.raw.items()
         }
+        self.data['solutions'] = []
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__}:{self.filename}>'
+
+    def __hash__(self):
+        return hash(self.filename)
 
     @classmethod
     def format_filename(cls, filename):
@@ -128,6 +149,7 @@ class Task(UserDict):
             for index, spec in enumerate(specs):
                 for input_output, grid in spec.items():
                     data[test_or_train][index][input_output] = np.array(grid).astype('int8')
+                    data[test_or_train][index][input_output].flags.writeable = False  # make immutable
         return data
 
     @property
@@ -140,21 +162,38 @@ class Task(UserDict):
 
     def solve(self) -> 'Task':
         # TODO: implement
+        print(self.__class__.__name__, 'solve()', NotImplementedError())
         return self  # for chaining
 
     def score(self) -> int:
-        return 0  # TODO: implement
+        score = len(set([
+            problem['output'].tobytes()
+            for problem in self.data['solutions']
+            if problem['output'] is not None
+        ]))
+        return min(score, self.max_score())
+
+    def max_score(self) -> int:
+        return len(self.data['test'])
 
 
 class ProblemSet(UserList):
     """ ProblemSet: An array of either test or training Problems """
-
+    _instance_count = 0
     def __init__(self, input_outputs: List[Dict[str, np.ndarray]], test_or_train: str, task: Task):
         super().__init__()
         self.task:          Task                       = task
         self.test_or_train: str                        = test_or_train
         self.raw:           List[Dict[str,np.ndarray]] = input_outputs
         self.data:          List[Problem]              = [ Problem(problem, self) for problem in self.raw ]
+        self._id = self.__class__._instance_count = self.__class__._instance_count + 1
+
+    def __eq__(self, other):
+        if not isinstance(ProblemSet, other): return False
+        return self._id == other._id
+
+    def __hash__(self):
+        return self._id
 
     @property
     def filename(self): return self.task.filename
@@ -172,22 +211,18 @@ class ProblemSet(UserList):
         return self.inputs + self.outputs
 
 
-
 class Problem(UserDict):
     """ Problem: An input + output Grid pair """
-    _hash_seed = 0  # hash('Problem')
     dtype = 'int8'
     def __init__(self, problem: Dict[str,np.ndarray], problemset: ProblemSet):
         super().__init__()
-        self._hash = self.__class__._hash_seed = self.__class__._hash_seed + 1
-
+        self._hash = 0
         self.problemset: ProblemSet           = problemset
         self.task:       Task                 = problemset.task
         self.raw:        Dict[str,np.ndarray] = problem
         self.data = {
             "input":    np.array(problem['input']).astype(self.dtype),
             "output":   np.array(problem['output']).astype(self.dtype) if 'output' in problem else None,
-            "solution": []
         }
         self.grids:  List[np.ndarray] = [ self.data[label]
                                           for label in ['input','output']
@@ -197,4 +232,9 @@ class Problem(UserDict):
     def filename(self): return self.task.filename
 
     def __hash__(self):
+        if not self._hash:
+            for item in [ self.data['input'], self.data['output'] ]:
+                item = item.tobytes() if isinstance(item, (np.ndarray, np.generic)) else item
+                self._hash += hash(item)
         return self._hash
+

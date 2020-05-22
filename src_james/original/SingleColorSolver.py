@@ -4,7 +4,6 @@ from src_james.original.Solver import Solver
 from src_james.original.functions import count_colors, count_squares, max_color, max_color_1d, min_color, min_color_1d
 
 
-
 class SingleColorSolver(Solver):
     verbose = True
     debug = True
@@ -31,11 +30,11 @@ class SingleColorSolver(Solver):
         return self.task_is_singlecolor(task)
 
     def test(self, task):
-        if task['file'] in self.cache: return True
+        if task.filename in self.cache: return True
         for query in self.queries:
             args = [ query ]
             if self.is_lambda_valid(task, self.action, *args, task=task):
-                self.cache[task['file']] = args
+                self.cache[task.filename] = args
                 if self.verbose: print(self.action, args)
                 return True
         return False

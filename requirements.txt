@@ -38,7 +38,7 @@ nbconvert==5.6.1          # via jupyter, notebook
 nbformat==5.0.6           # via ipywidgets, nbconvert, notebook
 networkx==2.4             # via scikit-image
 notebook==6.0.3           # via jupyter, widgetsnbextension
-numpy==1.18.4             # via -r requirements.in, imagecodecs, imageio, matplotlib, opencv-python, pandas, pywavelets, scikit-image, scikit-learn, scipy, tifffile
+numpy==1.18.4             # via -r requirements.in, imagecodecs, imageio, matplotlib, opencv-python, pandas, pywavelets, scikit-image, scikit-learn, scipy, tifffile, xgboost
 opencv-python==4.2.0.34   # via -r requirements.in
 packaging==20.4           # via bleach
 pandas==1.0.3             # via -r requirements.in
@@ -62,7 +62,7 @@ qtconsole==4.7.4          # via jupyter
 qtpy==1.9.0               # via qtconsole
 scikit-image==0.17.2      # via -r requirements.in
 scikit-learn==0.23.1      # via sklearn
-scipy==1.4.1              # via scikit-image, scikit-learn
+scipy==1.4.1              # via scikit-image, scikit-learn, xgboost
 send2trash==1.5.0         # via notebook
 simplejson==3.17.0        # via -r requirements.in
 six==1.15.0               # via bleach, cycler, jsonschema, packaging, pyrsistent, python-dateutil, traitlets
@@ -79,6 +79,7 @@ traitlets==4.3.3          # via ipykernel, ipython, ipywidgets, jupyter-client, 
 wcwidth==0.1.9            # via prompt-toolkit
 webencodings==0.5.1       # via bleach
 widgetsnbextension==3.5.1  # via ipywidgets
+xgboost==1.1.0            # via -r requirements.in
 zipp==3.1.0               # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:

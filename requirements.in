@@ -21,6 +21,7 @@ numpy
 pandas
 sklearn
 sympy
+xgboost
 
 # Image Manipulation
 opencv-python

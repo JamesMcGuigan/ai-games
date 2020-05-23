@@ -3,15 +3,15 @@
 ##### 
 ##### ./submission/kaggle_compile.py ./src_james/solver_multimodel/main.py
 ##### 
-##### 2020-05-23 18:24:15+01:00
+##### 2020-05-23 18:40:42+01:00
 ##### 
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### 
 #####   james-wip c81cf89 Solvers | work in progress - broken
-##### * master    739ed8f bugfixes for kaggle deployment
+##### * master    2b3212d DataModel.cast()
 ##### 
-##### 739ed8f0cdf4f30c3e7737f3f96eb92374eff9ce
+##### 2b3212dab3f1862e50dbb2f90afb0bde71a03e85
 ##### 
 
 #####
@@ -349,12 +349,14 @@ class Problem(UserDict):
 
         self.data = {}
         for key in ['input', 'output']:
-            value = problem.get(key, None)
-            if value is not None:
-                value = np.array(problem[key]).astype(self.dtype)
-                value.flags.writeable = False
+            value = self.cast(problem.get(key, None))
             self.data[key] = value
 
+    def cast(self, value: Any):
+        if value is None: return None
+        value = np.ascontiguousarray(value, dtype=self.dtype)
+        value.flags.writeable = False
+        return value
 
     @property
     def grids(self) -> List[np.ndarray]:
@@ -612,46 +614,56 @@ from fastcache._lrucache import clru_cache
 
 
 ### Profiler: 3x speedup
-def np_cache(function):
-    @wraps(function)
-    def wrapper(*args, **kwargs):
-        ### def encode(*args, **kwargs):
-        args = list(args)  # BUGFIX: TypeError: 'tuple' object does not support item assignment
-        for i, arg in enumerate(args):
-            if isinstance(arg, np.ndarray):
-                hash = arg.tobytes()
-                if hash not in wrapper.cache:
-                    wrapper.cache[hash] = arg
-                args[i] = hash
-        for key, arg in kwargs.items():
-            if isinstance(arg, np.ndarray):
-                hash = arg.tobytes()
-                if hash not in wrapper.cache:
-                    wrapper.cache[hash] = arg
-                kwargs[key] = hash
+def np_cache(maxsize=None, typed=True):
+    maxsize_default=None
 
-        return cached_wrapper(*args, **kwargs)
+    def np_cache_generator(function):
 
-    @clru_cache(maxsize=None, typed=True)
-    def cached_wrapper(*args, **kwargs):
-        ### def decode(*args, **kwargs):
-        args = list(args)  # BUGFIX: TypeError: 'tuple' object does not support item assignment
-        for i, arg in enumerate(args):
-            if isinstance(arg, bytes) and arg in wrapper.cache:
-                args[i] = wrapper.cache[arg]
-        for key, arg in kwargs.items():
-            if isinstance(arg, bytes) and arg in wrapper.cache:
-                kwargs[key] = wrapper.cache[arg]
+        @wraps(function)
+        def wrapper(*args, **kwargs):
+            ### def encode(*args, **kwargs):
+            args = list(args)  # BUGFIX: TypeError: 'tuple' object does not support item assignment
+            for i, arg in enumerate(args):
+                if isinstance(arg, np.ndarray):
+                    hash = arg.tobytes()
+                    if hash not in wrapper.cache:
+                        wrapper.cache[hash] = arg
+                    args[i] = hash
+            for key, arg in kwargs.items():
+                if isinstance(arg, np.ndarray):
+                    hash = arg.tobytes()
+                    if hash not in wrapper.cache:
+                        wrapper.cache[hash] = arg
+                    kwargs[key] = hash
 
-        return function(*args, **kwargs)
+            return cached_wrapper(*args, **kwargs)
 
+        @clru_cache(maxsize=maxsize, typed=typed)
+        def cached_wrapper(*args, **kwargs):
+            ### def decode(*args, **kwargs):
+            args = list(args)  # BUGFIX: TypeError: 'tuple' object does not support item assignment
+            for i, arg in enumerate(args):
+                if isinstance(arg, bytes) and arg in wrapper.cache:
+                    args[i] = wrapper.cache[arg]
+            for key, arg in kwargs.items():
+                if isinstance(arg, bytes) and arg in wrapper.cache:
+                    kwargs[key] = wrapper.cache[arg]
 
-    # copy lru_cache attributes over too
-    wrapper.cache       = {}
-    wrapper.cache_info  = cached_wrapper.cache_info
-    wrapper.cache_clear = cached_wrapper.cache_clear
+            return function(*args, **kwargs)
 
-    return wrapper
+        # copy lru_cache attributes over too
+        wrapper.cache       = {}
+        wrapper.cache_info  = cached_wrapper.cache_info
+        wrapper.cache_clear = cached_wrapper.cache_clear
+
+        return wrapper
+
+    ### def np_cache(maxsize=1024, typed=True):
+    if callable(maxsize):
+        (function, maxsize) = (maxsize, maxsize_default)
+        return np_cache_generator(function)
+    else:
+        return np_cache_generator
 
 #####
 ##### END   src_james/util/np_cache.py
@@ -785,7 +797,7 @@ def query_not_zero(grid,x,y):      return grid[x,y]
 def query_color(grid,x,y,color):   return grid[x,y] == color
 
 # evaluation/15696249.json - max(1d.argmax())
-@np_cache
+@np_cache(128)
 def query_max_color(grid,x,y,exclude_zero=True):
     return grid[x,y] == max_color(grid, exclude_zero)
 
@@ -1316,13 +1328,13 @@ if __name__ == '__main__':
 ##### 
 ##### ./submission/kaggle_compile.py ./src_james/solver_multimodel/main.py
 ##### 
-##### 2020-05-23 18:24:15+01:00
+##### 2020-05-23 18:40:42+01:00
 ##### 
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### 
 #####   james-wip c81cf89 Solvers | work in progress - broken
-##### * master    739ed8f bugfixes for kaggle deployment
+##### * master    2b3212d DataModel.cast()
 ##### 
-##### 739ed8f0cdf4f30c3e7737f3f96eb92374eff9ce
+##### 2b3212dab3f1862e50dbb2f90afb0bde71a03e85
 ##### 

@@ -1,6 +1,6 @@
 from copy import deepcopy
 from itertools import chain
-from typing import List, Dict
+from typing import List
 
 import numpy as np
 
@@ -29,7 +29,7 @@ class Solver():
         return True
 
     @staticmethod
-    def solve_lambda(_task_, _function_, *args, _inplace_=False, **kwargs) -> List[Dict[str,Problem]]:
+    def solve_lambda(_task_, _function_, *args, _inplace_=False, **kwargs) -> List[Problem]:
         solutions = []
         for index, problem in enumerate(_task_['test']):
             output = _function_(problem['input'], *args, **kwargs)
@@ -38,7 +38,7 @@ class Solver():
                 "input":  problem['input'],
                 "output": output,
             }, problemset=_task_['test'])
-            solutions.append(problem)
+            solutions.append(solution)
         if _inplace_:
             _task_['solutions'] += solutions
         return solutions

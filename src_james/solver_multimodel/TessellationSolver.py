@@ -1,6 +1,7 @@
 import inspect
 from itertools import product
 
+from src_james.core.DataModel import Task
 from src_james.solver_multimodel.GeometrySolver import GeometrySolver
 from src_james.solver_multimodel.ZoomSolver import ZoomSolver
 from src_james.solver_multimodel.functions import *
@@ -138,3 +139,11 @@ class TessellationSolver(GeometrySolver):
         except Exception as exception:
             if self.debug: print(exception)
             pass
+
+
+if __name__ == '__main__':
+    # This is a known test success
+    task   = Task('test/27f8ce4f.json')
+    solver = TessellationSolver()
+    solver.plot([ task ])
+    print('task.score(): ', task.score())

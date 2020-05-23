@@ -220,13 +220,21 @@ class Problem(UserDict):
         self.problemset: ProblemSet           = problemset
         self.task:       Task                 = problemset.task
         self.raw:        Dict[str,np.ndarray] = problem
-        self.data = {
-            "input":    np.array(problem['input']).astype(self.dtype),
-            "output":   np.array(problem['output']).astype(self.dtype) if 'output' in problem else None,
-        }
-        self.grids:  List[np.ndarray] = [ self.data[label]
-                                          for label in ['input','output']
-                                          if self.data[label] is not None ]
+
+        self.data = {}
+        for key in ['input', 'output']:
+            value = problem.get(key, None)
+            if value is not None:
+                value = np.array(problem[key]).astype(self.dtype)
+                value.flags.writeable = False
+            self.data[key] = value
+
+
+    @property
+    def grids(self) -> List[np.ndarray]:
+        return  [ self.data[label]
+                  for label in ['input','output']
+                  if self.data[label] is not None ]
 
     @property
     def filename(self): return self.task.filename

@@ -85,10 +85,12 @@ class Solver():
                         plot_task(task)
         return count
 
-    def plot(self, tasks: Union[Dataset,List[Task]]):
+    def plot(self, tasks: Union[Dataset,List[Task], Task]):
+        if isinstance(tasks, Task): tasks = [ tasks ]
         return self.solve_all(tasks, plot=True, solve_detects=False)
 
-    def plot_detects(self, tasks: Union[Dataset,List[Task]], unsolved=True):
+    def plot_detects(self, tasks: Union[Dataset,List[Task],Task], unsolved=True):
+        if isinstance(tasks, Task): tasks = [ tasks ]
         if unsolved:
             tasks = [ task for task in tasks if not len(task['solutions']) ]
         return self.solve_all(tasks, plot=True, solve_detects=True)

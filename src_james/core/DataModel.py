@@ -223,12 +223,14 @@ class Problem(UserDict):
 
         self.data = {}
         for key in ['input', 'output']:
-            value = problem.get(key, None)
-            if value is not None:
-                value = np.array(problem[key]).astype(self.dtype)
-                value.flags.writeable = False
+            value = self.cast(problem.get(key, None))
             self.data[key] = value
 
+    def cast(self, value: Any):
+        if value is None: return None
+        value = np.ascontiguousarray(value, dtype=self.dtype)
+        value.flags.writeable = False
+        return value
 
     @property
     def grids(self) -> List[np.ndarray]:

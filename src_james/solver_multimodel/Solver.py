@@ -1,10 +1,9 @@
-from copy import deepcopy
 from itertools import chain
-from typing import List
+from typing import List, Union, Callable
 
 import numpy as np
 
-from src_james.core.DataModel import Problem
+from src_james.core.DataModel import Problem, Task, Dataset
 from src_james.plot import plot_task
 
 
@@ -15,13 +14,13 @@ class Solver():
         self.cache = {}
 
     @staticmethod
-    def loop_specs(task, test_train='train'):
+    def loop_specs(task: Task, test_train='train'):
         specs = task[test_train]
         for index, spec in enumerate(specs):
             yield { 'input': spec['input'], 'output': spec['output'] }
 
     @staticmethod
-    def is_lambda_valid(_task_, _function_, *args, **kwargs):  # _task_ = avoid namespace conflicts with kwargs=task
+    def is_lambda_valid(_task_: Task, _function_: Callable, *args, **kwargs):  # _task_ = avoid namespace conflicts with kwargs=task
         for spec in Solver.loop_specs(_task_, 'train'):
             output = _function_(spec['input'], *args, **kwargs)
             if not np.array_equal( spec['output'], output):
@@ -29,7 +28,7 @@ class Solver():
         return True
 
     @staticmethod
-    def solve_lambda(_task_, _function_, *args, _inplace_=False, **kwargs) -> List[Problem]:
+    def solve_lambda( _task_: Task, _function_: Callable, *args, _inplace_=False, **kwargs) -> List[Problem]:
         solutions = []
         for index, problem in enumerate(_task_['test']):
             output = _function_(problem['input'], *args, **kwargs)
@@ -43,21 +42,21 @@ class Solver():
             _task_['solutions'] += solutions
         return solutions
 
-    def action(self, grid, task=None, *args):
+    def action(self, grid: np.ndarray, task=None, *args):
         """This is the primary method this needs to be defined"""
         return grid
         # raise NotImplementedError()
 
-    def detect(self, task):
+    def detect(self, task: Task) -> bool:
         """default heuristic is simply to run the solver"""
         return self.test(task)
 
-    def test(self, task):
+    def test(self, task: Task) -> bool:
         """test if the given action correctly solves the task"""
         args = self.cache.get(task.filename, ())
         return self.is_lambda_valid(task, self.action, *args, task=task)
 
-    def solve(self, task, force=False, inplace=True):
+    def solve(self, task: Task, force=False, inplace=True) -> Union[List[Problem],None]:
         """solve test case and persist"""
         try:
             if self.detect(task) or force:    # may generate cache
@@ -74,7 +73,7 @@ class Solver():
             if self.debug: raise exception
         return None
 
-    def solve_all(self, tasks, plot=False, solve_detects=False):
+    def solve_all(self, tasks: Union[Dataset,List[Task]], plot=False, solve_detects=False):
         count = 0
         for task in tasks:
             if self.detect(task):
@@ -86,12 +85,12 @@ class Solver():
                         plot_task(task)
         return count
 
-    def plot(self, tasks):
+    def plot(self, tasks: Union[Dataset,List[Task]]):
         return self.solve_all(tasks, plot=True, solve_detects=False)
 
-    def plot_detects(self, tasks, unsolved=True):
+    def plot_detects(self, tasks: Union[Dataset,List[Task]], unsolved=True):
         if unsolved:
-            tasks = { file: task for (file,task) in deepcopy(tasks).items() if not 'solution' in task }
+            tasks = [ task for task in tasks if not len(task['solutions']) ]
         return self.solve_all(tasks, plot=True, solve_detects=True)
 
 

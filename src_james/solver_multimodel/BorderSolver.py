@@ -1,5 +1,5 @@
 from src_james.solver_multimodel.Solver import Solver
-from src_james.solver_multimodel.functions import *
+from src_james.solver_multimodel.queries.grid import *
 
 
 class BorderSolver(Solver):

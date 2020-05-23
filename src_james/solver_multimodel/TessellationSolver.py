@@ -5,7 +5,11 @@ from itertools import product
 from src_james.core.DataModel import Task
 from src_james.solver_multimodel.GeometrySolver import GeometrySolver
 from src_james.solver_multimodel.ZoomSolver import ZoomSolver
-from src_james.solver_multimodel.functions import *
+from src_james.solver_multimodel.queries.grid import *
+from src_james.solver_multimodel.queries.loops import *
+from src_james.solver_multimodel.transforms.crop import crop_inner, crop_outer
+from src_james.solver_multimodel.transforms.grid import invert
+from src_james.util.make_tuple import make_tuple
 
 
 class TessellationSolver(GeometrySolver):

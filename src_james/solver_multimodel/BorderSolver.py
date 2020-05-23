@@ -1,5 +1,6 @@
 from src_james.solver_multimodel.Solver import Solver
 from src_james.solver_multimodel.queries.grid import *
+from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_consistant, task_shape_ratios
 
 
 class BorderSolver(Solver):
@@ -18,7 +19,7 @@ class BorderSolver(Solver):
     ]
 
     def task_has_border(self, task):
-        if not self.is_task_shape_ratio_consistant(task): return False
+        if not is_task_shape_ratio_consistant(task): return False
         return all([ self.grid_has_border(spec['output']) for spec in task['train'] ])
 
     def grid_has_border(self, grid):
@@ -44,7 +45,7 @@ class BorderSolver(Solver):
         return False
 
     def action(self, grid, query=None, task=None):
-        ratio  = list(self.task_shape_ratios(task))[0]
+        ratio  = task_shape_ratios(task)[0]
         output = np.zeros(( int(grid.shape[0] * ratio[0]), int(grid.shape[1] * ratio[1]) ))
         color  = query(grid) if callable(query) else query
         output[:,:] = color

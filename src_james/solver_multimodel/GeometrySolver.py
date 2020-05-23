@@ -3,6 +3,7 @@ from itertools import combinations, product
 import numpy as np
 
 from src_james.solver_multimodel.Solver import Solver
+from src_james.solver_multimodel.queries.ratio import task_grid_max_dim, is_task_shape_ratio_unchanged
 
 
 class GeometrySolver(Solver):
@@ -22,12 +23,12 @@ class GeometrySolver(Solver):
             self.actions[key] = (function, [ (args,) if not isinstance(args, tuple) else args for args in arglist ])
 
     def detect(self, task):
-        return self.is_task_shape_ratio_unchanged(task)  # grids must remain the exact same size
+        return is_task_shape_ratio_unchanged(task)  # grids must remain the exact same size
 
     def test(self, task):
         if task.filename in self.cache: return True
 
-        max_roll = (self.task_grid_max_dim(task) + 1) // 2
+        max_roll = (task_grid_max_dim(task) + 1) // 2
         for key, (function, arglist) in self.actions.items():
             if function == np.roll: arglist = product(range(-max_roll,max_roll),[0,1])
             for args in arglist:

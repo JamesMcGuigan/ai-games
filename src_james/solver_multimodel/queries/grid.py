@@ -89,4 +89,6 @@ def query_count_squares_col(grid,x,y):
 def count_squares(grid):
     return np.count_nonzero(grid.flatten())
 
-
+@np_cache
+def grid_unique_colors(grid):
+    return np.unique(grid.flatten())

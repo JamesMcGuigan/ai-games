@@ -1,4 +1,3 @@
-from itertools import chain
 from typing import List, Union, Callable
 
 import numpy as np
@@ -14,16 +13,10 @@ class Solver():
         self.cache = {}
 
     @staticmethod
-    def loop_specs(task: Task, test_train='train'):
-        specs = task[test_train]
-        for index, spec in enumerate(specs):
-            yield { 'input': spec['input'], 'output': spec['output'] }
-
-    @staticmethod
     def is_lambda_valid(_task_: Task, _function_: Callable, *args, **kwargs):  # _task_ = avoid namespace conflicts with kwargs=task
-        for spec in Solver.loop_specs(_task_, 'train'):
-            output = _function_(spec['input'], *args, **kwargs)
-            if not np.array_equal( spec['output'], output):
+        for problem in _task_['train']:
+            output = _function_(problem['input'], *args, **kwargs)
+            if not np.array_equal( problem['output'], output):
                 return False
         return True
 
@@ -94,52 +87,3 @@ class Solver():
         if unsolved:
             tasks = [ task for task in tasks if not len(task['solutions']) ]
         return self.solve_all(tasks, plot=True, solve_detects=True)
-
-
-    ### Helper Methods ###
-
-    @staticmethod
-    def grid_shape_ratio(grid1, grid2):
-        try:
-            return ( grid2.shape[0] / grid1.shape[0], grid2.shape[1] / grid1.shape[1] )
-        except:
-            return (0, 0)  # For tests
-
-    @staticmethod
-    def task_grids(task):
-        grids = []
-        for test_train in ['test','train']:
-            for spec in task[test_train]:
-                grids += [ spec.get('input',[]), spec.get('output',[]) ]  # tests not gaurenteed to have outputs
-        return grids
-
-    @staticmethod
-    def task_grid_shapes(task):
-        return [ np.array(grid).shape for grid in Solver.task_grids(task) ]
-
-    @staticmethod
-    def task_grid_max_dim(task):
-        return max(chain(*Solver.task_grid_shapes(task)))
-
-    @staticmethod
-    def task_shape_ratios(task):
-        ratios = set([
-            Solver.grid_shape_ratio(spec.get('input',[]), spec.get('output',[]))
-            for spec in Solver.loop_specs(task, 'train')
-        ])
-        # ratios = set([ int(ratio) if ratio.is_integer() else ratio for ratio in chain(*ratios) ])
-        return ratios
-
-    @staticmethod
-    def is_task_shape_ratio_unchanged(task):
-        return Solver.task_shape_ratios(task) == { (1,1) }
-
-    @staticmethod
-    def is_task_shape_ratio_consistant(task):
-        return len(Solver.task_shape_ratios(task)) == 1
-
-    @staticmethod
-    def is_task_shape_ratio_integer_multiple(task):
-        ratios = Solver.task_shape_ratios(task)
-        return all([ isinstance(d, int) or d.is_integer() for d in chain(*ratios) ])
-

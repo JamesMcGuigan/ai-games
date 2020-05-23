@@ -1,5 +1,7 @@
 from src_james.solver_multimodel.Solver import Solver
+from src_james.solver_multimodel.queries.colors import task_is_singlecolor
 from src_james.solver_multimodel.queries.grid import *
+from src_james.solver_multimodel.queries.ratio import task_shape_ratios
 
 
 class SingleColorSolver(Solver):
@@ -17,15 +19,8 @@ class SingleColorSolver(Solver):
         np.count_nonzero,
     ]
 
-    def grid_unique_colors(self, grid):
-        return np.unique(grid.flatten())
-
-    def task_is_singlecolor(self, task):
-        if not self.is_task_shape_ratio_consistant(task): return False
-        return all([ len(self.grid_unique_colors(spec['output'])) == 1 for spec in task['train'] ])
-
     def detect(self, task):
-        return self.task_is_singlecolor(task)
+        return task_is_singlecolor(task)
 
     def test(self, task):
         if task.filename in self.cache: return True
@@ -38,7 +33,7 @@ class SingleColorSolver(Solver):
         return False
 
     def action(self, grid, query=None, task=None):
-        ratio  = list(self.task_shape_ratios(task))[0]
+        ratio  = task_shape_ratios(task)[0]
         output = np.zeros(( int(grid.shape[0] * ratio[0]), int(grid.shape[1] * ratio[1]) ))
         color  = query(grid) if callable(query) else query
         output[:,:] = color

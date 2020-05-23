@@ -2,13 +2,14 @@ import cv2
 import skimage.measure
 
 from src_james.solver_multimodel.Solver import Solver
+from src_james.solver_multimodel.queries.ratio import task_shape_ratios
 
 
 class ZoomSolver(Solver):
     verbose = False
 
     def detect(self, task):
-        ratios = self.task_shape_ratios(task)
+        ratios = task_shape_ratios(task)
         ratio  = list(ratios)[0]
         detect = (
                 ratios != { (1,1) }   # not no scaling
@@ -18,7 +19,7 @@ class ZoomSolver(Solver):
         return detect
 
     def get_scale(self, task):
-        return list(self.task_shape_ratios(task))[0][0]
+        return task_shape_ratios(task)[0][0]
 
     def action( self, grid, task=None, *args ):
         scale = self.get_scale(task)

@@ -3,15 +3,15 @@
 ##### 
 ##### ./submission/kaggle_compile.py ./src_james/solver_multimodel/main.py
 ##### 
-##### 2020-05-23 18:40:42+01:00
+##### 2020-05-23 21:27:31+01:00
 ##### 
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### 
 #####   james-wip c81cf89 Solvers | work in progress - broken
-##### * master    2b3212d DataModel.cast()
+##### * master    1c43b99 Solver | reorganize functions.py into files
 ##### 
-##### 2b3212dab3f1862e50dbb2f90afb0bde71a03e85
+##### 1c43b991ccdb3d26128acdca4871b8cf7519361f
 ##### 
 
 #####
@@ -381,6 +381,82 @@ class Problem(UserDict):
 #####
 
 #####
+##### START src_james/util/np_cache.py
+#####
+
+# Inspired by: https://stackoverflow.com/questions/52331944/cache-decorator-for-numpy-arrays/52332109
+from functools import wraps
+
+import numpy as np
+from fastcache._lrucache import clru_cache
+
+
+### Profiler: 2x speedup
+def np_cache(maxsize=None, typed=True):
+    """
+        Decorator:
+        @np_cache
+        def fn(): return value
+
+        @np_cache(maxsize=128, typed=True)
+        def fn(): return value
+    """
+    maxsize_default=None
+
+    def np_cache_generator(function):
+
+        @wraps(function)
+        def wrapper(*args, **kwargs):
+            ### def encode(*args, **kwargs):
+            args = list(args)  # BUGFIX: TypeError: 'tuple' object does not support item assignment
+            for i, arg in enumerate(args):
+                if isinstance(arg, np.ndarray):
+                    hash = arg.tobytes()
+                    if hash not in wrapper.cache:
+                        wrapper.cache[hash] = arg
+                    args[i] = hash
+            for key, arg in kwargs.items():
+                if isinstance(arg, np.ndarray):
+                    hash = arg.tobytes()
+                    if hash not in wrapper.cache:
+                        wrapper.cache[hash] = arg
+                    kwargs[key] = hash
+
+            return cached_wrapper(*args, **kwargs)
+
+        @clru_cache(maxsize=maxsize, typed=typed)
+        def cached_wrapper(*args, **kwargs):
+            ### def decode(*args, **kwargs):
+            args = list(args)  # BUGFIX: TypeError: 'tuple' object does not support item assignment
+            for i, arg in enumerate(args):
+                if isinstance(arg, bytes) and arg in wrapper.cache:
+                    args[i] = wrapper.cache[arg]
+            for key, arg in kwargs.items():
+                if isinstance(arg, bytes) and arg in wrapper.cache:
+                    kwargs[key] = wrapper.cache[arg]
+
+            return function(*args, **kwargs)
+
+        # copy lru_cache attributes over too
+        wrapper.cache       = {}
+        wrapper.cache_info  = cached_wrapper.cache_info
+        wrapper.cache_clear = cached_wrapper.cache_clear
+
+        return wrapper
+
+
+    ### def np_cache(maxsize=1024, typed=True):
+    if callable(maxsize):
+        (function, maxsize) = (maxsize, maxsize_default)
+        return np_cache_generator(function)
+    else:
+        return np_cache_generator
+
+#####
+##### END   src_james/util/np_cache.py
+#####
+
+#####
 ##### START src_james/plot.py
 #####
 
@@ -452,13 +528,11 @@ def plot_task(task: Task, scale=2):
 ##### START src_james/solver_multimodel/Solver.py
 #####
 
-from copy import deepcopy
-from itertools import chain
-from typing import List
+from typing import List, Union, Callable
 
 import numpy as np
 
-# from src_james.core.DataModel import Problem
+# from src_james.core.DataModel import Problem, Task, Dataset
 # from src_james.plot import plot_task
 
 
@@ -469,21 +543,15 @@ class Solver():
         self.cache = {}
 
     @staticmethod
-    def loop_specs(task, test_train='train'):
-        specs = task[test_train]
-        for index, spec in enumerate(specs):
-            yield { 'input': spec['input'], 'output': spec['output'] }
-
-    @staticmethod
-    def is_lambda_valid(_task_, _function_, *args, **kwargs):  # _task_ = avoid namespace conflicts with kwargs=task
-        for spec in Solver.loop_specs(_task_, 'train'):
-            output = _function_(spec['input'], *args, **kwargs)
-            if not np.array_equal( spec['output'], output):
+    def is_lambda_valid(_task_: Task, _function_: Callable, *args, **kwargs):  # _task_ = avoid namespace conflicts with kwargs=task
+        for problem in _task_['train']:
+            output = _function_(problem['input'], *args, **kwargs)
+            if not np.array_equal( problem['output'], output):
                 return False
         return True
 
     @staticmethod
-    def solve_lambda(_task_, _function_, *args, _inplace_=False, **kwargs) -> List[Problem]:
+    def solve_lambda( _task_: Task, _function_: Callable, *args, _inplace_=False, **kwargs) -> List[Problem]:
         solutions = []
         for index, problem in enumerate(_task_['test']):
             output = _function_(problem['input'], *args, **kwargs)
@@ -497,21 +565,21 @@ class Solver():
             _task_['solutions'] += solutions
         return solutions
 
-    def action(self, grid, task=None, *args):
+    def action(self, grid: np.ndarray, task=None, *args):
         """This is the primary method this needs to be defined"""
         return grid
         # raise NotImplementedError()
 
-    def detect(self, task):
+    def detect(self, task: Task) -> bool:
         """default heuristic is simply to run the solver"""
         return self.test(task)
 
-    def test(self, task):
+    def test(self, task: Task) -> bool:
         """test if the given action correctly solves the task"""
         args = self.cache.get(task.filename, ())
         return self.is_lambda_valid(task, self.action, *args, task=task)
 
-    def solve(self, task, force=False, inplace=True):
+    def solve(self, task: Task, force=False, inplace=True) -> Union[List[Problem],None]:
         """solve test case and persist"""
         try:
             if self.detect(task) or force:    # may generate cache
@@ -528,7 +596,7 @@ class Solver():
             if self.debug: raise exception
         return None
 
-    def solve_all(self, tasks, plot=False, solve_detects=False):
+    def solve_all(self, tasks: Union[Dataset,List[Task]], plot=False, solve_detects=False):
         count = 0
         for task in tasks:
             if self.detect(task):
@@ -540,62 +608,15 @@ class Solver():
                         plot_task(task)
         return count
 
-    def plot(self, tasks):
+    def plot(self, tasks: Union[Dataset,List[Task], Task]):
+        if isinstance(tasks, Task): tasks = [ tasks ]
         return self.solve_all(tasks, plot=True, solve_detects=False)
 
-    def plot_detects(self, tasks, unsolved=True):
+    def plot_detects(self, tasks: Union[Dataset,List[Task],Task], unsolved=True):
+        if isinstance(tasks, Task): tasks = [ tasks ]
         if unsolved:
-            tasks = { file: task for (file,task) in deepcopy(tasks).items() if not 'solution' in task }
+            tasks = [ task for task in tasks if not len(task['solutions']) ]
         return self.solve_all(tasks, plot=True, solve_detects=True)
-
-
-    ### Helper Methods ###
-
-    @staticmethod
-    def grid_shape_ratio(grid1, grid2):
-        try:
-            return ( grid2.shape[0] / grid1.shape[0], grid2.shape[1] / grid1.shape[1] )
-        except:
-            return (0, 0)  # For tests
-
-    @staticmethod
-    def task_grids(task):
-        grids = []
-        for test_train in ['test','train']:
-            for spec in task[test_train]:
-                grids += [ spec.get('input',[]), spec.get('output',[]) ]  # tests not gaurenteed to have outputs
-        return grids
-
-    @staticmethod
-    def task_grid_shapes(task):
-        return [ np.array(grid).shape for grid in Solver.task_grids(task) ]
-
-    @staticmethod
-    def task_grid_max_dim(task):
-        return max(chain(*Solver.task_grid_shapes(task)))
-
-    @staticmethod
-    def task_shape_ratios(task):
-        ratios = set([
-            Solver.grid_shape_ratio(spec.get('input',[]), spec.get('output',[]))
-            for spec in Solver.loop_specs(task, 'train')
-        ])
-        # ratios = set([ int(ratio) if ratio.is_integer() else ratio for ratio in chain(*ratios) ])
-        return ratios
-
-    @staticmethod
-    def is_task_shape_ratio_unchanged(task):
-        return Solver.task_shape_ratios(task) == { (1,1) }
-
-    @staticmethod
-    def is_task_shape_ratio_consistant(task):
-        return len(Solver.task_shape_ratios(task)) == 1
-
-    @staticmethod
-    def is_task_shape_ratio_integer_multiple(task):
-        ratios = Solver.task_shape_ratios(task)
-        return all([ isinstance(d, int) or d.is_integer() for d in chain(*ratios) ])
-
 
 
 #####
@@ -603,186 +624,82 @@ class Solver():
 #####
 
 #####
-##### START src_james/util/np_cache.py
+##### START src_james/solver_multimodel/queries/ratio.py
 #####
 
-# Inspired by: https://stackoverflow.com/questions/52331944/cache-decorator-for-numpy-arrays/52332109
-from functools import wraps
+from itertools import chain
+from typing import List
 
 import numpy as np
 from fastcache._lrucache import clru_cache
 
-
-### Profiler: 3x speedup
-def np_cache(maxsize=None, typed=True):
-    maxsize_default=None
-
-    def np_cache_generator(function):
-
-        @wraps(function)
-        def wrapper(*args, **kwargs):
-            ### def encode(*args, **kwargs):
-            args = list(args)  # BUGFIX: TypeError: 'tuple' object does not support item assignment
-            for i, arg in enumerate(args):
-                if isinstance(arg, np.ndarray):
-                    hash = arg.tobytes()
-                    if hash not in wrapper.cache:
-                        wrapper.cache[hash] = arg
-                    args[i] = hash
-            for key, arg in kwargs.items():
-                if isinstance(arg, np.ndarray):
-                    hash = arg.tobytes()
-                    if hash not in wrapper.cache:
-                        wrapper.cache[hash] = arg
-                    kwargs[key] = hash
-
-            return cached_wrapper(*args, **kwargs)
-
-        @clru_cache(maxsize=maxsize, typed=typed)
-        def cached_wrapper(*args, **kwargs):
-            ### def decode(*args, **kwargs):
-            args = list(args)  # BUGFIX: TypeError: 'tuple' object does not support item assignment
-            for i, arg in enumerate(args):
-                if isinstance(arg, bytes) and arg in wrapper.cache:
-                    args[i] = wrapper.cache[arg]
-            for key, arg in kwargs.items():
-                if isinstance(arg, bytes) and arg in wrapper.cache:
-                    kwargs[key] = wrapper.cache[arg]
-
-            return function(*args, **kwargs)
-
-        # copy lru_cache attributes over too
-        wrapper.cache       = {}
-        wrapper.cache_info  = cached_wrapper.cache_info
-        wrapper.cache_clear = cached_wrapper.cache_clear
-
-        return wrapper
-
-    ### def np_cache(maxsize=1024, typed=True):
-    if callable(maxsize):
-        (function, maxsize) = (maxsize, maxsize_default)
-        return np_cache_generator(function)
-    else:
-        return np_cache_generator
-
-#####
-##### END   src_james/util/np_cache.py
-#####
-
-#####
-##### START src_james/solver_multimodel/GeometrySolver.py
-#####
-
-from itertools import combinations, product
-
-import numpy as np
-
-# from src_james.solver_multimodel.Solver import Solver
+# from src_james.core.DataModel import Task
+# from src_james.util.np_cache import np_cache
 
 
-class GeometrySolver(Solver):
-    optimise = True
-    verbose  = True
-    actions = {
-        "flip":      ( np.flip,      [0,1]    ),
-        "rot90":     ( np.rot90,     [1,2,3]  ),
-        "roll":      ( np.roll,      product(range(-5,5),[0,1]) ),
-        "swapaxes":  ( np.swapaxes,  [(0, 1),(1, 0)] ),
-        "transpose": ( np.transpose, []       ),                      # this doesn't find anything
-        }
+@np_cache
+def grid_shape_ratio(grid1, grid2):
+    try:
+        return ( grid2.shape[0] / grid1.shape[0], grid2.shape[1] / grid1.shape[1] )
+    except:
+        return (0, 0)  # For tests
 
-    def __init__(self):
-        super().__init__()
-        for key, (function, arglist) in self.actions.items():
-            self.actions[key] = (function, [ (args,) if not isinstance(args, tuple) else args for args in arglist ])
+@clru_cache()
+def task_grids(task):
+    grids = []
+    for test_train in ['test','train']:
+        for spec in task[test_train]:
+            grids += [ spec.get('input',[]), spec.get('output',[]) ]  # tests not gaurenteed to have outputs
+    return grids
 
-    def detect(self, task):
-        return self.is_task_shape_ratio_unchanged(task)  # grids must remain the exact same size
+@clru_cache()
+def task_grid_shapes(task):
+    return [ np.array(grid).shape for grid in task_grids(task) ]
 
-    def test(self, task):
-        if task.filename in self.cache: return True
+@clru_cache()
+def task_grid_max_dim(task):
+    return max(chain(*task_grid_shapes(task)))
 
-        max_roll = (self.task_grid_max_dim(task) + 1) // 2
-        for key, (function, arglist) in self.actions.items():
-            if function == np.roll: arglist = product(range(-max_roll,max_roll),[0,1])
-            for args in arglist:
-                if self.is_lambda_valid(task, function, *args):
-                    self.cache[task.filename] = (function, args)
-                    if self.verbose: print(function, args)
-                    return True
+@clru_cache()
+def is_task_shape_ratio_unchanged(task):
+    return task_shape_ratios(task) == [ (1,1) ]
 
-        # this doesn't find anything
-        if self.optimise: return False
-        for ((function1, arglist1),(function2, arglist2)) in combinations( self.actions.values(), 2 ):
-            if function1 == np.roll: arglist1 = product(range(-max_roll,max_roll),[0,1])
-            if function2 == np.roll: arglist2 = product(range(-max_roll,max_roll),[0,1])
-            for args1, args2 in product(arglist1, arglist2):
-                function = lambda grid, args1, args2: function1(function2(grid, *args2), *args1)
-                if self.is_lambda_valid(task, function, *(args1,args2)):
-                    self.cache[task.filename] = (function, (args1,args2))
-                    if self.verbose: print(function, (args1,args2))
-                    return True
-        return False
+@clru_cache()
+def is_task_shape_ratio_consistant(task):
+    return len(task_shape_ratios(task)) == 1
 
-    def action(self, grid, function=None, args=None, task=None):
-        try:
-            return function(grid, *args)
-        except Exception as exception:
-            if self.verbose: print(function, args, exception)
-            return grid
+@clru_cache()
+def is_task_shape_ratio_integer_multiple(task):
+    ratios = task_shape_ratios(task)
+    return all([ isinstance(d, int) or d.is_integer() for d in chain(*ratios) ])
+
+@clru_cache()
+def task_shape_ratios(task: Task) -> List:
+    ratios = list(set([
+        grid_shape_ratio(problem.get('input',[]), problem.get('output',[]))
+        for problem in task['train']
+    ]))
+    # ratios = set([ int(ratio) if ratio.is_integer() else ratio for ratio in chain(*ratios) ])
+    return ratios
+
+
+@clru_cache()
+def is_task_shape_ratio_consistent(task):
+    return len(task_shape_ratios(task)) == 1
+
+@clru_cache()
+def is_task_shape_ratio_integer_multiple(task):
+    ratios = task_shape_ratios(task)
+    return all([ isinstance(d, int) or d.is_integer() for d in chain(*ratios) ])
+
 
 
 #####
-##### END   src_james/solver_multimodel/GeometrySolver.py
+##### END   src_james/solver_multimodel/queries/ratio.py
 #####
 
 #####
-##### START src_james/solver_multimodel/ZoomSolver.py
-#####
-
-import cv2
-import skimage.measure
-
-# from src_james.solver_multimodel.Solver import Solver
-
-
-class ZoomSolver(Solver):
-    verbose = False
-
-    def detect(self, task):
-        ratios = self.task_shape_ratios(task)
-        ratio  = list(ratios)[0]
-        detect = (
-                ratios != { (1,1) }   # not no scaling
-                and len(ratios) == 1      # not multiple scalings
-                and ratio[0] == ratio[1]  # single consistant scaling
-        )
-        return detect
-
-    def get_scale(self, task):
-        return list(self.task_shape_ratios(task))[0][0]
-
-    def action( self, grid, task=None, *args ):
-        scale = self.get_scale(task)
-        if scale > 1:
-            resize = tuple( int(d*scale) for d in grid.shape )
-            output = cv2.resize(grid, resize, interpolation=cv2.INTER_NEAREST)
-        else:
-            resize = tuple( int(1/scale) for d in grid.shape )
-            output = skimage.measure.block_reduce(grid, resize)
-        if self.verbose:
-            print('scale', scale, 'grid.shape', grid.shape, 'output.shape', output.shape)
-            print('grid', grid)
-            print('output', output)
-        return output
-
-
-#####
-##### END   src_james/solver_multimodel/ZoomSolver.py
-#####
-
-#####
-##### START src_james/solver_multimodel/functions.py
+##### START src_james/solver_multimodel/queries/grid.py
 #####
 
 import numpy as np
@@ -796,8 +713,9 @@ def query_true(grid,x,y):          return True
 def query_not_zero(grid,x,y):      return grid[x,y]
 def query_color(grid,x,y,color):   return grid[x,y] == color
 
+
 # evaluation/15696249.json - max(1d.argmax())
-@np_cache(128)
+@np_cache
 def query_max_color(grid,x,y,exclude_zero=True):
     return grid[x,y] == max_color(grid, exclude_zero)
 
@@ -875,6 +793,148 @@ def query_count_squares_col(grid,x,y):
 def count_squares(grid):
     return np.count_nonzero(grid.flatten())
 
+@np_cache
+def grid_unique_colors(grid):
+    return np.unique(grid.flatten())
+
+
+
+
+#####
+##### END   src_james/solver_multimodel/queries/grid.py
+#####
+
+#####
+##### START src_james/solver_multimodel/GeometrySolver.py
+#####
+
+from itertools import combinations, product
+
+import numpy as np
+
+# from src_james.solver_multimodel.Solver import Solver
+# from src_james.solver_multimodel.queries.ratio import task_grid_max_dim, is_task_shape_ratio_unchanged
+
+
+class GeometrySolver(Solver):
+    optimise = True
+    verbose  = True
+    actions = {
+        "flip":      ( np.flip,      [0,1]    ),
+        "rot90":     ( np.rot90,     [1,2,3]  ),
+        "roll":      ( np.roll,      product(range(-5,5),[0,1]) ),
+        "swapaxes":  ( np.swapaxes,  [(0, 1),(1, 0)] ),
+        "transpose": ( np.transpose, []       ),                      # this doesn't find anything
+        }
+
+    def __init__(self):
+        super().__init__()
+        for key, (function, arglist) in self.actions.items():
+            self.actions[key] = (function, [ (args,) if not isinstance(args, tuple) else args for args in arglist ])
+
+    def detect(self, task):
+        return is_task_shape_ratio_unchanged(task)  # grids must remain the exact same size
+
+    def test(self, task):
+        if task.filename in self.cache: return True
+
+        max_roll = (task_grid_max_dim(task) + 1) // 2
+        for key, (function, arglist) in self.actions.items():
+            if function == np.roll: arglist = product(range(-max_roll,max_roll),[0,1])
+            for args in arglist:
+                if self.is_lambda_valid(task, function, *args):
+                    self.cache[task.filename] = (function, args)
+                    if self.verbose: print(function, args)
+                    return True
+
+        # this doesn't find anything
+        if self.optimise: return False
+        for ((function1, arglist1),(function2, arglist2)) in combinations( self.actions.values(), 2 ):
+            if function1 == np.roll: arglist1 = product(range(-max_roll,max_roll),[0,1])
+            if function2 == np.roll: arglist2 = product(range(-max_roll,max_roll),[0,1])
+            for args1, args2 in product(arglist1, arglist2):
+                function = lambda grid, args1, args2: function1(function2(grid, *args2), *args1)
+                if self.is_lambda_valid(task, function, *(args1,args2)):
+                    self.cache[task.filename] = (function, (args1,args2))
+                    if self.verbose: print(function, (args1,args2))
+                    return True
+        return False
+
+    def action(self, grid, function=None, args=None, task=None):
+        try:
+            return function(grid, *args)
+        except Exception as exception:
+            if self.verbose: print(function, args, exception)
+            return grid
+
+
+#####
+##### END   src_james/solver_multimodel/GeometrySolver.py
+#####
+
+#####
+##### START src_james/solver_multimodel/ZoomSolver.py
+#####
+
+import cv2
+import skimage.measure
+
+# from src_james.solver_multimodel.Solver import Solver
+# from src_james.solver_multimodel.queries.ratio import task_shape_ratios
+
+
+class ZoomSolver(Solver):
+    verbose = False
+
+    def detect(self, task):
+        ratios = task_shape_ratios(task)
+        ratio  = list(ratios)[0]
+        detect = (
+                ratios != { (1,1) }   # not no scaling
+                and len(ratios) == 1      # not multiple scalings
+                and ratio[0] == ratio[1]  # single consistant scaling
+        )
+        return detect
+
+    def get_scale(self, task):
+        return task_shape_ratios(task)[0][0]
+
+    def action( self, grid, task=None, *args ):
+        scale = self.get_scale(task)
+        if scale > 1:
+            resize = tuple( int(d*scale) for d in grid.shape )
+            output = cv2.resize(grid, resize, interpolation=cv2.INTER_NEAREST)
+        else:
+            resize = tuple( int(1/scale) for d in grid.shape )
+            output = skimage.measure.block_reduce(grid, resize)
+        if self.verbose:
+            print('scale', scale, 'grid.shape', grid.shape, 'output.shape', output.shape)
+            print('grid', grid)
+            print('output', output)
+        return output
+
+
+#####
+##### END   src_james/solver_multimodel/ZoomSolver.py
+#####
+
+#####
+##### START src_james/solver_multimodel/queries/loops.py
+#####
+
+import numpy as np
+
+# from src_james.solver_multimodel.queries.ratio import task_shape_ratios
+# from src_james.util.np_cache import np_cache
+
+
+@np_cache
+def loop_ratio(task):
+    ratio = list(task_shape_ratios(task))[0]
+    for i in range(int(ratio[0])):
+        for j in range(int(ratio[1])):
+            yield i,j
+
 # BROKEN?
 @np_cache
 def rotate_loop(grid, start=0):
@@ -925,22 +985,23 @@ def flip_loop_cols(grid, start=0):
         else:                     yield grid
         angle += 1 * np.sign(start)
 
-# BROKEN?
-@np_cache
-def invert(grid, color=None):
-    if callable(color): color = color(grid)
-    if color is None:   color = max_color(grid)
-    if color:
-        grid        = grid.copy()
-        mask_zero   = grid[ grid == 0 ]
-        mask_square = grid[ grid != 0 ]
-        grid[mask_zero]   = color
-        grid[mask_square] = 0
-    return grid
 
+
+#####
+##### END   src_james/solver_multimodel/queries/loops.py
+#####
+
+#####
+##### START src_james/solver_multimodel/transforms/crop.py
+#####
 
 
 # Source: https://codereview.stackexchange.com/questions/132914/crop-black-border-of-image-using-numpy
+import numpy as np
+
+# from src_james.util.np_cache import np_cache
+
+
 @np_cache
 def crop_inner(grid,tol=0):
     mask = grid > tol
@@ -955,14 +1016,69 @@ def crop_outer(grid,tol=0):
     row_start,row_end = mask1.argmax(),m-mask1[::-1].argmax()
     return grid[row_start:row_end,col_start:col_end]
 
+
+
+#####
+##### END   src_james/solver_multimodel/transforms/crop.py
+#####
+
+#####
+##### START src_james/solver_multimodel/transforms/grid.py
+#####
+
+
+# BROKEN?
+# from src_james.solver_multimodel.queries.grid import max_color
+# from src_james.util.np_cache import np_cache
+
+
+@np_cache
+def invert(grid, color=None):
+    if callable(color): color = color(grid)
+    if color is None:   color = max_color(grid)
+    if color:
+        grid        = grid.copy()
+        mask_zero   = grid[ grid == 0 ]
+        mask_square = grid[ grid != 0 ]
+        grid[mask_zero]   = color
+        grid[mask_square] = 0
+    return grid
+
+
+#####
+##### END   src_james/solver_multimodel/transforms/grid.py
+#####
+
+#####
+##### START src_james/util/make_tuple.py
+#####
+
+
 def make_tuple(args):
     if isinstance(args, tuple): return args
     if isinstance(args, list):  return tuple(args)
     return (args,)
 
+#####
+##### END   src_james/util/make_tuple.py
+#####
 
 #####
-##### END   src_james/solver_multimodel/functions.py
+##### START src_james/solver_multimodel/queries/colors.py
+#####
+
+# from src_james.solver_multimodel.queries.grid import grid_unique_colors
+# from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_consistant
+
+
+def task_is_singlecolor(task):
+    if not is_task_shape_ratio_consistant(task): return False
+    return all([ len(grid_unique_colors(spec['output'])) == 1 for spec in task['train'] ])
+
+
+
+#####
+##### END   src_james/solver_multimodel/queries/colors.py
 #####
 
 #####
@@ -970,7 +1086,8 @@ def make_tuple(args):
 #####
 
 # from src_james.solver_multimodel.Solver import Solver
-# from src_james.solver_multimodel.functions import *
+# from src_james.solver_multimodel.queries.grid import *
+# from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_consistant, task_shape_ratios
 
 
 class BorderSolver(Solver):
@@ -989,7 +1106,7 @@ class BorderSolver(Solver):
     ]
 
     def task_has_border(self, task):
-        if not self.is_task_shape_ratio_consistant(task): return False
+        if not is_task_shape_ratio_consistant(task): return False
         return all([ self.grid_has_border(spec['output']) for spec in task['train'] ])
 
     def grid_has_border(self, grid):
@@ -1015,7 +1132,7 @@ class BorderSolver(Solver):
         return False
 
     def action(self, grid, query=None, task=None):
-        ratio  = list(self.task_shape_ratios(task))[0]
+        ratio  = task_shape_ratios(task)[0]
         output = np.zeros(( int(grid.shape[0] * ratio[0]), int(grid.shape[1] * ratio[1]) ))
         color  = query(grid) if callable(query) else query
         output[:,:] = color
@@ -1049,7 +1166,9 @@ class DoNothingSolver(Solver):
 #####
 
 # from src_james.solver_multimodel.Solver import Solver
-# from src_james.solver_multimodel.functions import *
+# from src_james.solver_multimodel.queries.colors import task_is_singlecolor
+# from src_james.solver_multimodel.queries.grid import *
+# from src_james.solver_multimodel.queries.ratio import task_shape_ratios
 
 
 class SingleColorSolver(Solver):
@@ -1067,15 +1186,8 @@ class SingleColorSolver(Solver):
         np.count_nonzero,
     ]
 
-    def grid_unique_colors(self, grid):
-        return np.unique(grid.flatten())
-
-    def task_is_singlecolor(self, task):
-        if not self.is_task_shape_ratio_consistant(task): return False
-        return all([ len(self.grid_unique_colors(spec['output'])) == 1 for spec in task['train'] ])
-
     def detect(self, task):
-        return self.task_is_singlecolor(task)
+        return task_is_singlecolor(task)
 
     def test(self, task):
         if task.filename in self.cache: return True
@@ -1088,7 +1200,7 @@ class SingleColorSolver(Solver):
         return False
 
     def action(self, grid, query=None, task=None):
-        ratio  = list(self.task_shape_ratios(task))[0]
+        ratio  = task_shape_ratios(task)[0]
         output = np.zeros(( int(grid.shape[0] * ratio[0]), int(grid.shape[1] * ratio[1]) ))
         color  = query(grid) if callable(query) else query
         output[:,:] = color
@@ -1110,7 +1222,13 @@ from itertools import product
 # from src_james.core.DataModel import Task
 # from src_james.solver_multimodel.GeometrySolver import GeometrySolver
 # from src_james.solver_multimodel.ZoomSolver import ZoomSolver
-# from src_james.solver_multimodel.functions import *
+# from src_james.solver_multimodel.queries.grid import *
+# from src_james.solver_multimodel.queries.loops import *
+# from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_integer_multiple
+# from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
+# from src_james.solver_multimodel.transforms.crop import crop_inner, crop_outer
+# from src_james.solver_multimodel.transforms.grid import invert
+# from src_james.util.make_tuple import make_tuple
 
 
 class TessellationSolver(GeometrySolver):
@@ -1156,8 +1274,8 @@ class TessellationSolver(GeometrySolver):
 
 
     def detect(self, task):
-        if self.is_task_shape_ratio_unchanged(task):            return False  # Use GeometrySolver
-        if not self.is_task_shape_ratio_integer_multiple(task): return False  # Not a Tessalation problem
+        if is_task_shape_ratio_unchanged(task):            return False  # Use GeometrySolver
+        if not is_task_shape_ratio_integer_multiple(task): return False  # Not a Tessalation problem
         if not all([ count_colors(spec['input']) == count_colors(spec['output']) for spec in task['train'] ]): return False  # Different colors
         if ZoomSolver().solve(task):                            return False
         #if not self.is_task_shape_ratio_consistant(task):       return False  # Some inconsistant grids are tessalations
@@ -1223,13 +1341,6 @@ class TessellationSolver(GeometrySolver):
         return output
 
 
-    def loop_ratio(self, task):
-        ratio = list(self.task_shape_ratios(task))[0]
-        for i in range(int(ratio[0])):
-            for j in range(int(ratio[1])):
-                yield i,j
-
-
     def get_output_grid(self, grid, task):
         try:
             #print('get_output_grid(self, grid, task)', grid, task)
@@ -1238,7 +1349,7 @@ class TessellationSolver(GeometrySolver):
                     return spec['output']
             else:
                 # No output for tests
-                ratio = list(self.task_shape_ratios(task))[0]
+                ratio = task_shape_ratios(task)[0]
                 ratio = list(map(int, ratio))
                 shape = ( int(grid.shape[0]*ratio[0]), int(grid.shape[1]*ratio[1]) )
                 return np.zeros(shape)
@@ -1328,13 +1439,13 @@ if __name__ == '__main__':
 ##### 
 ##### ./submission/kaggle_compile.py ./src_james/solver_multimodel/main.py
 ##### 
-##### 2020-05-23 18:40:42+01:00
+##### 2020-05-23 21:27:31+01:00
 ##### 
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### 
 #####   james-wip c81cf89 Solvers | work in progress - broken
-##### * master    2b3212d DataModel.cast()
+##### * master    1c43b99 Solver | reorganize functions.py into files
 ##### 
-##### 2b3212dab3f1862e50dbb2f90afb0bde71a03e85
+##### 1c43b991ccdb3d26128acdca4871b8cf7519361f
 ##### 

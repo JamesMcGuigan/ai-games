@@ -7,6 +7,8 @@ from src_james.solver_multimodel.GeometrySolver import GeometrySolver
 from src_james.solver_multimodel.ZoomSolver import ZoomSolver
 from src_james.solver_multimodel.queries.grid import *
 from src_james.solver_multimodel.queries.loops import *
+from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_integer_multiple
+from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
 from src_james.solver_multimodel.transforms.crop import crop_inner, crop_outer
 from src_james.solver_multimodel.transforms.grid import invert
 from src_james.util.make_tuple import make_tuple
@@ -55,8 +57,8 @@ class TessellationSolver(GeometrySolver):
 
 
     def detect(self, task):
-        if self.is_task_shape_ratio_unchanged(task):            return False  # Use GeometrySolver
-        if not self.is_task_shape_ratio_integer_multiple(task): return False  # Not a Tessalation problem
+        if is_task_shape_ratio_unchanged(task):            return False  # Use GeometrySolver
+        if not is_task_shape_ratio_integer_multiple(task): return False  # Not a Tessalation problem
         if not all([ count_colors(spec['input']) == count_colors(spec['output']) for spec in task['train'] ]): return False  # Different colors
         if ZoomSolver().solve(task):                            return False
         #if not self.is_task_shape_ratio_consistant(task):       return False  # Some inconsistant grids are tessalations
@@ -122,13 +124,6 @@ class TessellationSolver(GeometrySolver):
         return output
 
 
-    def loop_ratio(self, task):
-        ratio = list(self.task_shape_ratios(task))[0]
-        for i in range(int(ratio[0])):
-            for j in range(int(ratio[1])):
-                yield i,j
-
-
     def get_output_grid(self, grid, task):
         try:
             #print('get_output_grid(self, grid, task)', grid, task)
@@ -137,7 +132,7 @@ class TessellationSolver(GeometrySolver):
                     return spec['output']
             else:
                 # No output for tests
-                ratio = list(self.task_shape_ratios(task))[0]
+                ratio = task_shape_ratios(task)[0]
                 ratio = list(map(int, ratio))
                 shape = ( int(grid.shape[0]*ratio[0]), int(grid.shape[1]*ratio[1]) )
                 return np.zeros(shape)

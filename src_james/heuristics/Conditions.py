@@ -1,4 +1,9 @@
+from itertools import chain
+
 import numpy as np
+
+from src_james.solver_multimodel.queries.ratio import grid_shape_ratio, task_shape_ratios
+
 
 class GridConditions:
 
@@ -23,25 +28,25 @@ class GridConditions:
 
 
 
-# class GridSizeConditions:
-#     @classmethod
-#     def task_shape_ratios(cls, task):
-#         ratios = set([
-#             cls.grid_shape_ratio(spec.get('input',[]), spec.get('output',[]))
-#             for spec in cls.loop_specs(task, 'train')
-#         ])
-#         # ratios = set([ int(ratio) if ratio.is_integer() else ratio for ratio in chain(*ratios) ])
-#         return ratios
-#
-#     @classmethod
-#     def is_task_shape_ratio_unchanged(cls, task):
-#         return cls.task_shape_ratios(task) == { (1,1) }
-#
-#     @classmethod
-#     def is_task_shape_ratio_consistent(cls, task):
-#         return len(cls.task_shape_ratios(task)) == 1
-#
-#     @classmethod
-#     def is_task_shape_ratio_integer_multiple(cls, task):
-#         ratios = cls.task_shape_ratios(task)
-#         return all([ isinstance(d, int) or d.is_integer() for d in chain(*ratios) ])
+class GridSizeConditions:
+    @classmethod
+    def task_shape_ratios(cls, task):
+        ratios = set([
+            grid_shape_ratio(problem.get('input',[]), problem.get('output',[]))
+            for problem in task['train']
+        ])
+        # ratios = set([ int(ratio) if ratio.is_integer() else ratio for ratio in chain(*ratios) ])
+        return ratios
+
+    @classmethod
+    def is_task_shape_ratio_unchanged(cls, task):
+        return task_shape_ratios(task) == { (1,1) }
+
+    @classmethod
+    def is_task_shape_ratio_consistent(cls, task):
+        return len(task_shape_ratios(task)) == 1
+
+    @classmethod
+    def is_task_shape_ratio_integer_multiple(cls, task):
+        ratios = task_shape_ratios(task)
+        return all([ isinstance(d, int) or d.is_integer() for d in chain(*ratios) ])

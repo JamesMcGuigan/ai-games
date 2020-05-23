@@ -1,7 +1,15 @@
 import numpy as np
 
+from src_james.solver_multimodel.queries.ratio import task_shape_ratios
 from src_james.util.np_cache import np_cache
 
+
+@np_cache
+def loop_ratio(task):
+    ratio = list(task_shape_ratios(task))[0]
+    for i in range(int(ratio[0])):
+        for j in range(int(ratio[1])):
+            yield i,j
 
 # BROKEN?
 @np_cache
@@ -52,3 +60,4 @@ def flip_loop_cols(grid, start=0):
         if angle % grid.shape[1]: yield np.flip(grid)
         else:                     yield grid
         angle += 1 * np.sign(start)
+

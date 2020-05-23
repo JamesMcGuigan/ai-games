@@ -3,15 +3,15 @@
 ##### 
 ##### ./submission/kaggle_compile.py ./src_james/solver_multimodel/main.py
 ##### 
-##### 2020-05-23 02:49:34+01:00
+##### 2020-05-23 18:24:15+01:00
 ##### 
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### 
 #####   james-wip c81cf89 Solvers | work in progress - broken
-##### * master    64fe0b4 [ahead 1] TessellationSolver | fix score/csv detection of tests
+##### * master    739ed8f bugfixes for kaggle deployment
 ##### 
-##### 64fe0b4e97cff1654ef026749bf62b4ca61c3a87
+##### 739ed8f0cdf4f30c3e7737f3f96eb92374eff9ce
 ##### 
 
 #####
@@ -601,6 +601,63 @@ class Solver():
 #####
 
 #####
+##### START src_james/util/np_cache.py
+#####
+
+# Inspired by: https://stackoverflow.com/questions/52331944/cache-decorator-for-numpy-arrays/52332109
+from functools import wraps
+
+import numpy as np
+from fastcache._lrucache import clru_cache
+
+
+### Profiler: 3x speedup
+def np_cache(function):
+    @wraps(function)
+    def wrapper(*args, **kwargs):
+        ### def encode(*args, **kwargs):
+        args = list(args)  # BUGFIX: TypeError: 'tuple' object does not support item assignment
+        for i, arg in enumerate(args):
+            if isinstance(arg, np.ndarray):
+                hash = arg.tobytes()
+                if hash not in wrapper.cache:
+                    wrapper.cache[hash] = arg
+                args[i] = hash
+        for key, arg in kwargs.items():
+            if isinstance(arg, np.ndarray):
+                hash = arg.tobytes()
+                if hash not in wrapper.cache:
+                    wrapper.cache[hash] = arg
+                kwargs[key] = hash
+
+        return cached_wrapper(*args, **kwargs)
+
+    @clru_cache(maxsize=None, typed=True)
+    def cached_wrapper(*args, **kwargs):
+        ### def decode(*args, **kwargs):
+        args = list(args)  # BUGFIX: TypeError: 'tuple' object does not support item assignment
+        for i, arg in enumerate(args):
+            if isinstance(arg, bytes) and arg in wrapper.cache:
+                args[i] = wrapper.cache[arg]
+        for key, arg in kwargs.items():
+            if isinstance(arg, bytes) and arg in wrapper.cache:
+                kwargs[key] = wrapper.cache[arg]
+
+        return function(*args, **kwargs)
+
+
+    # copy lru_cache attributes over too
+    wrapper.cache       = {}
+    wrapper.cache_info  = cached_wrapper.cache_info
+    wrapper.cache_clear = cached_wrapper.cache_clear
+
+    return wrapper
+
+#####
+##### END   src_james/util/np_cache.py
+#####
+
+#####
 ##### START src_james/solver_multimodel/GeometrySolver.py
 #####
 
@@ -718,74 +775,96 @@ class ZoomSolver(Solver):
 
 import numpy as np
 
-
-
 # from skimage.measure import block_reduce
 # from numpy_lru_cache_decorator import np_cache  # https://gist.github.com/Susensio/61f4fee01150caaac1e10fc5f005eb75
+# from src_james.util.np_cache import np_cache
+
 
 def query_true(grid,x,y):          return True
 def query_not_zero(grid,x,y):      return grid[x,y]
 def query_color(grid,x,y,color):   return grid[x,y] == color
 
 # evaluation/15696249.json - max(1d.argmax())
+@np_cache
 def query_max_color(grid,x,y,exclude_zero=True):
     return grid[x,y] == max_color(grid, exclude_zero)
-# @lru_cache(1024)
+
+@np_cache
 def max_color(grid, exclude_zero=True):
     bincount = np.bincount(grid.flatten())
     if exclude_zero:
         bincount[0] = np.min(bincount)  # exclude 0
     return bincount.argmax()
 
+@np_cache
 def query_min_color(grid,x,y, exclude_zero=True):
     return grid[x,y] == min_color(grid, exclude_zero)
-# @lru_cache(1024)
+
+@np_cache
 def min_color(grid,exclude_zero=True):
     bincount = np.bincount(grid.flatten())
     if exclude_zero:
         bincount[0] = np.max(bincount)  # exclude 0
     return bincount.argmin()
 
+@np_cache
 def query_max_color_1d(grid,x,y,exclude_zero=True):
     return grid[x,y] == max_color_1d(grid)
-# @lru_cache(16)
+
+@np_cache
 def max_color_1d(grid,exclude_zero=True):
     return max(
         [ max_color(row,exclude_zero) for row in grid ] +
         [ max_color(col,exclude_zero) for col in np.swapaxes(grid, 0,1) ]
-        )
+    )
+
+@np_cache
 def query_min_color_1d(grid,x,y):
     return grid[x,y] == min_color_1d(grid)
-# @lru_cache(16)
+
+@np_cache
 def min_color_1d(grid):
     return min(
         [ min_color(row) for row in grid ] +
         [ min_color(col) for col in np.swapaxes(grid, 0,1) ]
-        )
+    )
 
-
+@np_cache
 def query_count_colors(grid,x,y):
     return grid[x,y] >= count_colors(grid)
+
+@np_cache
 def query_count_colors_row(grid,x,y):
     return x + len(grid.shape[0])*y <= count_colors(grid)
+
+@np_cache
 def query_count_colors_col(grid,x,y):
     return y + len(grid.shape[1])*x <= count_colors(grid)
-# @lru_cache(16)
+
+
+@np_cache
 def count_colors(grid):
     bincount = np.bincount(grid.flatten())
     return np.count_nonzero(bincount[1:]) # exclude 0
 
+@np_cache
 def query_count_squares(grid,x,y):
     return grid[x,y] >= count_squares(grid)
+
+@np_cache
 def query_count_squares_row(grid,x,y):
     return x + len(grid.shape[0])*y <= count_squares(grid)
+
+@np_cache
 def query_count_squares_col(grid,x,y):
     return y + len(grid.shape[1])*x <= count_squares(grid)
-# @lru_cache(16)
+
+@np_cache
 def count_squares(grid):
     return np.count_nonzero(grid.flatten())
 
 # BROKEN?
+@np_cache
 def rotate_loop(grid, start=0):
     angle = start
     while True:
@@ -793,6 +872,7 @@ def rotate_loop(grid, start=0):
         angle += 1 * np.sign(start)
 
 # BROKEN?
+@np_cache
 def rotate_loop_rows(grid, start=0):
     angle = start
     while True:
@@ -800,12 +880,14 @@ def rotate_loop_rows(grid, start=0):
         angle += 1 * np.sign(start)
 
 # BROKEN?
+@np_cache
 def rotate_loop_cols(grid, start=0):
     angle = start
     while True:
         yield np.rot90(grid, angle % grid.shape[1])
         angle += 1 * np.sign(start)
 
+@np_cache
 def flip_loop(grid, start=0):
     angle = start
     while True:
@@ -814,6 +896,7 @@ def flip_loop(grid, start=0):
         angle += 1 * np.sign(start)
 
 # BROKEN?
+@np_cache
 def flip_loop_rows(grid, start=0):
     angle = start
     while True:
@@ -822,6 +905,7 @@ def flip_loop_rows(grid, start=0):
         angle += 1 * np.sign(start)
 
 # BROKEN?
+@np_cache
 def flip_loop_cols(grid, start=0):
     angle = start
     while True:
@@ -830,6 +914,7 @@ def flip_loop_cols(grid, start=0):
         angle += 1 * np.sign(start)
 
 # BROKEN?
+@np_cache
 def invert(grid, color=None):
     if callable(color): color = color(grid)
     if color is None:   color = max_color(grid)
@@ -844,10 +929,12 @@ def invert(grid, color=None):
 
 
 # Source: https://codereview.stackexchange.com/questions/132914/crop-black-border-of-image-using-numpy
+@np_cache
 def crop_inner(grid,tol=0):
     mask = grid > tol
     return grid[np.ix_(mask.any(1),mask.any(0))]
 
+@np_cache
 def crop_outer(grid,tol=0):
     mask = grid>tol
     m,n  = grid.shape
@@ -1229,13 +1316,13 @@ if __name__ == '__main__':
 ##### 
 ##### ./submission/kaggle_compile.py ./src_james/solver_multimodel/main.py
 ##### 
-##### 2020-05-23 02:49:34+01:00
+##### 2020-05-23 18:24:15+01:00
 ##### 
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### 
 #####   james-wip c81cf89 Solvers | work in progress - broken
-##### * master    64fe0b4 [ahead 1] TessellationSolver | fix score/csv detection of tests
+##### * master    739ed8f bugfixes for kaggle deployment
 ##### 
-##### 64fe0b4e97cff1654ef026749bf62b4ca61c3a87
+##### 739ed8f0cdf4f30c3e7737f3f96eb92374eff9ce
 ##### 

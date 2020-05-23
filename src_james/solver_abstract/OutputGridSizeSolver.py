@@ -1,3 +1,4 @@
+import os
 from collections import defaultdict
 from itertools import chain
 from pprint import pprint
@@ -28,7 +29,7 @@ class OutputGridSizeSolver(AbstractSolver):
         return input.shape
 
 
-if __name__ == '__main__':
+if __name__ == '__main__' and not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
     solver = OutputGridSizeSolver()
     task   = Task('evaluation/68b67ca3.json')
     rule   = solver.solve(task)

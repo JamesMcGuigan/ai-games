@@ -1,4 +1,5 @@
 import inspect
+import os
 from itertools import product
 
 from src_james.core.DataModel import Task
@@ -141,7 +142,7 @@ class TessellationSolver(GeometrySolver):
             pass
 
 
-if __name__ == '__main__':
+if __name__ == '__main__' and not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
     # This is a known test success
     task   = Task('test/27f8ce4f.json')
     solver = TessellationSolver()

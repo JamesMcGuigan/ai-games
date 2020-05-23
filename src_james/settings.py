@@ -1,7 +1,8 @@
 # DOCS: https://www.kaggle.com/WinningModelDocumentationGuidelines
 import os
 import pathlib
-root_dir = pathlib.Path(__file__).parent.parent.absolute()
+try:    root_dir = pathlib.Path(__file__).parent.parent.absolute()
+except: root_dir = ''
 
 settings = {
     'verbose': True,

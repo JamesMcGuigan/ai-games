@@ -3,15 +3,15 @@
 ##### 
 ##### ./submission/kaggle_compile.py ./src_james/solver_multimodel/main.py
 ##### 
-##### 2020-05-22 23:08:15+01:00
+##### 2020-05-23 02:49:34+01:00
 ##### 
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### 
 #####   james-wip c81cf89 Solvers | work in progress - broken
-##### * master    c960e68 rename src_james.abstract_solver -> src_james.solver_abstract
+##### * master    64fe0b4 [ahead 1] TessellationSolver | fix score/csv detection of tests
 ##### 
-##### c960e6898895b59d404692ce02f026b2d07d9042
+##### 64fe0b4e97cff1654ef026749bf62b4ca61c3a87
 ##### 
 
 #####
@@ -21,7 +21,8 @@
 # DOCS: https://www.kaggle.com/WinningModelDocumentationGuidelines
 import os
 import pathlib
-root_dir = pathlib.Path(__file__).parent.parent.absolute()
+try:    root_dir = pathlib.Path(__file__).parent.parent.absolute()
+except: root_dir = ''
 
 settings = {
     'verbose': True,
@@ -345,13 +346,21 @@ class Problem(UserDict):
         self.problemset: ProblemSet           = problemset
         self.task:       Task                 = problemset.task
         self.raw:        Dict[str,np.ndarray] = problem
-        self.data = {
-            "input":    np.array(problem['input']).astype(self.dtype),
-            "output":   np.array(problem['output']).astype(self.dtype) if 'output' in problem else None,
-        }
-        self.grids:  List[np.ndarray] = [ self.data[label]
-                                          for label in ['input','output']
-                                          if self.data[label] is not None ]
+
+        self.data = {}
+        for key in ['input', 'output']:
+            value = problem.get(key, None)
+            if value is not None:
+                value = np.array(problem[key]).astype(self.dtype)
+                value.flags.writeable = False
+            self.data[key] = value
+
+
+    @property
+    def grids(self) -> List[np.ndarray]:
+        return  [ self.data[label]
+                  for label in ['input','output']
+                  if self.data[label] is not None ]
 
     @property
     def filename(self): return self.task.filename
@@ -443,7 +452,7 @@ def plot_task(task: Task, scale=2):
 
 from copy import deepcopy
 from itertools import chain
-from typing import List, Dict
+from typing import List
 
 import numpy as np
 
@@ -472,7 +481,7 @@ class Solver():
         return True
 
     @staticmethod
-    def solve_lambda(_task_, _function_, *args, _inplace_=False, **kwargs) -> List[Dict[str,Problem]]:
+    def solve_lambda(_task_, _function_, *args, _inplace_=False, **kwargs) -> List[Problem]:
         solutions = []
         for index, problem in enumerate(_task_['test']):
             output = _function_(problem['input'], *args, **kwargs)
@@ -481,7 +490,7 @@ class Solver():
                 "input":  problem['input'],
                 "output": output,
             }, problemset=_task_['test'])
-            solutions.append(problem)
+            solutions.append(solution)
         if _inplace_:
             _task_['solutions'] += solutions
         return solutions
@@ -861,8 +870,6 @@ def make_tuple(args):
 ##### START src_james/solver_multimodel/BorderSolver.py
 #####
 
-import numpy as np
-
 # from src_james.solver_multimodel.Solver import Solver
 # from src_james.solver_multimodel.functions import *
 
@@ -942,8 +949,6 @@ class DoNothingSolver(Solver):
 ##### START src_james/solver_multimodel/SingleColorSolver.py
 #####
 
-import numpy as np
-
 # from src_james.solver_multimodel.Solver import Solver
 # from src_james.solver_multimodel.functions import *
 
@@ -1000,12 +1005,13 @@ class SingleColorSolver(Solver):
 #####
 
 import inspect
+import os
 from itertools import product
 
+# from src_james.core.DataModel import Task
 # from src_james.solver_multimodel.GeometrySolver import GeometrySolver
 # from src_james.solver_multimodel.ZoomSolver import ZoomSolver
 # from src_james.solver_multimodel.functions import *
-# from src_james.solver_multimodel.functions import crop_inner, crop_outer
 
 
 class TessellationSolver(GeometrySolver):
@@ -1142,6 +1148,14 @@ class TessellationSolver(GeometrySolver):
             pass
 
 
+if __name__ == '__main__' and not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
+    # This is a known test success
+    task   = Task('test/27f8ce4f.json')
+    solver = TessellationSolver()
+    solver.plot([ task ])
+    print('task.score(): ', task.score())
+
+
 #####
 ##### END   src_james/solver_multimodel/TessellationSolver.py
 #####
@@ -1184,26 +1198,28 @@ import time
 # from src_james.core.DataModel import Competition
 # from src_james.solver_multimodel.solvers import solvers
 
-time_start   = time.perf_counter()
-competition  = Competition()
-scores       = { name: 0 for name in competition.values() }
-for name, dataset in competition.items():
-    time_start_dataset = time.perf_counter()
-    for solver in solvers:
-        solver.cache = {}
-        if os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
-            scores[name] = solver.solve_all(dataset)
-        else:
-            scores[name] = solver.plot(dataset)
+if __name__ == '__main__':
+    plot_results = not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', '')
+    time_start   = time.perf_counter()
+    competition  = Competition()
+    scores       = { name: 0 for name in competition.values() }
+    for name, dataset in competition.items():
+        time_start_dataset = time.perf_counter()
+        for solver in solvers:
+            solver.cache = {}
+            if plot_results:
+                scores[name] = solver.plot(dataset)
+            else:
+                scores[name] = solver.solve_all(dataset)
 
-    dataset.time_taken = time.perf_counter() - time_start_dataset
-competition.time_taken = time.perf_counter() - time_start
+        dataset.time_taken = time.perf_counter() - time_start_dataset
+    competition.time_taken = time.perf_counter() - time_start
 
-competition['test'].write_submission()
+    competition['test'].write_submission()
 
-print('-'*20)
-print('Score:')
-for key, value in competition.score().items(): print(f'{key.rjust(11)}: {value}')
+    print('-'*20)
+    print('Score:')
+    for key, value in competition.score().items(): print(f'{key.rjust(11)}: {value}')
 
 
 #####
@@ -1213,13 +1229,13 @@ for key, value in competition.score().items(): print(f'{key.rjust(11)}: {value}'
 ##### 
 ##### ./submission/kaggle_compile.py ./src_james/solver_multimodel/main.py
 ##### 
-##### 2020-05-22 23:08:15+01:00
+##### 2020-05-23 02:49:34+01:00
 ##### 
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### 
 #####   james-wip c81cf89 Solvers | work in progress - broken
-##### * master    c960e68 rename src_james.abstract_solver -> src_james.solver_abstract
+##### * master    64fe0b4 [ahead 1] TessellationSolver | fix score/csv detection of tests
 ##### 
-##### c960e6898895b59d404692ce02f026b2d07d9042
+##### 64fe0b4e97cff1654ef026749bf62b4ca61c3a87
 ##### 

@@ -1,4 +1,5 @@
 import inspect
+import os
 import pprint
 from collections import defaultdict
 from typing import Any, Callable, Tuple, Union
@@ -180,7 +181,7 @@ class OutputGridSizeSolver:
 
 
 
-if __name__ == '__main__':
+if __name__ == '__main__' and not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
     solver      = OutputGridSizeSolver()
 
     task = Task('evaluation/68b67ca3.json')

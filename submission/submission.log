@@ -1,44 +1,47 @@
-<bound method BorderSolver.action of <__main__.BorderSolver object at 0x7f966cff0940>> [8]
+<bound method TessellationSolver.action of <__main__.TessellationSolver object at 0x7fe02e8778d0>> {'preprocess': <function copy at 0x7fe033237598>, 'p_arg': (), 'transform': <function copy at 0x7fe033237598>, 't_arg': (), 'query': <function query_max_color at 0x7fe02e87bd08>, 'q_arg': ()}
+solved:  TessellationSolver {'preprocess': <function copy at 0x7fe033237598>, 'p_arg': (), 'transform': <function copy at 0x7fe033237598>, 't_arg': (), 'query': <function query_max_color at 0x7fe02e87bd08>, 'q_arg': ()}
+task.score():  1
+<bound method BorderSolver.action of <__main__.BorderSolver object at 0x7fe019f0fdd8>> [8]
 solved:  BorderSolver [8]
-<function rot90 at 0x7f965b617b70> (1,)
-solved:  GeometrySolver (<function rot90 at 0x7f965b617b70>, (1,))
-<function roll at 0x7f965bdc6950> (-2, 0)
-solved:  GeometrySolver (<function roll at 0x7f965bdc6950>, (-2, 0))
-<function flip at 0x7f965b617d08> (1,)
-solved:  GeometrySolver (<function flip at 0x7f965b617d08>, (1,))
-<function rot90 at 0x7f965b617b70> (2,)
-solved:  GeometrySolver (<function rot90 at 0x7f965b617b70>, (2,))
-<function swapaxes at 0x7f965bda82f0> (0, 1)
-solved:  GeometrySolver (<function swapaxes at 0x7f965bda82f0>, (0, 1))
-<function flip at 0x7f965b617d08> (0,)
-solved:  GeometrySolver (<function flip at 0x7f965b617d08>, (0,))
-<function rot90 at 0x7f965b617b70> (2,)
-solved:  GeometrySolver (<function rot90 at 0x7f965b617b70>, (2,))
-<function swapaxes at 0x7f965bda82f0> (0, 1)
-solved:  GeometrySolver (<function swapaxes at 0x7f965bda82f0>, (0, 1))
-<bound method SingleColorSolver.action of <__main__.SingleColorSolver object at 0x7f966cca1eb8>> [<function max_color at 0x7f9656c5ad08>]
-solved:  SingleColorSolver [<function max_color at 0x7f9656c5ad08>]
-<bound method SingleColorSolver.action of <__main__.SingleColorSolver object at 0x7f966cca1eb8>> [<function max_color at 0x7f9656c5ad08>]
-solved:  SingleColorSolver [<function max_color at 0x7f9656c5ad08>]
-<bound method TessellationSolver.action of <__main__.TessellationSolver object at 0x7f966cca1320>> {'preprocess': <function copy at 0x7f965b615510>, 'p_arg': (), 'transform': <function copy at 0x7f965b615510>, 't_arg': (), 'query': <function query_max_color at 0x7f9656c5ac80>, 'q_arg': ()}
-solved:  TessellationSolver {'preprocess': <function copy at 0x7f965b615510>, 'p_arg': (), 'transform': <function copy at 0x7f965b615510>, 't_arg': (), 'query': <function query_max_color at 0x7f9656c5ac80>, 'q_arg': ()}
-<bound method TessellationSolver.action of <__main__.TessellationSolver object at 0x7f966cca1320>> {'preprocess': <function copy at 0x7f965b615510>, 'p_arg': (), 'transform': <function copy at 0x7f965b615510>, 't_arg': (), 'query': <function query_true at 0x7f966ccb8d90>, 'q_arg': ()}
-solved:  TessellationSolver {'preprocess': <function copy at 0x7f965b615510>, 'p_arg': (), 'transform': <function copy at 0x7f965b615510>, 't_arg': (), 'query': <function query_true at 0x7f966ccb8d90>, 'q_arg': ()}
-<bound method TessellationSolver.action of <__main__.TessellationSolver object at 0x7f966cca1320>> {'preprocess': <function copy at 0x7f965b615510>, 'p_arg': (), 'transform': <function copy at 0x7f965b615510>, 't_arg': (), 'query': <function query_not_zero at 0x7f9656c5ab70>, 'q_arg': ()}
-solved:  TessellationSolver {'preprocess': <function copy at 0x7f965b615510>, 'p_arg': (), 'transform': <function copy at 0x7f965b615510>, 't_arg': (), 'query': <function query_not_zero at 0x7f9656c5ab70>, 'q_arg': ()}
-<bound method TessellationSolver.action of <__main__.TessellationSolver object at 0x7f966cca1320>> {'preprocess': <function copy at 0x7f965b615510>, 'p_arg': (), 'transform': <function copy at 0x7f965b615510>, 't_arg': (), 'query': <function query_count_colors at 0x7f9656c5c158>, 'q_arg': ()}
-solved:  TessellationSolver {'preprocess': <function copy at 0x7f965b615510>, 'p_arg': (), 'transform': <function copy at 0x7f965b615510>, 't_arg': (), 'query': <function query_count_colors at 0x7f9656c5c158>, 'q_arg': ()}
-<bound method TessellationSolver.action of <__main__.TessellationSolver object at 0x7f966cca1320>> {'preprocess': <function copy at 0x7f965b615510>, 'p_arg': (), 'transform': <function copy at 0x7f965b615510>, 't_arg': (), 'query': <function query_max_color at 0x7f9656c5ac80>, 'q_arg': ()}
-solved:  TessellationSolver {'preprocess': <function copy at 0x7f965b615510>, 'p_arg': (), 'transform': <function copy at 0x7f965b615510>, 't_arg': (), 'query': <function query_max_color at 0x7f9656c5ac80>, 'q_arg': ()}
-<bound method TessellationSolver.action of <__main__.TessellationSolver object at 0x7f966cca1320>> {'preprocess': <function copy at 0x7f965b615510>, 'p_arg': (), 'transform': <function copy at 0x7f965b615510>, 't_arg': (), 'query': <function query_not_zero at 0x7f9656c5ab70>, 'q_arg': ()}
-solved:  TessellationSolver {'preprocess': <function copy at 0x7f965b615510>, 'p_arg': (), 'transform': <function copy at 0x7f965b615510>, 't_arg': (), 'query': <function query_not_zero at 0x7f9656c5ab70>, 'q_arg': ()}
-<bound method TessellationSolver.action of <__main__.TessellationSolver object at 0x7f966cca1320>> {'preprocess': <function copy at 0x7f965b615510>, 'p_arg': (), 'transform': <function copy at 0x7f965b615510>, 't_arg': (), 'query': <function query_max_color at 0x7f9656c5ac80>, 'q_arg': ()}
-solved:  TessellationSolver {'preprocess': <function copy at 0x7f965b615510>, 'p_arg': (), 'transform': <function copy at 0x7f965b615510>, 't_arg': (), 'query': <function query_max_color at 0x7f9656c5ac80>, 'q_arg': ()}
+<function rot90 at 0x7fe033238bf8> (1,)
+solved:  GeometrySolver (<function rot90 at 0x7fe033238bf8>, (1,))
+<function roll at 0x7fe04791a9d8> (-2, 0)
+solved:  GeometrySolver (<function roll at 0x7fe04791a9d8>, (-2, 0))
+<function flip at 0x7fe033238d90> (1,)
+solved:  GeometrySolver (<function flip at 0x7fe033238d90>, (1,))
+<function rot90 at 0x7fe033238bf8> (2,)
+solved:  GeometrySolver (<function rot90 at 0x7fe033238bf8>, (2,))
+<function swapaxes at 0x7fe0478fc378> (0, 1)
+solved:  GeometrySolver (<function swapaxes at 0x7fe0478fc378>, (0, 1))
+<function flip at 0x7fe033238d90> (0,)
+solved:  GeometrySolver (<function flip at 0x7fe033238d90>, (0,))
+<function rot90 at 0x7fe033238bf8> (2,)
+solved:  GeometrySolver (<function rot90 at 0x7fe033238bf8>, (2,))
+<function swapaxes at 0x7fe0478fc378> (0, 1)
+solved:  GeometrySolver (<function swapaxes at 0x7fe0478fc378>, (0, 1))
+<bound method SingleColorSolver.action of <__main__.SingleColorSolver object at 0x7fe019dffd30>> [<function max_color at 0x7fe02e87bd90>]
+solved:  SingleColorSolver [<function max_color at 0x7fe02e87bd90>]
+<bound method SingleColorSolver.action of <__main__.SingleColorSolver object at 0x7fe019dffd30>> [<function max_color at 0x7fe02e87bd90>]
+solved:  SingleColorSolver [<function max_color at 0x7fe02e87bd90>]
+<bound method TessellationSolver.action of <__main__.TessellationSolver object at 0x7fe019dfff98>> {'preprocess': <function copy at 0x7fe033237598>, 'p_arg': (), 'transform': <function copy at 0x7fe033237598>, 't_arg': (), 'query': <function query_max_color at 0x7fe02e87bd08>, 'q_arg': ()}
+solved:  TessellationSolver {'preprocess': <function copy at 0x7fe033237598>, 'p_arg': (), 'transform': <function copy at 0x7fe033237598>, 't_arg': (), 'query': <function query_max_color at 0x7fe02e87bd08>, 'q_arg': ()}
+<bound method TessellationSolver.action of <__main__.TessellationSolver object at 0x7fe019dfff98>> {'preprocess': <function copy at 0x7fe033237598>, 'p_arg': (), 'transform': <function copy at 0x7fe033237598>, 't_arg': (), 'query': <function query_true at 0x7fe044899ea0>, 'q_arg': ()}
+solved:  TessellationSolver {'preprocess': <function copy at 0x7fe033237598>, 'p_arg': (), 'transform': <function copy at 0x7fe033237598>, 't_arg': (), 'query': <function query_true at 0x7fe044899ea0>, 'q_arg': ()}
+<bound method TessellationSolver.action of <__main__.TessellationSolver object at 0x7fe019dfff98>> {'preprocess': <function copy at 0x7fe033237598>, 'p_arg': (), 'transform': <function copy at 0x7fe033237598>, 't_arg': (), 'query': <function query_not_zero at 0x7fe02e87bbf8>, 'q_arg': ()}
+solved:  TessellationSolver {'preprocess': <function copy at 0x7fe033237598>, 'p_arg': (), 'transform': <function copy at 0x7fe033237598>, 't_arg': (), 'query': <function query_not_zero at 0x7fe02e87bbf8>, 'q_arg': ()}
+<bound method TessellationSolver.action of <__main__.TessellationSolver object at 0x7fe019dfff98>> {'preprocess': <function copy at 0x7fe033237598>, 'p_arg': (), 'transform': <function copy at 0x7fe033237598>, 't_arg': (), 'query': <function query_count_colors at 0x7fe02e87d1e0>, 'q_arg': ()}
+solved:  TessellationSolver {'preprocess': <function copy at 0x7fe033237598>, 'p_arg': (), 'transform': <function copy at 0x7fe033237598>, 't_arg': (), 'query': <function query_count_colors at 0x7fe02e87d1e0>, 'q_arg': ()}
+<bound method TessellationSolver.action of <__main__.TessellationSolver object at 0x7fe019dfff98>> {'preprocess': <function copy at 0x7fe033237598>, 'p_arg': (), 'transform': <function copy at 0x7fe033237598>, 't_arg': (), 'query': <function query_max_color at 0x7fe02e87bd08>, 'q_arg': ()}
+solved:  TessellationSolver {'preprocess': <function copy at 0x7fe033237598>, 'p_arg': (), 'transform': <function copy at 0x7fe033237598>, 't_arg': (), 'query': <function query_max_color at 0x7fe02e87bd08>, 'q_arg': ()}
+<bound method TessellationSolver.action of <__main__.TessellationSolver object at 0x7fe019dfff98>> {'preprocess': <function copy at 0x7fe033237598>, 'p_arg': (), 'transform': <function copy at 0x7fe033237598>, 't_arg': (), 'query': <function query_not_zero at 0x7fe02e87bbf8>, 'q_arg': ()}
+solved:  TessellationSolver {'preprocess': <function copy at 0x7fe033237598>, 'p_arg': (), 'transform': <function copy at 0x7fe033237598>, 't_arg': (), 'query': <function query_not_zero at 0x7fe02e87bbf8>, 'q_arg': ()}
+<bound method TessellationSolver.action of <__main__.TessellationSolver object at 0x7fe019dfff98>> {'preprocess': <function copy at 0x7fe033237598>, 'p_arg': (), 'transform': <function copy at 0x7fe033237598>, 't_arg': (), 'query': <function query_max_color at 0x7fe02e87bd08>, 'q_arg': ()}
+solved:  TessellationSolver {'preprocess': <function copy at 0x7fe033237598>, 'p_arg': (), 'transform': <function copy at 0x7fe033237598>, 't_arg': (), 'query': <function query_max_color at 0x7fe02e87bd08>, 'q_arg': ()}
 
-wrote: /home/jamie/code/kaggle-arc/./submission/submission.csv | 1 lines
+wrote: /home/jamie/code/kaggle-arc/./submission/submission.csv | 2 lines
 --------------------
 Score:
-   training: {'correct': 18, 'total': 416, 'error': 0.9567, 'time': '00:00:44', 'name': 'training'}
- evaluation: {'correct': 4, 'total': 419, 'error': 0.9905, 'time': '00:00:50', 'name': 'evaluation'}
-       test: {'correct': 0, 'total': 104, 'error': 1.0, 'time': '00:00:11', 'name': 'test'}
-       time: 00:01:45
+   training: {'correct': 18, 'total': 416, 'error': 0.9567, 'time': '00:00:43', 'name': 'training'}
+ evaluation: {'correct': 4, 'total': 419, 'error': 0.9905, 'time': '00:00:59', 'name': 'evaluation'}
+       test: {'correct': 1, 'total': 104, 'error': 0.9904, 'time': '00:00:12', 'name': 'test'}
+       time: 00:01:55

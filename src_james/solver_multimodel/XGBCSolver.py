@@ -1,5 +1,6 @@
 import os
 import time
+from itertools import product
 
 import numpy as np
 from fastcache._lrucache import clru_cache
@@ -78,30 +79,38 @@ class XGBSolver(Solver):
 
     @classmethod
     @np_cache()
-    def make_features(cls, input_color: np.ndarray, local_neighb=5):
-        nrows, ncols = input_color.shape
-        feat = np.zeros((nrows * ncols, 13))
-        cur_idx = 0
-        for i in range(nrows):
-            for j in range(ncols):
-                feat[cur_idx, 0]   = i
-                feat[cur_idx, 1]   = j
-                feat[cur_idx, 2]   = input_color[i][j]
-                feat[cur_idx, 3:7] = cls.get_moore_neighbours(input_color, i, j, nrows, ncols)
-                feat[cur_idx, 7:9] = cls.get_tl_tr(input_color, i, j, nrows, ncols)
-                feat[cur_idx, 9]   = len(np.unique(input_color[i, :]))
-                feat[cur_idx, 10]  = len(np.unique(input_color[:, j]))
-                feat[cur_idx, 11]  = (i + j)
-                feat[cur_idx, 12]  = len(np.unique(
-                    input_color[i - local_neighb:i + local_neighb,
-                    j - local_neighb:j + local_neighb])
-                )
-                cur_idx += 1
-        return feat
+    def make_features(cls, grid: np.ndarray, local_neighb=5):
+        nrows, ncols = grid.shape
+        features = [
+            cls.make_feature(grid, i, j)
+            for i,j in product(range(nrows), range(ncols))
+        ]
+        assert len(set(map(len,features))) == 1
+        return np.array(features, dtype=np.int8)
+
+    @classmethod
+    # @np_cache()
+    def make_feature(cls, grid: np.ndarray, i, j, local_neighb=5):
+        feature = [
+            i, # i+1, i-1,,
+            j, # j+1, j-1,
+            grid[i][j],
+            *cls.get_moore_neighbours(grid, i, j),
+            *cls.get_tl_tr(grid, i, j),
+            len(np.unique(grid[i, ])),
+            len(np.unique(grid[:, j])),
+            i+j, # i-j, j-i,
+            len(np.unique(
+                grid[i - local_neighb:i + local_neighb,
+                j - local_neighb:j + local_neighb])
+            ),
+        ]
+        return feature
 
     @classmethod
     @np_cache()
-    def get_moore_neighbours(cls, color, cur_row, cur_col, nrows, ncols):
+    def get_moore_neighbours(cls, color, cur_row, cur_col):
+        nrows, ncols = color.shape
         top    = -1 if cur_row <= 0         else color[cur_row - 1][cur_col]
         bottom = -1 if cur_row >= nrows - 1 else color[cur_row + 1][cur_col]
         left   = -1 if cur_col <= 0         else color[cur_row][cur_col - 1]
@@ -111,7 +120,8 @@ class XGBSolver(Solver):
 
     @classmethod
     @np_cache()
-    def get_tl_tr(cls, color, cur_row, cur_col, nrows, ncols):
+    def get_tl_tr(cls, color, cur_row, cur_col):
+        nrows, ncols = color.shape
         top_left  = -1 if cur_row == 0 or cur_col == 0         else color[cur_row - 1][cur_col - 1]
         top_right = -1 if cur_row == 0 or cur_col == ncols - 1 else color[cur_row - 1][cur_col + 1]
         return top_left, top_right

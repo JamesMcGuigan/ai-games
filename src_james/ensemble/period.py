@@ -1,8 +1,10 @@
 import numpy as np
 
 from src_james.ensemble.util import Defensive_Copy
+from src_james.util.np_cache import np_cache
 
 
+@np_cache()
 def get_period_length0(arr):
     H, W = arr.shape
     period = 1
@@ -12,7 +14,7 @@ def get_period_length0(arr):
             return period
         period += 1
 
-
+@np_cache()
 def get_period_length1(arr):
     H, W = arr.shape
     period = 1

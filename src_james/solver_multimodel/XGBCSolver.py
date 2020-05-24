@@ -1,17 +1,15 @@
 import os
 import time
 from itertools import product
+from typing import List
 
-import numpy as np
 from fastcache._lrucache import clru_cache
 from xgboost import XGBClassifier
 
 from src_james.core.DataModel import Task, Competition
+from src_james.ensemble.period import get_period_length0, get_period_length1
 from src_james.solver_multimodel.Solver import Solver
-from src_james.solver_multimodel.queries.grid import query_not_zero, query_max_color, query_min_color, \
-    query_max_color_1d, query_min_color_1d, query_count_colors, query_count_colors_row, query_count_colors_col, \
-    query_count_squares, query_count_squares_row, query_count_squares_col, max_color, min_color, \
-    max_color_1d, min_color_1d, count_colors, count_squares
+from src_james.solver_multimodel.queries.grid import *
 from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
 from src_james.util.np_cache import np_cache
 
@@ -20,8 +18,7 @@ class XGBSolver(Solver):
     optimise = True
     verbose  = False
 
-    def __init__(self, local_neighb=5):
-        self.local_neighb = local_neighb
+    def __init__(self):
         super().__init__()
 
     def detect(self, task):
@@ -40,17 +37,17 @@ class XGBSolver(Solver):
             else:
                 xgb = XGBClassifier(n_estimators=10, n_jobs=-1)
                 xgb.fit(inputs, outputs, verbose=False)
-                self.cache[task.filename] = (xgb, self.local_neighb)
+                self.cache[task.filename] = (xgb,)
 
     def test(self, task: Task) -> bool:
         """test if the given action correctly solves the task"""
         args = self.cache.get(task.filename, ())
         return self.is_lambda_valid(task, self.action, *args, task=task)
 
-    def action(self, grid, xgb=None, local_neighb=5, task=None):
+    def action(self, grid, xgb=None, task=None):
         if task and task.filename not in self.cache: self.fit(task)
         xgb      = xgb or self.cache[task.filename][0]
-        features = self.make_features(grid, local_neighb=local_neighb)
+        features = self.make_features(grid, )
         predict  = xgb.predict(features)
         output   = predict.reshape(*grid.shape)
         return output
@@ -83,7 +80,7 @@ class XGBSolver(Solver):
 
     @classmethod
     @np_cache()
-    def make_features(cls, grid: np.ndarray, local_neighb=5):
+    def make_features(cls, grid: np.ndarray):
         nrows, ncols = grid.shape
         features = [
             cls.make_feature(grid, i, j)
@@ -94,22 +91,17 @@ class XGBSolver(Solver):
 
     @classmethod
     @np_cache()
-    def make_feature(cls, grid: np.ndarray, i, j, local_neighb=5):
+    def make_feature(cls, grid: np.ndarray, i: int, j: int) -> List:
         nrows, ncols = grid.shape
         features = [
-            i, j,
+            i, j, nrows-i, ncols-j,         # distance from edge
             i+j, i-j, j-i,                  # abs(i-j) can produce worse results
-            *grid.shape, nrows-i, ncols-j,  # shape and distance from edge
+            *grid.shape, nrows*ncols,       # grid shape and pixel size
             grid[i][j],                     # grid[i][j]+1, grid[i][j]-1 = can produce worse results
 
+            *cls.bincount(grid),
             *cls.get_moore_neighbours(grid, i, j),
             *cls.get_tl_tr(grid, i, j),
-            len(np.unique(grid[i, ])),
-            len(np.unique(grid[:, j])),
-            len(np.unique(
-                grid[i - local_neighb:i + local_neighb,
-                j - local_neighb:j + local_neighb])
-            ),
 
             query_not_zero(grid,i,j),
             query_max_color(grid,i,j),
@@ -122,27 +114,47 @@ class XGBSolver(Solver):
             query_count_squares(grid,i,j),
             query_count_squares_row(grid,i,j),
             query_count_squares_col(grid,i,j),
-            max_color(grid),
-            min_color(grid),
             max_color_1d(grid),
             min_color_1d(grid),
-            count_colors(grid),
-            count_squares(grid),
-            len(np.bincount(grid.flatten())), *np.bincount(grid.flatten(), minlength=10),  # adding sorted here doesn't help
+            get_period_length1(grid),  # has no effect
+            get_period_length0(grid),  # has no effect
         ]
+
+        neighbourhoods = [
+            grid,
+            cls.get_neighbourhood(grid,i,j,1),
+            cls.get_neighbourhood(grid,i,j,5),
+            grid[i,:], grid[:i+1,:], grid[i:,:],
+            grid[:,j], grid[:,:j+1], grid[:,j:],
+            grid[i:,j:], grid[:i+1,j:], grid[i:,:j+1], grid[:i+1,:j+1],
+        ]
+        for neighbourhood in neighbourhoods:
+            features += [
+                max_color(neighbourhood)           if len(neighbourhood) else 0,
+                min_color(neighbourhood)           if len(neighbourhood) else 0,
+                count_colors(neighbourhood)        if len(neighbourhood) else 0,
+                count_squares(neighbourhood)       if len(neighbourhood) else 0,
+            ]
         return features
 
+    @classmethod
+    @np_cache()
+    def bincount(cls, grid: np.ndarray):
+        return np.bincount(grid.flatten(), minlength=11).tolist()  # features requires a fixed length array
 
     @classmethod
     @np_cache()
     def get_neighbourhood(cls, grid: np.ndarray, i: int, j: int, distance=1):
-        output = np.full((2*distance+1, 2*distance+1), -1)
-        for xo, xg in enumerate(range(-distance, distance+1)):
-            for yo, yg in enumerate(range(-distance, distance+1)):
-                if not 0 <= xo < grid.shape[0]: continue
-                if not 0 <= yo < grid.shape[1]: continue
-                output[xo,yo] = grid[xg,yg]
-        return output
+        try:
+            output = np.full((2*distance+1, 2*distance+1), 11)  # 11 = outside of grid pixel
+            for xo, xg in enumerate(range(-distance, distance+1)):
+                for yo, yg in enumerate(range(-distance, distance+1)):
+                    if not 0 <= xo < grid.shape[0]: continue
+                    if not 0 <= yo < grid.shape[1]: continue
+                    output[xo,yo] = grid[xg,yg]
+            return output
+        except:
+            return np.full((2*distance+1, 2*distance+1), 11)  # 11 = outside of grid pixel
 
     @classmethod
     @np_cache()
@@ -164,6 +176,7 @@ class XGBSolver(Solver):
         return top_left, top_right
 
 
+
 if __name__ == '__main__' and not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
     competition = Competition()
     competition.time_start = time.perf_counter()
@@ -172,6 +185,9 @@ if __name__ == '__main__' and not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
         solver.solve_all(dataset)
     competition.time_taken = time.perf_counter() - competition.time_start
     print(competition)
+
+
+
 
 ### Original
 # training   : {'correct': 49, 'total': 416, 'error': 0.8822, 'time': '00:00:00', 'name': 'training'}
@@ -252,3 +268,40 @@ if __name__ == '__main__' and not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
 # evaluation : {'correct': 70, 'total': 419, 'error': 0.8329, 'time': '00:00:00', 'name': 'evaluation'}
 # test       : {'correct': 18, 'total': 104, 'error': 0.8269, 'time': '00:00:00', 'name': 'test'}
 # time       : 00:01:17
+
+
+
+### neighbourhood
+# training   : {'correct': 111, 'total': 416, 'error': 0.7332, 'time': '00:00:00', 'name': 'training'}
+# evaluation : {'correct': 71, 'total': 419, 'error': 0.8305, 'time': '00:00:00', 'name': 'evaluation'}
+# test       : {'correct': 18, 'total': 104, 'error': 0.8269, 'time': '00:00:00', 'name': 'test'}
+# time       : 00:01:36
+
+# training   : {'correct': 112, 'total': 416, 'error': 0.7308, 'time': '00:00:00', 'name': 'training'}
+# evaluation : {'correct': 72, 'total': 419, 'error': 0.8282, 'time': '00:00:00', 'name': 'evaluation'}
+# test       : {'correct': 19, 'total': 104, 'error': 0.8173, 'time': '00:00:00', 'name': 'test'}
+# time       : 00:02:50
+
+### without features += cls.get_neighbourhood(grid,i,j,local_neighbours).flatten().tolist()
+# training   : {'correct': 112, 'total': 416, 'error': 0.7308, 'time': '00:00:00', 'name': 'training'}
+# evaluation : {'correct': 78, 'total': 419, 'error': 0.8138, 'time': '00:00:00', 'name': 'evaluation'}
+# test       : {'correct': 22, 'total': 104, 'error': 0.7885, 'time': '00:00:00', 'name': 'test'}
+# time       : 00:02:43
+
+### for line in ( grid[i,:], grid[:,j] ):
+# training   : {'correct': 127, 'total': 416, 'error': 0.6947, 'time': '00:00:00', 'name': 'training'}
+# evaluation : {'correct': 87, 'total': 419, 'error': 0.7924, 'time': '00:00:00', 'name': 'evaluation'}
+# test       : {'correct': 22, 'total': 104, 'error': 0.7885, 'time': '00:00:00', 'name': 'test'}
+# time       : 00:02:07
+
+### for line_neighbourhood in [grid[i,:], grid[:i+1,:], grid[i:,:], grid[:,j], grid[:,:j+1], grid[:,j:], cls.get_neighbourhood(grid,i,j,1), cls.get_neighbourhood(grid,i,j,3), cls.get_neighbourhood(grid,i,j,5),]:
+# training   : {'correct': 138, 'total': 416, 'error': 0.6683, 'time': '00:00:00', 'name': 'training'}
+# evaluation : {'correct': 109, 'total': 419, 'error': 0.7399, 'time': '00:00:00', 'name': 'evaluation'}
+# test       : {'correct': 31, 'total': 104, 'error': 0.7019, 'time': '00:00:00', 'name': 'test'}
+# time       : 00:02:28
+
+### for neighbourhood in [ grid[i:,j:], grid[:i+1,j:], grid[i:,:j+1], grid[:i+1,:j+1], ]  == 3x slowdown
+# training   : {'correct': 148, 'total': 416, 'error': 0.6442, 'time': '00:00:00', 'name': 'training'}
+# evaluation : {'correct': 116, 'total': 419, 'error': 0.7232, 'time': '00:00:00', 'name': 'evaluation'}
+# test       : {'correct': 33, 'total': 104, 'error': 0.6827, 'time': '00:00:00', 'name': 'test'}
+# time       : 00:03:10

@@ -44,13 +44,20 @@ class Solver():
         """default heuristic is simply to run the solver"""
         return self.test(task)
 
+    def fit(self, task: Task):
+        if task.filename in self.cache: return
+        pass
+
     def test(self, task: Task) -> bool:
         """test if the given action correctly solves the task"""
+        if task.filename not in self.cache: self.fit(task)
+
         args = self.cache.get(task.filename, ())
         return self.is_lambda_valid(task, self.action, *args, task=task)
 
     def solve(self, task: Task, force=False, inplace=True) -> Union[List[Problem],None]:
         """solve test case and persist"""
+        if task.filename not in self.cache: self.fit(task)
         try:
             if self.detect(task) or force:    # may generate cache
                 if self.test(task) or force:  # may generate cache

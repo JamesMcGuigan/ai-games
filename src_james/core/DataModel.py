@@ -189,7 +189,7 @@ class ProblemSet(UserList):
         self._id = self.__class__._instance_count = self.__class__._instance_count + 1
 
     def __eq__(self, other):
-        if not isinstance(ProblemSet, other): return False
+        if not isinstance(other, ProblemSet): return False
         return self._id == other._id
 
     def __hash__(self):

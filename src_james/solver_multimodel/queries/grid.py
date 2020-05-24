@@ -61,11 +61,11 @@ def query_count_colors(grid,x,y):
 
 @np_cache
 def query_count_colors_row(grid,x,y):
-    return x + len(grid.shape[0])*y <= count_colors(grid)
+    return x + grid.shape[0]*y <= count_colors(grid)
 
 @np_cache
 def query_count_colors_col(grid,x,y):
-    return y + len(grid.shape[1])*x <= count_colors(grid)
+    return y + grid.shape[1]*x <= count_colors(grid)
 
 
 @np_cache
@@ -79,11 +79,11 @@ def query_count_squares(grid,x,y):
 
 @np_cache
 def query_count_squares_row(grid,x,y):
-    return x + len(grid.shape[0])*y <= count_squares(grid)
+    return x + grid.shape[0]*y <= count_squares(grid)
 
 @np_cache
 def query_count_squares_col(grid,x,y):
-    return y + len(grid.shape[1])*x <= count_squares(grid)
+    return y + grid.shape[1]*x <= count_squares(grid)
 
 @np_cache
 def count_squares(grid):

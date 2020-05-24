@@ -8,6 +8,10 @@ from xgboost import XGBClassifier
 
 from src_james.core.DataModel import Task, Competition
 from src_james.solver_multimodel.Solver import Solver
+from src_james.solver_multimodel.queries.grid import query_not_zero, query_max_color, query_min_color, \
+    query_max_color_1d, query_min_color_1d, query_count_colors, query_count_colors_row, query_count_colors_col, \
+    query_count_squares, query_count_squares_row, query_count_squares_col, max_color, min_color, \
+    max_color_1d, min_color_1d, count_colors, count_squares
 from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
 from src_james.util.np_cache import np_cache
 
@@ -89,23 +93,56 @@ class XGBSolver(Solver):
         return np.array(features, dtype=np.int8)
 
     @classmethod
-    # @np_cache()
+    @np_cache()
     def make_feature(cls, grid: np.ndarray, i, j, local_neighb=5):
-        feature = [
-            i, # i+1, i-1,,
-            j, # j+1, j-1,
-            grid[i][j],
+        nrows, ncols = grid.shape
+        features = [
+            i, j,
+            i+j, i-j, j-i,                  # abs(i-j) can produce worse results
+            *grid.shape, nrows-i, ncols-j,  # shape and distance from edge
+            grid[i][j],                     # grid[i][j]+1, grid[i][j]-1 = can produce worse results
+
             *cls.get_moore_neighbours(grid, i, j),
             *cls.get_tl_tr(grid, i, j),
             len(np.unique(grid[i, ])),
             len(np.unique(grid[:, j])),
-            i+j, # i-j, j-i,
             len(np.unique(
                 grid[i - local_neighb:i + local_neighb,
                 j - local_neighb:j + local_neighb])
             ),
+
+            query_not_zero(grid,i,j),
+            query_max_color(grid,i,j),
+            query_min_color(grid,i,j),
+            query_max_color_1d(grid,i,j),
+            query_min_color_1d(grid,i,j),
+            query_count_colors(grid,i,j),
+            query_count_colors_row(grid,i,j),
+            query_count_colors_col(grid,i,j),
+            query_count_squares(grid,i,j),
+            query_count_squares_row(grid,i,j),
+            query_count_squares_col(grid,i,j),
+            max_color(grid),
+            min_color(grid),
+            max_color_1d(grid),
+            min_color_1d(grid),
+            count_colors(grid),
+            count_squares(grid),
+            len(np.bincount(grid.flatten())), *np.bincount(grid.flatten(), minlength=10),  # adding sorted here doesn't help
         ]
-        return feature
+        return features
+
+
+    @classmethod
+    @np_cache()
+    def get_neighbourhood(cls, grid: np.ndarray, i: int, j: int, distance=1):
+        output = np.full((2*distance+1, 2*distance+1), -1)
+        for xo, xg in enumerate(range(-distance, distance+1)):
+            for yo, yg in enumerate(range(-distance, distance+1)):
+                if not 0 <= xo < grid.shape[0]: continue
+                if not 0 <= yo < grid.shape[1]: continue
+                output[xo,yo] = grid[xg,yg]
+        return output
 
     @classmethod
     @np_cache()
@@ -136,17 +173,82 @@ if __name__ == '__main__' and not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
     competition.time_taken = time.perf_counter() - competition.time_start
     print(competition)
 
-    # for local_neighb in [1,30]:
-    #     print(f'local_neighb: {local_neighb}')
-    #     competition.time_start = time.perf_counter()
-    #     solver = XGBSolver(local_neighb=local_neighb)
-    #     for name, dataset in competition.items():
-    #         dataset = [ task for task in dataset if not len(task['solutions'])]
-    #         solver.plot(dataset)
-    #     competition.time_taken = time.perf_counter() - competition.time_start
-    #     print(competition)
-
+### Original
 # training   : {'correct': 49, 'total': 416, 'error': 0.8822, 'time': '00:00:00', 'name': 'training'}
 # evaluation : {'correct': 19, 'total': 419, 'error': 0.9547, 'time': '00:00:00', 'name': 'evaluation'}
 # test       : {'correct':  8, 'total': 104, 'error': 0.9231, 'time': '00:00:00', 'name': 'test'}
 # time       : 00:00:30
+
+### Reorder i+j
+# training   : {'correct': 50, 'total': 416, 'error': 0.8798, 'time': '00:00:00', 'name': 'training'}
+# evaluation : {'correct': 19, 'total': 419, 'error': 0.9547, 'time': '00:00:00', 'name': 'evaluation'}
+# test       : {'correct': 8, 'total': 104, 'error': 0.9231, 'time': '00:00:00', 'name': 'test'}
+# time       : 00:00:27
+
+### Add i+-1, j+-1
+# training   : {'correct': 50, 'total': 416, 'error': 0.8798, 'time': '00:00:00', 'name': 'training'}
+# evaluation : {'correct': 19, 'total': 419, 'error': 0.9547, 'time': '00:00:00', 'name': 'evaluation'}
+# test       : {'correct': 8, 'total': 104, 'error': 0.9231, 'time': '00:00:00', 'name': 'test'}
+# time       : 00:00:30
+
+### Add i+-j
+# training   : {'correct': 54, 'total': 416, 'error': 0.8702, 'time': '00:00:00', 'name': 'training'}
+# evaluation : {'correct': 20, 'total': 419, 'error': 0.9523, 'time': '00:00:00', 'name': 'evaluation'}
+# test       : {'correct': 8, 'total': 104, 'error': 0.9231, 'time': '00:00:00', 'name': 'test'}
+# time       : 00:00:28
+
+### Add abs(i-j) - dangerous
+# training   : {'correct': 58, 'total': 416, 'error': 0.8606, 'time': '00:00:00', 'name': 'training'}
+# evaluation : {'correct': 17, 'total': 419, 'error': 0.9594, 'time': '00:00:00', 'name': 'evaluation'}
+# test       : {'correct': 6, 'total': 104, 'error': 0.9423, 'time': '00:00:00', 'name': 'test'}
+# time       : 00:00:27
+
+### Add color+-1
+# training   : {'correct': 50, 'total': 416, 'error': 0.8798, 'time': '00:00:00', 'name': 'training'}
+# evaluation : {'correct': 19, 'total': 419, 'error': 0.9547, 'time': '00:00:00', 'name': 'evaluation'}
+# test       : {'correct': 8, 'total': 104, 'error': 0.9231, 'time': '00:00:00', 'name': 'test'}
+# time       : 00:00:31
+
+### max_color(grid),; min_color(grid),; max_color_1d(grid),; min_color_1d(grid),; count_colors(grid),; count_squares(grid),
+# training   : {'correct': 88, 'total': 416, 'error': 0.7885, 'time': '00:00:00', 'name': 'training'}
+# evaluation : {'correct': 57, 'total': 419, 'error': 0.864, 'time': '00:00:00', 'name': 'evaluation'}
+# test       : {'correct': 17, 'total': 104, 'error': 0.8365, 'time': '00:00:00', 'name': 'test'}
+# time       : 00:00:45
+
+### max_color(grid),; min_color(grid),; max_color_1d(grid),; min_color_1d(grid),; count_colors(grid),; count_squares(grid),
+### query_not_zero(grid,i,j),; query_max_color(grid,i,j),; query_min_color(grid,i,j),; query_max_color_1d(grid,i,j),; query_min_color_1d(grid,i,j),; query_count_colors(grid,i,j),  # query_count_colors_row(grid,i,j), query_count_colors_col(grid,i,j), query_count_squares(grid,i,j), # query_count_squares_row(grid,i,j), query_count_squares_col(grid,i,j),
+# training   : {'correct': 89, 'total': 416, 'error': 0.7861, 'time': '00:00:00', 'name': 'training'}
+# evaluation : {'correct': 59, 'total': 419, 'error': 0.8592, 'time': '00:00:00', 'name': 'evaluation'}
+# test       : {'correct': 18, 'total': 104, 'error': 0.8269, 'time': '00:00:00', 'name': 'test'}
+# time       : 00:01:05
+
+### *grid.shape
+# training   : {'correct': 95, 'total': 416, 'error': 0.7716, 'time': '00:00:00', 'name': 'training'}
+# evaluation : {'correct': 62, 'total': 419, 'error': 0.852, 'time': '00:00:00', 'name': 'evaluation'}
+# test       : {'correct': 17, 'total': 104, 'error': 0.8365, 'time': '00:00:00', 'name': 'test'}
+# time       : 00:01:18
+
+### *np.bincount(grid.flatten(), minlength=10),; *sorted(np.bincount(grid.flatten(), minlength=10)),
+# training   : {'correct': 99, 'total': 416, 'error': 0.762, 'time': '00:00:00', 'name': 'training'}
+# evaluation : {'correct': 62, 'total': 419, 'error': 0.852, 'time': '00:00:00', 'name': 'evaluation'}
+# test       : {'correct': 17, 'total': 104, 'error': 0.8365, 'time': '00:00:00', 'name': 'test'}
+# time       : 00:01:29
+
+
+### *grid.shape, nrows-i, ncols-j,
+# training   : {'correct': 109, 'total': 416, 'error': 0.738, 'time': '00:00:00', 'name': 'training'}
+# evaluation : {'correct': 70, 'total': 419, 'error': 0.8329, 'time': '00:00:00', 'name': 'evaluation'}
+# test       : {'correct': 18, 'total': 104, 'error': 0.8269, 'time': '00:00:00', 'name': 'test'}
+# time       : 00:01:21
+
+### without bincount
+# training   : {'correct': 105, 'total': 416, 'error': 0.7476, 'time': '00:00:00', 'name': 'training'}
+# evaluation : {'correct': 69, 'total': 419, 'error': 0.8353, 'time': '00:00:00', 'name': 'evaluation'}
+# test       : {'correct': 18, 'total': 104, 'error': 0.8269, 'time': '00:00:00', 'name': 'test'}
+# time       : 00:01:08
+
+### len(np.bincount(grid.flatten())), *np.bincount(grid.flatten(), minlength=10)
+# training   : {'correct': 107, 'total': 416, 'error': 0.7428, 'time': '00:00:00', 'name': 'training'}
+# evaluation : {'correct': 70, 'total': 419, 'error': 0.8329, 'time': '00:00:00', 'name': 'evaluation'}
+# test       : {'correct': 18, 'total': 104, 'error': 0.8269, 'time': '00:00:00', 'name': 'test'}
+# time       : 00:01:17

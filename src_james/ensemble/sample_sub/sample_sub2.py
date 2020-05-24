@@ -1,8 +1,9 @@
 import json
 
-from src_james.ensemble.sample_sub import example_grid
-from src_james.ensemble.sample_sub.path import test_path
-from src_james.ensemble.sample_sub.sample_sub4 import sample_sub2, flattener
+import pandas as pd
+
+from src_james.ensemble.sample_sub.example_grid import example_grid
+from src_james.ensemble.sample_sub.path import test_path, data_path, output_dir
 from src_james.ensemble.solvers.Match_crop_mode import Match_crop_mode, Match_crop_mode_1
 from src_james.ensemble.solvers.Recolor import Recolor
 from src_james.ensemble.solvers.Recolor0 import Recolor0, Recolor0_bound
@@ -22,13 +23,18 @@ from src_james.ensemble.solvers.Solve_resize import Solve_resize, Solve_resizec,
 from src_james.ensemble.solvers.Solve_train_test_map import Solve_train_test_map
 from src_james.ensemble.solvers.Solve_trans import Solve_trans_bound, Solve_trans
 from src_james.ensemble.solvers.Solve_trans_negative import Solve_trans_negative
-from src_james.ensemble.util import Create
+from src_james.ensemble.util import Create, flattener
+
+sample_sub2 = pd.read_csv(data_path/'sample_submission.csv')
+sample_sub2 = sample_sub2.set_index('output_id', drop=False)
+sample_sub2.head()
 
 Solved = []
 Problems = sample_sub2['output_id'].values
 Proposed_Answers = []
 
 for i in range(len(Problems)):
+    # print(i)
     preds=[example_grid,example_grid,example_grid]
     predict_solution=[]
     output_id = Problems[i]
@@ -85,12 +91,10 @@ for i in range(len(Problems)):
         predict_solution.append(Solve_period(basic_task))
     except:
         predict_solution.append(-1)
-
     try:
         predict_solution.append(solve_inoutmap(basic_task,0,0,0,0))
     except:
         predict_solution.append(-1)
-
     try:
         predict_solution.append(solve_inoutmap_colormap(basic_task,1,1,1,1))
     except:
@@ -176,4 +180,4 @@ for i in range(len(Problems)):
     Proposed_Answers.append(pred)
 
 sample_sub2['output'] = Proposed_Answers
-sample_sub2.to_csv('submission2.csv', index = False)
+sample_sub2.to_csv(output_dir/'submission2.csv', index=False)

@@ -15,3 +15,4 @@ task_path       = data_path / mode
 training_path   = data_path / 'training'
 evaluation_path = data_path / 'evaluation'
 test_path       = data_path / 'test'
+output_dir      = Path( settings['dir']['output'] )

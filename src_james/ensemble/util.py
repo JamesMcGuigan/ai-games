@@ -13,13 +13,14 @@ def Defensive_Copy(A):
 
 def Create(task, task_id=0):
     n = len(task['train'])
-    Input  = [Defensive_Copy(task['train'][i]['input']) for i in range(n)]
+    Input  = [Defensive_Copy(task['train'][i]['input'])  for i in range(n)]
     Output = [Defensive_Copy(task['train'][i]['output']) for i in range(n)]
     Input.append(Defensive_Copy(task['test'][task_id]['input']))
     return Input, Output
 
 
 def flattener(pred):
+    if pred is None: return ''
     pred = np.array(pred).astype(np.int8).tolist()
     str_pred = str([row for row in pred])
     str_pred = str_pred.replace(', ', '')

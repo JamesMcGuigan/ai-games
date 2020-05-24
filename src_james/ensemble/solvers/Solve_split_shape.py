@@ -1,20 +1,18 @@
 import json
 import os
-from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import colors
 
+from src_james.ensemble.sample_sub.path import data_path, training_path, evaluation_path
+
 for dirname, _, filenames in os.walk('/kaggle/input'):
     print(dirname)
 
-data_path = Path('/kaggle/input/abstraction-and-reasoning-challenge/')
-training_path = data_path / 'training'
-evaluation_path = data_path / 'evaluation'
-test_path = data_path / 'test'
+test_path      = data_path / 'test'
 training_tasks = sorted(os.listdir(training_path))
-eval_tasks = sorted(os.listdir(evaluation_path))
+eval_tasks     = sorted(os.listdir(evaluation_path))
 
 T = training_tasks
 Trains = []

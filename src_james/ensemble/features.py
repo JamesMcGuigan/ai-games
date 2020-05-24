@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def get_moore_neighbours(color, cur_row, cur_col, nrows, ncols):
     if cur_row <= 0:
         top = -1
@@ -41,25 +42,26 @@ def get_tl_tr(color, cur_row, cur_col, nrows, ncols):
     return top_left, top_right
 
 
-def make_features(input_color, nfeat):
+def make_features(input_color, nfeat=13, local_neighb = 5):
     nrows, ncols = input_color.shape
     feat = np.zeros((nrows * ncols, nfeat))
     cur_idx = 0
     for i in range(nrows):
         for j in range(ncols):
-            feat[cur_idx, 0] = i
-            feat[cur_idx, 1] = j
-            feat[cur_idx, 2] = input_color[i][j]
+            feat[cur_idx, 0]   = i
+            feat[cur_idx, 1]   = j
+            feat[cur_idx, 2]   = input_color[i][j]
             feat[cur_idx, 3:7] = get_moore_neighbours(input_color, i, j, nrows, ncols)
             feat[cur_idx, 7:9] = get_tl_tr(input_color, i, j, nrows, ncols)
-            feat[cur_idx, 9] = len(np.unique(input_color[i, :]))
-            feat[cur_idx, 10] = len(np.unique(input_color[:, j]))
-            feat[cur_idx, 11] = (i + j)
-            feat[cur_idx, 12] = len(np.unique(input_color[i - local_neighb:i + local_neighb,
-                                              j - local_neighb:j + local_neighb]))
+            feat[cur_idx, 9]   = len(np.unique(input_color[i, :]))
+            feat[cur_idx, 10]  = len(np.unique(input_color[:, j]))
+            feat[cur_idx, 11]  = (i + j)
+            feat[cur_idx, 12]  = len(np.unique(
+                input_color[i - local_neighb:i + local_neighb,
+                            j - local_neighb:j + local_neighb])
+            )
 
             cur_idx += 1
-
     return feat
 
 

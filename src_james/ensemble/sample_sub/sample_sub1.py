@@ -12,7 +12,7 @@ from xgboost import XGBClassifier
 # mode = 'eval'
 from src_james.core.CSV import CSV
 from src_james.ensemble.features import features, make_features
-from src_james.ensemble.sample_sub.path import task_path, mode, data_path
+from src_james.ensemble.sample_sub.path import task_path, mode, data_path, output_dir
 
 all_task_ids = sorted(os.listdir(task_path))
 
@@ -25,11 +25,9 @@ pred_taskids = []
 
 
 sample_sub1 = pd.read_csv(data_path/'sample_submission.csv')
-sample_sub1 = sample_sub1.set_index('output_id')
-sample_sub1.head()
+sample_sub1 = sample_sub1.set_index('output_id', drop=False)
 
 for task_id in all_task_ids:
-
     task_file = str(task_path / task_id)
     with open(task_file, 'r') as f:
         task = json.load(f)
@@ -90,4 +88,4 @@ if (mode=='train') or (mode=='eval'):
 
 
 sample_sub1.head()
-sample_sub1.to_csv('submission1.csv')
+sample_sub1.to_csv(output_dir/'submission1.csv', index=False)

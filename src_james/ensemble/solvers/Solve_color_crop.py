@@ -1,7 +1,7 @@
 import numpy as np
 
-from src_james.ensemble.colors import color_select, colorbycolor_select, cropbycolor, checkColorMap, findColorMap, \
-    applyColorMap, mergedict
+from src_james.ensemble.colors import applyColorMap, mergedict
+from src_james.ensemble.colors import color_select, colorbycolor_select, cropbycolor, checkColorMap, findColorMap
 from src_james.ensemble.util import Defensive_Copy
 
 

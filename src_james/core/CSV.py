@@ -36,15 +36,11 @@ class CSV:
     def to_csv_line(cls, task: 'Task') -> str:
         csv = []
         for index, problemset in enumerate(task['solutions']):
-            solutions = problemset.unique()[:3]
-
-            solution_str = " ".join(
+            solutions = list(set(
                 cls.grid_to_csv_string(problem['output'])
-                for problem in solutions
-            )
-            if not solution_str:
-                solution_str = cls.default_csv_line(task)
-
+                for problem in problemset
+            ))
+            solution_str = " ".join(solutions[:3]) if len(solutions) else cls.default_csv_line(task)
             line = ",".join([
                 cls.object_id(task.filename, index),
                 solution_str

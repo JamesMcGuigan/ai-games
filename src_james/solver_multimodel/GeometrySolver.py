@@ -35,7 +35,6 @@ class GeometrySolver(Solver):
             for args in arglist:
                 if self.is_lambda_valid(task, function, *args):
                     self.cache[task.filename] = (function, args)
-                    # if self.verbose: print(function, args)
                     return True
 
         # this doesn't find anything

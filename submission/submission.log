@@ -7,584 +7,111 @@ https://www.kaggle.com/c/abstraction-and-reasoning-challenge
 
  -------------------- 
 
-DoNothingSolver
-BorderSolver
-GeometrySolver
-SingleColorSolver
-ZoomSolver
-TessellationSolver
-XGBSolver
+GlobSolver
 
  -------------------- 
 
-####### training DoNothingSolver
-####### training BorderSolver
-solved: training/6f8cd79b.json BorderSolver (8,)
-####### training GeometrySolver
-solved: training/ed36ccf7.json GeometrySolver ('<function:rot90>', (1,))
-solved: training/25ff71a9.json GeometrySolver ('<function:roll>', (-2, 0))
-solved: training/67a3c6ac.json GeometrySolver ('<function:flip>', (1,))
-solved: training/3c9b0459.json GeometrySolver ('<function:rot90>', (2,))
-solved: training/74dd1130.json GeometrySolver ('<function:swapaxes>', (0, 1))
-solved: training/68b16354.json GeometrySolver ('<function:flip>', (0,))
-solved: training/6150a2bd.json GeometrySolver ('<function:rot90>', (2,))
-solved: training/9dfd6313.json GeometrySolver ('<function:swapaxes>', (0, 1))
-####### training SingleColorSolver
-solved: training/5582e5ca.json SingleColorSolver ('<function:max_color>',)
-solved: training/445eab21.json SingleColorSolver ('<function:max_color>',)
-####### training ZoomSolver
-####### training TessellationSolver
-solved: training/c3e719e8.json TessellationSolver {'preprocess': <function copy at 0x7f5165a39950>, 'p_arg': (), 'transform': <function copy at 0x7f5165a39950>, 't_arg': (), 'query': <function query_max_color at 0x7f5176f0d400>, 'q_arg': ()}
-solved: training/a416b8f3.json TessellationSolver {'preprocess': <function copy at 0x7f5165a39950>, 'p_arg': (), 'transform': <function copy at 0x7f5165a39950>, 't_arg': (), 'query': <function query_true at 0x7f5176f0d158>, 'q_arg': ()}
-solved: training/007bbfb7.json TessellationSolver {'preprocess': <function copy at 0x7f5165a39950>, 'p_arg': (), 'transform': <function copy at 0x7f5165a39950>, 't_arg': (), 'query': <function query_not_zero at 0x7f5176f0d1e0>, 'q_arg': ()}
-solved: training/cce03e0d.json TessellationSolver {'preprocess': <function copy at 0x7f5165a39950>, 'p_arg': (), 'transform': <function copy at 0x7f5165a39950>, 't_arg': (), 'query': <function query_count_colors at 0x7f5176f2b840>, 'q_arg': ()}
-####### training XGBSolver
-guess : training/e9614598.json XGBSolver {'n_estimators': 24}
-solved: training/178fcbfb.json XGBSolver {'n_estimators': 24}
-guess : training/af902bf9.json XGBSolver {'n_estimators': 24}
-guess : training/3befdf3e.json XGBSolver {'n_estimators': 24}
-guess : training/6cf79266.json XGBSolver {'n_estimators': 24}
-guess : training/a64e4611.json XGBSolver {'n_estimators': 24}
-guess : training/29623171.json XGBSolver {'n_estimators': 24}
-guess : training/b8825c91.json XGBSolver {'n_estimators': 24}
-guess : training/3bdb4ada.json XGBSolver {'n_estimators': 24}
-guess : training/09629e4f.json XGBSolver {'n_estimators': 24}
-guess : training/36fdfd69.json XGBSolver {'n_estimators': 24}
-guess : training/e76a88a6.json XGBSolver {'n_estimators': 24}
-guess : training/b2862040.json XGBSolver {'n_estimators': 24}
-guess : training/0a938d79.json XGBSolver {'n_estimators': 24}
-guess : training/5521c0d9.json XGBSolver {'n_estimators': 24}
-guess : training/ea786f4a.json XGBSolver {'n_estimators': 24}
-guess : training/810b9b61.json XGBSolver {'n_estimators': 24}
-guess : training/93b581b8.json XGBSolver {'n_estimators': 24}
-guess : training/57aa92db.json XGBSolver {'n_estimators': 24}
-guess : training/42a50994.json XGBSolver {'n_estimators': 24}
-guess : training/5168d44c.json XGBSolver {'n_estimators': 24}
-guess : training/5582e5ca.json XGBSolver {'n_estimators': 24}
-guess : training/484b58aa.json XGBSolver {'n_estimators': 24}
-guess : training/3906de3d.json XGBSolver {'n_estimators': 24}
-guess : training/b60334d2.json XGBSolver {'n_estimators': 24}
-guess : training/253bf280.json XGBSolver {'n_estimators': 24}
-guess : training/d4a91cb9.json XGBSolver {'n_estimators': 24}
-solved: training/a61f2674.json XGBSolver {'n_estimators': 24}
-guess : training/7b6016b9.json XGBSolver {'n_estimators': 24}
-guess : training/4c5c2cf0.json XGBSolver {'n_estimators': 24}
-guess : training/e9afcf9a.json XGBSolver {'n_estimators': 24}
-guess : training/25d487eb.json XGBSolver {'n_estimators': 24}
-guess : training/31aa019c.json XGBSolver {'n_estimators': 24}
-guess : training/2bcee788.json XGBSolver {'n_estimators': 24}
-guess : training/4612dd53.json XGBSolver {'n_estimators': 24}
-guess : training/aabf363d.json XGBSolver {'n_estimators': 24}
-guess : training/ae3edfdc.json XGBSolver {'n_estimators': 24}
-solved: training/6f8cd79b.json XGBSolver {'n_estimators': 24}
-guess : training/6855a6e4.json XGBSolver {'n_estimators': 24}
-guess : training/025d127b.json XGBSolver {'n_estimators': 24}
-guess : training/a65b410d.json XGBSolver {'n_estimators': 24}
-guess : training/3bd67248.json XGBSolver {'n_estimators': 24}
-guess : training/05269061.json XGBSolver {'n_estimators': 24}
-guess : training/272f95fa.json XGBSolver {'n_estimators': 24}
-guess : training/1f876c06.json XGBSolver {'n_estimators': 24}
-guess : training/08ed6ac7.json XGBSolver {'n_estimators': 24}
-guess : training/ed36ccf7.json XGBSolver {'n_estimators': 24}
-solved: training/25ff71a9.json XGBSolver {'n_estimators': 24}
-guess : training/98cf29f8.json XGBSolver {'n_estimators': 24}
-solved: training/2281f1f4.json XGBSolver {'n_estimators': 24}
-solved: training/bdad9b1f.json XGBSolver {'n_estimators': 24}
-guess : training/b27ca6d3.json XGBSolver {'n_estimators': 24}
-guess : training/ec883f72.json XGBSolver {'n_estimators': 24}
-guess : training/d037b0a7.json XGBSolver {'n_estimators': 24}
-guess : training/54d9e175.json XGBSolver {'n_estimators': 24}
-guess : training/694f12f3.json XGBSolver {'n_estimators': 24}
-guess : training/29ec7d0e.json XGBSolver {'n_estimators': 24}
-guess : training/447fd412.json XGBSolver {'n_estimators': 24}
-guess : training/41e4d17e.json XGBSolver {'n_estimators': 24}
-guess : training/4258a5f9.json XGBSolver {'n_estimators': 24}
-guess : training/b527c5c6.json XGBSolver {'n_estimators': 24}
-guess : training/a85d4709.json XGBSolver {'n_estimators': 24}
-guess : training/e8593010.json XGBSolver {'n_estimators': 24}
-guess : training/1b60fb0c.json XGBSolver {'n_estimators': 24}
-guess : training/4093f84a.json XGBSolver {'n_estimators': 24}
-guess : training/e40b9e2f.json XGBSolver {'n_estimators': 24}
-guess : training/22168020.json XGBSolver {'n_estimators': 24}
-guess : training/00d62c1b.json XGBSolver {'n_estimators': 24}
-solved: training/794b24be.json XGBSolver {'n_estimators': 24}
-guess : training/d9f24cd1.json XGBSolver {'n_estimators': 24}
-solved: training/3618c87e.json XGBSolver {'n_estimators': 24}
-guess : training/dbc1a6ce.json XGBSolver {'n_estimators': 24}
-guess : training/913fb3ed.json XGBSolver {'n_estimators': 24}
-solved: training/ef135b50.json XGBSolver {'n_estimators': 24}
-guess : training/a8d7556c.json XGBSolver {'n_estimators': 24}
-guess : training/6e19193c.json XGBSolver {'n_estimators': 24}
-guess : training/d90796e8.json XGBSolver {'n_estimators': 24}
-guess : training/d2abd087.json XGBSolver {'n_estimators': 24}
-guess : training/2dd70a9a.json XGBSolver {'n_estimators': 24}
-guess : training/a9f96cdd.json XGBSolver {'n_estimators': 24}
-guess : training/e73095fd.json XGBSolver {'n_estimators': 24}
-solved: training/bb43febb.json XGBSolver {'n_estimators': 24}
-guess : training/e26a3af2.json XGBSolver {'n_estimators': 24}
-guess : training/d406998b.json XGBSolver {'n_estimators': 24}
-guess : training/99fa7670.json XGBSolver {'n_estimators': 24}
-guess : training/22233c11.json XGBSolver {'n_estimators': 24}
-guess : training/890034e9.json XGBSolver {'n_estimators': 24}
-guess : training/6d0160f0.json XGBSolver {'n_estimators': 24}
-guess : training/673ef223.json XGBSolver {'n_estimators': 24}
-guess : training/4347f46a.json XGBSolver {'n_estimators': 24}
-guess : training/29c11459.json XGBSolver {'n_estimators': 24}
-guess : training/91714a58.json XGBSolver {'n_estimators': 24}
-guess : training/e509e548.json XGBSolver {'n_estimators': 24}
-solved: training/2bee17df.json XGBSolver {'n_estimators': 24}
-solved: training/b1948b0a.json XGBSolver {'n_estimators': 24}
-guess : training/f8c80d96.json XGBSolver {'n_estimators': 24}
-guess : training/97999447.json XGBSolver {'n_estimators': 24}
-guess : training/88a10436.json XGBSolver {'n_estimators': 24}
-solved: training/c8f0f002.json XGBSolver {'n_estimators': 24}
-guess : training/868de0fa.json XGBSolver {'n_estimators': 24}
-guess : training/ea32f347.json XGBSolver {'n_estimators': 24}
-guess : training/855e0971.json XGBSolver {'n_estimators': 24}
-guess : training/ce22a75a.json XGBSolver {'n_estimators': 24}
-guess : training/6d58a25d.json XGBSolver {'n_estimators': 24}
-guess : training/06df4c85.json XGBSolver {'n_estimators': 24}
-guess : training/44d8ac46.json XGBSolver {'n_estimators': 24}
-guess : training/7447852a.json XGBSolver {'n_estimators': 24}
-guess : training/e8dc4411.json XGBSolver {'n_estimators': 24}
-guess : training/9565186b.json XGBSolver {'n_estimators': 24}
-guess : training/a5f85a15.json XGBSolver {'n_estimators': 24}
-guess : training/90f3ed37.json XGBSolver {'n_estimators': 24}
-guess : training/23581191.json XGBSolver {'n_estimators': 24}
-guess : training/d89b689b.json XGBSolver {'n_estimators': 24}
-guess : training/aedd82e4.json XGBSolver {'n_estimators': 24}
-guess : training/8403a5d5.json XGBSolver {'n_estimators': 24}
-solved: training/32597951.json XGBSolver {'n_estimators': 24}
-guess : training/928ad970.json XGBSolver {'n_estimators': 24}
-guess : training/d5d6de2d.json XGBSolver {'n_estimators': 24}
-guess : training/228f6490.json XGBSolver {'n_estimators': 24}
-guess : training/7e0986d6.json XGBSolver {'n_estimators': 24}
-guess : training/36d67576.json XGBSolver {'n_estimators': 24}
-guess : training/623ea044.json XGBSolver {'n_estimators': 24}
-guess : training/9edfc990.json XGBSolver {'n_estimators': 24}
-guess : training/f76d97a5.json XGBSolver {'n_estimators': 24}
-guess : training/496994bd.json XGBSolver {'n_estimators': 24}
-guess : training/82819916.json XGBSolver {'n_estimators': 24}
-guess : training/1a07d186.json XGBSolver {'n_estimators': 24}
-guess : training/2204b7a8.json XGBSolver {'n_estimators': 24}
-guess : training/bda2d7a6.json XGBSolver {'n_estimators': 24}
-guess : training/b7249182.json XGBSolver {'n_estimators': 24}
-guess : training/952a094c.json XGBSolver {'n_estimators': 24}
-guess : training/760b3cac.json XGBSolver {'n_estimators': 24}
-solved: training/d364b489.json XGBSolver {'n_estimators': 24}
-guess : training/d4f3cd78.json XGBSolver {'n_estimators': 24}
-guess : training/b8cdaf2b.json XGBSolver {'n_estimators': 24}
-guess : training/0962bcdd.json XGBSolver {'n_estimators': 24}
-guess : training/11852cab.json XGBSolver {'n_estimators': 24}
-guess : training/aba27056.json XGBSolver {'n_estimators': 24}
-guess : training/ba26e723.json XGBSolver {'n_estimators': 24}
-guess : training/d07ae81c.json XGBSolver {'n_estimators': 24}
-guess : training/60b61512.json XGBSolver {'n_estimators': 24}
-guess : training/b548a754.json XGBSolver {'n_estimators': 24}
-guess : training/d22278a0.json XGBSolver {'n_estimators': 24}
-guess : training/73251a56.json XGBSolver {'n_estimators': 24}
-guess : training/ecdecbb3.json XGBSolver {'n_estimators': 24}
-guess : training/f25ffba3.json XGBSolver {'n_estimators': 24}
-guess : training/bd4472b8.json XGBSolver {'n_estimators': 24}
-guess : training/6a1e5592.json XGBSolver {'n_estimators': 24}
-guess : training/50cb2852.json XGBSolver {'n_estimators': 24}
-guess : training/1f0c79e5.json XGBSolver {'n_estimators': 24}
-guess : training/1caeab9d.json XGBSolver {'n_estimators': 24}
-guess : training/39e1d7f9.json XGBSolver {'n_estimators': 24}
-guess : training/d6ad076f.json XGBSolver {'n_estimators': 24}
-guess : training/8d510a79.json XGBSolver {'n_estimators': 24}
-guess : training/a2fd1cf0.json XGBSolver {'n_estimators': 24}
-solved: training/a79310a0.json XGBSolver {'n_estimators': 24}
-guess : training/3eda0437.json XGBSolver {'n_estimators': 24}
-guess : training/ded97339.json XGBSolver {'n_estimators': 24}
-solved: training/6d75e8bb.json XGBSolver {'n_estimators': 24}
-guess : training/6e02f1e3.json XGBSolver {'n_estimators': 24}
-guess : training/d8c310e9.json XGBSolver {'n_estimators': 24}
-guess : training/50846271.json XGBSolver {'n_estimators': 24}
-guess : training/ce9e57f2.json XGBSolver {'n_estimators': 24}
-guess : training/a48eeaf7.json XGBSolver {'n_estimators': 24}
-solved: training/a699fb00.json XGBSolver {'n_estimators': 24}
-guess : training/0e206a2e.json XGBSolver {'n_estimators': 24}
-guess : training/67a3c6ac.json XGBSolver {'n_estimators': 24}
-guess : training/e21d9049.json XGBSolver {'n_estimators': 24}
-solved: training/25d8a9c8.json XGBSolver {'n_estimators': 24}
-guess : training/54d82841.json XGBSolver {'n_estimators': 24}
-guess : training/d06dbe63.json XGBSolver {'n_estimators': 24}
-solved: training/b6afb2da.json XGBSolver {'n_estimators': 24}
-guess : training/0ca9ddb6.json XGBSolver {'n_estimators': 24}
-guess : training/d43fd935.json XGBSolver {'n_estimators': 24}
-solved: training/0d3d703e.json XGBSolver {'n_estimators': 24}
-guess : training/db3e9e38.json XGBSolver {'n_estimators': 24}
-guess : training/56ff96f3.json XGBSolver {'n_estimators': 24}
-guess : training/1e0a9b12.json XGBSolver {'n_estimators': 24}
-guess : training/6e82a1ae.json XGBSolver {'n_estimators': 24}
-guess : training/6cdd2623.json XGBSolver {'n_estimators': 24}
-guess : training/6455b5f5.json XGBSolver {'n_estimators': 24}
-guess : training/56dc2b01.json XGBSolver {'n_estimators': 24}
-guess : training/1f642eb9.json XGBSolver {'n_estimators': 24}
-guess : training/beb8660c.json XGBSolver {'n_estimators': 24}
-guess : training/b782dc8a.json XGBSolver {'n_estimators': 24}
-guess : training/c9f8e694.json XGBSolver {'n_estimators': 24}
-guess : training/d687bc17.json XGBSolver {'n_estimators': 24}
-guess : training/8f2ea7aa.json XGBSolver {'n_estimators': 24}
-guess : training/150deff5.json XGBSolver {'n_estimators': 24}
-guess : training/ba97ae07.json XGBSolver {'n_estimators': 24}
-guess : training/7f4411dc.json XGBSolver {'n_estimators': 24}
-guess : training/cbded52d.json XGBSolver {'n_estimators': 24}
-guess : training/d511f180.json XGBSolver {'n_estimators': 24}
-guess : training/834ec97d.json XGBSolver {'n_estimators': 24}
-guess : training/3c9b0459.json XGBSolver {'n_estimators': 24}
-guess : training/6c434453.json XGBSolver {'n_estimators': 24}
-guess : training/74dd1130.json XGBSolver {'n_estimators': 24}
-guess : training/40853293.json XGBSolver {'n_estimators': 24}
-guess : training/1e32b0e9.json XGBSolver {'n_estimators': 24}
-guess : training/2c608aff.json XGBSolver {'n_estimators': 24}
-guess : training/05f2a901.json XGBSolver {'n_estimators': 24}
-guess : training/c1d99e64.json XGBSolver {'n_estimators': 24}
-guess : training/85c4e7cd.json XGBSolver {'n_estimators': 24}
-solved: training/67385a82.json XGBSolver {'n_estimators': 24}
-guess : training/f1cefba8.json XGBSolver {'n_estimators': 24}
-guess : training/a78176bb.json XGBSolver {'n_estimators': 24}
-guess : training/6aa20dc0.json XGBSolver {'n_estimators': 24}
-guess : training/83302e8f.json XGBSolver {'n_estimators': 24}
-guess : training/68b16354.json XGBSolver {'n_estimators': 24}
-guess : training/1bfc4729.json XGBSolver {'n_estimators': 24}
-guess : training/444801d8.json XGBSolver {'n_estimators': 24}
-guess : training/776ffc46.json XGBSolver {'n_estimators': 24}
-guess : training/7ddcd7ec.json XGBSolver {'n_estimators': 24}
-guess : training/95990924.json XGBSolver {'n_estimators': 24}
-guess : training/a5313dff.json XGBSolver {'n_estimators': 24}
-guess : training/264363fd.json XGBSolver {'n_estimators': 24}
-guess : training/8e5a5113.json XGBSolver {'n_estimators': 24}
-guess : training/c0f76784.json XGBSolver {'n_estimators': 24}
-guess : training/e5062a87.json XGBSolver {'n_estimators': 24}
-guess : training/22eb0ac0.json XGBSolver {'n_estimators': 24}
-guess : training/3345333e.json XGBSolver {'n_estimators': 24}
-guess : training/ddf7fa4f.json XGBSolver {'n_estimators': 24}
-guess : training/b230c067.json XGBSolver {'n_estimators': 24}
-guess : training/941d9a10.json XGBSolver {'n_estimators': 24}
-guess : training/508bd3b6.json XGBSolver {'n_estimators': 24}
-solved: training/dc433765.json XGBSolver {'n_estimators': 24}
-guess : training/3aa6fb7a.json XGBSolver {'n_estimators': 24}
-guess : training/543a7ed5.json XGBSolver {'n_estimators': 24}
-guess : training/3ac3eb23.json XGBSolver {'n_estimators': 24}
-guess : training/0dfd9992.json XGBSolver {'n_estimators': 24}
-guess : training/6150a2bd.json XGBSolver {'n_estimators': 24}
-guess : training/e48d4e1a.json XGBSolver {'n_estimators': 24}
-guess : training/d23f8c26.json XGBSolver {'n_estimators': 24}
-guess : training/fcc82909.json XGBSolver {'n_estimators': 24}
-guess : training/321b1fc6.json XGBSolver {'n_estimators': 24}
-guess : training/c3f564a4.json XGBSolver {'n_estimators': 24}
-guess : training/67a423a3.json XGBSolver {'n_estimators': 24}
-guess : training/72322fa7.json XGBSolver {'n_estimators': 24}
-guess : training/63613498.json XGBSolver {'n_estimators': 24}
-guess : training/dc1df850.json XGBSolver {'n_estimators': 24}
-####### evaluation DoNothingSolver
-####### evaluation BorderSolver
-####### evaluation GeometrySolver
-####### evaluation SingleColorSolver
-####### evaluation ZoomSolver
-####### evaluation TessellationSolver
-solved: evaluation/27f8ce4f.json TessellationSolver {'preprocess': <function copy at 0x7f5165a39950>, 'p_arg': (), 'transform': <function copy at 0x7f5165a39950>, 't_arg': (), 'query': <function query_max_color at 0x7f5176f0d400>, 'q_arg': ()}
-solved: evaluation/5b6cbef5.json TessellationSolver {'preprocess': <function copy at 0x7f5165a39950>, 'p_arg': (), 'transform': <function copy at 0x7f5165a39950>, 't_arg': (), 'query': <function query_not_zero at 0x7f5176f0d1e0>, 'q_arg': ()}
-####### evaluation XGBSolver
-guess : evaluation/009d5c81.json XGBSolver {'n_estimators': 24}
-guess : evaluation/782b5218.json XGBSolver {'n_estimators': 24}
-guess : evaluation/f3e62deb.json XGBSolver {'n_estimators': 24}
-guess : evaluation/17cae0c1.json XGBSolver {'n_estimators': 24}
-guess : evaluation/09c534e7.json XGBSolver {'n_estimators': 24}
-guess : evaluation/575b1a71.json XGBSolver {'n_estimators': 24}
-guess : evaluation/0a2355a6.json XGBSolver {'n_estimators': 24}
-guess : evaluation/73c3b0d8.json XGBSolver {'n_estimators': 24}
-guess : evaluation/103eff5b.json XGBSolver {'n_estimators': 24}
-guess : evaluation/90347967.json XGBSolver {'n_estimators': 24}
-guess : evaluation/f9a67cb5.json XGBSolver {'n_estimators': 24}
-guess : evaluation/e69241bd.json XGBSolver {'n_estimators': 24}
-guess : evaluation/7c8af763.json XGBSolver {'n_estimators': 24}
-guess : evaluation/e760a62e.json XGBSolver {'n_estimators': 24}
-guess : evaluation/896d5239.json XGBSolver {'n_estimators': 24}
-guess : evaluation/0d87d2a6.json XGBSolver {'n_estimators': 24}
-guess : evaluation/84f2aca1.json XGBSolver {'n_estimators': 24}
-guess : evaluation/4cd1b7b2.json XGBSolver {'n_estimators': 24}
-guess : evaluation/e74e1818.json XGBSolver {'n_estimators': 24}
-guess : evaluation/423a55dc.json XGBSolver {'n_estimators': 24}
-solved: evaluation/1c0d0a4b.json XGBSolver {'n_estimators': 24}
-guess : evaluation/a8610ef7.json XGBSolver {'n_estimators': 24}
-guess : evaluation/2b01abd0.json XGBSolver {'n_estimators': 24}
-solved: evaluation/21f83797.json XGBSolver {'n_estimators': 24}
-guess : evaluation/5ffb2104.json XGBSolver {'n_estimators': 24}
-guess : evaluation/2685904e.json XGBSolver {'n_estimators': 24}
-guess : evaluation/e2092e0c.json XGBSolver {'n_estimators': 24}
-guess : evaluation/1c56ad9f.json XGBSolver {'n_estimators': 24}
-guess : evaluation/b15fca0b.json XGBSolver {'n_estimators': 24}
-solved: evaluation/319f2597.json XGBSolver {'n_estimators': 24}
-guess : evaluation/770cc55f.json XGBSolver {'n_estimators': 24}
-guess : evaluation/7ee1c6ea.json XGBSolver {'n_estimators': 24}
-guess : evaluation/3391f8c0.json XGBSolver {'n_estimators': 24}
-guess : evaluation/12eac192.json XGBSolver {'n_estimators': 24}
-guess : evaluation/9b4c17c4.json XGBSolver {'n_estimators': 24}
-guess : evaluation/f83cb3f6.json XGBSolver {'n_estimators': 24}
-guess : evaluation/aa300dc3.json XGBSolver {'n_estimators': 24}
-guess : evaluation/cfb2ce5a.json XGBSolver {'n_estimators': 24}
-guess : evaluation/ecaa0ec1.json XGBSolver {'n_estimators': 24}
-guess : evaluation/ae58858e.json XGBSolver {'n_estimators': 24}
-guess : evaluation/4364c1c4.json XGBSolver {'n_estimators': 24}
-guess : evaluation/4e469f39.json XGBSolver {'n_estimators': 24}
-guess : evaluation/cf133acc.json XGBSolver {'n_estimators': 24}
-guess : evaluation/9b365c51.json XGBSolver {'n_estimators': 24}
-solved: evaluation/332efdb3.json XGBSolver {'n_estimators': 24}
-guess : evaluation/8cb8642d.json XGBSolver {'n_estimators': 24}
-guess : evaluation/4aab4007.json XGBSolver {'n_estimators': 24}
-guess : evaluation/d931c21c.json XGBSolver {'n_estimators': 24}
-guess : evaluation/0f63c0b9.json XGBSolver {'n_estimators': 24}
-guess : evaluation/14754a24.json XGBSolver {'n_estimators': 24}
-guess : evaluation/33b52de3.json XGBSolver {'n_estimators': 24}
-guess : evaluation/516b51b7.json XGBSolver {'n_estimators': 24}
-guess : evaluation/50f325b5.json XGBSolver {'n_estimators': 24}
-guess : evaluation/88207623.json XGBSolver {'n_estimators': 24}
-guess : evaluation/1e97544e.json XGBSolver {'n_estimators': 24}
-guess : evaluation/692cd3b6.json XGBSolver {'n_estimators': 24}
-guess : evaluation/e5790162.json XGBSolver {'n_estimators': 24}
-guess : evaluation/4f537728.json XGBSolver {'n_estimators': 24}
-guess : evaluation/c074846d.json XGBSolver {'n_estimators': 24}
-guess : evaluation/e1d2900e.json XGBSolver {'n_estimators': 24}
-guess : evaluation/95a58926.json XGBSolver {'n_estimators': 24}
-solved: evaluation/da2b0fe3.json XGBSolver {'n_estimators': 24}
-guess : evaluation/d37a1ef5.json XGBSolver {'n_estimators': 24}
-guess : evaluation/817e6c09.json XGBSolver {'n_estimators': 24}
-guess : evaluation/29700607.json XGBSolver {'n_estimators': 24}
-guess : evaluation/d282b262.json XGBSolver {'n_estimators': 24}
-guess : evaluation/ac2e8ecf.json XGBSolver {'n_estimators': 24}
-guess : evaluation/7e02026e.json XGBSolver {'n_estimators': 24}
-guess : evaluation/705a3229.json XGBSolver {'n_estimators': 24}
-guess : evaluation/477d2879.json XGBSolver {'n_estimators': 24}
-guess : evaluation/18419cfa.json XGBSolver {'n_estimators': 24}
-guess : evaluation/bf89d739.json XGBSolver {'n_estimators': 24}
-guess : evaluation/903d1b4a.json XGBSolver {'n_estimators': 24}
-guess : evaluation/ce039d91.json XGBSolver {'n_estimators': 24}
-guess : evaluation/27a77e38.json XGBSolver {'n_estimators': 24}
-guess : evaluation/25094a63.json XGBSolver {'n_estimators': 24}
-guess : evaluation/17b80ad2.json XGBSolver {'n_estimators': 24}
-guess : evaluation/22a4bbc2.json XGBSolver {'n_estimators': 24}
-guess : evaluation/dd2401ed.json XGBSolver {'n_estimators': 24}
-guess : evaluation/f21745ec.json XGBSolver {'n_estimators': 24}
-guess : evaluation/ea959feb.json XGBSolver {'n_estimators': 24}
-guess : evaluation/2a5f8217.json XGBSolver {'n_estimators': 24}
-guess : evaluation/55783887.json XGBSolver {'n_estimators': 24}
-guess : evaluation/0e671a1a.json XGBSolver {'n_estimators': 24}
-guess : evaluation/845d6e51.json XGBSolver {'n_estimators': 24}
-guess : evaluation/64a7c07e.json XGBSolver {'n_estimators': 24}
-guess : evaluation/42918530.json XGBSolver {'n_estimators': 24}
-guess : evaluation/1d0a4b61.json XGBSolver {'n_estimators': 24}
-guess : evaluation/e88171ec.json XGBSolver {'n_estimators': 24}
-guess : evaluation/ff72ca3e.json XGBSolver {'n_estimators': 24}
-guess : evaluation/62ab2642.json XGBSolver {'n_estimators': 24}
-guess : evaluation/baf41dbf.json XGBSolver {'n_estimators': 24}
-guess : evaluation/ef26cbf6.json XGBSolver {'n_estimators': 24}
-guess : evaluation/8a371977.json XGBSolver {'n_estimators': 24}
-guess : evaluation/fea12743.json XGBSolver {'n_estimators': 24}
-guess : evaluation/97239e3d.json XGBSolver {'n_estimators': 24}
-guess : evaluation/6ad5bdfd.json XGBSolver {'n_estimators': 24}
-guess : evaluation/551d5bf1.json XGBSolver {'n_estimators': 24}
-guess : evaluation/55059096.json XGBSolver {'n_estimators': 24}
-guess : evaluation/1d398264.json XGBSolver {'n_estimators': 24}
-guess : evaluation/00dbd492.json XGBSolver {'n_estimators': 24}
-guess : evaluation/917bccba.json XGBSolver {'n_estimators': 24}
-guess : evaluation/bb52a14b.json XGBSolver {'n_estimators': 24}
-guess : evaluation/f3b10344.json XGBSolver {'n_estimators': 24}
-guess : evaluation/642248e4.json XGBSolver {'n_estimators': 24}
-guess : evaluation/9c56f360.json XGBSolver {'n_estimators': 24}
-guess : evaluation/184a9768.json XGBSolver {'n_estimators': 24}
-guess : evaluation/9def23fe.json XGBSolver {'n_estimators': 24}
-guess : evaluation/62b74c02.json XGBSolver {'n_estimators': 24}
-guess : evaluation/fd096ab6.json XGBSolver {'n_estimators': 24}
-guess : evaluation/05a7bcf2.json XGBSolver {'n_estimators': 24}
-guess : evaluation/d94c3b52.json XGBSolver {'n_estimators': 24}
-guess : evaluation/40f6cd08.json XGBSolver {'n_estimators': 24}
-guess : evaluation/ca8f78db.json XGBSolver {'n_estimators': 24}
-guess : evaluation/d2acf2cb.json XGBSolver {'n_estimators': 24}
-guess : evaluation/bf32578f.json XGBSolver {'n_estimators': 24}
-guess : evaluation/e41c6fd3.json XGBSolver {'n_estimators': 24}
-guess : evaluation/5207a7b5.json XGBSolver {'n_estimators': 24}
-guess : evaluation/92e50de0.json XGBSolver {'n_estimators': 24}
-guess : evaluation/2546ccf6.json XGBSolver {'n_estimators': 24}
-guess : evaluation/639f5a19.json XGBSolver {'n_estimators': 24}
-guess : evaluation/7d419a02.json XGBSolver {'n_estimators': 24}
-guess : evaluation/94be5b80.json XGBSolver {'n_estimators': 24}
-guess : evaluation/140c817e.json XGBSolver {'n_estimators': 24}
-guess : evaluation/070dd51e.json XGBSolver {'n_estimators': 24}
-guess : evaluation/4e45f183.json XGBSolver {'n_estimators': 24}
-guess : evaluation/85fa5666.json XGBSolver {'n_estimators': 24}
-guess : evaluation/15113be4.json XGBSolver {'n_estimators': 24}
-guess : evaluation/58743b76.json XGBSolver {'n_estimators': 24}
-guess : evaluation/1c02dbbe.json XGBSolver {'n_estimators': 24}
-guess : evaluation/03560426.json XGBSolver {'n_estimators': 24}
-guess : evaluation/ac3e2b04.json XGBSolver {'n_estimators': 24}
-guess : evaluation/9caba7c3.json XGBSolver {'n_estimators': 24}
-guess : evaluation/696d4842.json XGBSolver {'n_estimators': 24}
-guess : evaluation/f9d67f8b.json XGBSolver {'n_estimators': 24}
-guess : evaluation/94414823.json XGBSolver {'n_estimators': 24}
-guess : evaluation/79369cc6.json XGBSolver {'n_estimators': 24}
-guess : evaluation/3490cc26.json XGBSolver {'n_estimators': 24}
-guess : evaluation/a04b2602.json XGBSolver {'n_estimators': 24}
-guess : evaluation/45737921.json XGBSolver {'n_estimators': 24}
-guess : evaluation/f823c43c.json XGBSolver {'n_estimators': 24}
-guess : evaluation/b20f7c8b.json XGBSolver {'n_estimators': 24}
-guess : evaluation/e681b708.json XGBSolver {'n_estimators': 24}
-guess : evaluation/32e9702f.json XGBSolver {'n_estimators': 24}
-solved: evaluation/e7dd8335.json XGBSolver {'n_estimators': 24}
-guess : evaluation/69889d6e.json XGBSolver {'n_estimators': 24}
-guess : evaluation/1acc24af.json XGBSolver {'n_estimators': 24}
-guess : evaluation/16b78196.json XGBSolver {'n_estimators': 24}
-guess : evaluation/8fbca751.json XGBSolver {'n_estimators': 24}
-guess : evaluation/0becf7df.json XGBSolver {'n_estimators': 24}
-solved: evaluation/6ea4a07e.json XGBSolver {'n_estimators': 24}
-guess : evaluation/8ee62060.json XGBSolver {'n_estimators': 24}
-guess : evaluation/1da012fc.json XGBSolver {'n_estimators': 24}
-guess : evaluation/3f23242b.json XGBSolver {'n_estimators': 24}
-guess : evaluation/a934301b.json XGBSolver {'n_estimators': 24}
-guess : evaluation/84db8fc4.json XGBSolver {'n_estimators': 24}
-guess : evaluation/0607ce86.json XGBSolver {'n_estimators': 24}
-guess : evaluation/f3cdc58f.json XGBSolver {'n_estimators': 24}
-guess : evaluation/292dd178.json XGBSolver {'n_estimators': 24}
-guess : evaluation/99306f82.json XGBSolver {'n_estimators': 24}
-guess : evaluation/df8cc377.json XGBSolver {'n_estimators': 24}
-guess : evaluation/3a301edc.json XGBSolver {'n_estimators': 24}
-guess : evaluation/256b0a75.json XGBSolver {'n_estimators': 24}
-guess : evaluation/45bbe264.json XGBSolver {'n_estimators': 24}
-guess : evaluation/992798f6.json XGBSolver {'n_estimators': 24}
-guess : evaluation/60a26a3e.json XGBSolver {'n_estimators': 24}
-guess : evaluation/5b692c0f.json XGBSolver {'n_estimators': 24}
-guess : evaluation/ac605cbb.json XGBSolver {'n_estimators': 24}
-guess : evaluation/a096bf4d.json XGBSolver {'n_estimators': 24}
-guess : evaluation/929ab4e9.json XGBSolver {'n_estimators': 24}
-guess : evaluation/b7f8a4d8.json XGBSolver {'n_estimators': 24}
-guess : evaluation/72a961c9.json XGBSolver {'n_estimators': 24}
-guess : evaluation/54db823b.json XGBSolver {'n_estimators': 24}
-guess : evaluation/20981f0e.json XGBSolver {'n_estimators': 24}
-guess : evaluation/e9bb6954.json XGBSolver {'n_estimators': 24}
-guess : evaluation/c35c1b4c.json XGBSolver {'n_estimators': 24}
-guess : evaluation/b457fec5.json XGBSolver {'n_estimators': 24}
-guess : evaluation/4acc7107.json XGBSolver {'n_estimators': 24}
-guess : evaluation/626c0bcc.json XGBSolver {'n_estimators': 24}
-guess : evaluation/fafd9572.json XGBSolver {'n_estimators': 24}
-guess : evaluation/456873bc.json XGBSolver {'n_estimators': 24}
-guess : evaluation/712bf12e.json XGBSolver {'n_estimators': 24}
-guess : evaluation/e4075551.json XGBSolver {'n_estimators': 24}
-guess : evaluation/a406ac07.json XGBSolver {'n_estimators': 24}
-guess : evaluation/bd14c3bf.json XGBSolver {'n_estimators': 24}
-guess : evaluation/f0df5ff0.json XGBSolver {'n_estimators': 24}
-guess : evaluation/67c52801.json XGBSolver {'n_estimators': 24}
-guess : evaluation/963f59bc.json XGBSolver {'n_estimators': 24}
-guess : evaluation/4b6b68e5.json XGBSolver {'n_estimators': 24}
-guess : evaluation/9ddd00f0.json XGBSolver {'n_estimators': 24}
-guess : evaluation/bcb3040b.json XGBSolver {'n_estimators': 24}
-guess : evaluation/e9c9d9a1.json XGBSolver {'n_estimators': 24}
-guess : evaluation/c87289bb.json XGBSolver {'n_estimators': 24}
-guess : evaluation/37d3e8b2.json XGBSolver {'n_estimators': 24}
-guess : evaluation/e21a174a.json XGBSolver {'n_estimators': 24}
-guess : evaluation/ba9d41b8.json XGBSolver {'n_estimators': 24}
-guess : evaluation/4ff4c9da.json XGBSolver {'n_estimators': 24}
-guess : evaluation/c62e2108.json XGBSolver {'n_estimators': 24}
-guess : evaluation/e9ac8c9e.json XGBSolver {'n_estimators': 24}
-guess : evaluation/1e81d6f9.json XGBSolver {'n_estimators': 24}
-guess : evaluation/c7d4e6ad.json XGBSolver {'n_estimators': 24}
-guess : evaluation/c97c0139.json XGBSolver {'n_estimators': 24}
-guess : evaluation/12422b43.json XGBSolver {'n_estimators': 24}
-guess : evaluation/9c1e755f.json XGBSolver {'n_estimators': 24}
-solved: evaluation/5b526a93.json XGBSolver {'n_estimators': 24}
-guess : evaluation/aa18de87.json XGBSolver {'n_estimators': 24}
-guess : evaluation/137f0df0.json XGBSolver {'n_estimators': 24}
-guess : evaluation/9772c176.json XGBSolver {'n_estimators': 24}
-guess : evaluation/9356391f.json XGBSolver {'n_estimators': 24}
-guess : evaluation/13713586.json XGBSolver {'n_estimators': 24}
-guess : evaluation/cb227835.json XGBSolver {'n_estimators': 24}
-guess : evaluation/5af49b42.json XGBSolver {'n_estimators': 24}
-guess : evaluation/604001fa.json XGBSolver {'n_estimators': 24}
-guess : evaluation/dc2aa30b.json XGBSolver {'n_estimators': 24}
-guess : evaluation/9f27f097.json XGBSolver {'n_estimators': 24}
-guess : evaluation/15663ba9.json XGBSolver {'n_estimators': 24}
-guess : evaluation/b942fd60.json XGBSolver {'n_estimators': 24}
-guess : evaluation/85b81ff1.json XGBSolver {'n_estimators': 24}
-guess : evaluation/fc754716.json XGBSolver {'n_estimators': 24}
-solved: evaluation/f45f5ca7.json XGBSolver {'n_estimators': 24}
-guess : evaluation/31adaf00.json XGBSolver {'n_estimators': 24}
-guess : evaluation/7d1f7ee8.json XGBSolver {'n_estimators': 24}
-guess : evaluation/6df30ad6.json XGBSolver {'n_estimators': 24}
-guess : evaluation/c6e1b8da.json XGBSolver {'n_estimators': 24}
-guess : evaluation/f8be4b64.json XGBSolver {'n_estimators': 24}
-guess : evaluation/d492a647.json XGBSolver {'n_estimators': 24}
-guess : evaluation/e7639916.json XGBSolver {'n_estimators': 24}
-guess : evaluation/762cd429.json XGBSolver {'n_estimators': 24}
-guess : evaluation/e0fb7511.json XGBSolver {'n_estimators': 24}
-guess : evaluation/8dae5dfc.json XGBSolver {'n_estimators': 24}
-####### test DoNothingSolver
-####### test BorderSolver
-####### test GeometrySolver
-####### test SingleColorSolver
-####### test ZoomSolver
-####### test TessellationSolver
-test  : test/27f8ce4f.json TessellationSolver {'preprocess': <function copy at 0x7f5165a39950>, 'p_arg': (), 'transform': <function copy at 0x7f5165a39950>, 't_arg': (), 'query': <function query_max_color at 0x7f5176f0d400>, 'q_arg': ()}
-####### test XGBSolver
-test  : test/009d5c81.json XGBSolver {'n_estimators': 24}
-test  : test/17cae0c1.json XGBSolver {'n_estimators': 24}
-test  : test/09c534e7.json XGBSolver {'n_estimators': 24}
-test  : test/0a2355a6.json XGBSolver {'n_estimators': 24}
-test  : test/103eff5b.json XGBSolver {'n_estimators': 24}
-test  : test/0d87d2a6.json XGBSolver {'n_estimators': 24}
-test  : test/423a55dc.json XGBSolver {'n_estimators': 24}
-test  : test/1c0d0a4b.json XGBSolver {'n_estimators': 24}
-test  : test/2b01abd0.json XGBSolver {'n_estimators': 24}
-test  : test/21f83797.json XGBSolver {'n_estimators': 24}
-test  : test/2685904e.json XGBSolver {'n_estimators': 24}
-test  : test/1c56ad9f.json XGBSolver {'n_estimators': 24}
-test  : test/319f2597.json XGBSolver {'n_estimators': 24}
-test  : test/3391f8c0.json XGBSolver {'n_estimators': 24}
-test  : test/12eac192.json XGBSolver {'n_estimators': 24}
-test  : test/332efdb3.json XGBSolver {'n_estimators': 24}
-test  : test/0f63c0b9.json XGBSolver {'n_estimators': 24}
-test  : test/14754a24.json XGBSolver {'n_estimators': 24}
-test  : test/33b52de3.json XGBSolver {'n_estimators': 24}
-test  : test/1e97544e.json XGBSolver {'n_estimators': 24}
-test  : test/29700607.json XGBSolver {'n_estimators': 24}
-test  : test/18419cfa.json XGBSolver {'n_estimators': 24}
-test  : test/27a77e38.json XGBSolver {'n_estimators': 24}
-test  : test/25094a63.json XGBSolver {'n_estimators': 24}
-test  : test/17b80ad2.json XGBSolver {'n_estimators': 24}
-test  : test/22a4bbc2.json XGBSolver {'n_estimators': 24}
-test  : test/2a5f8217.json XGBSolver {'n_estimators': 24}
-test  : test/0e671a1a.json XGBSolver {'n_estimators': 24}
-test  : test/1d0a4b61.json XGBSolver {'n_estimators': 24}
-test  : test/1d398264.json XGBSolver {'n_estimators': 24}
-test  : test/00dbd492.json XGBSolver {'n_estimators': 24}
-test  : test/184a9768.json XGBSolver {'n_estimators': 24}
-test  : test/05a7bcf2.json XGBSolver {'n_estimators': 24}
-test  : test/40f6cd08.json XGBSolver {'n_estimators': 24}
-test  : test/2546ccf6.json XGBSolver {'n_estimators': 24}
-test  : test/140c817e.json XGBSolver {'n_estimators': 24}
-test  : test/070dd51e.json XGBSolver {'n_estimators': 24}
-test  : test/15113be4.json XGBSolver {'n_estimators': 24}
-test  : test/1c02dbbe.json XGBSolver {'n_estimators': 24}
-test  : test/03560426.json XGBSolver {'n_estimators': 24}
-test  : test/3490cc26.json XGBSolver {'n_estimators': 24}
-test  : test/32e9702f.json XGBSolver {'n_estimators': 24}
-test  : test/1acc24af.json XGBSolver {'n_estimators': 24}
-test  : test/16b78196.json XGBSolver {'n_estimators': 24}
-test  : test/0becf7df.json XGBSolver {'n_estimators': 24}
-test  : test/1da012fc.json XGBSolver {'n_estimators': 24}
-test  : test/3f23242b.json XGBSolver {'n_estimators': 24}
-test  : test/0607ce86.json XGBSolver {'n_estimators': 24}
-test  : test/292dd178.json XGBSolver {'n_estimators': 24}
-test  : test/3a301edc.json XGBSolver {'n_estimators': 24}
-test  : test/256b0a75.json XGBSolver {'n_estimators': 24}
-test  : test/20981f0e.json XGBSolver {'n_estimators': 24}
-test  : test/37d3e8b2.json XGBSolver {'n_estimators': 24}
-test  : test/1e81d6f9.json XGBSolver {'n_estimators': 24}
-test  : test/12422b43.json XGBSolver {'n_estimators': 24}
-test  : test/137f0df0.json XGBSolver {'n_estimators': 24}
-test  : test/13713586.json XGBSolver {'n_estimators': 24}
-test  : test/15663ba9.json XGBSolver {'n_estimators': 24}
-test  : test/31adaf00.json XGBSolver {'n_estimators': 24}
+####### training GlobSolver
+####### evaluation GlobSolver
+####### test GlobSolver
+test  : test/00576224.json GlobSolver ('evaluation/00576224.json',)
+test  : test/009d5c81.json GlobSolver ('evaluation/009d5c81.json',)
+test  : test/00dbd492.json GlobSolver ('evaluation/00dbd492.json',)
+test  : test/03560426.json GlobSolver ('evaluation/03560426.json',)
+test  : test/05a7bcf2.json GlobSolver ('evaluation/05a7bcf2.json',)
+test  : test/0607ce86.json GlobSolver ('evaluation/0607ce86.json',)
+test  : test/0692e18c.json GlobSolver ('evaluation/0692e18c.json',)
+test  : test/070dd51e.json GlobSolver ('evaluation/070dd51e.json',)
+test  : test/08573cc6.json GlobSolver ('evaluation/08573cc6.json',)
+test  : test/0934a4d8.json GlobSolver ('evaluation/0934a4d8.json',)
+test  : test/09c534e7.json GlobSolver ('evaluation/09c534e7.json',)
+test  : test/0a1d4ef5.json GlobSolver ('evaluation/0a1d4ef5.json',)
+test  : test/0a2355a6.json GlobSolver ('evaluation/0a2355a6.json',)
+test  : test/0b17323b.json GlobSolver ('evaluation/0b17323b.json',)
+test  : test/0bb8deee.json GlobSolver ('evaluation/0bb8deee.json',)
+test  : test/0becf7df.json GlobSolver ('evaluation/0becf7df.json',)
+test  : test/0c786b71.json GlobSolver ('evaluation/0c786b71.json',)
+test  : test/0c9aba6e.json GlobSolver ('evaluation/0c9aba6e.json',)
+test  : test/0d87d2a6.json GlobSolver ('evaluation/0d87d2a6.json',)
+test  : test/0e671a1a.json GlobSolver ('evaluation/0e671a1a.json',)
+test  : test/0f63c0b9.json GlobSolver ('evaluation/0f63c0b9.json',)
+test  : test/103eff5b.json GlobSolver ('evaluation/103eff5b.json',)
+test  : test/11e1fe23.json GlobSolver ('evaluation/11e1fe23.json',)
+test  : test/12997ef3.json GlobSolver ('evaluation/12997ef3.json',)
+test  : test/12eac192.json GlobSolver ('evaluation/12eac192.json',)
+test  : test/136b0064.json GlobSolver ('evaluation/136b0064.json',)
+test  : test/13713586.json GlobSolver ('evaluation/13713586.json',)
+test  : test/137f0df0.json GlobSolver ('evaluation/137f0df0.json',)
+test  : test/140c817e.json GlobSolver ('evaluation/140c817e.json',)
+test  : test/14754a24.json GlobSolver ('evaluation/14754a24.json',)
+test  : test/15113be4.json GlobSolver ('evaluation/15113be4.json',)
+test  : test/15663ba9.json GlobSolver ('evaluation/15663ba9.json',)
+test  : test/15696249.json GlobSolver ('evaluation/15696249.json',)
+test  : test/16b78196.json GlobSolver ('evaluation/16b78196.json',)
+test  : test/17b80ad2.json GlobSolver ('evaluation/17b80ad2.json',)
+test  : test/17cae0c1.json GlobSolver ('evaluation/17cae0c1.json',)
+test  : test/18419cfa.json GlobSolver ('evaluation/18419cfa.json',)
+test  : test/184a9768.json GlobSolver ('evaluation/184a9768.json',)
+test  : test/195ba7dc.json GlobSolver ('evaluation/195ba7dc.json',)
+test  : test/1990f7a8.json GlobSolver ('evaluation/1990f7a8.json',)
+test  : test/19bb5feb.json GlobSolver ('evaluation/19bb5feb.json',)
+test  : test/1a2e2828.json GlobSolver ('evaluation/1a2e2828.json',)
+test  : test/1a6449f1.json GlobSolver ('evaluation/1a6449f1.json',)
+test  : test/1acc24af.json GlobSolver ('evaluation/1acc24af.json',)
+test  : test/1c02dbbe.json GlobSolver ('evaluation/1c02dbbe.json',)
+test  : test/1c0d0a4b.json GlobSolver ('evaluation/1c0d0a4b.json',)
+test  : test/1c56ad9f.json GlobSolver ('evaluation/1c56ad9f.json',)
+test  : test/1d0a4b61.json GlobSolver ('evaluation/1d0a4b61.json',)
+test  : test/1d398264.json GlobSolver ('evaluation/1d398264.json',)
+test  : test/1da012fc.json GlobSolver ('evaluation/1da012fc.json',)
+test  : test/1e81d6f9.json GlobSolver ('evaluation/1e81d6f9.json',)
+test  : test/1e97544e.json GlobSolver ('evaluation/1e97544e.json',)
+test  : test/2037f2c7.json GlobSolver ('evaluation/2037f2c7.json',)
+test  : test/20818e16.json GlobSolver ('evaluation/20818e16.json',)
+test  : test/20981f0e.json GlobSolver ('evaluation/20981f0e.json',)
+test  : test/212895b5.json GlobSolver ('evaluation/212895b5.json',)
+test  : test/21f83797.json GlobSolver ('evaluation/21f83797.json',)
+test  : test/22a4bbc2.json GlobSolver ('evaluation/22a4bbc2.json',)
+test  : test/25094a63.json GlobSolver ('evaluation/25094a63.json',)
+test  : test/2546ccf6.json GlobSolver ('evaluation/2546ccf6.json',)
+test  : test/256b0a75.json GlobSolver ('evaluation/256b0a75.json',)
+test  : test/2685904e.json GlobSolver ('evaluation/2685904e.json',)
+test  : test/2697da3f.json GlobSolver ('evaluation/2697da3f.json',)
+test  : test/2753e76c.json GlobSolver ('evaluation/2753e76c.json',)
+test  : test/27a77e38.json GlobSolver ('evaluation/27a77e38.json',)
+test  : test/27f8ce4f.json GlobSolver ('evaluation/27f8ce4f.json',)
+test  : test/281123b4.json GlobSolver ('evaluation/281123b4.json',)
+test  : test/292dd178.json GlobSolver ('evaluation/292dd178.json',)
+test  : test/29700607.json GlobSolver ('evaluation/29700607.json',)
+test  : test/2a5f8217.json GlobSolver ('evaluation/2a5f8217.json',)
+test  : test/2b01abd0.json GlobSolver ('evaluation/2b01abd0.json',)
+test  : test/2c0b0aff.json GlobSolver ('evaluation/2c0b0aff.json',)
+test  : test/2c737e39.json GlobSolver ('evaluation/2c737e39.json',)
+test  : test/2f0c5170.json GlobSolver ('evaluation/2f0c5170.json',)
+test  : test/310f3251.json GlobSolver ('evaluation/310f3251.json',)
+test  : test/3194b014.json GlobSolver ('evaluation/3194b014.json',)
+test  : test/319f2597.json GlobSolver ('evaluation/319f2597.json',)
+test  : test/31adaf00.json GlobSolver ('evaluation/31adaf00.json',)
+test  : test/31d5ba1a.json GlobSolver ('evaluation/31d5ba1a.json',)
+test  : test/32e9702f.json GlobSolver ('evaluation/32e9702f.json',)
+test  : test/332efdb3.json GlobSolver ('evaluation/332efdb3.json',)
+test  : test/3391f8c0.json GlobSolver ('evaluation/3391f8c0.json',)
+test  : test/33b52de3.json GlobSolver ('evaluation/33b52de3.json',)
+test  : test/3490cc26.json GlobSolver ('evaluation/3490cc26.json',)
+test  : test/34b99a2b.json GlobSolver ('evaluation/34b99a2b.json',)
+test  : test/351d6448.json GlobSolver ('evaluation/351d6448.json',)
+test  : test/358ba94e.json GlobSolver ('evaluation/358ba94e.json',)
+test  : test/37d3e8b2.json GlobSolver ('evaluation/37d3e8b2.json',)
+test  : test/3979b1a8.json GlobSolver ('evaluation/3979b1a8.json',)
+test  : test/3a301edc.json GlobSolver ('evaluation/3a301edc.json',)
+test  : test/3b4c2228.json GlobSolver ('evaluation/3b4c2228.json',)
+test  : test/3d31c5b3.json GlobSolver ('evaluation/3d31c5b3.json',)
+test  : test/3ed85e70.json GlobSolver ('evaluation/3ed85e70.json',)
+test  : test/3ee1011a.json GlobSolver ('evaluation/3ee1011a.json',)
+test  : test/3f23242b.json GlobSolver ('evaluation/3f23242b.json',)
+test  : test/40f6cd08.json GlobSolver ('evaluation/40f6cd08.json',)
+test  : test/414297c0.json GlobSolver ('evaluation/414297c0.json',)
+test  : test/423a55dc.json GlobSolver ('evaluation/423a55dc.json',)
 
 wrote: /home/jamie/code/kaggle-arc.copy/./submission/submission5.csv | 105 lines
 
@@ -593,24 +120,14 @@ wrote: /home/jamie/code/kaggle-arc.copy/./submission/submission.csv | 105 lines
 Solver Scores:
 
 # training
-240 XGBSolver
-8 GeometrySolver
-4 TessellationSolver
-2 SingleColorSolver
-2 ZoomSolver
-1 BorderSolver
 
 # evaluation
-230 XGBSolver
-2 ZoomSolver
-2 TessellationSolver
 
 # test
-59 XGBSolver
-1 TessellationSolver
+98 GlobSolver
 --------------------
 Dataset Scores:
-training   : {'correct': 40, 'guesses': 254, 'total': 416, 'error': 0.9038, 'time': '00:01:56', 'name': 'training'}
-evaluation : {'correct': 14, 'guesses': 241, 'total': 419, 'error': 0.9666, 'time': '00:03:28', 'name': 'evaluation'}
-test       : {'correct': 3.5, 'guesses': 61, 'total': 104, 'error': 1.0, 'time': '00:00:24', 'name': 'test'}
-time       : 00:05:49
+training   : {'correct': 0, 'guesses': 0, 'total': 416, 'error': 1.0, 'time': '00:00:00', 'name': 'training'}
+evaluation : {'correct': 0, 'guesses': 0, 'total': 419, 'error': 1.0, 'time': '00:00:00', 'name': 'evaluation'}
+test       : {'correct': 0.0, 'guesses': 102, 'total': 104, 'error': 1.0, 'time': '00:00:00', 'name': 'test'}
+time       : 00:00:00

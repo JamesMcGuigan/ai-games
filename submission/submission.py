@@ -3,14 +3,14 @@
 ##### 
 ##### ./submission/kaggle_compile.py ./src_james/solver_multimodel/main.py
 ##### 
-##### 2020-05-25 19:19:28+01:00
+##### 2020-05-26 00:22:14+01:00
 ##### 
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### 
-##### * master 16e2daf [ahead 2] XGBSolver | bugfix format_args()
+##### * master ccab583 [ahead 1] GlobSover | Create a lookup table of all previously seen input/output pairs
 ##### 
-##### 16e2daf8321cf0e3c2ecbba27aeb53b4d16cf107
+##### ccab58302b388ed65c55c9e12812429893ec29cb
 ##### 
 
 #####
@@ -79,16 +79,41 @@ class CSV:
             file.write(csv)
             print(f"\nwrote: {filename} | {line_count} lines")
 
+    ### No need to extend sample_submission.csv, just sort the CSV
+    # @classmethod
+    # def sample_submission(cls):
+    #     filename = os.path.join(settings['dir']['data'],'sample_submission.csv')
+    #     sample_submission = pd.read_csv(filename)
+    #     return sample_submission
+    #
+    # @classmethod
+    # def write_submission(cls, dataset: 'Dataset', filename='submission.csv'):
+    #     csv        = CSV.to_csv(dataset)
+    #     lines      = csv.split('\n')
+    #     line_count = len(lines)
+    #     data       = []
+    #
+    #     submission = cls.sample_submission()
+    #     submission = submission.set_index('output_id', drop=False)
+    #     for line in lines[1:]:  # ignore header
+    #         object_id,output = line.split(',',2)
+    #         submission.loc[object_id]['output'] = output
+    #
+    #     submission.to_csv(filename, index=False)
+    #     print(f"\nwrote: {filename} | {line_count} lines")
+
+
     @classmethod
     def object_id(cls, filename, index=0) -> str:
         return re.sub('^.*/|\.json$', '', filename) + '_' + str(index)
 
     @classmethod
     def to_csv(cls, dataset: 'Dataset'):
-        csv = ['output_id,output']
+        csv = []
         for task in dataset:
             line = CSV.to_csv_line(task)
             if line: csv.append(line)
+        csv = ['output_id,output'] + sorted(csv) # object_id keys are sorted in sample_submission.csv
         return "\n".join(csv)
 
     @classmethod
@@ -99,15 +124,11 @@ class CSV:
     def to_csv_line(cls, task: 'Task') -> str:
         csv = []
         for index, problemset in enumerate(task['solutions']):
-            solutions = problemset.unique()[:3]
-
-            solution_str = " ".join(
+            solutions = list(set(
                 cls.grid_to_csv_string(problem['output'])
-                for problem in solutions
-            )
-            if not solution_str:
-                solution_str = cls.default_csv_line(task)
-
+                for problem in problemset
+            ))
+            solution_str = " ".join(solutions[:3]) if len(solutions) else cls.default_csv_line(task)
             line = ",".join([
                 cls.object_id(task.filename, index),
                 solution_str
@@ -217,7 +238,7 @@ class Dataset(UserList):
         self.name       = name
         self.directory  = directory
         self.filenames  = glob2.glob( self.directory + '/**/*.json' )
-        self.filenames  = [ Task.format_filename(filename) for filename in self.filenames ]
+        self.filenames  = sorted([ Task.format_filename(filename) for filename in self.filenames ])
         assert len(self.filenames), f'invalid directory: {directory}'
         self.data       = [Task(filename, self) for filename in self.filenames]
         self.time_taken = 0
@@ -281,7 +302,8 @@ class Task(UserDict):
     def __init__(self, filename: str, dataset: Dataset = None):
         super().__init__()
 
-        self.filename: str = self.format_filename(filename)
+        self.dataset: Dataset = dataset
+        self.filename: str    = self.format_filename(filename)
         self.raw  = self.read_file( os.path.join(settings['dir']['data'], self.filename) )
         self.data = {
             test_or_train: ProblemSet(input_outputs, test_or_train, self)
@@ -341,7 +363,7 @@ class Task(UserDict):
 
     def score(self) -> int:
         score = 0
-        self.make_solutions_unique()
+        # self.make_solutions_unique()  # Is causing exceptions
         for index, test_problem in enumerate(self.data['test']):
             for solution in self.data['solutions'][index]:
                 if test_problem == solution:
@@ -379,10 +401,12 @@ class ProblemSet(UserList):
         return self._id
 
     def unique(self) -> 'ProblemSet':
-        unique = list({ hash(problem): problem for problem in self.data }.values())
+        # unique = list({ hash(problem): problem for problem in self.data }.values())
+        unique = set( problem for problem in self.data )
         if len(self.data) == len(unique):
             return self
         else:
+            unique = [ problem.raw for problem in self.data ]
             return ProblemSet(unique, test_or_train=self.test_or_train, task=self.task)
 
     @property
@@ -465,7 +489,7 @@ from fastcache._lrucache import clru_cache
 ### Profiler: 2x speedup
 # from src_james.settings import settings
 
-
+__np_cache = {}
 def np_cache(maxsize=1024, typed=True):
     """
         Decorator:
@@ -512,7 +536,7 @@ def np_cache(maxsize=1024, typed=True):
             return function(*args, **kwargs)
 
         # copy lru_cache attributes over too
-        wrapper.cache       = {}
+        wrapper.cache       = __np_cache  # use a shared cache between wrappers to save memory
         wrapper.cache_info  = cached_wrapper.cache_info
         wrapper.cache_clear = cached_wrapper.cache_clear
 
@@ -1332,6 +1356,16 @@ def task_is_singlecolor(task):
 #####
 
 #####
+##### START submission/submission.py
+#####
+
+
+
+#####
+##### END   submission/submission.py
+#####
+
+#####
 ##### START src_james/solver_multimodel/BorderSolver.py
 #####
 
@@ -1408,6 +1442,83 @@ class DoNothingSolver(Solver):
 
 #####
 ##### END   src_james/solver_multimodel/DoNothingSolver.py
+#####
+
+#####
+##### START src_james/solver_multimodel/GlobSolver.py
+#####
+
+# from src_james.settings import settings
+# from src_james.solver_multimodel.queries.grid import *
+# from src_james.solver_multimodel.Solver import Solver
+# from submission.submission import Competition
+
+
+class GlobSolver(Solver):
+    """ Create a lookup table of all previously seen input/output pairs """
+    verbose = True
+    debug = True
+    solutions = {}
+    cache     = {}
+
+    def __init__(self, tests_only=True):
+        super().__init__()
+        self.tests_only = tests_only
+        self.init_cache()
+
+    def init_cache(self):
+        if len(self.cache): return
+        competition = Competition()
+        for name, dataset in competition.items():
+            if name == 'test': continue  # exclude test from the cache
+            for task in dataset:
+                for name, problemset in task.items():
+                    for problem in problemset:
+                        try:
+                            if len(problem) == 0: continue
+                            if problem['input'] is None or problem['output'] is None: continue
+                            hash = problem['input'].tobytes()
+                            self.solutions[hash] = (task.filename, problem['output'])
+                        except Exception as exception:
+                            pass
+
+
+    def detect(self, task):
+        if task.filename in self.cache: return True
+        if self.tests_only and 'test' not in task.filename: return False  # We would get 100% success rate otherwise
+
+        # Loop through the all the inputs, as see if it is in our public database
+        for name, problemset in task.items():
+            inputs = [ problem['input'] for problem in problemset if problem ]
+            for input in inputs:
+                hash = input.tobytes()
+                if hash in self.solutions:
+                    filename, solutions = self.solutions[hash]
+                    self.cache[task.filename] = (filename,)  # for logging purposes
+                    return True
+        return False
+
+
+    def action(self, grid: np.ndarray, filename:str=None, task=None, *args):
+        """If we have seen the input before, then propose the same output"""
+        hash = grid.tobytes()
+        if hash in self.solutions:
+            filename, solutions = self.solutions[hash]
+            return solutions
+        else:
+            return None
+
+
+if __name__ == '__main__' and not settings['production']:
+    solver = GlobSolver(tests_only=True)
+    solver.verbose = True
+
+    competition = Competition()
+    competition.map(solver.solve_all)
+    print(competition)
+
+#####
+##### END   src_james/solver_multimodel/GlobSolver.py
 #####
 
 #####
@@ -1650,6 +1761,7 @@ if __name__ == '__main__' and not settings['production']:
 from itertools import product
 from typing import List
 
+import pydash
 from fastcache._lrucache import clru_cache
 from xgboost import XGBClassifier
 
@@ -1668,9 +1780,14 @@ class XGBSolver(Solver):
     optimise = True
     verbose  = True
 
-    def __init__(self, n_estimators=24, **kwargs):
+    def __init__(self, n_estimators=24, max_depth=10, **kwargs):
         super().__init__()
-        self.kwargs = { "n_estimators": n_estimators, **kwargs }
+        self.kwargs = { "n_estimators": n_estimators, "max_depth": max_depth, **kwargs }
+        if self.kwargs.get('booster') == 'gblinear':
+            self.kwargs = pydash.omit(self.kwargs, *['max_depth'])
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__}:self.kwargs>'
 
     def format_args(self, args):
         return self.kwargs
@@ -1830,6 +1947,21 @@ class XGBSolver(Solver):
         return top_left, top_right
 
 
+class XGBSolverDart(XGBSolver):
+    def __init__(self, booster='dart', **kwargs):
+        self.kwargs = { "booster": booster, **kwargs }
+        super().__init__(**self.kwargs)
+
+class XGBSolverGBtree(XGBSolver):
+    def __init__(self, booster='gbtree', **kwargs):
+        self.kwargs = { "booster": booster, **kwargs }
+        super().__init__(**self.kwargs)
+
+class XGBSolverGBlinear(XGBSolver):
+    def __init__(self, booster='gblinear', **kwargs):
+        self.kwargs = { "booster": booster, "max_depth": None, **kwargs }
+        super().__init__(**self.kwargs)
+
 
 if __name__ == '__main__' and not settings['production']:
     solver = XGBSolver()
@@ -1956,6 +2088,19 @@ if __name__ == '__main__' and not settings['production']:
 # test       : {'correct': 0, 'guesses': 64, 'total': 104, 'error': 1.0, 'time': '00:00:00', 'name': 'test'}
 # time       : 00:02:39
 
+### XGBSolverDart(); XGBSolverGBtree(); XGBSolverGBlinear()
+# training   : {'correct': 42, 'guesses': 254, 'total': 416, 'error': 0.899, 'time': '00:03:31', 'name': 'training'}
+# evaluation : {'correct': 14, 'guesses': 242, 'total': 419, 'error': 0.9666, 'time': '00:07:17', 'name': 'evaluation'}
+# test       : {'correct': 3.5, 'guesses': 61, 'total': 104, 'error': 1.0, 'time': '00:01:35', 'name': 'test'}
+# time       : 00:12:23
+
+### max_depth=10
+# training   : {'correct': 43, 'guesses': 266, 'total': 416, 'error': 0.8966, 'time': '00:04:49', 'name': 'training'}
+# evaluation : {'correct': 14, 'guesses': 266, 'total': 419, 'error': 0.9666, 'time': '00:08:23', 'name': 'evaluation'}
+# test       : {'correct': 3.4, 'guesses': 65, 'total': 104, 'error': 1.0, 'time': '00:01:40', 'name': 'test'}
+# time       : 00:14:53
+
+
 #####
 ##### END   src_james/solver_multimodel/XGBSolver.py
 #####
@@ -1969,20 +2114,27 @@ from typing import List
 # from src_james.solver_multimodel.BorderSolver import BorderSolver
 # from src_james.solver_multimodel.DoNothingSolver import DoNothingSolver
 # from src_james.solver_multimodel.GeometrySolver import GeometrySolver
+# from src_james.solver_multimodel.GlobSolver import GlobSolver
 # from src_james.solver_multimodel.SingleColorSolver import SingleColorSolver
 # from src_james.solver_multimodel.Solver import Solver
 # from src_james.solver_multimodel.TessellationSolver import TessellationSolver
 # from src_james.solver_multimodel.XGBSolver import XGBSolver
+# from src_james.solver_multimodel.XGBSolver import XGBSolverDart
+# from src_james.solver_multimodel.XGBSolver import XGBSolverGBlinear
+# from src_james.solver_multimodel.XGBSolver import XGBSolverGBtree
 # from src_james.solver_multimodel.ZoomSolver import ZoomSolver
 
 solvers: List[Solver] = [
-    DoNothingSolver(),
-    BorderSolver(),
-    GeometrySolver(),
-    SingleColorSolver(),
-    ZoomSolver(),
-    TessellationSolver(),
-    XGBSolver(),
+    GlobSolver(),
+    # DoNothingSolver(),
+    # BorderSolver(),
+    # GeometrySolver(),
+    # SingleColorSolver(),
+    # ZoomSolver(),
+    # TessellationSolver(),
+    # XGBSolverDart(),
+    # XGBSolverGBtree(),
+    # XGBSolverGBlinear(),
 ]
 
 
@@ -1994,11 +2146,13 @@ solvers: List[Solver] = [
 ##### START ./src_james/solver_multimodel/main.py
 #####
 
+import gc
 import os
 import time
 from operator import itemgetter
 
 # from src_james.core.DataModel import Competition
+# from src_james.settings import settings
 # from src_james.solver_multimodel.solvers import solvers
 
 if __name__ == '__main__':
@@ -2010,7 +2164,7 @@ if __name__ == '__main__':
     for solver in solvers: print(solver.__class__.__name__)
     print('\n','-'*20,'\n')
 
-    plot_results = not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', '') and ('submission' not in __file__)
+    plot_results = not settings['production']
     time_start   = time.perf_counter()
     competition  = Competition()
     scores       = { name: { solver.__class__.__name__: 0 for solver in solvers } for name in competition.keys() }
@@ -2022,6 +2176,9 @@ if __name__ == '__main__':
                 scores[dataset_name][solver.__class__.__name__] += solver.plot(dataset)
             else:
                 scores[dataset_name][solver.__class__.__name__] += solver.solve_all(dataset)
+            # Running on Kaggle uses up nearly all 16GB of RAM
+            solver.cache = {}
+            gc.collect()
 
         dataset.time_taken = time.perf_counter() - time_start_dataset
     competition.time_taken = time.perf_counter() - time_start
@@ -2048,12 +2205,12 @@ if __name__ == '__main__':
 ##### 
 ##### ./submission/kaggle_compile.py ./src_james/solver_multimodel/main.py
 ##### 
-##### 2020-05-25 19:19:28+01:00
+##### 2020-05-26 00:22:14+01:00
 ##### 
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### 
-##### * master 16e2daf [ahead 2] XGBSolver | bugfix format_args()
+##### * master ccab583 [ahead 1] GlobSover | Create a lookup table of all previously seen input/output pairs
 ##### 
-##### 16e2daf8321cf0e3c2ecbba27aeb53b4d16cf107
+##### ccab58302b388ed65c55c9e12812429893ec29cb
 ##### 

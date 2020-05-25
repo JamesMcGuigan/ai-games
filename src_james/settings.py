@@ -11,7 +11,7 @@ settings = {
     **settings,
     'verbose': True,
     'debug':   not settings['production'],
-    'caching': settings['production'] or False,
+    'caching': settings['production'] or True,
 }
 
 if os.environ.get('KAGGLE_KERNEL_RUN_TYPE'):

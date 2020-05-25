@@ -3,15 +3,15 @@
 ##### 
 ##### ./submission/kaggle_compile.py ./src_james/solver_multimodel/main.py
 ##### 
-##### 2020-05-25 01:49:24+01:00
+##### 2020-05-25 04:27:42+01:00
 ##### 
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### 
 #####   james-wip c81cf89 Solvers | work in progress - broken
-##### * master    80932c6 [ahead 5] XGBCSolver | add neighbourhood features
+##### * master    b503de2 [ahead 8] GeometrySolver | remove commented line
 ##### 
-##### 80932c63a299ec6752ac37d12cd77cf33edd6664
+##### b503de2b776f71c0d68b10c09a7778ed7446aa3a
 ##### 
 
 #####
@@ -57,8 +57,8 @@ if __name__ == '__main__':
 #####
 
 import os
-import re
 import random
+import re
 
 import numpy as np
 
@@ -89,7 +89,7 @@ class CSV:
 
     @classmethod
     def default_csv_line(cls, task: 'Task') -> str:
-        return f'|{random.randint(1,9)}|'
+        return '|123|456|789|'
 
     @classmethod
     def to_csv_line(cls, task: 'Task') -> str:
@@ -638,19 +638,44 @@ class Solver():
         args = self.cache.get(task.filename, ())
         return self.is_lambda_valid(task, self.action, *args, task=task)
 
+
+    def format_args(self, args):
+        if isinstance(args, dict):
+            return dict(zip(args.keys(), map(self.format_args, list(args.values()))))
+        elif isinstance(args, (list,set,tuple)):
+            original_type = type(args)
+            args = original_type(map(self.format_args, args))
+        elif hasattr(args, '__name__'):
+            return f"<{type(args).__name__}:{args.__name__}>"
+        else:
+            return args
+
+    def log_solved(self, task: Task, args: Union[list,tuple,set], solutions: List[Problem]):
+        if self.verbose:
+            label = 'solved' if self.is_solved(task, solutions) else 'guess '
+            args  = self.format_args(args)
+            print(f'{label}:', task.filename, self.__class__.__name__, args)
+
+    def is_solved(self, task: Task, solutions: List[Problem]):
+        for solution in solutions:
+            for problem in task['test']:
+                if solution == problem:
+                    return True
+        return False
+
     def solve(self, task: Task, force=False, inplace=True) -> Union[List[Problem],None]:
         """solve test case and persist"""
         if task.filename not in self.cache: self.fit(task)
         try:
             if self.detect(task) or force:    # may generate cache
                 if self.test(task) or force:  # may generate cache
-                    args     = self.cache.get(task.filename, ())
-                    if self.verbose and args:
-                        print('solved: ', self.__class__.__name__, args)
+                    args = self.cache.get(task.filename, ())
                     if isinstance(args, dict):
                         solutions = self.solve_lambda(task, self.action, **args, task=task, _inplace_=True)
                     else:
                         solutions = self.solve_lambda(task, self.action,  *args, task=task, _inplace_=True )
+                    if len(solutions):
+                        self.log_solved(task, args, solutions)
                     return solutions
         except Exception as exception:
             if self.debug: raise exception
@@ -663,7 +688,6 @@ class Solver():
                 solution = self.solve(task, force=solve_detects)
                 if solution or (solve_detects and self.test(task)):
                     count += 1
-                    # solution = self.solve(task, force=solve_detects)
                     if plot == True:
                         plot_task(task)
         return count
@@ -996,6 +1020,7 @@ import numpy as np
 class GeometrySolver(Solver):
     optimise = True
     verbose  = True
+    debug    = False
     actions = {
         "flip":      ( np.flip,      [0,1]    ),
         "rot90":     ( np.rot90,     [1,2,3]  ),
@@ -1021,7 +1046,6 @@ class GeometrySolver(Solver):
             for args in arglist:
                 if self.is_lambda_valid(task, function, *args):
                     self.cache[task.filename] = (function, args)
-                    if self.verbose: print(function, args)
                     return True
 
         # this doesn't find anything
@@ -1033,7 +1057,6 @@ class GeometrySolver(Solver):
                 function = lambda grid, args1, args2: function1(function2(grid, *args2), *args1)
                 if self.is_lambda_valid(task, function, *(args1,args2)):
                     self.cache[task.filename] = (function, (args1,args2))
-                    if self.verbose: print(function, (args1,args2))
                     return True
         return False
 
@@ -1041,7 +1064,7 @@ class GeometrySolver(Solver):
         try:
             return function(grid, *args)
         except Exception as exception:
-            if self.verbose: print(function, args, exception)
+            if self.debug: print('Exception', self.__class__.__name__, 'action()', function, args, exception)
             return grid
 
 
@@ -1304,7 +1327,6 @@ class BorderSolver(Solver):
             args = [ query ]
             if self.is_lambda_valid(task, self.action, *args, task=task):
                 self.cache[task.filename] = args
-                if self.verbose: print(self.action, args)
                 return True
         return False
 
@@ -1372,7 +1394,6 @@ class SingleColorSolver(Solver):
             args = [ query ]
             if self.is_lambda_valid(task, self.action, *args, task=task):
                 self.cache[task.filename] = args
-                if self.verbose: print(self.action, args)
                 return True
         return False
 
@@ -1474,6 +1495,7 @@ class TessellationSolver(GeometrySolver):
                                 q_arg = make_tuple(q_arg)
                                 yield (preprocess, p_arg),(transform,t_arg),(query,q_arg)
 
+
     # TODO: hieraracharical nesting of solves and solutions/rules array generator
     def test(self, task):
         if task.filename in self.cache: return True
@@ -1488,13 +1510,11 @@ class TessellationSolver(GeometrySolver):
                 }
             if self.is_lambda_valid(task, self.action, **kwargs, task=task):
                 self.cache[task.filename] = kwargs
-                if self.verbose: print(self.action, kwargs)
                 return True
         return False
 
 
     def action(self, grid, preprocess=np.copy, p_arg=(), transform=np.copy, t_arg=(), query=query_true, q_arg=(), task=None):
-        #print('action', preprocess, transform, query)
         if inspect.isgeneratorfunction(transform):
             generator = transform(grid, *t_arg)
             transform = lambda grid, *args: next(generator)
@@ -1569,7 +1589,7 @@ from xgboost import XGBClassifier
 
 class XGBSolver(Solver):
     optimise = True
-    verbose  = False
+    verbose  = True
 
     def __init__(self):
         super().__init__()
@@ -1899,32 +1919,49 @@ solvers: List[Solver] = [
 
 import os
 import time
+from operator import itemgetter
 
 # from src_james.core.DataModel import Competition
 # from src_james.solver_multimodel.solvers import solvers
 
 if __name__ == '__main__':
-    plot_results = not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', '')
+    print('\n','-'*20,'\n')
+    print('Abstraction and Reasoning Challenge')
+    print('Team: Mathematicians + Experts')
+    print('https://www.kaggle.com/c/abstraction-and-reasoning-challenge')
+    print('\n','-'*20,'\n')
+    for solver in solvers: print(solver.__class__.__name__)
+    print('\n','-'*20,'\n')
+
+    plot_results = not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', '') and ('submission' not in __file__)
     time_start   = time.perf_counter()
     competition  = Competition()
-    scores       = { name: 0 for name in competition.values() }
-    for name, dataset in competition.items():
+    scores       = { name: { solver.__class__.__name__: 0 for solver in solvers } for name in competition.keys() }
+    for dataset_name, dataset in competition.items():
         time_start_dataset = time.perf_counter()
         for solver in solvers:
-            solver.cache = {}
+            print('#######', dataset_name, solver.__class__.__name__)
             if plot_results:
-                scores[name] = solver.plot(dataset)
+                scores[dataset_name][solver.__class__.__name__] += solver.plot(dataset)
             else:
-                scores[name] = solver.solve_all(dataset)
+                scores[dataset_name][solver.__class__.__name__] += solver.solve_all(dataset)
 
         dataset.time_taken = time.perf_counter() - time_start_dataset
     competition.time_taken = time.perf_counter() - time_start
 
+    competition['test'].write_submission('submission5.csv')
     competition['test'].write_submission()
 
     print('-'*20)
-    print('Score:')
-    for key, value in competition.score().items(): print(f'{key.rjust(11)}: {value}')
+    print('Solver Scores:')
+    for dataset_name in scores.keys():
+        print(f'\n# {dataset_name}')
+        for solver_name, score in sorted(scores[dataset_name].items(), key=itemgetter(1), reverse=True):
+            if score: print(score, solver_name)
+    print('-'*20)
+    print('Dataset Scores:')
+    print(competition)
+
 
 
 #####
@@ -1934,13 +1971,13 @@ if __name__ == '__main__':
 ##### 
 ##### ./submission/kaggle_compile.py ./src_james/solver_multimodel/main.py
 ##### 
-##### 2020-05-25 01:49:24+01:00
+##### 2020-05-25 04:27:42+01:00
 ##### 
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### 
 #####   james-wip c81cf89 Solvers | work in progress - broken
-##### * master    80932c6 [ahead 5] XGBCSolver | add neighbourhood features
+##### * master    b503de2 [ahead 8] GeometrySolver | remove commented line
 ##### 
-##### 80932c63a299ec6752ac37d12cd77cf33edd6664
+##### b503de2b776f71c0d68b10c09a7778ed7446aa3a
 ##### 

@@ -1,5 +1,4 @@
 import os
-import random
 import re
 
 import numpy as np
@@ -31,7 +30,7 @@ class CSV:
 
     @classmethod
     def default_csv_line(cls, task: 'Task') -> str:
-        return f'|{random.randint(1,9)}|'
+        return '|123|456|789|'
 
     @classmethod
     def to_csv_line(cls, task: 'Task') -> str:

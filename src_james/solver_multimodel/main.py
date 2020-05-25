@@ -1,28 +1,45 @@
 import os
 import time
+from operator import itemgetter
 
 from src_james.core.DataModel import Competition
 from src_james.solver_multimodel.solvers import solvers
 
 if __name__ == '__main__':
-    plot_results = not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', '')
+    print('\n','-'*20,'\n')
+    print('Abstraction and Reasoning Challenge')
+    print('Team: Mathematicians + Experts')
+    print('https://www.kaggle.com/c/abstraction-and-reasoning-challenge')
+    print('\n','-'*20,'\n')
+    for solver in solvers: print(solver.__class__.__name__)
+    print('\n','-'*20,'\n')
+
+    plot_results = not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', '') and ('submission' not in __file__)
     time_start   = time.perf_counter()
     competition  = Competition()
-    scores       = { name: 0 for name in competition.values() }
-    for name, dataset in competition.items():
+    scores       = { name: { solver.__class__.__name__: 0 for solver in solvers } for name in competition.keys() }
+    for dataset_name, dataset in competition.items():
         time_start_dataset = time.perf_counter()
         for solver in solvers:
-            solver.cache = {}
+            print('#######', dataset_name, solver.__class__.__name__)
             if plot_results:
-                scores[name] = solver.plot(dataset)
+                scores[dataset_name][solver.__class__.__name__] += solver.plot(dataset)
             else:
-                scores[name] = solver.solve_all(dataset)
+                scores[dataset_name][solver.__class__.__name__] += solver.solve_all(dataset)
 
         dataset.time_taken = time.perf_counter() - time_start_dataset
     competition.time_taken = time.perf_counter() - time_start
 
+    competition['test'].write_submission('submission5.csv')
     competition['test'].write_submission()
 
     print('-'*20)
-    print('Score:')
-    for key, value in competition.score().items(): print(f'{key.rjust(11)}: {value}')
+    print('Solver Scores:')
+    for dataset_name in scores.keys():
+        print(f'\n# {dataset_name}')
+        for solver_name, score in sorted(scores[dataset_name].items(), key=itemgetter(1), reverse=True):
+            if score: print(score, solver_name)
+    print('-'*20)
+    print('Dataset Scores:')
+    print(competition)
+

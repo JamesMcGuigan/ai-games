@@ -78,7 +78,7 @@ class Dataset(UserList):
         self.name       = name
         self.directory  = directory
         self.filenames  = glob2.glob( self.directory + '/**/*.json' )
-        self.filenames  = [ Task.format_filename(filename) for filename in self.filenames ]
+        self.filenames  = sorted([ Task.format_filename(filename) for filename in self.filenames ])
         assert len(self.filenames), f'invalid directory: {directory}'
         self.data       = [Task(filename, self) for filename in self.filenames]
         self.time_taken = 0

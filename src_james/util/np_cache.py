@@ -4,8 +4,10 @@ from functools import wraps
 import numpy as np
 from fastcache._lrucache import clru_cache
 
-
 ### Profiler: 2x speedup
+from src_james.settings import settings
+
+
 def np_cache(maxsize=1024, typed=True):
     """
         Decorator:
@@ -18,7 +20,7 @@ def np_cache(maxsize=1024, typed=True):
     maxsize_default=None
 
     def np_cache_generator(function):
-
+        if not settings['caching']: return function
         @wraps(function)
         def wrapper(*args, **kwargs):
             ### def encode(*args, **kwargs):

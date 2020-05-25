@@ -142,7 +142,8 @@ class Task(UserDict):
     def __init__(self, filename: str, dataset: Dataset = None):
         super().__init__()
 
-        self.filename: str = self.format_filename(filename)
+        self.dataset: Dataset = dataset
+        self.filename: str    = self.format_filename(filename)
         self.raw  = self.read_file( os.path.join(settings['dir']['data'], self.filename) )
         self.data = {
             test_or_train: ProblemSet(input_outputs, test_or_train, self)
@@ -202,7 +203,7 @@ class Task(UserDict):
 
     def score(self) -> int:
         score = 0
-        self.make_solutions_unique()
+        # self.make_solutions_unique()  # Is causing exceptions
         for index, test_problem in enumerate(self.data['test']):
             for solution in self.data['solutions'][index]:
                 if test_problem == solution:

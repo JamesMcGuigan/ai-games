@@ -27,12 +27,15 @@ def plot_one(task, ax, i,train_or_test,input_or_output):
     norm  = colors.Normalize(vmin=0, vmax=9)
 
     try:
-        input_matrix = task[train_or_test][i][input_or_output]
-        font_size    = 50 / np.sqrt(input_matrix.shape[0] * input_matrix.shape[1])
+        input_matrix  = task[train_or_test][i][input_or_output]
+        font_size     = 50 / np.sqrt(input_matrix.shape[0] * input_matrix.shape[1])
+        min_font_size = 6
+
         ax.imshow(input_matrix, cmap=cmap, norm=norm)
         # DOC: https://stackoverflow.com/questions/33828780/matplotlib-display-array-values-with-imshow
-        for (j,i),label in np.ndenumerate(input_matrix):
-            ax.text(i,j,label,ha='center',va='center', fontsize=font_size, color='black')
+        if font_size >= min_font_size:
+            for (j,i),label in np.ndenumerate(input_matrix):
+                ax.text(i,j,label,ha='center',va='center', fontsize=font_size, color='black')
         ax.grid(True,which='both',color='lightgrey', linewidth=0.5)
         ax.set_yticks([x-0.5 for x in range(1+len(input_matrix))])
         ax.set_xticks([x-0.5 for x in range(1+len(input_matrix[0]))])

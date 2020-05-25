@@ -333,3 +333,9 @@ if __name__ == '__main__' and not settings['production']:
 # evaluation : {'correct': 14, 'guesses': 242, 'total': 419, 'error': 0.9666, 'time': '00:07:17', 'name': 'evaluation'}
 # test       : {'correct': 3.5, 'guesses': 61, 'total': 104, 'error': 1.0, 'time': '00:01:35', 'name': 'test'}
 # time       : 00:12:23
+
+### max_depth=10
+# training   : {'correct': 43, 'guesses': 266, 'total': 416, 'error': 0.8966, 'time': '00:04:49', 'name': 'training'}
+# evaluation : {'correct': 14, 'guesses': 266, 'total': 419, 'error': 0.9666, 'time': '00:08:23', 'name': 'evaluation'}
+# test       : {'correct': 3.4, 'guesses': 65, 'total': 104, 'error': 1.0, 'time': '00:01:40', 'name': 'test'}
+# time       : 00:14:53

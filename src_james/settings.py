@@ -4,13 +4,14 @@ import pathlib
 try:    root_dir = pathlib.Path(__file__).parent.parent.absolute()
 except: root_dir = ''
 
-if not os.environ.get('KAGGLE_KERNEL_RUN_TYPE','') and 'submission' in __file__:
-    os.environ['KAGGLE_KERNEL_RUN_TYPE'] = 'Batch'
-
 settings = {
+    'production': bool(os.environ.get('KAGGLE_KERNEL_RUN_TYPE', '')) or 'submission' in __file__
+}
+settings = {
+    **settings,
     'verbose': True,
-    'debug':   not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''),
-    'caching': bool(os.environ.get('KAGGLE_KERNEL_RUN_TYPE', '')) or False,
+    'debug':   not settings['production'],
+    'caching': settings['production'] or False,
 }
 
 if os.environ.get('KAGGLE_KERNEL_RUN_TYPE'):
@@ -23,6 +24,7 @@ else:
         "data":        os.path.join(root_dir, "./input"),
         "output":      os.path.join(root_dir, "./submission"),
     }
+
 
 ####################
 if __name__ == '__main__':

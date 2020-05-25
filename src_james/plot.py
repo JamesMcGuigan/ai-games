@@ -21,18 +21,18 @@ def plot_one(task, ax, i,train_or_test,input_or_output):
         '#000000', '#0074D9', '#FF4136', '#2ECC40', '#FFDC00',
         '#AAAAAA', '#F012BE', '#FF851B', '#7FDBFF', '#870C25',
     ]
-    inverted_hexcodes = list(map(invert_hexcode,hexcodes))
+    # inverted_hexcodes = list(map(invert_hexcode,hexcodes))
+    # icmap = colors.ListedColormap(inverted_hexcodes)
     cmap  = colors.ListedColormap(hexcodes)
-    icmap = colors.ListedColormap(inverted_hexcodes)
-    norm = colors.Normalize(vmin=0, vmax=9)
+    norm  = colors.Normalize(vmin=0, vmax=9)
 
     try:
         input_matrix = task[train_or_test][i][input_or_output]
-        matrix_size  = np.sqrt(input_matrix.shape[0] * input_matrix.shape[1])
+        font_size    = 50 / np.sqrt(input_matrix.shape[0] * input_matrix.shape[1])
         ax.imshow(input_matrix, cmap=cmap, norm=norm)
         # DOC: https://stackoverflow.com/questions/33828780/matplotlib-display-array-values-with-imshow
         for (j,i),label in np.ndenumerate(input_matrix):
-            ax.text(i,j,label,ha='center',va='center', fontsize=50/matrix_size, color='black')
+            ax.text(i,j,label,ha='center',va='center', fontsize=font_size, color='black')
         ax.grid(True,which='both',color='lightgrey', linewidth=0.5)
         ax.set_yticks([x-0.5 for x in range(1+len(input_matrix))])
         ax.set_xticks([x-0.5 for x in range(1+len(input_matrix[0]))])

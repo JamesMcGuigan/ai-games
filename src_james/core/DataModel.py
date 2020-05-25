@@ -240,10 +240,12 @@ class ProblemSet(UserList):
         return self._id
 
     def unique(self) -> 'ProblemSet':
-        unique = list({ hash(problem): problem for problem in self.data }.values())
+        # unique = list({ hash(problem): problem for problem in self.data }.values())
+        unique = set( problem for problem in self.data )
         if len(self.data) == len(unique):
             return self
         else:
+            unique = [ problem.raw for problem in self.data ]
             return ProblemSet(unique, test_or_train=self.test_or_train, task=self.task)
 
     @property

@@ -190,16 +190,9 @@ if __name__ == '__main__' and not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
 
 
 ### Original
-# training   : {'correct': 49, 'total': 416, 'error': 0.8822, 'time': '00:00:00', 'name': 'training'}
-# evaluation : {'correct': 19, 'total': 419, 'error': 0.9547, 'time': '00:00:00', 'name': 'evaluation'}
-# test       : {'correct':  8, 'total': 104, 'error': 0.9231, 'time': '00:00:00', 'name': 'test'}
-# time       : 00:00:30
-
-### Reorder i+j
-# training   : {'correct': 50, 'total': 416, 'error': 0.8798, 'time': '00:00:00', 'name': 'training'}
-# evaluation : {'correct': 19, 'total': 419, 'error': 0.9547, 'time': '00:00:00', 'name': 'evaluation'}
-# test       : {'correct': 8, 'total': 104, 'error': 0.9231, 'time': '00:00:00', 'name': 'test'}
-# time       : 00:00:27
+# training   : {'correct': 18, 'guesses': 49, 'total': 416, 'error': 0.9567, 'time': '00:00:00', 'name': 'training'}
+# evaluation : {'correct': 3, 'guesses': 19, 'total': 419, 'error': 0.9928, 'time': '00:00:00', 'name': 'evaluation'}
+# test       : {'correct': 0, 'guesses': 8, 'total': 104, 'error': 1.0, 'time': '00:00:00', 'name': 'test'}
 
 ### Add i+-1, j+-1
 # training   : {'correct': 50, 'total': 416, 'error': 0.8798, 'time': '00:00:00', 'name': 'training'}

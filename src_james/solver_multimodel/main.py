@@ -3,6 +3,7 @@ import time
 from operator import itemgetter
 
 from src_james.core.DataModel import Competition
+from src_james.settings import settings
 from src_james.solver_multimodel.solvers import solvers
 
 if __name__ == '__main__':
@@ -14,7 +15,7 @@ if __name__ == '__main__':
     for solver in solvers: print(solver.__class__.__name__)
     print('\n','-'*20,'\n')
 
-    plot_results = not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', '') and ('submission' not in __file__)
+    plot_results = not settings['production']
     time_start   = time.perf_counter()
     competition  = Competition()
     scores       = { name: { solver.__class__.__name__: 0 for solver in solvers } for name in competition.keys() }

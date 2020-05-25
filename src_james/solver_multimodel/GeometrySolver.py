@@ -9,6 +9,7 @@ from src_james.solver_multimodel.queries.ratio import task_grid_max_dim, is_task
 class GeometrySolver(Solver):
     optimise = True
     verbose  = True
+    debug    = False
     actions = {
         "flip":      ( np.flip,      [0,1]    ),
         "rot90":     ( np.rot90,     [1,2,3]  ),
@@ -34,7 +35,7 @@ class GeometrySolver(Solver):
             for args in arglist:
                 if self.is_lambda_valid(task, function, *args):
                     self.cache[task.filename] = (function, args)
-                    if self.verbose: print(function, args)
+                    # if self.verbose: print(function, args)
                     return True
 
         # this doesn't find anything
@@ -46,7 +47,6 @@ class GeometrySolver(Solver):
                 function = lambda grid, args1, args2: function1(function2(grid, *args2), *args1)
                 if self.is_lambda_valid(task, function, *(args1,args2)):
                     self.cache[task.filename] = (function, (args1,args2))
-                    if self.verbose: print(function, (args1,args2))
                     return True
         return False
 
@@ -54,5 +54,5 @@ class GeometrySolver(Solver):
         try:
             return function(grid, *args)
         except Exception as exception:
-            if self.verbose: print(function, args, exception)
+            if self.debug: print('Exception', self.__class__.__name__, 'action()', function, args, exception)
             return grid

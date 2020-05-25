@@ -16,7 +16,7 @@ from src_james.util.np_cache import np_cache
 
 class XGBSolver(Solver):
     optimise = True
-    verbose  = False
+    verbose  = True
 
     def __init__(self):
         super().__init__()

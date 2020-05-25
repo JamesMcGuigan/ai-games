@@ -80,6 +80,7 @@ class TessellationSolver(GeometrySolver):
                                 q_arg = make_tuple(q_arg)
                                 yield (preprocess, p_arg),(transform,t_arg),(query,q_arg)
 
+
     # TODO: hieraracharical nesting of solves and solutions/rules array generator
     def test(self, task):
         if task.filename in self.cache: return True
@@ -94,13 +95,11 @@ class TessellationSolver(GeometrySolver):
                 }
             if self.is_lambda_valid(task, self.action, **kwargs, task=task):
                 self.cache[task.filename] = kwargs
-                if self.verbose: print(self.action, kwargs)
                 return True
         return False
 
 
     def action(self, grid, preprocess=np.copy, p_arg=(), transform=np.copy, t_arg=(), query=query_true, q_arg=(), task=None):
-        #print('action', preprocess, transform, query)
         if inspect.isgeneratorfunction(transform):
             generator = transform(grid, *t_arg)
             transform = lambda grid, *args: next(generator)

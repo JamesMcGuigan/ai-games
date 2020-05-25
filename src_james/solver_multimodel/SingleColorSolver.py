@@ -28,7 +28,6 @@ class SingleColorSolver(Solver):
             args = [ query ]
             if self.is_lambda_valid(task, self.action, *args, task=task):
                 self.cache[task.filename] = args
-                if self.verbose: print(self.action, args)
                 return True
         return False
 

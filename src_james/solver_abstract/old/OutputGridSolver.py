@@ -14,6 +14,8 @@ from src_james.heuristics.Queries import Query
 # from pydash import group_by
 
 # NOTE: This is getting half way to the level of abstraction required, but we need to go to the next level of inception
+from src_james.settings import settings
+
 
 class Rule:
     def __init__(self,
@@ -181,7 +183,7 @@ class OutputGridSizeSolver:
 
 
 
-if __name__ == '__main__' and not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
+if __name__ == '__main__' and not settings['production']:
     solver      = OutputGridSizeSolver()
 
     task = Task('evaluation/68b67ca3.json')

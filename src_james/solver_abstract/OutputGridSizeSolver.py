@@ -9,6 +9,7 @@ import numpy as np
 from src_james.core.AbstractSolver import AbstractSolver
 from src_james.core.DataModel import Competition, Task
 from src_james.heuristics.Queries import Query
+from src_james.settings import settings
 from src_james.solver_abstract.old.OutputGridSolver import OutputGridSizeTransforms
 
 
@@ -29,7 +30,7 @@ class OutputGridSizeSolver(AbstractSolver):
         return input.shape
 
 
-if __name__ == '__main__' and not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
+if __name__ == '__main__' and not settings['production']:
     solver = OutputGridSizeSolver()
     task   = Task('evaluation/68b67ca3.json')
     rule   = solver.solve(task)

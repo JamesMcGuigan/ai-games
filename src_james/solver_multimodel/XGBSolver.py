@@ -7,6 +7,7 @@ from xgboost import XGBClassifier
 
 from src_james.core.DataModel import Task, Competition
 from src_james.ensemble.period import get_period_length0, get_period_length1
+from src_james.settings import settings
 from src_james.solver_multimodel.Solver import Solver
 from src_james.solver_multimodel.queries.grid import *
 from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
@@ -180,7 +181,7 @@ class XGBSolver(Solver):
 
 
 
-if __name__ == '__main__' and not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
+if __name__ == '__main__' and not settings['production']:
     solver = XGBSolver()
     solver.verbose = True
     competition = Competition()

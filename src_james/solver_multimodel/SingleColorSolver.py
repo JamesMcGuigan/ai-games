@@ -1,6 +1,7 @@
 import os
 
 from src_james.core.DataModel import Task
+from src_james.settings import settings
 from src_james.solver_multimodel.Solver import Solver
 from src_james.solver_multimodel.queries.colors import task_is_singlecolor
 from src_james.solver_multimodel.queries.grid import *
@@ -43,7 +44,7 @@ class SingleColorSolver(Solver):
 
 
 
-if __name__ == '__main__' and not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
+if __name__ == '__main__' and not settings['production']:
     solver = SingleColorSolver()
     solver.verbose = True
     filenames = [

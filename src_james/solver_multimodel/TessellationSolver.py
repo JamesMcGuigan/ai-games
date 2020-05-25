@@ -3,6 +3,7 @@ import os
 from itertools import product
 
 from src_james.core.DataModel import Task
+from src_james.settings import settings
 from src_james.solver_multimodel.GeometrySolver import GeometrySolver
 from src_james.solver_multimodel.ZoomSolver import ZoomSolver
 from src_james.solver_multimodel.queries.grid import *
@@ -140,7 +141,7 @@ class TessellationSolver(GeometrySolver):
             pass
 
 
-if __name__ == '__main__' and not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
+if __name__ == '__main__' and not settings['production']:
     # This is a known test success
     task   = Task('test/27f8ce4f.json')
     solver = TessellationSolver()

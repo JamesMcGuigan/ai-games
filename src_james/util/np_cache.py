@@ -6,7 +6,7 @@ from fastcache._lrucache import clru_cache
 
 
 ### Profiler: 2x speedup
-def np_cache(maxsize=None, typed=True):
+def np_cache(maxsize=1024, typed=True):
     """
         Decorator:
         @np_cache

@@ -1,6 +1,7 @@
 from itertools import product
 from typing import List
 
+import pydash
 from fastcache._lrucache import clru_cache
 from xgboost import XGBClassifier
 
@@ -22,6 +23,8 @@ class XGBSolver(Solver):
     def __init__(self, n_estimators=24, max_depth=10, **kwargs):
         super().__init__()
         self.kwargs = { "n_estimators": n_estimators, "max_depth": max_depth, **kwargs }
+        if self.kwargs.get('booster') == 'gblinear':
+            self.kwargs = pydash.omit(self.kwargs, *['max_depth'])
 
     def __repr__(self):
         return f'<{self.__class__.__name__}:self.kwargs>'
@@ -196,7 +199,7 @@ class XGBSolverGBtree(XGBSolver):
 
 class XGBSolverGBlinear(XGBSolver):
     def __init__(self, booster='gblinear', **kwargs):
-        self.kwargs = { "booster": booster, **kwargs }
+        self.kwargs = { "booster": booster, "max_depth": None, **kwargs }
         super().__init__(**self.kwargs)
 
 

@@ -21,6 +21,9 @@ class XGBSolver(Solver):
         super().__init__()
         self.kwargs = { "n_estimators": n_estimators, **kwargs }
 
+    def format_args(self, args):
+        return super().format_args(self.kwargs)
+
     def detect(self, task):
         if not is_task_shape_ratio_unchanged(task): return False
         # inputs, outputs, not_valid = self.features(task)

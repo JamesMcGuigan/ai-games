@@ -1,3 +1,6 @@
+import os
+
+from src_james.core.DataModel import Task
 from src_james.solver_multimodel.Solver import Solver
 from src_james.solver_multimodel.queries.colors import task_is_singlecolor
 from src_james.solver_multimodel.queries.grid import *
@@ -22,14 +25,13 @@ class SingleColorSolver(Solver):
     def detect(self, task):
         return task_is_singlecolor(task)
 
-    def test(self, task):
+    def fit(self, task: Task):
         if task.filename in self.cache: return True
         for query in self.queries:
-            args = [ query ]
+            args = ( query, )
             if self.is_lambda_valid(task, self.action, *args, task=task):
                 self.cache[task.filename] = args
-                return True
-        return False
+                break
 
     def action(self, grid, query=None, task=None):
         ratio  = task_shape_ratios(task)[0]
@@ -37,3 +39,26 @@ class SingleColorSolver(Solver):
         color  = query(grid) if callable(query) else query
         output[:,:] = color
         return output
+
+
+
+
+if __name__ == '__main__' and not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
+    solver = SingleColorSolver()
+    solver.verbose = True
+    filenames = [
+        'training/5582e5ca.json',  # solved
+        'training/445eab21.json',  # solved
+        'training/27a28665.json',
+        'training/44f52bb0.json',
+        'evaluation/3194b014.json',
+        'test/3194b014.json',
+    ]
+    for filename in filenames:
+        task = Task(filename)
+        solver.plot_detects([task])
+
+    # competition = Competition()
+    # # competition['test'].apply(solver.solve_all)
+    # competition.map(solver.solve_all)
+    # print(competition)

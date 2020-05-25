@@ -58,14 +58,17 @@ class Solver():
 
     def format_args(self, args):
         if isinstance(args, dict):
-            return dict(zip(args.keys(), map(self.format_args, list(args.values()))))
+            args = dict(zip(args.keys(), map(self.format_args, list(args.values()))))
         elif isinstance(args, (list,set,tuple)):
-            original_type = type(args)
-            args = original_type(map(self.format_args, args))
-        elif hasattr(args, '__name__'):
-            return f"<{type(args).__name__}:{args.__name__}>"
-        else:
-            return args
+            args = list(args)
+            for index, arg in enumerate(args):
+                if hasattr(arg, '__name__'):
+                    arg = f"<{type(arg).__name__}:{arg.__name__}>"
+                if isinstance(arg, (list,set,tuple,dict)):
+                    arg = self.format_args(arg)
+                args[index] = arg
+            args = tuple(args)
+        return args
 
     def log_solved(self, task: Task, args: Union[list,tuple,set], solutions: List[Problem]):
         if self.verbose:
@@ -73,7 +76,7 @@ class Solver():
             elif self.is_solved(task, solutions): label = 'solved'
             else:                                 label = 'guess '
 
-            args  = self.format_args(args)
+            args  = self.format_args(args) if len(args) else None
             print(f'{label}:', task.filename, self.__class__.__name__, args)
 
     def is_solved(self, task: Task, solutions: List[Problem]):

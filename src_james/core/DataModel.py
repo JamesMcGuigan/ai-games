@@ -2,9 +2,13 @@ import json
 import os
 import re
 import time
-from collections import UserDict, UserList
+from collections import UserDict
+from collections import UserList
 from itertools import chain
-from typing import Any, Dict, List, Union
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Union
 
 import glob2
 import numpy as np
@@ -281,7 +285,7 @@ class Problem(UserDict):
 
     def cast(self, value: Any):
         if value is None: return None
-        value = np.ascontiguousarray(value, dtype=self.dtype)
+        # value = np.ascontiguousarray(value, dtype=self.dtype)  # disable: could potntually mess with hashing
         value.flags.writeable = False
         return value
 

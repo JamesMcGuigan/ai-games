@@ -3,15 +3,14 @@
 ##### 
 ##### ./submission/kaggle_compile.py ./src_james/solver_multimodel/main.py
 ##### 
-##### 2020-05-25 04:27:42+01:00
+##### 2020-05-25 19:19:28+01:00
 ##### 
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### 
-#####   james-wip c81cf89 Solvers | work in progress - broken
-##### * master    b503de2 [ahead 8] GeometrySolver | remove commented line
+##### * master 16e2daf [ahead 2] XGBSolver | bugfix format_args()
 ##### 
-##### b503de2b776f71c0d68b10c09a7778ed7446aa3a
+##### 16e2daf8321cf0e3c2ecbba27aeb53b4d16cf107
 ##### 
 
 #####
@@ -25,8 +24,13 @@ try:    root_dir = pathlib.Path(__file__).parent.parent.absolute()
 except: root_dir = ''
 
 settings = {
+    'production': os.environ.get('KAGGLE_KERNEL_RUN_TYPE', None) != None or 'submission' in __file__
+}
+settings = {
+    **settings,
     'verbose': True,
-    'debug':   not os.environ.get('KAGGLE_KERNEL_RUN_TYPE'),
+    'debug':   not settings['production'],
+    'caching': settings['production'] or True,
 }
 
 if os.environ.get('KAGGLE_KERNEL_RUN_TYPE'):
@@ -39,6 +43,7 @@ else:
         "data":        os.path.join(root_dir, "./input"),
         "output":      os.path.join(root_dir, "./submission"),
     }
+
 
 ####################
 if __name__ == '__main__':
@@ -57,7 +62,6 @@ if __name__ == '__main__':
 #####
 
 import os
-import random
 import re
 
 import numpy as np
@@ -172,6 +176,9 @@ class Competition(UserDict):
             for name, directory in self.directories.items()
         }
 
+    def __str__(self):
+        return "\n".join([ f"{key:11s}: {value}" for key, value in self.score().items() ])
+
     def solve(self) -> 'Competition':
         time_start = time.perf_counter()
         for name, dataset in self.data.items():
@@ -181,6 +188,8 @@ class Competition(UserDict):
 
     def score(self) -> Dict[str,Any]:
         score = { name: dataset.score() for name, dataset in self.data.items() }
+        success_ratio = score['evaluation']['correct'] / max(1e-10, score['evaluation']['guesses'])
+        score['test']['correct'] = round(score['test']['guesses'] * success_ratio, 1)
         score['time'] = Dataset.format_clock(self.time_taken)
         return score
 
@@ -188,8 +197,15 @@ class Competition(UserDict):
     def format_clock(cls, time_taken: float) -> str:
         return Dataset.format_clock(time_taken)
 
-    def __str__(self):
-        return "\n".join([ f"{key:11s}: {value}" for key, value in self.score().items() ])
+    def map(self, function):
+        output = []
+        competition = self
+        competition.time_start = time.perf_counter()
+        for name, dataset in competition.items():
+            result = dataset.apply(function)
+            output.append( result )
+        competition.time_taken = time.perf_counter() - competition.time_start
+        return output
 
 
 
@@ -216,6 +232,12 @@ class Dataset(UserList):
         if not isinstance(other, Dataset): return False
         return self.directory == other.directory
 
+    def apply(self, function):
+        dataset = self
+        dataset.time_start = time.perf_counter()
+        result = function(dataset)
+        dataset.time_taken = time.perf_counter() - dataset.time_start
+        return result
 
     def solve(self) -> 'Dataset':
         time_start = time.perf_counter()
@@ -440,9 +462,11 @@ from functools import wraps
 import numpy as np
 from fastcache._lrucache import clru_cache
 
-
 ### Profiler: 2x speedup
-def np_cache(maxsize=None, typed=True):
+# from src_james.settings import settings
+
+
+def np_cache(maxsize=1024, typed=True):
     """
         Decorator:
         @np_cache
@@ -454,7 +478,7 @@ def np_cache(maxsize=None, typed=True):
     maxsize_default=None
 
     def np_cache_generator(function):
-
+        if not settings['caching']: return function
         @wraps(function)
         def wrapper(*args, **kwargs):
             ### def encode(*args, **kwargs):
@@ -514,21 +538,40 @@ def np_cache(maxsize=None, typed=True):
 from itertools import chain
 
 import matplotlib.pyplot as plt
+import numpy as np
+from fastcache._lrucache import clru_cache
 from matplotlib import colors
 
 # Modified from: https://www.kaggle.com/zaharch/visualizing-all-tasks-updated
 # from src_james.core.DataModel import Task
 
 
+@clru_cache()
+def invert_hexcode(hexcode):
+    hexcode = hexcode.replace('#','0x')
+    number  = (16**len(hexcode)-1) - int(hexcode, 16)
+    return hex(number).replace('0x','#')
+
 def plot_one(task, ax, i,train_or_test,input_or_output):
-    cmap = colors.ListedColormap(
-        ['#000000', '#0074D9','#FF4136','#2ECC40','#FFDC00',
-         '#AAAAAA', '#F012BE', '#FF851B', '#7FDBFF', '#870C25'])
-    norm = colors.Normalize(vmin=0, vmax=9)
+    hexcodes = [
+        '#000000', '#0074D9', '#FF4136', '#2ECC40', '#FFDC00',
+        '#AAAAAA', '#F012BE', '#FF851B', '#7FDBFF', '#870C25',
+    ]
+    # inverted_hexcodes = list(map(invert_hexcode,hexcodes))
+    # icmap = colors.ListedColormap(inverted_hexcodes)
+    cmap  = colors.ListedColormap(hexcodes)
+    norm  = colors.Normalize(vmin=0, vmax=9)
 
     try:
-        input_matrix = task[train_or_test][i][input_or_output]
+        input_matrix  = task[train_or_test][i][input_or_output]
+        font_size     = 50 / np.sqrt(input_matrix.shape[0] * input_matrix.shape[1])
+        min_font_size = 6
+
         ax.imshow(input_matrix, cmap=cmap, norm=norm)
+        # DOC: https://stackoverflow.com/questions/33828780/matplotlib-display-array-values-with-imshow
+        if font_size >= min_font_size:
+            for (j,i),label in np.ndenumerate(input_matrix):
+                ax.text(i,j,label,ha='center',va='center', fontsize=font_size, color='black')
         ax.grid(True,which='both',color='lightgrey', linewidth=0.5)
         ax.set_yticks([x-0.5 for x in range(1+len(input_matrix))])
         ax.set_xticks([x-0.5 for x in range(1+len(input_matrix[0]))])
@@ -570,6 +613,7 @@ def plot_task(task: Task, scale=2):
             plot_one(task_solutions, axs[0,i+j+4+k],k,'solutions','input')
             plot_one(task_solutions, axs[1,i+j+4+k],k,'solutions','output')
 
+    for ax in chain(*axs): ax.axis('off')
     plt.show()
 
 
@@ -641,19 +685,25 @@ class Solver():
 
     def format_args(self, args):
         if isinstance(args, dict):
-            return dict(zip(args.keys(), map(self.format_args, list(args.values()))))
+            args = dict(zip(args.keys(), map(self.format_args, list(args.values()))))
         elif isinstance(args, (list,set,tuple)):
-            original_type = type(args)
-            args = original_type(map(self.format_args, args))
-        elif hasattr(args, '__name__'):
-            return f"<{type(args).__name__}:{args.__name__}>"
-        else:
-            return args
+            args = list(args)
+            for index, arg in enumerate(args):
+                if hasattr(arg, '__name__'):
+                    arg = f"<{type(arg).__name__}:{arg.__name__}>"
+                if isinstance(arg, (list,set,tuple,dict)):
+                    arg = self.format_args(arg)
+                args[index] = arg
+            args = tuple(args)
+        return args
 
     def log_solved(self, task: Task, args: Union[list,tuple,set], solutions: List[Problem]):
         if self.verbose:
-            label = 'solved' if self.is_solved(task, solutions) else 'guess '
-            args  = self.format_args(args)
+            if 'test' in task.filename:           label = 'test  '
+            elif self.is_solved(task, solutions): label = 'solved'
+            else:                                 label = 'guess '
+
+            args  = self.format_args(args) if len(args) else None
             print(f'{label}:', task.filename, self.__class__.__name__, args)
 
     def is_solved(self, task: Task, solutions: List[Problem]):
@@ -1364,6 +1414,10 @@ class DoNothingSolver(Solver):
 ##### START src_james/solver_multimodel/SingleColorSolver.py
 #####
 
+import os
+
+# from src_james.core.DataModel import Task
+# from src_james.settings import settings
 # from src_james.solver_multimodel.Solver import Solver
 # from src_james.solver_multimodel.queries.colors import task_is_singlecolor
 # from src_james.solver_multimodel.queries.grid import *
@@ -1388,14 +1442,13 @@ class SingleColorSolver(Solver):
     def detect(self, task):
         return task_is_singlecolor(task)
 
-    def test(self, task):
+    def fit(self, task: Task):
         if task.filename in self.cache: return True
         for query in self.queries:
-            args = [ query ]
+            args = ( query, )
             if self.is_lambda_valid(task, self.action, *args, task=task):
                 self.cache[task.filename] = args
-                return True
-        return False
+                break
 
     def action(self, grid, query=None, task=None):
         ratio  = task_shape_ratios(task)[0]
@@ -1404,6 +1457,28 @@ class SingleColorSolver(Solver):
         output[:,:] = color
         return output
 
+
+
+
+if __name__ == '__main__' and not settings['production']:
+    solver = SingleColorSolver()
+    solver.verbose = True
+    filenames = [
+        'training/5582e5ca.json',  # solved
+        'training/445eab21.json',  # solved
+        'training/27a28665.json',
+        'training/44f52bb0.json',
+        'evaluation/3194b014.json',
+        'test/3194b014.json',
+    ]
+    for filename in filenames:
+        task = Task(filename)
+        solver.plot_detects([task])
+
+    # competition = Competition()
+    # # competition['test'].apply(solver.solve_all)
+    # competition.map(solver.solve_all)
+    # print(competition)
 
 #####
 ##### END   src_james/solver_multimodel/SingleColorSolver.py
@@ -1418,6 +1493,7 @@ import os
 from itertools import product
 
 # from src_james.core.DataModel import Task
+# from src_james.settings import settings
 # from src_james.solver_multimodel.GeometrySolver import GeometrySolver
 # from src_james.solver_multimodel.ZoomSolver import ZoomSolver
 # from src_james.solver_multimodel.queries.grid import *
@@ -1555,7 +1631,7 @@ class TessellationSolver(GeometrySolver):
             pass
 
 
-if __name__ == '__main__' and not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
+if __name__ == '__main__' and not settings['production']:
     # This is a known test success
     task   = Task('test/27f8ce4f.json')
     solver = TessellationSolver()
@@ -1571,19 +1647,20 @@ if __name__ == '__main__' and not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
 ##### START src_james/solver_multimodel/XGBSolver.py
 #####
 
-import os
-import time
 from itertools import product
 from typing import List
 
 from fastcache._lrucache import clru_cache
 from xgboost import XGBClassifier
 
-# from src_james.core.DataModel import Task, Competition
-# from src_james.ensemble.period import get_period_length0, get_period_length1
-# from src_james.solver_multimodel.Solver import Solver
+# from src_james.core.DataModel import Competition
+# from src_james.core.DataModel import Task
+# from src_james.ensemble.period import get_period_length0
+# from src_james.ensemble.period import get_period_length1
+# from src_james.settings import settings
 # from src_james.solver_multimodel.queries.grid import *
 # from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
+# from src_james.solver_multimodel.Solver import Solver
 # from src_james.util.np_cache import np_cache
 
 
@@ -1591,8 +1668,12 @@ class XGBSolver(Solver):
     optimise = True
     verbose  = True
 
-    def __init__(self):
+    def __init__(self, n_estimators=24, **kwargs):
         super().__init__()
+        self.kwargs = { "n_estimators": n_estimators, **kwargs }
+
+    def format_args(self, args):
+        return self.kwargs
 
     def detect(self, task):
         if not is_task_shape_ratio_unchanged(task): return False
@@ -1608,7 +1689,7 @@ class XGBSolver(Solver):
             if not_valid:
                 self.cache[task.filename] = None
             else:
-                xgb = XGBClassifier(n_estimators=10, n_jobs=-1)
+                xgb = XGBClassifier(**self.kwargs, n_jobs=-1)
                 xgb.fit(inputs, outputs, verbose=False)
                 self.cache[task.filename] = (xgb,)
 
@@ -1750,29 +1831,20 @@ class XGBSolver(Solver):
 
 
 
-if __name__ == '__main__' and not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
-    competition = Competition()
-    competition.time_start = time.perf_counter()
+if __name__ == '__main__' and not settings['production']:
     solver = XGBSolver()
-    for name, dataset in competition.items():
-        solver.solve_all(dataset)
-    competition.time_taken = time.perf_counter() - competition.time_start
+    solver.verbose = True
+    competition = Competition()
+    competition.map(solver.solve_all)
     print(competition)
 
 
 
 
 ### Original
-# training   : {'correct': 49, 'total': 416, 'error': 0.8822, 'time': '00:00:00', 'name': 'training'}
-# evaluation : {'correct': 19, 'total': 419, 'error': 0.9547, 'time': '00:00:00', 'name': 'evaluation'}
-# test       : {'correct':  8, 'total': 104, 'error': 0.9231, 'time': '00:00:00', 'name': 'test'}
-# time       : 00:00:30
-
-### Reorder i+j
-# training   : {'correct': 50, 'total': 416, 'error': 0.8798, 'time': '00:00:00', 'name': 'training'}
-# evaluation : {'correct': 19, 'total': 419, 'error': 0.9547, 'time': '00:00:00', 'name': 'evaluation'}
-# test       : {'correct': 8, 'total': 104, 'error': 0.9231, 'time': '00:00:00', 'name': 'test'}
-# time       : 00:00:27
+# training   : {'correct': 18, 'guesses': 49, 'total': 416, 'error': 0.9567, 'time': '00:00:00', 'name': 'training'}
+# evaluation : {'correct': 3, 'guesses': 19, 'total': 419, 'error': 0.9928, 'time': '00:00:00', 'name': 'evaluation'}
+# test       : {'correct': 0, 'guesses': 8, 'total': 104, 'error': 1.0, 'time': '00:00:00', 'name': 'test'}
 
 ### Add i+-1, j+-1
 # training   : {'correct': 50, 'total': 416, 'error': 0.8798, 'time': '00:00:00', 'name': 'training'}
@@ -1830,18 +1902,11 @@ if __name__ == '__main__' and not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
 # test       : {'correct': 18, 'total': 104, 'error': 0.8269, 'time': '00:00:00', 'name': 'test'}
 # time       : 00:01:21
 
-### without bincount
-# training   : {'correct': 105, 'total': 416, 'error': 0.7476, 'time': '00:00:00', 'name': 'training'}
-# evaluation : {'correct': 69, 'total': 419, 'error': 0.8353, 'time': '00:00:00', 'name': 'evaluation'}
-# test       : {'correct': 18, 'total': 104, 'error': 0.8269, 'time': '00:00:00', 'name': 'test'}
-# time       : 00:01:08
-
 ### len(np.bincount(grid.flatten())), *np.bincount(grid.flatten(), minlength=10)
 # training   : {'correct': 107, 'total': 416, 'error': 0.7428, 'time': '00:00:00', 'name': 'training'}
 # evaluation : {'correct': 70, 'total': 419, 'error': 0.8329, 'time': '00:00:00', 'name': 'evaluation'}
 # test       : {'correct': 18, 'total': 104, 'error': 0.8269, 'time': '00:00:00', 'name': 'test'}
 # time       : 00:01:17
-
 
 
 ### neighbourhood
@@ -1878,6 +1943,18 @@ if __name__ == '__main__' and not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
 # evaluation : {'correct': 116, 'total': 419, 'error': 0.7232, 'time': '00:00:00', 'name': 'evaluation'}
 # test       : {'correct': 33, 'total': 104, 'error': 0.6827, 'time': '00:00:00', 'name': 'test'}
 # time       : 00:03:10
+
+# XGBSolver(n_estimators=10)
+# training   : {'correct': 22, 'guesses': 148, 'total': 416, 'error': 0.9471, 'time': '00:00:00', 'name': 'training'}
+# evaluation : {'correct': 9, 'guesses': 116, 'total': 419, 'error': 0.9785, 'time': '00:00:00', 'name': 'evaluation'}
+# test       : {'correct': 0, 'guesses': 33, 'total': 104, 'error': 1.0, 'time': '00:00:00', 'name': 'test'}
+# time       : 00:00:53
+
+# XGBSolver(n_estimators=32)
+# training   : {'correct': 25, 'guesses': 255, 'total': 416, 'error': 0.9399, 'time': '00:00:00', 'name': 'training'}
+# evaluation : {'correct': 10, 'guesses': 257, 'total': 419, 'error': 0.9761, 'time': '00:00:00', 'name': 'evaluation'}
+# test       : {'correct': 0, 'guesses': 64, 'total': 104, 'error': 1.0, 'time': '00:00:00', 'name': 'test'}
+# time       : 00:02:39
 
 #####
 ##### END   src_james/solver_multimodel/XGBSolver.py
@@ -1971,13 +2048,12 @@ if __name__ == '__main__':
 ##### 
 ##### ./submission/kaggle_compile.py ./src_james/solver_multimodel/main.py
 ##### 
-##### 2020-05-25 04:27:42+01:00
+##### 2020-05-25 19:19:28+01:00
 ##### 
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### 
-#####   james-wip c81cf89 Solvers | work in progress - broken
-##### * master    b503de2 [ahead 8] GeometrySolver | remove commented line
+##### * master 16e2daf [ahead 2] XGBSolver | bugfix format_args()
 ##### 
-##### b503de2b776f71c0d68b10c09a7778ed7446aa3a
+##### 16e2daf8321cf0e3c2ecbba27aeb53b4d16cf107
 ##### 

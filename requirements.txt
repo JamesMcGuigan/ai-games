@@ -7,13 +7,16 @@
 attrs==19.3.0             # via jsonschema
 backcall==0.1.0           # via ipython
 bleach==3.1.5             # via nbconvert
+cloudpickle==1.4.1        # via hyperopt
 cycler==0.10.0            # via matplotlib
 cytoolz==0.10.1           # via -r requirements.in
 decorator==4.4.2          # via ipython, networkx, traitlets
 defusedxml==0.6.0         # via nbconvert
 entrypoints==0.3          # via nbconvert
 fastcache==1.1.0          # via -r requirements.in
+future==0.18.2            # via hyperopt
 glob2==0.7                # via -r requirements.in
+hyperopt==0.2.4           # via -r requirements.in
 imagecodecs==2020.2.18    # via tifffile
 imageio==2.8.0            # via scikit-image
 importlib-metadata==1.6.0  # via jsonschema
@@ -30,15 +33,16 @@ jupyter-console==6.1.0    # via jupyter
 jupyter-core==4.6.3       # via jupyter-client, nbconvert, nbformat, notebook, qtconsole
 jupyter==1.0.0            # via -r requirements.in
 kiwisolver==1.2.0         # via matplotlib
+lightgbm==2.3.1           # via -r requirements.in
 markupsafe==1.1.1         # via jinja2
 matplotlib==3.2.1         # via -r requirements.in, scikit-image
 mistune==0.8.4            # via nbconvert
 mpmath==1.1.0             # via sympy
 nbconvert==5.6.1          # via jupyter, notebook
 nbformat==5.0.6           # via ipywidgets, nbconvert, notebook
-networkx==2.4             # via scikit-image
+networkx==2.4             # via hyperopt, scikit-image
 notebook==6.0.3           # via jupyter, widgetsnbextension
-numpy==1.18.4             # via -r requirements.in, imagecodecs, imageio, matplotlib, opencv-python, pandas, pywavelets, scikit-image, scikit-learn, scipy, tifffile, xgboost
+numpy==1.18.4             # via -r requirements.in, hyperopt, imagecodecs, imageio, lightgbm, matplotlib, opencv-python, pandas, pywavelets, scikit-image, scikit-learn, scipy, tifffile, xgboost
 opencv-python==4.2.0.34   # via -r requirements.in
 packaging==20.4           # via bleach
 pandas==1.0.3             # via -r requirements.in
@@ -61,11 +65,11 @@ pyzmq==19.0.1             # via jupyter-client, notebook, qtconsole
 qtconsole==4.7.4          # via jupyter
 qtpy==1.9.0               # via qtconsole
 scikit-image==0.17.2      # via -r requirements.in
-scikit-learn==0.23.1      # via sklearn
-scipy==1.4.1              # via scikit-image, scikit-learn, xgboost
+scikit-learn==0.23.1      # via lightgbm, sklearn
+scipy==1.4.1              # via hyperopt, lightgbm, scikit-image, scikit-learn, xgboost
 send2trash==1.5.0         # via notebook
 simplejson==3.17.0        # via -r requirements.in
-six==1.15.0               # via bleach, cycler, jsonschema, packaging, pyrsistent, python-dateutil, traitlets
+six==1.15.0               # via bleach, cycler, hyperopt, jsonschema, packaging, pyrsistent, python-dateutil, traitlets
 sklearn==0.0              # via -r requirements.in
 sympy==1.5.1              # via -r requirements.in
 terminado==0.8.3          # via notebook
@@ -74,7 +78,7 @@ threadpoolctl==2.0.0      # via scikit-learn
 tifffile==2020.5.11       # via scikit-image
 toolz==0.10.0             # via cytoolz
 tornado==6.0.4            # via ipykernel, jupyter-client, notebook, terminado
-tqdm==4.46.0              # via -r requirements.in
+tqdm==4.46.0              # via -r requirements.in, hyperopt
 traitlets==4.3.3          # via ipykernel, ipython, ipywidgets, jupyter-client, jupyter-core, nbconvert, nbformat, notebook, qtconsole
 wcwidth==0.1.9            # via prompt-toolkit
 webencodings==0.5.1       # via bleach

@@ -22,6 +22,8 @@ pandas
 sklearn
 sympy
 xgboost
+hyperopt
+lightgbm
 
 # Image Manipulation
 opencv-python

@@ -19,9 +19,9 @@ class XGBSolver(Solver):
     optimise = True
     verbose  = True
 
-    def __init__(self, n_estimators=24, **kwargs):
+    def __init__(self, n_estimators=24, max_depth=10, **kwargs):
         super().__init__()
-        self.kwargs = { "n_estimators": n_estimators, **kwargs }
+        self.kwargs = { "n_estimators": n_estimators, "max_depth": max_depth, **kwargs }
 
     def __repr__(self):
         return f'<{self.__class__.__name__}:self.kwargs>'

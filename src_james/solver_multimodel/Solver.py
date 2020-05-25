@@ -31,8 +31,8 @@ class Solver():
                 "output": output,
             }, problemset=_task_['test'])
             solutions.append(solution)
-        if _inplace_:
-            _task_['solutions'] += solutions
+            if _inplace_:
+                _task_['solutions'][index].append(solution)
         return solutions
 
     def action(self, grid: np.ndarray, task=None, *args):
@@ -92,5 +92,5 @@ class Solver():
     def plot_detects(self, tasks: Union[Dataset,List[Task],Task], unsolved=True):
         if isinstance(tasks, Task): tasks = [ tasks ]
         if unsolved:
-            tasks = [ task for task in tasks if not len(task['solutions']) ]
+            tasks = [ task for task in tasks if not task.solutions_count ]
         return self.solve_all(tasks, plot=True, solve_detects=True)

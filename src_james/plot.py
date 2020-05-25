@@ -1,4 +1,5 @@
 # Source: https://www.kaggle.com/jamesmcguigan/arc-geometry-solvers/
+from itertools import chain
 
 import matplotlib.pyplot as plt
 from matplotlib import colors
@@ -31,9 +32,11 @@ def plot_task(task: Task, scale=2):
     """
     if isinstance(task, str): task = Task(task)
     filename = task.filename
-
-    num_train = len(task['train']) + len(task['test']) + 1
-    if len(task['solutions']): num_train += len(task['solutions']) + 1
+    task_solutions = {
+        "solutions": list(chain(*task['solutions']))  # this is a 2D array now
+    }
+    num_train      = len(task['train']) + len(task['test']) + 1
+    if task.solutions_count: num_train += task.solutions_count + 1
 
     fig, axs = plt.subplots(2, num_train, figsize=(scale*num_train,scale*2))
     if filename: fig.suptitle(filename)
@@ -49,10 +52,10 @@ def plot_task(task: Task, scale=2):
         plot_one(task, axs[0,i+2+j],j,'test','input')
         plot_one(task, axs[1,i+2+j],j,'test','output')
 
-    if len(task['solutions']):
+    if task.solutions_count:
         axs[0,i+j+3].axis('off'); axs[1,i+j+3].axis('off')
-        for k in range(len(task['solutions'])):
-            plot_one(task, axs[0,i+j+4+k],k,'solutions','input')
-            plot_one(task, axs[1,i+j+4+k],k,'solutions','output')
+        for k in range(len(task_solutions)):
+            plot_one(task_solutions, axs[0,i+j+4+k],k,'solutions','input')
+            plot_one(task_solutions, axs[1,i+j+4+k],k,'solutions','output')
 
     plt.show()

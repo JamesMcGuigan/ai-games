@@ -1,4 +1,5 @@
 import os
+import random
 import re
 
 import numpy as np
@@ -29,17 +30,25 @@ class CSV:
         return "\n".join(csv)
 
     @classmethod
+    def default_csv_line(cls, task: 'Task') -> str:
+        return f'|{random.randint(1,9)}|'
+
+    @classmethod
     def to_csv_line(cls, task: 'Task') -> str:
         csv = []
-        solutions = set({
-            cls.grid_to_csv_string(problem['output'])
-            for problem in task['solutions']
-        })
-        for index, solution_csv in enumerate(solutions):
-            if not solution_csv: continue
+        for index, problemset in enumerate(task['solutions']):
+            solutions = problemset.unique()[:3]
+
+            solution_str = " ".join(
+                cls.grid_to_csv_string(problem['output'])
+                for problem in solutions
+            )
+            if not solution_str:
+                solution_str = cls.default_csv_line(task)
+
             line = ",".join([
                 cls.object_id(task.filename, index),
-                solution_csv
+                solution_str
             ])
             csv.append(line)
         return "\n".join(csv)

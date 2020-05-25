@@ -1,207 +1,51 @@
-Number of input rows: 2 cols: 2
-Number of target rows: 6 cols: 6
-ignoring task /home/jamie/code/kaggle-arc/input/test/00576224.json
+<bound method TessellationSolver.action of <__main__.TessellationSolver object at 0x7faf1e70fb38>> {'preprocess': <function copy at 0x7faf22c001e0>, 'p_arg': (), 'transform': <function copy at 0x7faf22c001e0>, 't_arg': (), 'query': <function query_max_color at 0x7faf33353400>, 'q_arg': ()}
+solved:  TessellationSolver {'preprocess': <function copy at 0x7faf22c001e0>, 'p_arg': (), 'transform': <function copy at 0x7faf22c001e0>, 't_arg': (), 'query': <function query_max_color at 0x7faf33353400>, 'q_arg': ()}
+task.score():  0
+training   : {'correct': 22, 'guesses': 148, 'total': 416, 'error': 0.9471, 'time': '00:00:00', 'name': 'training'}
+evaluation : {'correct': 9, 'guesses': 116, 'total': 419, 'error': 0.9785, 'time': '00:00:00', 'name': 'evaluation'}
+test       : {'correct': 0, 'guesses': 33, 'total': 104, 'error': 1.0, 'time': '00:00:00', 'name': 'test'}
+time       : 00:03:15
+<bound method BorderSolver.action of <__main__.BorderSolver object at 0x7fadf366f780>> [8]
+solved:  BorderSolver [8]
+<function rot90 at 0x7faf22bfe840> (1,)
+solved:  GeometrySolver (<function rot90 at 0x7faf22bfe840>, (1,))
+<function roll at 0x7faf37975620> (-2, 0)
+solved:  GeometrySolver (<function roll at 0x7faf37975620>, (-2, 0))
+<function flip at 0x7faf22bfe9d8> (1,)
+solved:  GeometrySolver (<function flip at 0x7faf22bfe9d8>, (1,))
+<function rot90 at 0x7faf22bfe840> (2,)
+solved:  GeometrySolver (<function rot90 at 0x7faf22bfe840>, (2,))
+<function swapaxes at 0x7faf379d2f28> (0, 1)
+solved:  GeometrySolver (<function swapaxes at 0x7faf379d2f28>, (0, 1))
+<function flip at 0x7faf22bfe9d8> (0,)
+solved:  GeometrySolver (<function flip at 0x7faf22bfe9d8>, (0,))
+<function rot90 at 0x7faf22bfe840> (2,)
+solved:  GeometrySolver (<function rot90 at 0x7faf22bfe840>, (2,))
+<function swapaxes at 0x7faf379d2f28> (0, 1)
+solved:  GeometrySolver (<function swapaxes at 0x7faf379d2f28>, (0, 1))
+<bound method SingleColorSolver.action of <__main__.SingleColorSolver object at 0x7fadf3670da0>> [<function max_color at 0x7faf333538c8>]
+solved:  SingleColorSolver [<function max_color at 0x7faf333538c8>]
+<bound method SingleColorSolver.action of <__main__.SingleColorSolver object at 0x7fadf3670da0>> [<function max_color at 0x7faf333538c8>]
+solved:  SingleColorSolver [<function max_color at 0x7faf333538c8>]
+<bound method TessellationSolver.action of <__main__.TessellationSolver object at 0x7fadf3670e10>> {'preprocess': <function copy at 0x7faf22c001e0>, 'p_arg': (), 'transform': <function copy at 0x7faf22c001e0>, 't_arg': (), 'query': <function query_max_color at 0x7faf33353400>, 'q_arg': ()}
+solved:  TessellationSolver {'preprocess': <function copy at 0x7faf22c001e0>, 'p_arg': (), 'transform': <function copy at 0x7faf22c001e0>, 't_arg': (), 'query': <function query_max_color at 0x7faf33353400>, 'q_arg': ()}
+<bound method TessellationSolver.action of <__main__.TessellationSolver object at 0x7fadf3670e10>> {'preprocess': <function copy at 0x7faf22c001e0>, 'p_arg': (), 'transform': <function copy at 0x7faf22c001e0>, 't_arg': (), 'query': <function query_true at 0x7faf33353158>, 'q_arg': ()}
+solved:  TessellationSolver {'preprocess': <function copy at 0x7faf22c001e0>, 'p_arg': (), 'transform': <function copy at 0x7faf22c001e0>, 't_arg': (), 'query': <function query_true at 0x7faf33353158>, 'q_arg': ()}
+<bound method TessellationSolver.action of <__main__.TessellationSolver object at 0x7fadf3670e10>> {'preprocess': <function copy at 0x7faf22c001e0>, 'p_arg': (), 'transform': <function copy at 0x7faf22c001e0>, 't_arg': (), 'query': <function query_not_zero at 0x7faf333531e0>, 'q_arg': ()}
+solved:  TessellationSolver {'preprocess': <function copy at 0x7faf22c001e0>, 'p_arg': (), 'transform': <function copy at 0x7faf22c001e0>, 't_arg': (), 'query': <function query_not_zero at 0x7faf333531e0>, 'q_arg': ()}
+<bound method TessellationSolver.action of <__main__.TessellationSolver object at 0x7fadf3670e10>> {'preprocess': <function copy at 0x7faf22c001e0>, 'p_arg': (), 'transform': <function copy at 0x7faf22c001e0>, 't_arg': (), 'query': <function query_count_colors at 0x7faf3334d840>, 'q_arg': ()}
+solved:  TessellationSolver {'preprocess': <function copy at 0x7faf22c001e0>, 'p_arg': (), 'transform': <function copy at 0x7faf22c001e0>, 't_arg': (), 'query': <function query_count_colors at 0x7faf3334d840>, 'q_arg': ()}
+<bound method TessellationSolver.action of <__main__.TessellationSolver object at 0x7fadf3670e10>> {'preprocess': <function copy at 0x7faf22c001e0>, 'p_arg': (), 'transform': <function copy at 0x7faf22c001e0>, 't_arg': (), 'query': <function query_max_color at 0x7faf33353400>, 'q_arg': ()}
+solved:  TessellationSolver {'preprocess': <function copy at 0x7faf22c001e0>, 'p_arg': (), 'transform': <function copy at 0x7faf22c001e0>, 't_arg': (), 'query': <function query_max_color at 0x7faf33353400>, 'q_arg': ()}
+<bound method TessellationSolver.action of <__main__.TessellationSolver object at 0x7fadf3670e10>> {'preprocess': <function copy at 0x7faf22c001e0>, 'p_arg': (), 'transform': <function copy at 0x7faf22c001e0>, 't_arg': (), 'query': <function query_not_zero at 0x7faf333531e0>, 'q_arg': ()}
+solved:  TessellationSolver {'preprocess': <function copy at 0x7faf22c001e0>, 'p_arg': (), 'transform': <function copy at 0x7faf22c001e0>, 't_arg': (), 'query': <function query_not_zero at 0x7faf333531e0>, 'q_arg': ()}
+<bound method TessellationSolver.action of <__main__.TessellationSolver object at 0x7fadf3670e10>> {'preprocess': <function copy at 0x7faf22c001e0>, 'p_arg': (), 'transform': <function copy at 0x7faf22c001e0>, 't_arg': (), 'query': <function query_max_color at 0x7faf33353400>, 'q_arg': ()}
+solved:  TessellationSolver {'preprocess': <function copy at 0x7faf22c001e0>, 'p_arg': (), 'transform': <function copy at 0x7faf22c001e0>, 't_arg': (), 'query': <function query_max_color at 0x7faf33353400>, 'q_arg': ()}
 
-Made predictions for  009d5c81
-Made predictions for  00dbd492
-Made predictions for  03560426
-Made predictions for  05a7bcf2
-Made predictions for  0607ce86
-Number of input rows: 3 cols: 3
-Number of target rows: 9 cols: 9
-ignoring task /home/jamie/code/kaggle-arc/input/test/0692e18c.json
-
-Made predictions for  070dd51e
-Made predictions for  08573cc6
-Number of input rows: 30 cols: 30
-Number of target rows: 4 cols: 4
-ignoring task /home/jamie/code/kaggle-arc/input/test/0934a4d8.json
-
-Made predictions for  09c534e7
-Number of input rows: 30 cols: 30
-Number of target rows: 3 cols: 3
-ignoring task /home/jamie/code/kaggle-arc/input/test/0a1d4ef5.json
-
-Made predictions for  0a2355a6
-Made predictions for  0b17323b
-Number of input rows: 12 cols: 13
-Number of target rows: 6 cols: 6
-ignoring task /home/jamie/code/kaggle-arc/input/test/0bb8deee.json
-
-Made predictions for  0becf7df
-Number of input rows: 3 cols: 4
-Number of target rows: 6 cols: 8
-ignoring task /home/jamie/code/kaggle-arc/input/test/0c786b71.json
-
-Number of input rows: 13 cols: 4
-Number of target rows: 6 cols: 4
-ignoring task /home/jamie/code/kaggle-arc/input/test/0c9aba6e.json
-
-Made predictions for  0d87d2a6
-Made predictions for  0e671a1a
-Made predictions for  0f63c0b9
-Made predictions for  103eff5b
-Made predictions for  11e1fe23
-Made predictions for  12422b43
-Number of input rows: 11 cols: 14
-Number of target rows: 3 cols: 9
-ignoring task /home/jamie/code/kaggle-arc/input/test/12997ef3.json
-
-Made predictions for  12eac192
-Number of input rows: 7 cols: 15
-Number of target rows: 7 cols: 7
-ignoring task /home/jamie/code/kaggle-arc/input/test/136b0064.json
-
-Made predictions for  13713586
-Made predictions for  137f0df0
-Made predictions for  140c817e
-Made predictions for  14754a24
-Made predictions for  15113be4
-Made predictions for  15663ba9
-Number of input rows: 3 cols: 3
-Number of target rows: 9 cols: 9
-ignoring task /home/jamie/code/kaggle-arc/input/test/15696249.json
-
-Made predictions for  16b78196
-Made predictions for  17b80ad2
-Made predictions for  17cae0c1
-Made predictions for  18419cfa
-Made predictions for  184a9768
-Number of input rows: 5 cols: 13
-Number of target rows: 5 cols: 6
-ignoring task /home/jamie/code/kaggle-arc/input/test/195ba7dc.json
-
-Number of input rows: 23 cols: 23
-Number of target rows: 7 cols: 7
-ignoring task /home/jamie/code/kaggle-arc/input/test/1990f7a8.json
-
-Number of input rows: 13 cols: 15
-Number of target rows: 2 cols: 2
-ignoring task /home/jamie/code/kaggle-arc/input/test/19bb5feb.json
-
-Number of input rows: 8 cols: 12
-Number of target rows: 1 cols: 1
-ignoring task /home/jamie/code/kaggle-arc/input/test/1a2e2828.json
-
-Number of input rows: 19 cols: 13
-Number of target rows: 6 cols: 7
-ignoring task /home/jamie/code/kaggle-arc/input/test/1a6449f1.json
-
-Made predictions for  1acc24af
-Made predictions for  1c02dbbe
-Made predictions for  1c0d0a4b
-Made predictions for  1c56ad9f
-Made predictions for  1d0a4b61
-Made predictions for  1d398264
-Made predictions for  1d398264
-Made predictions for  1da012fc
-Made predictions for  1e81d6f9
-Made predictions for  1e97544e
-Number of input rows: 23 cols: 25
-Number of target rows: 3 cols: 7
-ignoring task /home/jamie/code/kaggle-arc/input/test/2037f2c7.json
-
-Number of input rows: 3 cols: 3
-Number of target rows: 6 cols: 6
-ignoring task /home/jamie/code/kaggle-arc/input/test/2072aba6.json
-
-Number of input rows: 14 cols: 15
-Number of target rows: 6 cols: 8
-ignoring task /home/jamie/code/kaggle-arc/input/test/20818e16.json
-
-Made predictions for  20981f0e
-Made predictions for  212895b5
-Made predictions for  21f83797
-Made predictions for  22a4bbc2
-Made predictions for  25094a63
-Made predictions for  2546ccf6
-Made predictions for  256b0a75
-Made predictions for  2685904e
-Number of input rows: 9 cols: 7
-Number of target rows: 15 cols: 15
-ignoring task /home/jamie/code/kaggle-arc/input/test/2697da3f.json
-
-Number of input rows: 16 cols: 16
-Number of target rows: 3 cols: 3
-ignoring task /home/jamie/code/kaggle-arc/input/test/2753e76c.json
-
-Made predictions for  27a77e38
-Number of input rows: 3 cols: 3
-Number of target rows: 9 cols: 9
-ignoring task /home/jamie/code/kaggle-arc/input/test/27f8ce4f.json
-
-Number of input rows: 4 cols: 19
-Number of target rows: 4 cols: 4
-ignoring task /home/jamie/code/kaggle-arc/input/test/281123b4.json
-
-Made predictions for  292dd178
-Made predictions for  29700607
-Made predictions for  2a5f8217
-Made predictions for  2b01abd0
-Number of input rows: 23 cols: 23
-Number of target rows: 7 cols: 8
-ignoring task /home/jamie/code/kaggle-arc/input/test/2c0b0aff.json
-
-Made predictions for  2c737e39
-Number of input rows: 20 cols: 23
-Number of target rows: 9 cols: 9
-ignoring task /home/jamie/code/kaggle-arc/input/test/2f0c5170.json
-
-Number of input rows: 2 cols: 2
-Number of target rows: 6 cols: 6
-ignoring task /home/jamie/code/kaggle-arc/input/test/310f3251.json
-
-Number of input rows: 20 cols: 20
-Number of target rows: 3 cols: 3
-ignoring task /home/jamie/code/kaggle-arc/input/test/3194b014.json
-
-Made predictions for  319f2597
-Made predictions for  31adaf00
-Number of input rows: 6 cols: 5
-Number of target rows: 3 cols: 5
-ignoring task /home/jamie/code/kaggle-arc/input/test/31d5ba1a.json
-
-Made predictions for  32e9702f
-Made predictions for  332efdb3
-Made predictions for  3391f8c0
-Made predictions for  33b52de3
-Made predictions for  3490cc26
-Number of input rows: 5 cols: 9
-Number of target rows: 5 cols: 4
-ignoring task /home/jamie/code/kaggle-arc/input/test/34b99a2b.json
-
-Number of input rows: 15 cols: 13
-Number of target rows: 3 cols: 13
-ignoring task /home/jamie/code/kaggle-arc/input/test/351d6448.json
-
-Number of input rows: 14 cols: 18
-Number of target rows: 5 cols: 5
-ignoring task /home/jamie/code/kaggle-arc/input/test/358ba94e.json
-
-Made predictions for  37d3e8b2
-Number of input rows: 5 cols: 5
-Number of target rows: 10 cols: 10
-ignoring task /home/jamie/code/kaggle-arc/input/test/3979b1a8.json
-
-Made predictions for  3a301edc
-Number of input rows: 7 cols: 7
-Number of target rows: 3 cols: 3
-ignoring task /home/jamie/code/kaggle-arc/input/test/3b4c2228.json
-
-Number of input rows: 12 cols: 6
-Number of target rows: 3 cols: 6
-ignoring task /home/jamie/code/kaggle-arc/input/test/3d31c5b3.json
-
-Made predictions for  3ed85e70
-Number of input rows: 23 cols: 29
-Number of target rows: 5 cols: 5
-ignoring task /home/jamie/code/kaggle-arc/input/test/3ee1011a.json
-
-Made predictions for  3f23242b
-Made predictions for  40f6cd08
-Number of input rows: 18 cols: 22
-Number of target rows: 12 cols: 11
-ignoring task /home/jamie/code/kaggle-arc/input/test/414297c0.json
-
-Made predictions for  423a55dc
-|123|456|789|
+wrote: /home/jamie/code/kaggle-arc/./submission/submission.csv | 105 lines
+--------------------
+Score:
+   training: {'correct': 37, 'guesses': 156, 'total': 416, 'error': 0.9111, 'time': '00:01:22', 'name': 'training'}
+ evaluation: {'correct': 13, 'guesses': 120, 'total': 419, 'error': 0.969, 'time': '00:01:26', 'name': 'evaluation'}
+       test: {'correct': 0, 'guesses': 34, 'total': 104, 'error': 1.0, 'time': '00:00:20', 'name': 'test'}
+       time: 00:03:09

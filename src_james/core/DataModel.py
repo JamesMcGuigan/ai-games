@@ -91,7 +91,8 @@ class Dataset(UserList):
 
     def score(self) -> Dict[str,Union[int,float]]:
         score = {}
-        score['correct'] = sum([task.score() for task in self])
+        score['correct'] = sum([task.score()   for task in self])
+        score['guesses'] = sum([task.guesses() for task in self])
         score['total']   = len(self.test_outputs)
         score['error']   = round(1 - score['correct'] / score['total'],4) if score['total'] else 0
         score['time']    = self.format_clock(self.time_taken)
@@ -129,7 +130,9 @@ class Task(UserDict):
             test_or_train: ProblemSet(input_outputs, test_or_train, self)
             for test_or_train, input_outputs in self.raw.items()
         }
-        self.data['solutions'] = []
+        self.data['solutions']: List[ProblemSet] = [
+            ProblemSet([], test_or_train='solutions', task=self) for task in self.data['test']
+        ]
 
     def __repr__(self):
         return f'<{self.__class__.__name__}:{self.filename}>'
@@ -165,12 +168,35 @@ class Task(UserDict):
         print(self.__class__.__name__, 'solve()', NotImplementedError())
         return self  # for chaining
 
+    def make_solutions_unique(self):
+        self.data['solutions'] = [
+            problemset.unique() for problemset in self.data['solutions']
+        ]
+
+
+    @property
+    def is_solved(self):
+        return all(map(len, self.data['solutions']))
+
+    @property
+    def solutions_count(self):
+        return sum(map(len, self.data['solutions']))
+
     def score(self) -> int:
-        score = len(set([
-            problem['output'].tobytes()
-            for problem in self.data['solutions']
-            if problem['output'] is not None
-        ]))
+        score = 0
+        self.make_solutions_unique()
+        for index, test_problem in enumerate(self.data['test']):
+            for solution in self.data['solutions'][index]:
+                if test_problem == solution:
+                    score += 1
+                    break
+        return min(score, self.max_score())
+
+    def guesses(self) -> int:
+        score = 0
+        for index, test_problem in enumerate(self.data['test']):
+            if len(self.data['solutions'][index]):
+                score += 1
         return min(score, self.max_score())
 
     def max_score(self) -> int:
@@ -195,6 +221,13 @@ class ProblemSet(UserList):
     def __hash__(self):
         return self._id
 
+    def unique(self) -> 'ProblemSet':
+        unique = list({ hash(problem): problem for problem in self.data }.values())
+        if len(self.data) == len(unique):
+            return self
+        else:
+            return ProblemSet(unique, test_or_train=self.test_or_train, task=self.task)
+
     @property
     def filename(self): return self.task.filename
 
@@ -209,7 +242,6 @@ class ProblemSet(UserList):
     @property
     def grids(self) -> List[np.ndarray]:
         return self.inputs + self.outputs
-
 
 class Problem(UserDict):
     """ Problem: An input + output Grid pair """
@@ -241,10 +273,19 @@ class Problem(UserDict):
     @property
     def filename(self): return self.task.filename
 
+    def __eq__(self, other):
+        if not isinstance(other, (Problem, dict, UserDict)): return False
+        for label in ['input','output']:
+            if label in self  and label not in other: return False
+            if label in other and label not in self:  return False
+            if not np.array_equal(self[label], other[label]):
+                return False
+        return True
+
     def __hash__(self):
         if not self._hash:
             for item in [ self.data['input'], self.data['output'] ]:
-                item = item.tobytes() if isinstance(item, (np.ndarray, np.generic)) else item
+                item = item.tobytes() if isinstance(item, np.ndarray) else item
                 self._hash += hash(item)
         return self._hash
 

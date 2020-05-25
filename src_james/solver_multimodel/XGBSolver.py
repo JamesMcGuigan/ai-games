@@ -300,7 +300,7 @@ if __name__ == '__main__' and not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
 # test       : {'correct': 31, 'total': 104, 'error': 0.7019, 'time': '00:00:00', 'name': 'test'}
 # time       : 00:02:28
 
-### for neighbourhood in [ grid[i:,j:], grid[:i+1,j:], grid[i:,:j+1], grid[:i+1,:j+1], ]  == 3x slowdown
+### for neighbourhood in [ grid[i:,j:], grid[:i+1,j:], grid[i:,:j+1], grid[:i+1,:j+1], ]
 # training   : {'correct': 148, 'total': 416, 'error': 0.6442, 'time': '00:00:00', 'name': 'training'}
 # evaluation : {'correct': 116, 'total': 419, 'error': 0.7232, 'time': '00:00:00', 'name': 'evaluation'}
 # test       : {'correct': 33, 'total': 104, 'error': 0.6827, 'time': '00:00:00', 'name': 'test'}

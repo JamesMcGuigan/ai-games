@@ -1,5 +1,4 @@
 import os
-import time
 from itertools import product
 from typing import List
 
@@ -18,9 +17,9 @@ class XGBSolver(Solver):
     optimise = True
     verbose  = True
 
-    def __init__(self, **kwargs):
+    def __init__(self, n_estimators=24, **kwargs):
         super().__init__()
-        self.kwargs = kwargs
+        self.kwargs = { "n_estimators": n_estimators, **kwargs }
 
     def detect(self, task):
         if not is_task_shape_ratio_unchanged(task): return False
@@ -179,16 +178,11 @@ class XGBSolver(Solver):
 
 
 if __name__ == '__main__' and not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
-    for n_estimators in [2,4,8,10,16,32,64,128,256,512]:
-        print(f'XGBSolver(n_estimators={n_estimators})')
-        competition = Competition()
-        competition.time_start = time.perf_counter()
-        solver = XGBSolver(n_estimators=n_estimators)
-        solver.verbose = False
-        for name, dataset in competition.items():
-            solver.solve_all(dataset)
-        competition.time_taken = time.perf_counter() - competition.time_start
-        print(competition)
+    solver = XGBSolver()
+    solver.verbose = True
+    competition = Competition()
+    competition.map(solver.solve_all)
+    print(competition)
 
 
 

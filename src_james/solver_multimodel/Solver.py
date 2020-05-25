@@ -69,7 +69,10 @@ class Solver():
 
     def log_solved(self, task: Task, args: Union[list,tuple,set], solutions: List[Problem]):
         if self.verbose:
-            label = 'solved' if self.is_solved(task, solutions) else 'guess '
+            if 'test' in task.filename:           label = 'test  '
+            elif self.is_solved(task, solutions): label = 'solved'
+            else:                                 label = 'guess '
+
             args  = self.format_args(args)
             print(f'{label}:', task.filename, self.__class__.__name__, args)
 

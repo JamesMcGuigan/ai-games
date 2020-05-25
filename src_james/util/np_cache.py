@@ -7,7 +7,7 @@ from fastcache._lrucache import clru_cache
 ### Profiler: 2x speedup
 from src_james.settings import settings
 
-
+__np_cache = {}
 def np_cache(maxsize=1024, typed=True):
     """
         Decorator:
@@ -54,7 +54,7 @@ def np_cache(maxsize=1024, typed=True):
             return function(*args, **kwargs)
 
         # copy lru_cache attributes over too
-        wrapper.cache       = {}
+        wrapper.cache       = __np_cache  # use a shared cache between wrappers to save memory
         wrapper.cache_info  = cached_wrapper.cache_info
         wrapper.cache_clear = cached_wrapper.cache_clear
 

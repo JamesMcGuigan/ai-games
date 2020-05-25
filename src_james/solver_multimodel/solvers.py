@@ -7,6 +7,9 @@ from src_james.solver_multimodel.SingleColorSolver import SingleColorSolver
 from src_james.solver_multimodel.Solver import Solver
 from src_james.solver_multimodel.TessellationSolver import TessellationSolver
 from src_james.solver_multimodel.XGBSolver import XGBSolver
+from src_james.solver_multimodel.XGBSolver import XGBSolverDart
+from src_james.solver_multimodel.XGBSolver import XGBSolverGBlinear
+from src_james.solver_multimodel.XGBSolver import XGBSolverGBtree
 from src_james.solver_multimodel.ZoomSolver import ZoomSolver
 
 solvers: List[Solver] = [
@@ -16,5 +19,7 @@ solvers: List[Solver] = [
     SingleColorSolver(),
     ZoomSolver(),
     TessellationSolver(),
-    XGBSolver(),
+    XGBSolverDart(),
+    XGBSolverGBtree(),
+    XGBSolverGBlinear(),
 ]

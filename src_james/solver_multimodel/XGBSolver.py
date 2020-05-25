@@ -23,6 +23,9 @@ class XGBSolver(Solver):
         super().__init__()
         self.kwargs = { "n_estimators": n_estimators, **kwargs }
 
+    def __repr__(self):
+        return f'<{self.__class__.__name__}:self.kwargs>'
+
     def format_args(self, args):
         return self.kwargs
 
@@ -181,6 +184,21 @@ class XGBSolver(Solver):
         return top_left, top_right
 
 
+class XGBSolverDart(XGBSolver):
+    def __init__(self, booster='dart', **kwargs):
+        self.kwargs = { "booster": booster, **kwargs }
+        super().__init__(**self.kwargs)
+
+class XGBSolverGBtree(XGBSolver):
+    def __init__(self, booster='gbtree', **kwargs):
+        self.kwargs = { "booster": booster, **kwargs }
+        super().__init__(**self.kwargs)
+
+class XGBSolverGBlinear(XGBSolver):
+    def __init__(self, booster='gblinear', **kwargs):
+        self.kwargs = { "booster": booster, **kwargs }
+        super().__init__(**self.kwargs)
+
 
 if __name__ == '__main__' and not settings['production']:
     solver = XGBSolver()
@@ -306,3 +324,9 @@ if __name__ == '__main__' and not settings['production']:
 # evaluation : {'correct': 10, 'guesses': 257, 'total': 419, 'error': 0.9761, 'time': '00:00:00', 'name': 'evaluation'}
 # test       : {'correct': 0, 'guesses': 64, 'total': 104, 'error': 1.0, 'time': '00:00:00', 'name': 'test'}
 # time       : 00:02:39
+
+### XGBSolverDart(); XGBSolverGBtree(); XGBSolverGBlinear()
+# training   : {'correct': 42, 'guesses': 254, 'total': 416, 'error': 0.899, 'time': '00:03:31', 'name': 'training'}
+# evaluation : {'correct': 14, 'guesses': 242, 'total': 419, 'error': 0.9666, 'time': '00:07:17', 'name': 'evaluation'}
+# test       : {'correct': 3.5, 'guesses': 61, 'total': 104, 'error': 1.0, 'time': '00:01:35', 'name': 'test'}
+# time       : 00:12:23

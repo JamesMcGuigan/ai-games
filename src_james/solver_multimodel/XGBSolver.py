@@ -1,16 +1,17 @@
-import os
 from itertools import product
 from typing import List
 
 from fastcache._lrucache import clru_cache
 from xgboost import XGBClassifier
 
-from src_james.core.DataModel import Task, Competition
-from src_james.ensemble.period import get_period_length0, get_period_length1
+from src_james.core.DataModel import Competition
+from src_james.core.DataModel import Task
+from src_james.ensemble.period import get_period_length0
+from src_james.ensemble.period import get_period_length1
 from src_james.settings import settings
-from src_james.solver_multimodel.Solver import Solver
 from src_james.solver_multimodel.queries.grid import *
 from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
+from src_james.solver_multimodel.Solver import Solver
 from src_james.util.np_cache import np_cache
 
 
@@ -23,7 +24,7 @@ class XGBSolver(Solver):
         self.kwargs = { "n_estimators": n_estimators, **kwargs }
 
     def format_args(self, args):
-        return super().format_args(self.kwargs)
+        return self.kwargs
 
     def detect(self, task):
         if not is_task_shape_ratio_unchanged(task): return False

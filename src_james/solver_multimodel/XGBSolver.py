@@ -18,8 +18,9 @@ class XGBSolver(Solver):
     optimise = True
     verbose  = True
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         super().__init__()
+        self.kwargs = kwargs
 
     def detect(self, task):
         if not is_task_shape_ratio_unchanged(task): return False
@@ -35,7 +36,7 @@ class XGBSolver(Solver):
             if not_valid:
                 self.cache[task.filename] = None
             else:
-                xgb = XGBClassifier(n_estimators=10, n_jobs=-1)
+                xgb = XGBClassifier(**self.kwargs, n_jobs=-1)
                 xgb.fit(inputs, outputs, verbose=False)
                 self.cache[task.filename] = (xgb,)
 
@@ -178,13 +179,16 @@ class XGBSolver(Solver):
 
 
 if __name__ == '__main__' and not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
-    competition = Competition()
-    competition.time_start = time.perf_counter()
-    solver = XGBSolver()
-    for name, dataset in competition.items():
-        solver.solve_all(dataset)
-    competition.time_taken = time.perf_counter() - competition.time_start
-    print(competition)
+    for n_estimators in [2,4,8,10,16,32,64,128,256,512]:
+        print(f'XGBSolver(n_estimators={n_estimators})')
+        competition = Competition()
+        competition.time_start = time.perf_counter()
+        solver = XGBSolver(n_estimators=n_estimators)
+        solver.verbose = False
+        for name, dataset in competition.items():
+            solver.solve_all(dataset)
+        competition.time_taken = time.perf_counter() - competition.time_start
+        print(competition)
 
 
 
@@ -250,18 +254,11 @@ if __name__ == '__main__' and not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
 # test       : {'correct': 18, 'total': 104, 'error': 0.8269, 'time': '00:00:00', 'name': 'test'}
 # time       : 00:01:21
 
-### without bincount
-# training   : {'correct': 105, 'total': 416, 'error': 0.7476, 'time': '00:00:00', 'name': 'training'}
-# evaluation : {'correct': 69, 'total': 419, 'error': 0.8353, 'time': '00:00:00', 'name': 'evaluation'}
-# test       : {'correct': 18, 'total': 104, 'error': 0.8269, 'time': '00:00:00', 'name': 'test'}
-# time       : 00:01:08
-
 ### len(np.bincount(grid.flatten())), *np.bincount(grid.flatten(), minlength=10)
 # training   : {'correct': 107, 'total': 416, 'error': 0.7428, 'time': '00:00:00', 'name': 'training'}
 # evaluation : {'correct': 70, 'total': 419, 'error': 0.8329, 'time': '00:00:00', 'name': 'evaluation'}
 # test       : {'correct': 18, 'total': 104, 'error': 0.8269, 'time': '00:00:00', 'name': 'test'}
 # time       : 00:01:17
-
 
 
 ### neighbourhood
@@ -298,3 +295,15 @@ if __name__ == '__main__' and not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
 # evaluation : {'correct': 116, 'total': 419, 'error': 0.7232, 'time': '00:00:00', 'name': 'evaluation'}
 # test       : {'correct': 33, 'total': 104, 'error': 0.6827, 'time': '00:00:00', 'name': 'test'}
 # time       : 00:03:10
+
+# XGBSolver(n_estimators=10)
+# training   : {'correct': 22, 'guesses': 148, 'total': 416, 'error': 0.9471, 'time': '00:00:00', 'name': 'training'}
+# evaluation : {'correct': 9, 'guesses': 116, 'total': 419, 'error': 0.9785, 'time': '00:00:00', 'name': 'evaluation'}
+# test       : {'correct': 0, 'guesses': 33, 'total': 104, 'error': 1.0, 'time': '00:00:00', 'name': 'test'}
+# time       : 00:00:53
+
+# XGBSolver(n_estimators=32)
+# training   : {'correct': 25, 'guesses': 255, 'total': 416, 'error': 0.9399, 'time': '00:00:00', 'name': 'training'}
+# evaluation : {'correct': 10, 'guesses': 257, 'total': 419, 'error': 0.9761, 'time': '00:00:00', 'name': 'evaluation'}
+# test       : {'correct': 0, 'guesses': 64, 'total': 104, 'error': 1.0, 'time': '00:00:00', 'name': 'test'}
+# time       : 00:02:39

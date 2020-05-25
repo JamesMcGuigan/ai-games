@@ -16,16 +16,41 @@ class CSV:
             file.write(csv)
             print(f"\nwrote: {filename} | {line_count} lines")
 
+    ### No need to extend sample_submission.csv, just sort the CSV
+    # @classmethod
+    # def sample_submission(cls):
+    #     filename = os.path.join(settings['dir']['data'],'sample_submission.csv')
+    #     sample_submission = pd.read_csv(filename)
+    #     return sample_submission
+    #
+    # @classmethod
+    # def write_submission(cls, dataset: 'Dataset', filename='submission.csv'):
+    #     csv        = CSV.to_csv(dataset)
+    #     lines      = csv.split('\n')
+    #     line_count = len(lines)
+    #     data       = []
+    #
+    #     submission = cls.sample_submission()
+    #     submission = submission.set_index('output_id', drop=False)
+    #     for line in lines[1:]:  # ignore header
+    #         object_id,output = line.split(',',2)
+    #         submission.loc[object_id]['output'] = output
+    #
+    #     submission.to_csv(filename, index=False)
+    #     print(f"\nwrote: {filename} | {line_count} lines")
+
+
     @classmethod
     def object_id(cls, filename, index=0) -> str:
         return re.sub('^.*/|\.json$', '', filename) + '_' + str(index)
 
     @classmethod
     def to_csv(cls, dataset: 'Dataset'):
-        csv = ['output_id,output']
+        csv = []
         for task in dataset:
             line = CSV.to_csv_line(task)
             if line: csv.append(line)
+        csv = ['output_id,output'] + sorted(csv) # object_id keys are sorted in sample_submission.csv
         return "\n".join(csv)
 
     @classmethod

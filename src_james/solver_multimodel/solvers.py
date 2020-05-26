@@ -15,13 +15,13 @@ from src_james.solver_multimodel.ZoomSolver import ZoomSolver
 
 solvers: List[Solver] = [
     GlobSolver(),
-    # DoNothingSolver(),
-    # BorderSolver(),
-    # GeometrySolver(),
-    # SingleColorSolver(),
-    # ZoomSolver(),
-    # TessellationSolver(),
-    # XGBSolverDart(),
-    # XGBSolverGBtree(),
-    # XGBSolverGBlinear(),
+    DoNothingSolver(),
+    BorderSolver(),
+    GeometrySolver(),
+    SingleColorSolver(),
+    ZoomSolver(),
+    TessellationSolver(),
+    XGBSolverDart(),
+    XGBSolverGBtree(),
+    XGBSolverGBlinear(),
 ]

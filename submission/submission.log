@@ -8,11 +8,1163 @@ https://www.kaggle.com/c/abstraction-and-reasoning-challenge
  -------------------- 
 
 GlobSolver
+DoNothingSolver
+BorderSolver
+GeometrySolver
+SingleColorSolver
+ZoomSolver
+TessellationSolver
+XGBSolverDart
+XGBSolverGBtree
+XGBSolverGBlinear
 
  -------------------- 
 
 ####### training GlobSolver
+####### training DoNothingSolver
+####### training BorderSolver
+solved: training/6f8cd79b.json BorderSolver (8,)
+####### training GeometrySolver
+solved: training/25ff71a9.json GeometrySolver ('<function:roll>', (-2, 0))
+solved: training/3c9b0459.json GeometrySolver ('<function:rot90>', (2,))
+solved: training/6150a2bd.json GeometrySolver ('<function:rot90>', (2,))
+solved: training/67a3c6ac.json GeometrySolver ('<function:flip>', (1,))
+solved: training/68b16354.json GeometrySolver ('<function:flip>', (0,))
+solved: training/74dd1130.json GeometrySolver ('<function:swapaxes>', (0, 1))
+solved: training/9dfd6313.json GeometrySolver ('<function:swapaxes>', (0, 1))
+solved: training/ed36ccf7.json GeometrySolver ('<function:rot90>', (1,))
+####### training SingleColorSolver
+solved: training/445eab21.json SingleColorSolver ('<function:max_color>',)
+solved: training/5582e5ca.json SingleColorSolver ('<function:max_color>',)
+####### training ZoomSolver
+####### training TessellationSolver
+solved: training/007bbfb7.json TessellationSolver {'preprocess': <function copy at 0x7f97f2f90840>, 'p_arg': (), 'transform': <function copy at 0x7f97f2f90840>, 't_arg': (), 'query': <function query_not_zero at 0x7f98044110d0>, 'q_arg': ()}
+solved: training/a416b8f3.json TessellationSolver {'preprocess': <function copy at 0x7f97f2f90840>, 'p_arg': (), 'transform': <function copy at 0x7f97f2f90840>, 't_arg': (), 'query': <function query_true at 0x7f9804411048>, 'q_arg': ()}
+solved: training/c3e719e8.json TessellationSolver {'preprocess': <function copy at 0x7f97f2f90840>, 'p_arg': (), 'transform': <function copy at 0x7f97f2f90840>, 't_arg': (), 'query': <function query_max_color at 0x7f98044112f0>, 'q_arg': ()}
+solved: training/cce03e0d.json TessellationSolver {'preprocess': <function copy at 0x7f97f2f90840>, 'p_arg': (), 'transform': <function copy at 0x7f97f2f90840>, 't_arg': (), 'query': <function query_count_colors at 0x7f9804431730>, 'q_arg': ()}
+####### training XGBSolverDart
+guess : training/00d62c1b.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/025d127b.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/05269061.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/05f2a901.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/06df4c85.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/08ed6ac7.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/09629e4f.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/0962bcdd.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/0a938d79.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/0ca9ddb6.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: training/0d3d703e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/0dfd9992.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/0e206a2e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/11852cab.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/150deff5.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: training/178fcbfb.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/1a07d186.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/1b60fb0c.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/1bfc4729.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/1caeab9d.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/1e0a9b12.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/1e32b0e9.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/1f0c79e5.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/1f642eb9.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/1f876c06.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/2204b7a8.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/22168020.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/22233c11.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: training/2281f1f4.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/228f6490.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/22eb0ac0.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/23581191.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/253bf280.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/25d487eb.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: training/25d8a9c8.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: training/25ff71a9.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/264363fd.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/272f95fa.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/28e73c20.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/29623171.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/29c11459.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/29ec7d0e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/2bcee788.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: training/2bee17df.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/2c608aff.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/2dd70a9a.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/31aa019c.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/321b1fc6.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: training/32597951.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/3345333e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: training/3618c87e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/3631a71a.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/363442ee.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/36d67576.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/36fdfd69.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/3906de3d.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/39e1d7f9.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/3aa6fb7a.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/3ac3eb23.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/3bd67248.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/3bdb4ada.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/3befdf3e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/3c9b0459.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/3eda0437.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/40853293.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/41e4d17e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/4258a5f9.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/42a50994.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/4347f46a.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/444801d8.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/447fd412.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/44d8ac46.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: training/4612dd53.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/484b58aa.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/4938f0c2.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/496994bd.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/4c5c2cf0.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/50846271.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/508bd3b6.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/50cb2852.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/5168d44c.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/543a7ed5.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/54d82841.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/54d9e175.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/5521c0d9.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/5582e5ca.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/56dc2b01.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/56ff96f3.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/57aa92db.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/5c0a986e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/5c2c9af4.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/60b61512.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/6150a2bd.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/623ea044.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/63613498.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/6455b5f5.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: training/67385a82.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/673ef223.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/67a3c6ac.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/67a423a3.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/6855a6e4.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/68b16354.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/694f12f3.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/6a1e5592.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/6aa20dc0.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/6c434453.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/6cdd2623.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/6cf79266.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/6d0160f0.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/6d58a25d.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: training/6d75e8bb.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/6e02f1e3.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/6e19193c.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/6e82a1ae.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: training/6f8cd79b.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/72322fa7.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/73251a56.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/7447852a.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/74dd1130.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/760b3cac.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/776ffc46.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/7b6016b9.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/7ddcd7ec.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/7df24a62.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/7e0986d6.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/7f4411dc.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/810b9b61.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/82819916.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/83302e8f.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/834ec97d.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/8403a5d5.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/855e0971.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/85c4e7cd.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/868de0fa.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/88a10436.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/890034e9.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/8d510a79.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/8e5a5113.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/8eb1be9a.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/8f2ea7aa.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/90f3ed37.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/913fb3ed.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/91714a58.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/928ad970.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/93b581b8.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/941d9a10.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/952a094c.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/9565186b.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/95990924.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/97999447.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/98cf29f8.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/99fa7670.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/9edfc990.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/a1570a43.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/a2fd1cf0.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/a48eeaf7.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/a5313dff.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/a5f85a15.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: training/a61f2674.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/a64e4611.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/a65b410d.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: training/a699fb00.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/a78176bb.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: training/a79310a0.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/a85d4709.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/a8d7556c.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/a9f96cdd.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/aabf363d.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/aba27056.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/ae3edfdc.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/aedd82e4.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/af902bf9.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: training/b1948b0a.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/b230c067.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/b27ca6d3.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/b2862040.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/b527c5c6.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/b548a754.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/b60334d2.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: training/b6afb2da.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/b7249182.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/b775ac94.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/b782dc8a.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/b8825c91.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/b8cdaf2b.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/ba26e723.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/ba97ae07.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: training/bb43febb.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/bd4472b8.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/bda2d7a6.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: training/bdad9b1f.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/beb8660c.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/c0f76784.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/c1d99e64.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/c3f564a4.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: training/c8f0f002.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/c9f8e694.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/caa06a1f.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/cbded52d.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/ce22a75a.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/ce9e57f2.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/d037b0a7.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/d06dbe63.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/d07ae81c.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/d22278a0.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/d23f8c26.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/d2abd087.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: training/d364b489.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/d406998b.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/d43fd935.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/d4a91cb9.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/d4f3cd78.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/d511f180.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/d5d6de2d.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/d687bc17.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/d6ad076f.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/d89b689b.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/d8c310e9.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/d90796e8.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/d9f24cd1.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/db3e9e38.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/db93a21d.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/dbc1a6ce.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/dc1df850.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: training/dc433765.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/ddf7fa4f.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/ded97339.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/e21d9049.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/e26a3af2.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/e40b9e2f.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/e48d4e1a.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/e5062a87.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/e509e548.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/e73095fd.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/e76a88a6.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/e8593010.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/e8dc4411.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/e9614598.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/e9afcf9a.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/ea32f347.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/ea786f4a.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/ec883f72.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/ecdecbb3.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/ed36ccf7.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: training/ef135b50.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/f15e1fac.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/f1cefba8.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/f25ffba3.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/f76d97a5.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/f8c80d96.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : training/fcc82909.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+####### training XGBSolverGBtree
+guess : training/00d62c1b.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/025d127b.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/05269061.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/05f2a901.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/06df4c85.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/08ed6ac7.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/09629e4f.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/0962bcdd.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/0a938d79.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/0ca9ddb6.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: training/0d3d703e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/0dfd9992.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/0e206a2e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/11852cab.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/150deff5.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: training/178fcbfb.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/1a07d186.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/1b60fb0c.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/1bfc4729.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/1caeab9d.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/1e0a9b12.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/1e32b0e9.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/1f0c79e5.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/1f642eb9.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/1f876c06.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/2204b7a8.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/22168020.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/22233c11.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: training/2281f1f4.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/228f6490.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/22eb0ac0.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/23581191.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/253bf280.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/25d487eb.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: training/25d8a9c8.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: training/25ff71a9.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/264363fd.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/272f95fa.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/28e73c20.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/29623171.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/29c11459.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/29ec7d0e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/2bcee788.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: training/2bee17df.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/2c608aff.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/2dd70a9a.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/31aa019c.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/321b1fc6.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: training/32597951.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/3345333e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: training/3618c87e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/3631a71a.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/363442ee.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/36d67576.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/36fdfd69.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/3906de3d.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/39e1d7f9.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/3aa6fb7a.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/3ac3eb23.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/3bd67248.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/3bdb4ada.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/3befdf3e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/3c9b0459.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/3eda0437.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/40853293.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/41e4d17e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/4258a5f9.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/42a50994.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/4347f46a.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/444801d8.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/447fd412.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/44d8ac46.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: training/4612dd53.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/484b58aa.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/4938f0c2.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/496994bd.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/4c5c2cf0.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/50846271.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/508bd3b6.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/50cb2852.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/5168d44c.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/543a7ed5.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/54d82841.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/54d9e175.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/5521c0d9.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/5582e5ca.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/56dc2b01.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/56ff96f3.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/57aa92db.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/5c0a986e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/5c2c9af4.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/60b61512.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/6150a2bd.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/623ea044.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/63613498.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/6455b5f5.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: training/67385a82.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/673ef223.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/67a3c6ac.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/67a423a3.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/6855a6e4.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/68b16354.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/694f12f3.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/6a1e5592.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/6aa20dc0.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/6c434453.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/6cdd2623.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/6cf79266.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/6d0160f0.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/6d58a25d.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: training/6d75e8bb.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/6e02f1e3.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/6e19193c.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/6e82a1ae.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: training/6f8cd79b.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/72322fa7.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/73251a56.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/7447852a.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/74dd1130.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/760b3cac.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/776ffc46.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/7b6016b9.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/7ddcd7ec.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/7df24a62.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/7e0986d6.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/7f4411dc.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/810b9b61.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/82819916.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/83302e8f.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/834ec97d.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/8403a5d5.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/855e0971.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/85c4e7cd.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/868de0fa.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/88a10436.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/890034e9.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/8d510a79.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/8e5a5113.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/8eb1be9a.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/8f2ea7aa.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/90f3ed37.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/913fb3ed.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/91714a58.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/928ad970.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/93b581b8.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/941d9a10.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/952a094c.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/9565186b.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/95990924.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/97999447.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/98cf29f8.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/99fa7670.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/9edfc990.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/a1570a43.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/a2fd1cf0.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/a48eeaf7.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/a5313dff.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/a5f85a15.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: training/a61f2674.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/a64e4611.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/a65b410d.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: training/a699fb00.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/a78176bb.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: training/a79310a0.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/a85d4709.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/a8d7556c.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/a9f96cdd.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/aabf363d.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/aba27056.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/ae3edfdc.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/aedd82e4.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/af902bf9.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: training/b1948b0a.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/b230c067.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/b27ca6d3.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/b2862040.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/b527c5c6.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/b548a754.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/b60334d2.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: training/b6afb2da.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/b7249182.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/b775ac94.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/b782dc8a.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/b8825c91.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/b8cdaf2b.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/ba26e723.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/ba97ae07.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: training/bb43febb.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/bd4472b8.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/bda2d7a6.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: training/bdad9b1f.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/beb8660c.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/c0f76784.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/c1d99e64.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/c3f564a4.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: training/c8f0f002.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/c9f8e694.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/caa06a1f.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/cbded52d.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/ce22a75a.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/ce9e57f2.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/d037b0a7.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/d06dbe63.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/d07ae81c.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/d22278a0.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/d23f8c26.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/d2abd087.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: training/d364b489.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/d406998b.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/d43fd935.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/d4a91cb9.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/d4f3cd78.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/d511f180.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/d5d6de2d.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/d687bc17.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/d6ad076f.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/d89b689b.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/d8c310e9.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/d90796e8.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/d9f24cd1.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/db3e9e38.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/db93a21d.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/dbc1a6ce.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/dc1df850.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: training/dc433765.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/ddf7fa4f.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/ded97339.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/e21d9049.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/e26a3af2.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/e40b9e2f.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/e48d4e1a.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/e5062a87.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/e509e548.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/e73095fd.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/e76a88a6.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/e8593010.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/e8dc4411.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/e9614598.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/e9afcf9a.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/ea32f347.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/ea786f4a.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/ec883f72.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/ecdecbb3.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/ed36ccf7.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: training/ef135b50.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/f15e1fac.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/f1cefba8.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/f25ffba3.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/f76d97a5.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/f8c80d96.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : training/fcc82909.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+####### training XGBSolverGBlinear
+guess : training/025d127b.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/08ed6ac7.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/0d3d703e.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/11852cab.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/1bfc4729.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/1caeab9d.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/1e0a9b12.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/2204b7a8.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/22168020.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/2281f1f4.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/22eb0ac0.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/23581191.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/25d487eb.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/25d8a9c8.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+solved: training/25ff71a9.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/29c11459.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/321b1fc6.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/32597951.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+solved: training/3618c87e.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/3906de3d.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/3aa6fb7a.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/3befdf3e.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/3c9b0459.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/4347f46a.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/444801d8.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/496994bd.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/54d82841.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/5582e5ca.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/56ff96f3.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/60b61512.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/6150a2bd.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/63613498.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+solved: training/67385a82.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/6d75e8bb.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+solved: training/6f8cd79b.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/74dd1130.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/7e0986d6.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/7f4411dc.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/85c4e7cd.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/91714a58.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/93b581b8.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/9565186b.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/99fa7670.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/9dfd6313.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/a5313dff.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/a61f2674.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/a65b410d.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/a699fb00.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+solved: training/a79310a0.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/a85d4709.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/aabf363d.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+solved: training/aedd82e4.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/af902bf9.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+solved: training/b1948b0a.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/b230c067.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/b548a754.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/ba97ae07.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+solved: training/bb43febb.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/bda2d7a6.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+solved: training/bdad9b1f.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/beb8660c.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/c1d99e64.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+solved: training/c8f0f002.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/d037b0a7.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/d23f8c26.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/d364b489.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+solved: training/d4a91cb9.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/d511f180.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/d5d6de2d.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/d89b689b.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/d90796e8.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/ddf7fa4f.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/e26a3af2.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/ed36ccf7.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/f25ffba3.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : training/f76d97a5.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
 ####### evaluation GlobSolver
+####### evaluation DoNothingSolver
+####### evaluation BorderSolver
+####### evaluation GeometrySolver
+####### evaluation SingleColorSolver
+####### evaluation ZoomSolver
+####### evaluation TessellationSolver
+solved: evaluation/27f8ce4f.json TessellationSolver {'preprocess': <function copy at 0x7f97f2f90840>, 'p_arg': (), 'transform': <function copy at 0x7f97f2f90840>, 't_arg': (), 'query': <function query_max_color at 0x7f98044112f0>, 'q_arg': ()}
+solved: evaluation/5b6cbef5.json TessellationSolver {'preprocess': <function copy at 0x7f97f2f90840>, 'p_arg': (), 'transform': <function copy at 0x7f97f2f90840>, 't_arg': (), 'query': <function query_not_zero at 0x7f98044110d0>, 'q_arg': ()}
+####### evaluation XGBSolverDart
+guess : evaluation/009d5c81.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/00dbd492.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/03560426.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/05a7bcf2.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/0607ce86.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/070dd51e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/08573cc6.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/09c534e7.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/0a2355a6.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/0becf7df.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/0d87d2a6.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/0e671a1a.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/0f63c0b9.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/103eff5b.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/12422b43.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/12eac192.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/13713586.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/137f0df0.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/140c817e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/14754a24.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/15113be4.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/15663ba9.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/16b78196.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/17b80ad2.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/17cae0c1.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/18419cfa.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/184a9768.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/1acc24af.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/1c02dbbe.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: evaluation/1c0d0a4b.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/1c56ad9f.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/1d0a4b61.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/1d398264.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/1da012fc.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/1e81d6f9.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/1e97544e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/20981f0e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/212895b5.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: evaluation/21f83797.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/22a4bbc2.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/25094a63.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/2546ccf6.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/256b0a75.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/2685904e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/27a77e38.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/292dd178.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/29700607.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/2a5f8217.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/2b01abd0.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/2c737e39.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: evaluation/319f2597.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/31adaf00.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: evaluation/332efdb3.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/3391f8c0.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/33b52de3.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/3490cc26.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/37d3e8b2.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/3a301edc.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/3ed85e70.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/3f23242b.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/40f6cd08.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/423a55dc.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/42918530.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/4364c1c4.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/456873bc.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/45737921.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/45bbe264.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/477d2879.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/47996f11.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/4aab4007.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/4acc7107.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/4b6b68e5.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/4cd1b7b2.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/4e45f183.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/4e469f39.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/4f537728.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/4ff4c9da.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/50a16a69.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/50f325b5.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/516b51b7.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/5207a7b5.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/52fd389e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/54db823b.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/55059096.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/551d5bf1.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/55783887.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/575b1a71.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/58743b76.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/5a5a2103.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/5af49b42.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: evaluation/5b526a93.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/5b692c0f.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/5ffb2104.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/604001fa.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/60a26a3e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/626c0bcc.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/62ab2642.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/62b74c02.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/639f5a19.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/642248e4.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/64a7c07e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/67c52801.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/692cd3b6.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/696d4842.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/69889d6e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/6ad5bdfd.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/6df30ad6.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/705a3229.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/712bf12e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/72a961c9.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/73c3b0d8.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/759f3fd3.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/762cd429.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/770cc55f.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/782b5218.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/79369cc6.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/79fb03f4.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/7c8af763.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/7d1f7ee8.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/7d419a02.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/7e02026e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/7ee1c6ea.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/817e6c09.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/845d6e51.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/84db8fc4.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/84f2aca1.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/85b81ff1.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/85fa5666.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/88207623.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/891232d6.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/896d5239.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/8a371977.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/8cb8642d.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/8dae5dfc.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/8ee62060.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/8fbca751.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/90347967.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/903d1b4a.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/917bccba.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/929ab4e9.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/92e50de0.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/9356391f.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/93c31fbe.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/94414823.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/94be5b80.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/95a58926.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/963f59bc.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/96a8c0cd.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/97239e3d.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/9772c176.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/981571dc.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/992798f6.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/99306f82.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/9b2a60aa.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/9b365c51.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/9b4c17c4.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/9bebae7a.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/9c1e755f.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/9c56f360.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/9caba7c3.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/9ddd00f0.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/9def23fe.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/9f27f097.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/a04b2602.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/a096bf4d.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/a406ac07.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/a57f2f04.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/a8610ef7.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/a934301b.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/aa18de87.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/aa300dc3.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/aa4ec2a5.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/ac0c5833.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/ac2e8ecf.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/ac3e2b04.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/ac605cbb.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/ae58858e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/af22c60d.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/b15fca0b.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/b20f7c8b.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/b457fec5.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/b7f8a4d8.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/b942fd60.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/ba9d41b8.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/baf41dbf.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/bb52a14b.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/bcb3040b.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/bd14c3bf.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/bf32578f.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/bf89d739.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/c074846d.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/c35c1b4c.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/c62e2108.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/c663677b.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/c6e1b8da.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/c7d4e6ad.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/c87289bb.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/c97c0139.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/ca8f78db.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/cb227835.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/ce039d91.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/cf133acc.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/cfb2ce5a.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/d282b262.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/d2acf2cb.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/d304284e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/d37a1ef5.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/d492a647.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/d931c21c.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/d94c3b52.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: evaluation/da2b0fe3.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/dc2aa30b.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/dc2e9a9d.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/dd2401ed.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/df8cc377.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/e0fb7511.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/e1d2900e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/e2092e0c.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/e21a174a.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/e4075551.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/e41c6fd3.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/e5790162.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/e5c44e8f.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/e681b708.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/e69241bd.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/e74e1818.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/e760a62e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/e7639916.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: evaluation/e7dd8335.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/e88171ec.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/e95e3d8e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/e9ac8c9e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/e9bb6954.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/e9c9d9a1.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/ea959feb.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/ecaa0ec1.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/ef26cbf6.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/f0df5ff0.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/f21745ec.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/f3b10344.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/f3cdc58f.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+solved: evaluation/f45f5ca7.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/f823c43c.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/f83cb3f6.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/f8be4b64.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/f9a67cb5.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/f9d67f8b.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/fafd9572.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/fd096ab6.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/fd4b2b02.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/fea12743.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+guess : evaluation/ff72ca3e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+####### evaluation XGBSolverGBtree
+guess : evaluation/009d5c81.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/00dbd492.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/03560426.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/05a7bcf2.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/0607ce86.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/070dd51e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/08573cc6.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/09c534e7.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/0a2355a6.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/0becf7df.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/0d87d2a6.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/0e671a1a.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/0f63c0b9.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/103eff5b.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/12422b43.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/12eac192.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/13713586.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/137f0df0.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/140c817e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/14754a24.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/15113be4.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/15663ba9.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/16b78196.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/17b80ad2.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/17cae0c1.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/18419cfa.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/184a9768.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/1acc24af.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/1c02dbbe.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: evaluation/1c0d0a4b.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/1c56ad9f.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/1d0a4b61.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/1d398264.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/1da012fc.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/1e81d6f9.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/1e97544e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/20981f0e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/212895b5.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: evaluation/21f83797.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/22a4bbc2.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/25094a63.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/2546ccf6.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/256b0a75.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/2685904e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/27a77e38.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/292dd178.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/29700607.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/2a5f8217.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/2b01abd0.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/2c737e39.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: evaluation/319f2597.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/31adaf00.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: evaluation/332efdb3.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/3391f8c0.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/33b52de3.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/3490cc26.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/37d3e8b2.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/3a301edc.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/3ed85e70.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/3f23242b.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/40f6cd08.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/423a55dc.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/42918530.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/4364c1c4.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/456873bc.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/45737921.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/45bbe264.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/477d2879.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/47996f11.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/4aab4007.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/4acc7107.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/4b6b68e5.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/4cd1b7b2.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/4e45f183.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/4e469f39.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/4f537728.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/4ff4c9da.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/50a16a69.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/50f325b5.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/516b51b7.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/5207a7b5.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/52fd389e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/54db823b.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/55059096.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/551d5bf1.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/55783887.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/575b1a71.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/58743b76.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/5a5a2103.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/5af49b42.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: evaluation/5b526a93.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/5b692c0f.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/5ffb2104.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/604001fa.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/60a26a3e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/626c0bcc.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/62ab2642.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/62b74c02.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/639f5a19.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/642248e4.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/64a7c07e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/67c52801.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/692cd3b6.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/696d4842.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/69889d6e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/6ad5bdfd.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/6df30ad6.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/705a3229.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/712bf12e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/72a961c9.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/73c3b0d8.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/759f3fd3.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/762cd429.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/770cc55f.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/782b5218.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/79369cc6.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/79fb03f4.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/7c8af763.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/7d1f7ee8.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/7d419a02.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/7e02026e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/7ee1c6ea.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/817e6c09.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/845d6e51.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/84db8fc4.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/84f2aca1.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/85b81ff1.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/85fa5666.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/88207623.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/891232d6.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/896d5239.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/8a371977.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/8cb8642d.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/8dae5dfc.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/8ee62060.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/8fbca751.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/90347967.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/903d1b4a.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/917bccba.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/929ab4e9.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/92e50de0.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/9356391f.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/93c31fbe.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/94414823.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/94be5b80.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/95a58926.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/963f59bc.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/96a8c0cd.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/97239e3d.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/9772c176.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/981571dc.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/992798f6.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/99306f82.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/9b2a60aa.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/9b365c51.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/9b4c17c4.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/9bebae7a.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/9c1e755f.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/9c56f360.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/9caba7c3.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/9ddd00f0.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/9def23fe.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/9f27f097.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/a04b2602.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/a096bf4d.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/a406ac07.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/a57f2f04.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/a8610ef7.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/a934301b.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/aa18de87.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/aa300dc3.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/aa4ec2a5.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/ac0c5833.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/ac2e8ecf.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/ac3e2b04.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/ac605cbb.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/ae58858e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/af22c60d.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/b15fca0b.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/b20f7c8b.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/b457fec5.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/b7f8a4d8.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/b942fd60.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/ba9d41b8.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/baf41dbf.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/bb52a14b.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/bcb3040b.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/bd14c3bf.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/bf32578f.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/bf89d739.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/c074846d.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/c35c1b4c.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/c62e2108.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/c663677b.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/c6e1b8da.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/c7d4e6ad.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/c87289bb.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/c97c0139.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/ca8f78db.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/cb227835.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/ce039d91.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/cf133acc.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/cfb2ce5a.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/d282b262.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/d2acf2cb.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/d304284e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/d37a1ef5.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/d492a647.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/d931c21c.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/d94c3b52.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: evaluation/da2b0fe3.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/dc2aa30b.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/dc2e9a9d.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/dd2401ed.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/df8cc377.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/e0fb7511.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/e1d2900e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/e2092e0c.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/e21a174a.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/e4075551.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/e41c6fd3.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/e5790162.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/e5c44e8f.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/e681b708.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/e69241bd.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/e74e1818.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/e760a62e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/e7639916.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: evaluation/e7dd8335.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/e88171ec.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/e95e3d8e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/e9ac8c9e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/e9bb6954.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/e9c9d9a1.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/ea959feb.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/ecaa0ec1.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/ef26cbf6.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/f0df5ff0.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/f21745ec.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/f3b10344.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/f3cdc58f.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+solved: evaluation/f45f5ca7.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/f823c43c.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/f83cb3f6.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/f8be4b64.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/f9a67cb5.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/f9d67f8b.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/fafd9572.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/fd096ab6.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/fd4b2b02.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/fea12743.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+guess : evaluation/ff72ca3e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+####### evaluation XGBSolverGBlinear
+guess : evaluation/00dbd492.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : evaluation/0becf7df.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : evaluation/12eac192.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : evaluation/137f0df0.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : evaluation/1c0d0a4b.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : evaluation/1da012fc.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : evaluation/1e81d6f9.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+solved: evaluation/21f83797.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : evaluation/2a5f8217.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : evaluation/45737921.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : evaluation/45bbe264.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : evaluation/4f537728.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : evaluation/58743b76.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : evaluation/604001fa.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : evaluation/66e6c45b.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : evaluation/67c52801.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : evaluation/6df30ad6.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : evaluation/782b5218.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : evaluation/7d1f7ee8.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : evaluation/84f2aca1.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : evaluation/917bccba.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : evaluation/c7d4e6ad.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : evaluation/da2b0fe3.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : evaluation/e7dd8335.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : evaluation/e9ac8c9e.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+guess : evaluation/ef26cbf6.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
 ####### test GlobSolver
 test  : test/00576224.json GlobSolver ('evaluation/00576224.json',)
 test  : test/009d5c81.json GlobSolver ('evaluation/009d5c81.json',)
@@ -112,6 +1264,149 @@ test  : test/3f23242b.json GlobSolver ('evaluation/3f23242b.json',)
 test  : test/40f6cd08.json GlobSolver ('evaluation/40f6cd08.json',)
 test  : test/414297c0.json GlobSolver ('evaluation/414297c0.json',)
 test  : test/423a55dc.json GlobSolver ('evaluation/423a55dc.json',)
+####### test DoNothingSolver
+####### test BorderSolver
+####### test GeometrySolver
+####### test SingleColorSolver
+####### test ZoomSolver
+####### test TessellationSolver
+test  : test/27f8ce4f.json TessellationSolver {'preprocess': <function copy at 0x7f97f2f90840>, 'p_arg': (), 'transform': <function copy at 0x7f97f2f90840>, 't_arg': (), 'query': <function query_max_color at 0x7f98044112f0>, 'q_arg': ()}
+####### test XGBSolverDart
+test  : test/009d5c81.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/00dbd492.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/03560426.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/05a7bcf2.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/0607ce86.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/070dd51e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/08573cc6.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/09c534e7.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/0a2355a6.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/0becf7df.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/0d87d2a6.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/0e671a1a.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/0f63c0b9.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/103eff5b.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/12422b43.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/12eac192.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/13713586.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/137f0df0.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/140c817e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/14754a24.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/15113be4.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/15663ba9.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/16b78196.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/17b80ad2.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/17cae0c1.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/18419cfa.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/184a9768.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/1acc24af.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/1c02dbbe.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/1c0d0a4b.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/1c56ad9f.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/1d0a4b61.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/1d398264.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/1da012fc.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/1e81d6f9.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/1e97544e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/20981f0e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/212895b5.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/21f83797.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/22a4bbc2.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/25094a63.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/2546ccf6.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/256b0a75.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/2685904e.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/27a77e38.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/292dd178.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/29700607.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/2a5f8217.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/2b01abd0.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/2c737e39.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/319f2597.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/31adaf00.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/332efdb3.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/3391f8c0.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/33b52de3.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/3490cc26.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/37d3e8b2.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/3a301edc.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/3ed85e70.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/3f23242b.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/40f6cd08.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+test  : test/423a55dc.json XGBSolverDart {'n_estimators': 24, 'max_depth': 10, 'booster': 'dart'}
+####### test XGBSolverGBtree
+test  : test/009d5c81.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/00dbd492.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/03560426.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/05a7bcf2.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/0607ce86.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/070dd51e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/08573cc6.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/09c534e7.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/0a2355a6.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/0becf7df.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/0d87d2a6.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/0e671a1a.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/0f63c0b9.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/103eff5b.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/12422b43.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/12eac192.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/13713586.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/137f0df0.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/140c817e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/14754a24.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/15113be4.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/15663ba9.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/16b78196.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/17b80ad2.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/17cae0c1.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/18419cfa.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/184a9768.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/1acc24af.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/1c02dbbe.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/1c0d0a4b.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/1c56ad9f.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/1d0a4b61.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/1d398264.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/1da012fc.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/1e81d6f9.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/1e97544e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/20981f0e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/212895b5.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/21f83797.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/22a4bbc2.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/25094a63.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/2546ccf6.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/256b0a75.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/2685904e.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/27a77e38.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/292dd178.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/29700607.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/2a5f8217.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/2b01abd0.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/2c737e39.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/319f2597.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/31adaf00.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/332efdb3.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/3391f8c0.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/33b52de3.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/3490cc26.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/37d3e8b2.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/3a301edc.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/3ed85e70.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/3f23242b.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/40f6cd08.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+test  : test/423a55dc.json XGBSolverGBtree {'n_estimators': 24, 'max_depth': 10, 'booster': 'gbtree'}
+####### test XGBSolverGBlinear
+test  : test/00dbd492.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+test  : test/0becf7df.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+test  : test/12eac192.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+test  : test/137f0df0.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+test  : test/1c0d0a4b.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+test  : test/1da012fc.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+test  : test/1e81d6f9.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+test  : test/21f83797.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
+test  : test/2a5f8217.json XGBSolverGBlinear {'n_estimators': 24, 'booster': 'gblinear'}
 
 wrote: /home/jamie/code/kaggle-arc.copy/./submission/submission5.csv | 105 lines
 
@@ -120,14 +1415,31 @@ wrote: /home/jamie/code/kaggle-arc.copy/./submission/submission.csv | 105 lines
 Solver Scores:
 
 # training
+251 XGBSolverDart
+251 XGBSolverGBtree
+76 XGBSolverGBlinear
+8 GeometrySolver
+4 TessellationSolver
+2 SingleColorSolver
+2 ZoomSolver
+1 BorderSolver
 
 # evaluation
+252 XGBSolverDart
+252 XGBSolverGBtree
+26 XGBSolverGBlinear
+2 ZoomSolver
+2 TessellationSolver
 
 # test
 98 GlobSolver
+62 XGBSolverDart
+62 XGBSolverGBtree
+9 XGBSolverGBlinear
+1 TessellationSolver
 --------------------
 Dataset Scores:
-training   : {'correct': 0, 'guesses': 0, 'total': 416, 'error': 1.0, 'time': '00:00:00', 'name': 'training'}
-evaluation : {'correct': 0, 'guesses': 0, 'total': 419, 'error': 1.0, 'time': '00:00:00', 'name': 'evaluation'}
-test       : {'correct': 0.0, 'guesses': 102, 'total': 104, 'error': 1.0, 'time': '00:00:00', 'name': 'test'}
-time       : 00:00:00
+training   : {'correct': 41, 'guesses': 264, 'total': 416, 'error': 0.9014, 'time': '00:03:47', 'name': 'training'}
+evaluation : {'correct': 12, 'guesses': 262, 'total': 419, 'error': 0.9714, 'time': '00:06:49', 'name': 'evaluation'}
+test       : {'correct': 4.7, 'guesses': 103, 'total': 104, 'error': 1.0, 'time': '00:01:29', 'name': 'test'}
+time       : 00:12:05

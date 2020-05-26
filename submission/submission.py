@@ -3,14 +3,14 @@
 ##### 
 ##### ./submission/kaggle_compile.py ./src_james/solver_multimodel/main.py
 ##### 
-##### 2020-05-26 00:22:14+01:00
+##### 2020-05-26 01:33:42+01:00
 ##### 
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### 
-##### * master ccab583 [ahead 1] GlobSover | Create a lookup table of all previously seen input/output pairs
+##### * master db7b972 Solver | reenable all solvers
 ##### 
-##### ccab58302b388ed65c55c9e12812429893ec29cb
+##### db7b9722fb4d6a56cbf12149b5d84915503fe38a
 ##### 
 
 #####
@@ -2126,15 +2126,15 @@ from typing import List
 
 solvers: List[Solver] = [
     GlobSolver(),
-    # DoNothingSolver(),
-    # BorderSolver(),
-    # GeometrySolver(),
-    # SingleColorSolver(),
-    # ZoomSolver(),
-    # TessellationSolver(),
-    # XGBSolverDart(),
-    # XGBSolverGBtree(),
-    # XGBSolverGBlinear(),
+    DoNothingSolver(),
+    BorderSolver(),
+    GeometrySolver(),
+    SingleColorSolver(),
+    ZoomSolver(),
+    TessellationSolver(),
+    XGBSolverDart(),
+    XGBSolverGBtree(),
+    XGBSolverGBlinear(),
 ]
 
 
@@ -2205,12 +2205,12 @@ if __name__ == '__main__':
 ##### 
 ##### ./submission/kaggle_compile.py ./src_james/solver_multimodel/main.py
 ##### 
-##### 2020-05-26 00:22:14+01:00
+##### 2020-05-26 01:33:42+01:00
 ##### 
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### 
-##### * master ccab583 [ahead 1] GlobSover | Create a lookup table of all previously seen input/output pairs
+##### * master db7b972 Solver | reenable all solvers
 ##### 
-##### ccab58302b388ed65c55c9e12812429893ec29cb
+##### db7b9722fb4d6a56cbf12149b5d84915503fe38a
 ##### 

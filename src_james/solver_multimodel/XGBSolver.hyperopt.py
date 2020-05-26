@@ -3,6 +3,7 @@
 import os
 import random
 import time
+from copy import deepcopy
 
 import numpy as np
 from hyperopt import fmin
@@ -20,34 +21,51 @@ from src_james.util.timeout import timeout
 def resolve_hparms(best_param, param_space):
     best_param_resolved = {}
     for key, value in best_param.items():
-        resolved = value
-        if isinstance(resolved, (int,np.int32,np.int64)):
-            resolved = int(resolved)
-        if isinstance(resolved, (float,np.float32,np.float64)):
-            resolved = round(float(resolved), 4)
-
-        # if isinstance(value, (int,np.int64)) and \
+        if isinstance(value, (int,np.int32,np.int64)):
+            value = int(value)
+        if isinstance(value, (float,np.float32,np.float64)):
+            value = round(float(value), 4)
         if isinstance(param_space[key], type(hp.choice('',[]))):
-            try: resolved = param_space[key].inputs()[value].eval()
-            except: pass
+            try: value = param_space[key].inputs()[value].eval()
+            except:
+                try:    value = param_space[key].pos_args[value+1].obj
+                except: print('resolve_hparms()', type(value), value, param_space[key])
 
-        best_param_resolved[key] = resolved
+        best_param_resolved[key] = value
     return best_param_resolved
 
 
-def hyperopt(param_space, num_eval, verbose=True, timeout_seconds=120):
+# Compiles, but doesn't seem to have any impact
+def encode_points_to_evaluate(points_to_evaluate, param_space):
+    if points_to_evaluate is None: return None
+
+    points_to_evaluate = deepcopy(points_to_evaluate)
+    for params in points_to_evaluate:
+        for key, value in params.items():
+            if key not in param_space.keys(): del params[key]; continue
+            if isinstance(param_space[key], type(hp.choice('',[]))):
+                for index, pos_arg in enumerate(param_space[key].pos_args[1:]):  # First pos_arg is namespace
+                    if value == pos_arg.obj:
+                        params[key] = index
+                        break
+    return points_to_evaluate
+
+
+
+def hyperopt(param_space, num_eval, points_to_evaluate=None, verbose=True, timeout_seconds=120, debug=False):
     start = time.time()
 
     def test_function(params={}):
         competition = Competition()
         dataset     = competition['evaluation']
         try:
-            with timeout(timeout_seconds):
-                solver = XGBSolver(verbosity=0, **params)
-                solver.verbose = False
-                # competition['test'].apply(solver.solve_all)  # Quick for debugging
-                # competition.map(solver.solve_all)
-                dataset.apply(solver.solve_all)
+            if not debug:
+                with timeout(timeout_seconds):
+                    solver = XGBSolver(verbosity=0, **params)
+                    solver.verbose = False
+                    # competition['test'].apply(solver.solve_all)  # Quick for debugging
+                    # competition.map(solver.solve_all)
+                    dataset.apply(solver.solve_all)
         except Exception as exception:
             # if verbose:
             #     print('Exception:')
@@ -72,21 +90,24 @@ def hyperopt(param_space, num_eval, verbose=True, timeout_seconds=120):
         if verbose:
             print(params)
             # print(competition)
-        status = STATUS_OK if score > 0 else STATUS_FAIL
+        status = STATUS_OK if debug or score > 0 else STATUS_FAIL
         return {'loss': -score, 'status': status}
 
+
+    points = encode_points_to_evaluate(points_to_evaluate, param_space)
     trials = Trials()
     best_param = fmin(
         objective_function,
         param_space,
         algo=tpe.suggest,
         max_evals=num_eval,
-        trials=trials,
+        trials=None, # trials,
         rstate= np.random.RandomState(random.randint(0,10000)),
         max_queue_len=8,
+        points_to_evaluate=points,
     )
 
-    loss = [x['result']['loss'] for x in trials.trials]
+    loss = [x['result']['loss'] for x in trials.trials] if len(trials.trials) else [0]
 
     best_param = resolve_hparms(best_param, param_space)
 
@@ -102,7 +123,6 @@ def hyperopt(param_space, num_eval, verbose=True, timeout_seconds=120):
         print(f'{key} =', value, type(value).__name__)
     # print("Test Score: ", score)
     print("-"*20)
-    print(test_function(best_param))
 
     competition = Competition()
     dataset     = competition['evaluation']
@@ -184,10 +204,30 @@ if __name__ == '__main__' and not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
             # 'aft-nloglik'     # score 0
         ])
     }
-    hyperopt(param_hyperopt, 30, verbose=True, timeout_seconds=180)
+    ### Best keyword results - score = 9
+    points_to_evaluate = [
+        { 'booster': 'dart',   'eval_metric': 'error',          'grow_policy': 'lossguide', 'objective': 'reg:squaredlogerror', 'sampling_method': 'gradient_based', 'tree_method': 'hist'},
+        { 'booster': 'gbtree', 'eval_metric': 'ndcg',           'grow_policy': 'depthwise', 'objective': 'reg:squarederror',    'sampling_method': 'uniform',        'tree_method': 'exact'},
+        { 'booster': 'gbtree', 'eval_metric': 'aucpr',          'grow_policy': 'lossguide', 'objective': 'reg:squarederror',    'sampling_method': 'uniform',        'tree_method': 'exact'},
+        { 'booster': 'gbtree', 'eval_metric': 'ndcg',           'grow_policy': 'lossguide', 'objective': 'count:poisson',       'sampling_method': 'uniform',        'tree_method': 'exact'},
+        { 'booster': 'dart',   'eval_metric': 'gamma-nloglik',  'grow_policy': 'lossguide', 'objective': 'count:poisson',       'sampling_method': 'gradient_based', 'tree_method': 'approx'},
+        { 'booster': 'gbtree', 'eval_metric': 'aucpr',          'grow_policy': 'lossguide', 'objective': 'reg:squarederror',    'sampling_method': 'uniform',        'tree_method': 'approx'},
+        { 'booster': 'dart',   'eval_metric': 'logloss',        'grow_policy': 'depthwise', 'objective': 'reg:squarederror',    'sampling_method': 'gradient_based', 'tree_method': 'approx'},
+        { 'booster': 'dart',   'eval_metric': 'gamma-deviance', 'grow_policy': 'depthwise', 'objective': 'reg:squarederror',    'sampling_method': 'gradient_based', 'tree_method': 'approx'},
+    ]
+    hyperopt(param_hyperopt, 50, points_to_evaluate=points_to_evaluate, verbose=True, timeout_seconds=180)
 
 
-# {'score': 71.0, 'base_score': 0.5580316005760565, 'booster': 'gbtree', 'colsample_bytree': 0.8711693954468235, 'learning_rate': 0.26376465700523233, 'max_delta_step': 5, 'max_depth': 11, 'min_child_weight': 1, 'n_estimators': 8, 'num_parallel_tree': 4, 'objective': 'reg:tweedie', 'reg_lambda': 0.29549016341486206, 'subsample': 0.9863675458668577}
+### Best keyword results - score = 9
+# {'score': 9, 'time': 85,  'booster': 'dart',   'eval_metric': 'error',          'grow_policy': 'lossguide', 'objective': 'reg:squaredlogerror', 'sampling_method': 'gradient_based', 'tree_method': 'hist'}
+# {'score': 9, 'time': 94,  'booster': 'gbtree', 'eval_metric': 'ndcg',           'grow_policy': 'depthwise', 'objective': 'reg:squarederror',    'sampling_method': 'uniform',        'tree_method': 'exact'}
+# {'score': 9, 'time': 135, 'booster': 'gbtree', 'eval_metric': 'aucpr',          'grow_policy': 'lossguide', 'objective': 'reg:squarederror',    'sampling_method': 'uniform',        'tree_method': 'exact'}
+# {'score': 9, 'time': 173, 'booster': 'gbtree', 'eval_metric': 'ndcg',           'grow_policy': 'lossguide', 'objective': 'count:poisson',       'sampling_method': 'uniform',        'tree_method': 'exact'}
+# {'score': 9, 'time': 180, 'booster': 'dart',   'eval_metric': 'gamma-nloglik',  'grow_policy': 'lossguide', 'objective': 'count:poisson',       'sampling_method': 'gradient_based', 'tree_method': 'approx'}
+# {'score': 9, 'time': 200, 'booster': 'gbtree', 'eval_metric': 'aucpr',          'grow_policy': 'lossguide', 'objective': 'reg:squarederror',    'sampling_method': 'uniform',        'tree_method': 'approx'}
+# {'score': 9, 'time': 206, 'booster': 'dart',   'eval_metric': 'logloss',        'grow_policy': 'depthwise', 'objective': 'reg:squarederror',    'sampling_method': 'gradient_based', 'tree_method': 'approx'}
+# {'score': 9, 'time': 231, 'booster': 'dart',   'eval_metric': 'gamma-deviance', 'grow_policy': 'depthwise', 'objective': 'reg:squarederror',    'sampling_method': 'gradient_based', 'tree_method': 'approx'}
+
 
 ### Figure out broken keys | -bad +good
 # for key in 0 '[4-7]' '[8-9]' 9; do cat src_james/solver_multimodel/logs/*keyword* | grep "score': $key" | perl -p -e "s/': '/:/g; s/['{}\d,]//g;"  | perl -p -e "s/\s/\n/g; s/\w+:\W//g;" | sed -r '/^\s*$/d' | sort | uniq -c | sort -k2 > src_james/solver_multimodel/logs/score/keywords.$key.txt; done;

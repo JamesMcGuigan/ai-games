@@ -188,13 +188,29 @@ class XGBSolver(Solver):
 
 
 class XGBSolverDart(XGBSolver):
-    def __init__(self, booster='dart', **kwargs):
-        self.kwargs = { "booster": booster, **kwargs }
+    kwargs_defaults = {
+        'booster': 'dart',
+        'eval_metric': 'error',
+        'grow_policy': 'lossguide',
+        'objective': 'reg:squaredlogerror',
+        'sampling_method': 'gradient_based',
+        'tree_method': 'hist'
+    }
+    def __init__(self, **kwargs):
+        self.kwargs = { **self.kwargs_defaults, **kwargs }
         super().__init__(**self.kwargs)
 
 class XGBSolverGBtree(XGBSolver):
+    kwargs_defaults = {
+        'booster': 'gbtree',
+        'eval_metric': 'ndcg',
+        'grow_policy': 'depthwise',
+        'objective': 'reg:squarederror',
+        'sampling_method': 'uniform',
+        'tree_method': 'exact'
+    }
     def __init__(self, booster='gbtree', **kwargs):
-        self.kwargs = { "booster": booster, **kwargs }
+        self.kwargs = { **self.kwargs_defaults, **kwargs }
         super().__init__(**self.kwargs)
 
 class XGBSolverGBlinear(XGBSolver):

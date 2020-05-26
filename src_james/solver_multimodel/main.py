@@ -1,5 +1,4 @@
 import gc
-import os
 import time
 from operator import itemgetter
 
@@ -27,7 +26,7 @@ if __name__ == '__main__':
             if plot_results:
                 scores[dataset_name][solver.__class__.__name__] += solver.plot(dataset)
             else:
-                scores[dataset_name][solver.__class__.__name__] += solver.solve_all(dataset)
+                scores[dataset_name][solver.__class__.__name__] += solver.solve_dataset(dataset)
             # Running on Kaggle uses up nearly all 16GB of RAM
             solver.cache = {}
             gc.collect()

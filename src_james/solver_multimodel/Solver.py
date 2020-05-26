@@ -1,8 +1,12 @@
-from typing import List, Union, Callable
+from typing import Callable
+from typing import List
+from typing import Union
 
 import numpy as np
 
-from src_james.core.DataModel import Problem, Task, Dataset
+from src_james.core.DataModel import Dataset
+from src_james.core.DataModel import Problem
+from src_james.core.DataModel import Task
 from src_james.plot import plot_task
 
 
@@ -104,7 +108,7 @@ class Solver():
             if self.debug: raise exception
         return None
 
-    def solve_all(self, tasks: Union[Dataset,List[Task]], plot=False, solve_detects=False):
+    def solve_dataset(self, tasks: Union[Dataset, List[Task]], plot=False, solve_detects=False):
         count = 0
         for task in tasks:
             if self.detect(task):
@@ -117,10 +121,10 @@ class Solver():
 
     def plot(self, tasks: Union[Dataset,List[Task], Task]):
         if isinstance(tasks, Task): tasks = [ tasks ]
-        return self.solve_all(tasks, plot=True, solve_detects=False)
+        return self.solve_dataset(tasks, plot=True, solve_detects=False)
 
     def plot_detects(self, tasks: Union[Dataset,List[Task],Task], unsolved=True):
         if isinstance(tasks, Task): tasks = [ tasks ]
         if unsolved:
             tasks = [ task for task in tasks if not task.solutions_count ]
-        return self.solve_all(tasks, plot=True, solve_detects=True)
+        return self.solve_dataset(tasks, plot=True, solve_detects=True)

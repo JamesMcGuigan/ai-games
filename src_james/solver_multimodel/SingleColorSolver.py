@@ -1,11 +1,9 @@
-import os
-
 from src_james.core.DataModel import Task
 from src_james.settings import settings
-from src_james.solver_multimodel.Solver import Solver
 from src_james.solver_multimodel.queries.colors import task_is_singlecolor
 from src_james.solver_multimodel.queries.grid import *
 from src_james.solver_multimodel.queries.ratio import task_shape_ratios
+from src_james.solver_multimodel.Solver import Solver
 
 
 class SingleColorSolver(Solver):
@@ -60,6 +58,6 @@ if __name__ == '__main__' and not settings['production']:
         solver.plot_detects([task])
 
     # competition = Competition()
-    # # competition['test'].apply(solver.solve_all)
-    # competition.map(solver.solve_all)
+    # # competition['test'].apply(solver.solve_dataset)
+    # competition.map(solver.solve_dataset)
     # print(competition)

@@ -223,7 +223,7 @@ if __name__ == '__main__' and not settings['production']:
     solver = XGBSolver()
     solver.verbose = True
     competition = Competition()
-    competition.map(solver.solve_all)
+    competition.map(solver.solve_dataset)
     print(competition)
 
 

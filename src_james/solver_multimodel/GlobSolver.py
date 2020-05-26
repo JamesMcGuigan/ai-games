@@ -1,7 +1,8 @@
+from submission.submission import Competition
+
 from src_james.settings import settings
 from src_james.solver_multimodel.queries.grid import *
 from src_james.solver_multimodel.Solver import Solver
-from submission.submission import Competition
 
 
 class GlobSolver(Solver):
@@ -64,5 +65,5 @@ if __name__ == '__main__' and not settings['production']:
     solver.verbose = True
 
     competition = Competition()
-    competition.map(solver.solve_all)
+    competition.map(solver.solve_dataset)
     print(competition)

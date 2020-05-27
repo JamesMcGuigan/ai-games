@@ -13,16 +13,31 @@ from src_james.settings import settings
 from src_james.solver_multimodel.queries.grid import *
 from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
 from src_james.solver_multimodel.Solver import Solver
+from src_james.solver_multimodel.transforms.singlecolor import np_bincount
 from src_james.util.np_cache import np_cache
 
 
 class XGBGridSolver(Solver):
     optimise = True
     verbose  = True
+    xgb_defaults = {
+        'tree_method':      'exact',
+        'eval_metric':      'error',
+        'objective':        'reg:squarederror',
+        'n_estimators':     32,
+        'max_depth':        100,
+        'min_child_weight': 0,
+        # 'sampling_method':  'uniform',
+        # 'max_delta_step':   1,
+        # 'min_child_weight': 0,
+    }
 
     def __init__(self, n_estimators=24, max_depth=10, **kwargs):
         super().__init__()
-        self.kwargs = { "n_estimators": n_estimators, "max_depth": max_depth, **kwargs }
+        self.kwargs = {
+            **self.xgb_defaults,
+            **kwargs,
+        }
         if self.kwargs.get('booster') == 'gblinear':
             self.kwargs = pydash.omit(self.kwargs, *['max_depth'])
 
@@ -51,16 +66,24 @@ class XGBGridSolver(Solver):
             if not_valid:
                 self.cache[task.filename] = None
             else:
-                xgb = self.create_classifier()
-                xgb.fit(inputs, outputs, verbose=False)
-                self.cache[task.filename] = (xgb,)
-
+                # BUGFIX: occasionally throws exceptions in jupyter
+                classifier = None
+                try:
+                    classifier = self.create_classifier()
+                    classifier.fit(inputs, outputs, verbose=False)
+                    self.cache[task.filename] = (classifier,)
+                except Exception as exception:
+                    if self.debug:
+                        print(f'{self.__class__.__name__}:fit({task}] | Exception: ')
+                        print(classifier)
+                        print(type(exception), exception)
+                    pass
     def test(self, task: Task) -> bool:
         """test if the given solve_grid correctly solves the task"""
         args = self.cache.get(task.filename, ())
         return self.is_lambda_valid(task, self.solve_grid, *args, task=task)
 
-    def solve_grid(self, grid, xgb=None, task=None, **kwargs):
+    def solve_grid(self, grid: np.ndarray, xgb=None, task=None, **kwargs):
         if task and task.filename not in self.cache: self.fit(task)
         xgb      = xgb or self.cache[task.filename][0]
         features = self.make_features(grid, )
@@ -115,7 +138,7 @@ class XGBGridSolver(Solver):
             *grid.shape, nrows*ncols,       # grid shape and pixel size
             grid[i][j],                     # grid[i][j]+1, grid[i][j]-1 = can produce worse results
 
-            *cls.bincount(grid),
+            *np_bincount(grid),
             *cls.get_moore_neighbours(grid, i, j),
             *cls.get_tl_tr(grid, i, j),
 
@@ -152,11 +175,6 @@ class XGBGridSolver(Solver):
                 count_squares(neighbourhood)       if len(neighbourhood) else 0,
             ]
         return features
-
-    @classmethod
-    @np_cache()
-    def bincount(cls, grid: np.ndarray):
-        return np.bincount(grid.flatten(), minlength=11).tolist()  # features requires a fixed length array
 
     @classmethod
     @np_cache()

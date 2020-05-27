@@ -7,10 +7,10 @@ from src_james.solver_multimodel.GlobSolver import GlobSolver
 from src_james.solver_multimodel.SingleColorSolver import SingleColorSolver
 from src_james.solver_multimodel.Solver import Solver
 from src_james.solver_multimodel.TessellationSolver import TessellationSolver
+from src_james.solver_multimodel.XGBGridSolver import XGBGridSolverDart
+from src_james.solver_multimodel.XGBGridSolver import XGBGridSolverGBlinear
+from src_james.solver_multimodel.XGBGridSolver import XGBGridSolverGBtree
 from src_james.solver_multimodel.XGBSingleColorSolver import XGBSingleColorSolver
-from src_james.solver_multimodel.XGBSolver import XGBSolverDart
-from src_james.solver_multimodel.XGBSolver import XGBSolverGBlinear
-from src_james.solver_multimodel.XGBSolver import XGBSolverGBtree
 from src_james.solver_multimodel.ZoomSolver import ZoomSolver
 
 solvers: List[Solver] = [
@@ -25,7 +25,7 @@ solvers: List[Solver] = [
 
     # Non-Deterministic (lots of random guesses)
     XGBSingleColorSolver(),
-    XGBSolverDart(),
-    XGBSolverGBtree(),
-    XGBSolverGBlinear(),
+    XGBGridSolverDart(),
+    XGBGridSolverGBtree(),
+    XGBGridSolverGBlinear(),
 ]

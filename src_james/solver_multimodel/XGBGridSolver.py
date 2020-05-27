@@ -16,7 +16,7 @@ from src_james.solver_multimodel.Solver import Solver
 from src_james.util.np_cache import np_cache
 
 
-class XGBSolver(Solver):
+class XGBGridSolver(Solver):
     optimise = True
     verbose  = True
 
@@ -192,7 +192,7 @@ class XGBSolver(Solver):
         return top_left, top_right
 
 
-class XGBSolverDart(XGBSolver):
+class XGBGridSolverDart(XGBGridSolver):
     kwargs_defaults = {
         'booster': 'dart',
         'eval_metric': 'error',
@@ -205,7 +205,7 @@ class XGBSolverDart(XGBSolver):
         self.kwargs = { **self.kwargs_defaults, **kwargs }
         super().__init__(**self.kwargs)
 
-class XGBSolverGBtree(XGBSolver):
+class XGBGridSolverGBtree(XGBGridSolver):
     kwargs_defaults = {
         'booster': 'gbtree',
         'eval_metric': 'ndcg',
@@ -218,14 +218,14 @@ class XGBSolverGBtree(XGBSolver):
         self.kwargs = { **self.kwargs_defaults, **kwargs }
         super().__init__(**self.kwargs)
 
-class XGBSolverGBlinear(XGBSolver):
+class XGBGridSolverGBlinear(XGBGridSolver):
     def __init__(self, booster='gblinear', **kwargs):
         self.kwargs = { "booster": booster, "max_depth": None, **kwargs }
         super().__init__(**self.kwargs)
 
 
 if __name__ == '__main__' and not settings['production']:
-    solver = XGBSolver()
+    solver = XGBGridSolver()
     solver.verbose = True
     competition = Competition()
     competition.map(solver.solve_dataset)
@@ -337,13 +337,13 @@ if __name__ == '__main__' and not settings['production']:
 # test       : {'correct': 33, 'total': 104, 'error': 0.6827, 'time': '00:00:00', 'name': 'test'}
 # time       : 00:03:10
 
-# XGBSolver(n_estimators=10)
+# XGBGridSolver(n_estimators=10)
 # training   : {'correct': 22, 'guesses': 148, 'total': 416, 'error': 0.9471, 'time': '00:00:00', 'name': 'training'}
 # evaluation : {'correct': 9, 'guesses': 116, 'total': 419, 'error': 0.9785, 'time': '00:00:00', 'name': 'evaluation'}
 # test       : {'correct': 0, 'guesses': 33, 'total': 104, 'error': 1.0, 'time': '00:00:00', 'name': 'test'}
 # time       : 00:00:53
 
-# XGBSolver(n_estimators=32)
+# XGBGridSolver(n_estimators=32)
 # training   : {'correct': 25, 'guesses': 255, 'total': 416, 'error': 0.9399, 'time': '00:00:00', 'name': 'training'}
 # evaluation : {'correct': 10, 'guesses': 257, 'total': 419, 'error': 0.9761, 'time': '00:00:00', 'name': 'evaluation'}
 # test       : {'correct': 0, 'guesses': 64, 'total': 104, 'error': 1.0, 'time': '00:00:00', 'name': 'test'}

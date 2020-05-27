@@ -12,10 +12,10 @@ from hyperopt import STATUS_FAIL
 from hyperopt import STATUS_OK
 from hyperopt import tpe
 from hyperopt import Trials
-from src_james.util.timeout import timeout
 
 from src_james.core.DataModel import Competition
-from src_james.solver_multimodel.XGBSolver import XGBSolver
+from src_james.solver_multimodel.XGBGridSolver import XGBGridSolver
+from src_james.util.timeout import timeout
 
 
 def resolve_hparms(best_param, param_space):
@@ -61,7 +61,7 @@ def hyperopt(param_space, num_eval, points_to_evaluate=None, verbose=True, timeo
         try:
             if not debug:
                 with timeout(timeout_seconds):
-                    solver = XGBSolver(verbosity=0, **params)
+                    solver = XGBGridSolver(verbosity=0, **params)
                     solver.verbose = False
                     # competition['test'].apply(solver.solve_dataset)  # Quick for debugging
                     # competition.map(solver.solve_dataset)
@@ -126,7 +126,7 @@ def hyperopt(param_space, num_eval, points_to_evaluate=None, verbose=True, timeo
 
     competition = Competition()
     dataset     = competition['evaluation']
-    solver = XGBSolver(**best_param)
+    solver = XGBGridSolver(**best_param)
     solver.verbose = False
     competition.map(solver.solve_dataset)
     print(competition)

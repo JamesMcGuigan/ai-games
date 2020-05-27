@@ -3,6 +3,8 @@ from itertools import product
 
 import numpy as np
 
+from src_james.core.DataModel import Competition
+from src_james.settings import settings
 from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
 from src_james.solver_multimodel.queries.ratio import task_grid_max_dim
 from src_james.solver_multimodel.Solver import Solver
@@ -57,3 +59,11 @@ class GeometrySolver(Solver):
         except Exception as exception:
             if self.debug: print('Exception', self.__class__.__name__, 'solve_grid()', function, args, exception)
             return grid
+
+
+if __name__ == '__main__' and not settings['production']:
+    solver = GeometrySolver()
+    solver.verbose = True
+    competition = Competition()
+    competition.map(solver.solve_dataset)
+    print(competition)

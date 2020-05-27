@@ -23,7 +23,7 @@ class ProblemSetSolver(Solver):
         if not _task_.filename in self.cache:   return []
         if self.cache[_task_.filename] is None: return []
 
-        solutions = self.predict(_task_['test'])
+        solutions = self.solve_grid(_task_['test'])
         if solutions is None: return []
 
         problemset = self.cast_problemset(solutions, task=_task_)
@@ -49,16 +49,16 @@ class ProblemSetSolver(Solver):
         return output
 
 
-    def predict(self, _task_: Union[ProblemSet,Task], *args, task: Task=None, **kwargs) -> Union[None,List[np.ndarray]]:
-        task = task or _task_
-        if isinstance(task, ProblemSet):      task = task.task
+    def predict(self, problemset: Union[ProblemSet,Task], *args, task: Task=None, **kwargs) -> Union[None,List[np.ndarray]]:
+        task       = task or (problemset if isinstance(problemset, Task) else problemset.task)
+        problemset = (problemset['test'] if isinstance(problemset, Task) else problemset )
         if task.filename not in self.cache:   self.fit(task)
-        if self.cache[task.filename] is None: return None
+        if self.cache[task.filename] is None: return None  # Unsolvable mapping
         raise NotImplementedError
 
 
     def test(self, task: Task) -> bool:
-        """test if the given predict correctly solves the task"""
+        """test if .predict() correctly solves the task"""
         self.fit(task)
         if not task.filename in self.cache:   return False
         if self.cache[task.filename] is None: return False
@@ -144,8 +144,8 @@ class ProblemSetEncoder(ProblemSetSolver):
                 task:  Task = None,
                 *args, **kwargs
     ) -> Any:
-        if isinstance(problemset, Task):      problemset = problemset['test']
-        task = problemset.task
+        task       = task or (problemset if isinstance(problemset, Task) else problemset.task)
+        problemset = (problemset['test'] if isinstance(problemset, Task) else problemset )
         if task.filename not in self.cache:   self.fit(task)
         if self.cache[task.filename] is None: return None  # Unsolvable mapping
 
@@ -158,7 +158,7 @@ class ProblemSetEncoder(ProblemSetSolver):
 
 
     def test(self, task: Task) -> bool:
-        """test if the given predict correctly solves the task"""
+        """test if .predict() correctly solves the task"""
         if task.filename not in self.cache:             self.fit(task)
         if self.cache.get(task.filename, True) is None: return False
 

@@ -51,11 +51,11 @@ class XGBSolver(Solver):
                 self.cache[task.filename] = (xgb,)
 
     def test(self, task: Task) -> bool:
-        """test if the given action correctly solves the task"""
+        """test if the given solve_grid correctly solves the task"""
         args = self.cache.get(task.filename, ())
-        return self.is_lambda_valid(task, self.action, *args, task=task)
+        return self.is_lambda_valid(task, self.solve_grid, *args, task=task)
 
-    def action(self, grid, xgb=None, task=None):
+    def solve_grid(self, grid, xgb=None, task=None, **kwargs):
         if task and task.filename not in self.cache: self.fit(task)
         xgb      = xgb or self.cache[task.filename][0]
         features = self.make_features(grid, )

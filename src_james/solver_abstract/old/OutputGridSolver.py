@@ -1,22 +1,25 @@
 import inspect
-import os
 import pprint
 from collections import defaultdict
-from typing import Any, Callable, Tuple, Union
+from typing import Any
+from typing import Callable
+from typing import List
+from typing import Tuple
+from typing import Union
 
 import numpy as np
 import pydash as py
 
-from src_james.core.DataModel import Competition, ProblemSet, Task
+from src_james.core.DataModel import Competition
+from src_james.core.DataModel import ProblemSet
+from src_james.core.DataModel import Task
 from src_james.heuristics.Queries import Query
+from src_james.settings import settings
 
 
 # from pydash import group_by
 
 # NOTE: This is getting half way to the level of abstraction required, but we need to go to the next level of inception
-from src_james.settings import settings
-
-
 class Rule:
     def __init__(self,
                  function:  Callable,
@@ -174,8 +177,11 @@ class OutputGridSizeSolver:
         return True
 
 
-    def predict(self, problemset: Union[ProblemSet,Task], rule: Rule=None, inplace=False):
-        if isinstance(problemset, Task): return self.predict(problemset['test'])
+    def predict(self, problemset: Union[ProblemSet,Task], rule: Rule=None, *args, task: Task=None, **kwargs) -> Union[None,List[np.ndarray]]:
+        task       = task or (problemset if isinstance(problemset, Task) else problemset.task)
+        problemset = (problemset['test'] if isinstance(problemset, Task) else problemset )
+        if task.filename not in self.cache:   self.fit(task)
+        if self.cache[task.filename] is None: return None  # Unsolvable mapping
 
         if not rule: rule = self.cache[problemset.filename]
         if not callable(rule): return None

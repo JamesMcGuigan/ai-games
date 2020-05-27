@@ -51,9 +51,9 @@ class GeometrySolver(Solver):
                     return True
         return False
 
-    def predict(self, grid, function=None, args=None, task=None):
+    def solve_grid(self, grid, function=None, args=None, task=None):
         try:
             return function(grid, *args)
         except Exception as exception:
-            if self.debug: print('Exception', self.__class__.__name__, 'predict()', function, args, exception)
+            if self.debug: print('Exception', self.__class__.__name__, 'solve_grid()', function, args, exception)
             return grid

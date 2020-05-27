@@ -21,7 +21,7 @@ class ZoomSolver(Solver):
     def get_scale(self, task):
         return task_shape_ratios(task)[0][0]
 
-    def predict(self, grid, task=None, *args):
+    def solve_grid(self, grid, task=None, *args):
         scale = self.get_scale(task)
         if scale > 1:
             resize = tuple( int(d*scale) for d in grid.shape )

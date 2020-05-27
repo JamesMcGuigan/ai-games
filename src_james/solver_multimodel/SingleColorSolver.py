@@ -28,7 +28,7 @@ class SingleColorSolver(Solver):
         if task.filename in self.cache: return True
         for query in self.queries:
             args = ( query, )
-            if self.is_lambda_valid(task, self.predict, *args, task=task):
+            if self.is_lambda_valid(task, self.solve_grid , *args, task=task):
                 self.cache[task.filename] = args
                 break
 

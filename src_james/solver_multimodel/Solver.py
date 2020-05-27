@@ -29,7 +29,7 @@ class Solver():
         pass
 
 
-    def predict(self, grid: np.ndarray, *args, task=None, **kwargs):
+    def solve_grid(self, grid: np.ndarray, *args, task=None, **kwargs):
         """ @override | This is the primary method this needs to be defined"""
         raise NotImplementedError
         # return grid
@@ -37,12 +37,12 @@ class Solver():
 
 
     def test(self, task: Task) -> bool:
-        """test if the given predict correctly solves the task"""
+        """test if the given .solve_grid() correctly solves the task"""
         if task.filename not in self.cache: self.fit(task)
         if self.cache.get(task.filename, True) is None: return False
 
         args = self.cache.get(task.filename, ())
-        return self.is_lambda_valid(task, self.predict, *args, task=task)
+        return self.is_lambda_valid(task, self.solve_grid, *args, task=task)
 
 
     def is_lambda_valid(self, _task_: Task, _function_: Callable, *args, **kwargs):  # _task_ = avoid namespace conflicts with kwargs=task
@@ -96,9 +96,9 @@ class Solver():
                     args = self.cache.get(task.filename, ())
                     if args is None: return None
                     if isinstance(args, dict):
-                        solutions = self.solve_task(task, self.predict, **args, task=task)
+                        solutions = self.solve_task(task, self.solve_grid, **args, task=task)
                     else:
-                        solutions = self.solve_task(task, self.predict, *args, task=task)
+                        solutions = self.solve_task(task, self.solve_grid, *args, task=task)
 
                     for index, solution in enumerate(solutions):
                         task['solutions'][index].append(solution)

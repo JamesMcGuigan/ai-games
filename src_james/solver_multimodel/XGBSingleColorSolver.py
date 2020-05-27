@@ -69,7 +69,11 @@ class SingleColorXGBEncoder(XGBEncoder):
     #             task:  Task = None,
     #             *args, **kwargs
     # ) -> Any:
-    #     task   = task or (problemset if isinstance(problemset, Task) else problemset.task)
+    #     task       = task or (problemset if isinstance(problemset, Task) else problemset.task)
+    #     problemset = (problemset['test'] if isinstance(problemset, Task) else problemset )
+    #     if task.filename not in self.cache:   self.fit(task)
+    #     # if self.cache[task.filename] is None: return None  # Unsolvable mapping
+    #
     #     output = [ 8 ] * len(task['test'])
     #     return output
 
@@ -99,15 +103,15 @@ class XGBSingleColorSolver(ProblemSetSolver):
     # def test(self, task: Task = None) -> Any:
     #     return True
 
-    # BUGFIX: TypeError: predict() got multiple values for argument 'task'
-    def predict(self, _task_: Union[ProblemSet,Task], *args, task: Task=None, **kwargs) -> Union[None,List[np.ndarray]]:
-        task = task or _task_
-        if isinstance(task, ProblemSet):      task = task.task
+    # BUGFIX: TypeError: solve_grid() got multiple values for argument 'task'
+    def predict(self, problemset: Union[ProblemSet,Task], *args, task: Task=None, **kwargs) -> Union[None,List[np.ndarray]]:
+        task       = task or (problemset if isinstance(problemset, Task) else problemset.task)
+        problemset = (problemset['test'] if isinstance(problemset, Task) else problemset )
         if task.filename not in self.cache:   self.fit(task)
-        if self.cache[task.filename] is None: return None
+        if self.cache[task.filename] is None: return None  # Unsolvable mapping
 
         colors = self.cache[task.filename]
-        output_size = task_output_grid_shape(task) # TODO: Replace with OutputGridSizeSolver().predict() per problem
+        output_size = task_output_grid_shape(task) # TODO: Replace with OutputGridSizeSolver().solve_grid() per problem
         outputs = [
             np.full(output_size, fill_value=color)
             for color in colors

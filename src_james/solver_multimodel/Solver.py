@@ -88,16 +88,20 @@ class Solver():
 
     def solve(self, task: Task, force=False, inplace=True) -> Union[List[Problem],None]:
         """solve test case and persist"""
-        if task.filename not in self.cache:   self.fit(task)
+        if task.filename not in self.cache:             self.fit(task)
+        if self.cache.get(task.filename, True) is None: return None
         try:
             if self.detect(task) or force:    # may generate cache
                 if self.test(task) or force:  # may generate cache
-                    args = self.cache.get(task.filename, ()) or ()
+                    args = self.cache.get(task.filename, ())
                     if args is None: return None
                     if isinstance(args, dict):
-                        solutions = self.solve_task(task, self.predict, **args, task=task, _inplace_=True)
+                        solutions = self.solve_task(task, self.predict, **args, task=task)
                     else:
-                        solutions = self.solve_task(task, self.predict, *args, task=task, _inplace_=True)
+                        solutions = self.solve_task(task, self.predict, *args, task=task)
+
+                    for index, solution in enumerate(solutions):
+                        task['solutions'][index].append(solution)
                     if len(solutions):
                         self.log_solved(task, args, solutions)
                     return solutions
@@ -129,8 +133,6 @@ class Solver():
                 **kwargs
             )
             solutions.append(solution)
-            if _inplace_:
-                _task_['solutions'][index].append_flat(solution)
         return solutions
 
 

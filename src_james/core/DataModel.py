@@ -229,11 +229,20 @@ class Task(UserDict):
 class ProblemSet(UserList):
     """ ProblemSet: An array of either test or training Problems """
     _instance_count = 0
-    def __init__(self, input_outputs: List[Dict[str, np.ndarray]], test_or_train: str, task: Task):
+
+    # def __new__(cls, input_outputs: Union[List[Dict[str, np.ndarray]],ProblemSet], *args, **kwargs):
+    #     if isinstance(input_outputs, ProblemSet): return input_outputs
+    #     else:                                     return super(ProblemSet, cls).__new__(cls, *args, **kwargs)
+
+    def __init__(self,
+                 input_outputs: Union[List[Dict[str, np.ndarray]],List['Problem'],'ProblemSet'],
+                 test_or_train: str,
+                 task: Task
+    ):
         super().__init__()
         self.task:          Task                       = task
         self.test_or_train: str                        = test_or_train
-        self.raw:           List[Dict[str,np.ndarray]] = input_outputs
+        self.raw:           List[Dict[str,np.ndarray]] = input_outputs.raw if isinstance(input_outputs, ProblemSet) else input_outputs
         self.data:          List[Problem]              = [ Problem(problem, self) for problem in self.raw ]
         self._id = self.__class__._instance_count = self.__class__._instance_count + 1
 
@@ -270,13 +279,13 @@ class ProblemSet(UserList):
 
 class Problem(UserDict):
     """ Problem: An input + output Grid pair """
-    dtype = 'int8'
-    def __init__(self, problem: Dict[str,np.ndarray], problemset: ProblemSet):
+    dtype = np.int8
+    def __init__(self, problem: Union[Dict[str,np.ndarray],'Problem'], problemset: ProblemSet):
         super().__init__()
         self._hash = 0
         self.problemset: ProblemSet           = problemset
         self.task:       Task                 = problemset.task
-        self.raw:        Dict[str,np.ndarray] = problem
+        self.raw:        Dict[str,np.ndarray] = problem.raw if isinstance(problem, Problem) else problem
 
         self.data = {}
         for key in ['input', 'output']:
@@ -285,6 +294,7 @@ class Problem(UserDict):
 
     def cast(self, value: Any):
         if value is None: return None
+        value = np.array(value, dtype=self.dtype)
         # value = np.ascontiguousarray(value, dtype=self.dtype)  # disable: could potntually mess with hashing
         value.flags.writeable = False
         return value

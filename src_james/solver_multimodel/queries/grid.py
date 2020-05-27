@@ -6,6 +6,7 @@ from src_james.util.np_cache import np_cache
 
 
 def query_true(     grid: np.ndarray, x: int, y: int ):            return True
+def query_false(    grid: np.ndarray, x: int, y: int ):            return False
 def query_not_zero( grid: np.ndarray, x: int, y: int ):            return grid[x,y]
 def query_color(    grid: np.ndarray, x: int, y: int, color: int): return grid[x,y] == color
 
@@ -39,6 +40,8 @@ def query_max_color_1d(grid:np.ndarray, x:int, y:int, exclude_zero=True):
 
 @np_cache
 def max_color_1d(grid: np.ndarray, exclude_zero=True):
+    if grid is None: return 0
+    if len(grid.shape) == 1: return max_color(grid)
     return max(
         [ max_color(row,exclude_zero) for row in grid ] +
         [ max_color(col,exclude_zero) for col in np.swapaxes(grid, 0,1) ]

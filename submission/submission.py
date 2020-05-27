@@ -3,14 +3,15 @@
 ##### 
 ##### ./submission/kaggle_compile.py ./src_james/solver_multimodel/main.py
 ##### 
-##### 2020-05-26 01:33:42+01:00
+##### 2020-05-27 21:45:45+01:00
 ##### 
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### 
-##### * master db7b972 Solver | reenable all solvers
+#####   james-wip c81cf89 Solvers | work in progress - broken
+##### * master    620f07e XGBGridSolver | rerun noteboook
 ##### 
-##### db7b9722fb4d6a56cbf12149b5d84915503fe38a
+##### 620f07e2820831d29e329e5484cf0e88d79c848f
 ##### 
 
 #####
@@ -162,9 +163,13 @@ import json
 import os
 import re
 import time
-from collections import UserDict, UserList
+from collections import UserDict
+from collections import UserList
 from itertools import chain
-from typing import Any, Dict, List, Union
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Union
 
 import glob2
 import numpy as np
@@ -385,11 +390,20 @@ class Task(UserDict):
 class ProblemSet(UserList):
     """ ProblemSet: An array of either test or training Problems """
     _instance_count = 0
-    def __init__(self, input_outputs: List[Dict[str, np.ndarray]], test_or_train: str, task: Task):
+
+    # def __new__(cls, input_outputs: Union[List[Dict[str, np.ndarray]],ProblemSet], *args, **kwargs):
+    #     if isinstance(input_outputs, ProblemSet): return input_outputs
+    #     else:                                     return super(ProblemSet, cls).__new__(cls, *args, **kwargs)
+
+    def __init__(self,
+                 input_outputs: Union[List[Dict[str, np.ndarray]],List['Problem'],'ProblemSet'],
+                 test_or_train: str,
+                 task: Task
+    ):
         super().__init__()
         self.task:          Task                       = task
         self.test_or_train: str                        = test_or_train
-        self.raw:           List[Dict[str,np.ndarray]] = input_outputs
+        self.raw:           List[Dict[str,np.ndarray]] = input_outputs.raw if isinstance(input_outputs, ProblemSet) else input_outputs
         self.data:          List[Problem]              = [ Problem(problem, self) for problem in self.raw ]
         self._id = self.__class__._instance_count = self.__class__._instance_count + 1
 
@@ -426,13 +440,13 @@ class ProblemSet(UserList):
 
 class Problem(UserDict):
     """ Problem: An input + output Grid pair """
-    dtype = 'int8'
-    def __init__(self, problem: Dict[str,np.ndarray], problemset: ProblemSet):
+    dtype = np.int8
+    def __init__(self, problem: Union[Dict[str,np.ndarray],'Problem'], problemset: ProblemSet):
         super().__init__()
         self._hash = 0
         self.problemset: ProblemSet           = problemset
         self.task:       Task                 = problemset.task
-        self.raw:        Dict[str,np.ndarray] = problem
+        self.raw:        Dict[str,np.ndarray] = problem.raw if isinstance(problem, Problem) else problem
 
         self.data = {}
         for key in ['input', 'output']:
@@ -441,7 +455,8 @@ class Problem(UserDict):
 
     def cast(self, value: Any):
         if value is None: return None
-        value = np.ascontiguousarray(value, dtype=self.dtype)
+        value = np.array(value, dtype=self.dtype)
+        # value = np.ascontiguousarray(value, dtype=self.dtype)  # disable: could potntually mess with hashing
         value.flags.writeable = False
         return value
 
@@ -474,84 +489,6 @@ class Problem(UserDict):
 
 #####
 ##### END   src_james/core/DataModel.py
-#####
-
-#####
-##### START src_james/util/np_cache.py
-#####
-
-# Inspired by: https://stackoverflow.com/questions/52331944/cache-decorator-for-numpy-arrays/52332109
-from functools import wraps
-
-import numpy as np
-from fastcache._lrucache import clru_cache
-
-### Profiler: 2x speedup
-# from src_james.settings import settings
-
-__np_cache = {}
-def np_cache(maxsize=1024, typed=True):
-    """
-        Decorator:
-        @np_cache
-        def fn(): return value
-
-        @np_cache(maxsize=128, typed=True)
-        def fn(): return value
-    """
-    maxsize_default=None
-
-    def np_cache_generator(function):
-        if not settings['caching']: return function
-        @wraps(function)
-        def wrapper(*args, **kwargs):
-            ### def encode(*args, **kwargs):
-            args = list(args)  # BUGFIX: TypeError: 'tuple' object does not support item assignment
-            for i, arg in enumerate(args):
-                if isinstance(arg, np.ndarray):
-                    hash = arg.tobytes()
-                    if hash not in wrapper.cache:
-                        wrapper.cache[hash] = arg
-                    args[i] = hash
-            for key, arg in kwargs.items():
-                if isinstance(arg, np.ndarray):
-                    hash = arg.tobytes()
-                    if hash not in wrapper.cache:
-                        wrapper.cache[hash] = arg
-                    kwargs[key] = hash
-
-            return cached_wrapper(*args, **kwargs)
-
-        @clru_cache(maxsize=maxsize, typed=typed)
-        def cached_wrapper(*args, **kwargs):
-            ### def decode(*args, **kwargs):
-            args = list(args)  # BUGFIX: TypeError: 'tuple' object does not support item assignment
-            for i, arg in enumerate(args):
-                if isinstance(arg, bytes) and arg in wrapper.cache:
-                    args[i] = wrapper.cache[arg]
-            for key, arg in kwargs.items():
-                if isinstance(arg, bytes) and arg in wrapper.cache:
-                    kwargs[key] = wrapper.cache[arg]
-
-            return function(*args, **kwargs)
-
-        # copy lru_cache attributes over too
-        wrapper.cache       = __np_cache  # use a shared cache between wrappers to save memory
-        wrapper.cache_info  = cached_wrapper.cache_info
-        wrapper.cache_clear = cached_wrapper.cache_clear
-
-        return wrapper
-
-
-    ### def np_cache(maxsize=1024, typed=True):
-    if callable(maxsize):
-        (function, maxsize) = (maxsize, maxsize_default)
-        return np_cache_generator(function)
-    else:
-        return np_cache_generator
-
-#####
-##### END   src_james/util/np_cache.py
 #####
 
 #####
@@ -646,14 +583,197 @@ def plot_task(task: Task, scale=2):
 #####
 
 #####
+##### START src_james/util/np_cache.py
+#####
+
+# Inspired by: https://stackoverflow.com/questions/52331944/cache-decorator-for-numpy-arrays/52332109
+from functools import wraps
+
+import numpy as np
+from fastcache._lrucache import clru_cache
+
+### Profiler: 2x speedup
+# from src_james.settings import settings
+
+__np_cache = {}
+def np_cache(maxsize=1024, typed=True):
+    """
+        Decorator:
+        @np_cache
+        def fn(): return value
+
+        @np_cache(maxsize=128, typed=True)
+        def fn(): return value
+    """
+    maxsize_default=None
+
+    def np_cache_generator(function):
+        if not settings['caching']: return function
+        @wraps(function)
+        def wrapper(*args, **kwargs):
+            ### def encode(*args, **kwargs):
+            args = list(args)  # BUGFIX: TypeError: 'tuple' object does not support item assignment
+            for i, arg in enumerate(args):
+                if isinstance(arg, np.ndarray):
+                    hash = arg.tobytes()
+                    if hash not in wrapper.cache:
+                        wrapper.cache[hash] = arg
+                    args[i] = hash
+            for key, arg in kwargs.items():
+                if isinstance(arg, np.ndarray):
+                    hash = arg.tobytes()
+                    if hash not in wrapper.cache:
+                        wrapper.cache[hash] = arg
+                    kwargs[key] = hash
+
+            return cached_wrapper(*args, **kwargs)
+
+        @clru_cache(maxsize=maxsize, typed=typed)
+        def cached_wrapper(*args, **kwargs):
+            ### def decode(*args, **kwargs):
+            args = list(args)  # BUGFIX: TypeError: 'tuple' object does not support item assignment
+            for i, arg in enumerate(args):
+                if isinstance(arg, bytes) and arg in wrapper.cache:
+                    args[i] = wrapper.cache[arg]
+            for key, arg in kwargs.items():
+                if isinstance(arg, bytes) and arg in wrapper.cache:
+                    kwargs[key] = wrapper.cache[arg]
+
+            return function(*args, **kwargs)
+
+        # copy lru_cache attributes over too
+        wrapper.cache       = __np_cache  # use a shared cache between wrappers to save memory
+        wrapper.cache_info  = cached_wrapper.cache_info
+        wrapper.cache_clear = cached_wrapper.cache_clear
+
+        return wrapper
+
+
+    ### def np_cache(maxsize=1024, typed=True):
+    if callable(maxsize):
+        (function, maxsize) = (maxsize, maxsize_default)
+        return np_cache_generator(function)
+    else:
+        return np_cache_generator
+
+#####
+##### END   src_james/util/np_cache.py
+#####
+
+#####
+##### START src_james/solver_multimodel/queries/ratio.py
+#####
+
+from itertools import chain
+from typing import List
+from typing import Tuple
+from typing import Union
+
+import numpy as np
+from fastcache._lrucache import clru_cache
+
+# from src_james.core.DataModel import Task
+# from src_james.util.np_cache import np_cache
+
+
+@np_cache()
+def grid_shape_ratio(grid1: np.ndarray, grid2: np.ndarray) -> Tuple[float,float]:
+    try:
+        return ( grid2.shape[0] / grid1.shape[0], grid2.shape[1] / grid1.shape[1] )
+    except:
+        return (0, 0)  # For tests
+
+@clru_cache(maxsize=None)
+def task_grids(task) -> List[np.ndarray]:
+    grids = []
+    for test_train in ['test','train']:
+        for spec in task[test_train]:
+            grids += [ spec.get('input',[]), spec.get('output',[]) ]  # tests not gaurenteed to have outputs
+    return grids
+
+@clru_cache(maxsize=None)
+def task_grid_shapes(task) -> List[Tuple[int,int]]:
+    return [ np.array(grid).shape for grid in task_grids(task) ]
+
+@clru_cache(maxsize=None)
+def task_grid_max_dim(task: Task) -> int:
+    return max(chain(*task_grid_shapes(task)))
+
+@clru_cache(maxsize=None)
+def is_task_shape_ratio_unchanged(task: Task) -> bool:
+    return task_shape_ratios(task) == [ (1,1) ]
+
+@clru_cache(maxsize=None)
+def is_task_shape_ratio_consistant(task: Task) -> bool:
+    return len(task_shape_ratios(task)) == 1
+
+@clru_cache(maxsize=None)
+def is_task_shape_ratio_integer_multiple(task: Task) -> bool:
+    ratios = task_shape_ratios(task)
+    return all([ isinstance(d, int) or d.is_integer() for d in chain(*ratios) ])
+
+@clru_cache(maxsize=None)
+def task_shape_ratios(task: Task) -> List[Tuple[float,float]]:
+    ratios = list(set([
+        grid_shape_ratio(problem.get('input',[]), problem.get('output',[]))
+        for problem in task['train']
+    ]))
+    # ratios = set([ int(ratio) if ratio.is_integer() else ratio for ratio in chain(*ratios) ])
+    return ratios
+
+@clru_cache(maxsize=None)
+def task_shape_ratio(task: Task) -> Union[Tuple[float,float],None]:
+    ratios = task_shape_ratios(task)
+    if len(ratios) != 1: return None
+    return ratios[0]
+
+@clru_cache(maxsize=None)
+def is_task_shape_ratio_consistent(task: Task) -> bool:
+    return len(task_shape_ratios(task)) == 1
+
+@clru_cache(maxsize=None)
+def is_task_shape_ratio_integer_multiple(task: Task) -> bool:
+    ratios = task_shape_ratios(task)
+    return all([ isinstance(d, int) or d.is_integer() for d in chain(*ratios) ])
+
+@clru_cache(maxsize=None)
+def task_output_grid_shapes(task: Task) -> List[Tuple[int,int]]:
+    return list(set(
+        problem['output'].shape
+        for problem in task['train']
+        if problem['output'] is not None
+    ))
+
+# TODO: Replace with OutputGridSizeSolver().predict()
+@clru_cache(maxsize=None)
+def task_output_grid_shape(task) -> Union[Tuple[int,int], None]:
+    grid_sizes = task_output_grid_shapes(task)
+    return len(grid_sizes) == 1 and grid_sizes[0] or None
+
+@clru_cache(maxsize=None)
+def is_task_output_grid_shape_constant(task: Task) -> bool:
+    return bool(task_output_grid_shape(task))
+
+
+
+#####
+##### END   src_james/solver_multimodel/queries/ratio.py
+#####
+
+#####
 ##### START src_james/solver_multimodel/Solver.py
 #####
 
-from typing import List, Union, Callable
+from collections import UserList
+from typing import Callable
+from typing import List
+from typing import Union
 
 import numpy as np
 
-# from src_james.core.DataModel import Problem, Task, Dataset
+# from src_james.core.DataModel import Dataset
+# from src_james.core.DataModel import Problem
+# from src_james.core.DataModel import Task
 # from src_james.plot import plot_task
 
 
@@ -663,48 +783,40 @@ class Solver():
     def __init__(self):
         self.cache = {}
 
-    @staticmethod
-    def is_lambda_valid(_task_: Task, _function_: Callable, *args, **kwargs):  # _task_ = avoid namespace conflicts with kwargs=task
+
+    def detect(self, task: Task) -> bool:
+        """ @override | default heuristic is simply to run the solver"""
+        return self.test(task)
+
+
+    def fit(self, task: Task):
+        """ @override | sets: self.cache[task.filename] """
+        if task.filename in self.cache: return
+        pass
+
+
+    def solve_grid(self, grid: np.ndarray, *args, task=None, **kwargs):
+        """ @override | This is the primary method this needs to be defined"""
+        raise NotImplementedError
+        # return grid
+        # raise NotImplementedError()
+
+
+    def test(self, task: Task) -> bool:
+        """test if the given .solve_grid() correctly solves the task"""
+        if task.filename not in self.cache: self.fit(task)
+        if self.cache.get(task.filename, True) is None: return False
+
+        args = self.cache.get(task.filename, ())
+        return self.is_lambda_valid(task, self.solve_grid, *args, task=task)
+
+
+    def is_lambda_valid(self, _task_: Task, _function_: Callable, *args, **kwargs):  # _task_ = avoid namespace conflicts with kwargs=task
         for problem in _task_['train']:
             output = _function_(problem['input'], *args, **kwargs)
             if not np.array_equal( problem['output'], output):
                 return False
         return True
-
-    @staticmethod
-    def solve_lambda( _task_: Task, _function_: Callable, *args, _inplace_=False, **kwargs) -> List[Problem]:
-        solutions = []
-        for index, problem in enumerate(_task_['test']):
-            output = _function_(problem['input'], *args, **kwargs)
-            output.flags.writeable = False
-            solution = Problem({
-                "input":  problem['input'],
-                "output": output,
-            }, problemset=_task_['test'])
-            solutions.append(solution)
-            if _inplace_:
-                _task_['solutions'][index].append(solution)
-        return solutions
-
-    def action(self, grid: np.ndarray, task=None, *args):
-        """This is the primary method this needs to be defined"""
-        return grid
-        # raise NotImplementedError()
-
-    def detect(self, task: Task) -> bool:
-        """default heuristic is simply to run the solver"""
-        return self.test(task)
-
-    def fit(self, task: Task):
-        if task.filename in self.cache: return
-        pass
-
-    def test(self, task: Task) -> bool:
-        """test if the given action correctly solves the task"""
-        if task.filename not in self.cache: self.fit(task)
-
-        args = self.cache.get(task.filename, ())
-        return self.is_lambda_valid(task, self.action, *args, task=task)
 
 
     def format_args(self, args):
@@ -721,6 +833,7 @@ class Solver():
             args = tuple(args)
         return args
 
+
     def log_solved(self, task: Task, args: Union[list,tuple,set], solutions: List[Problem]):
         if self.verbose:
             if 'test' in task.filename:           label = 'test  '
@@ -730,6 +843,7 @@ class Solver():
             args  = self.format_args(args) if len(args) else None
             print(f'{label}:', task.filename, self.__class__.__name__, args)
 
+
     def is_solved(self, task: Task, solutions: List[Problem]):
         for solution in solutions:
             for problem in task['test']:
@@ -737,17 +851,23 @@ class Solver():
                     return True
         return False
 
+
     def solve(self, task: Task, force=False, inplace=True) -> Union[List[Problem],None]:
         """solve test case and persist"""
-        if task.filename not in self.cache: self.fit(task)
+        if task.filename not in self.cache:             self.fit(task)
+        if self.cache.get(task.filename, True) is None: return None
         try:
             if self.detect(task) or force:    # may generate cache
                 if self.test(task) or force:  # may generate cache
                     args = self.cache.get(task.filename, ())
+                    if args is None: return None
                     if isinstance(args, dict):
-                        solutions = self.solve_lambda(task, self.action, **args, task=task, _inplace_=True)
+                        solutions = self.solve_task(task, self.solve_grid, **args, task=task)
                     else:
-                        solutions = self.solve_lambda(task, self.action,  *args, task=task, _inplace_=True )
+                        solutions = self.solve_task(task, self.solve_grid, *args, task=task)
+
+                    for index, solution in enumerate(solutions):
+                        task['solutions'][index].append(solution)
                     if len(solutions):
                         self.log_solved(task, args, solutions)
                     return solutions
@@ -755,7 +875,8 @@ class Solver():
             if self.debug: raise exception
         return None
 
-    def solve_all(self, tasks: Union[Dataset,List[Task]], plot=False, solve_detects=False):
+
+    def solve_dataset(self, tasks: Union[Dataset, List[Task]], plot=False, solve_detects=False):
         count = 0
         for task in tasks:
             if self.detect(task):
@@ -766,15 +887,40 @@ class Solver():
                         plot_task(task)
         return count
 
+
+    def solve_task(self, _task_: Task, _function_: Callable, *args, _inplace_=False, **kwargs) -> List[Problem]:
+        solutions = []
+        for index, problem in enumerate(_task_['test']):
+            solution = self.solve_problem(
+                _problem_  = problem,
+                _task_     = _task_,
+                _function_ = _function_,
+                *args,
+                **kwargs
+            )
+            solutions.append(solution)
+        return solutions
+
+
+    def solve_problem(self, *args, _problem_: Problem, _task_: Task, _function_: Callable, **kwargs) -> Problem:
+        output = _function_(_problem_['input'], *args, **kwargs)
+        solution = Problem({
+            "input":  _problem_['input'],
+            "output": output,
+        }, problemset=_task_['test'])
+        return solution
+
+
     def plot(self, tasks: Union[Dataset,List[Task], Task]):
-        if isinstance(tasks, Task): tasks = [ tasks ]
-        return self.solve_all(tasks, plot=True, solve_detects=False)
+        if not isinstance(tasks, (list,UserList)): tasks = [ tasks ]
+        return self.solve_dataset(tasks, plot=True, solve_detects=False)
+
 
     def plot_detects(self, tasks: Union[Dataset,List[Task],Task], unsolved=True):
-        if isinstance(tasks, Task): tasks = [ tasks ]
+        if not isinstance(tasks, (list,UserList)): tasks = [ tasks ]
         if unsolved:
             tasks = [ task for task in tasks if not task.solutions_count ]
-        return self.solve_all(tasks, plot=True, solve_detects=True)
+        return self.solve_dataset(tasks, plot=True, solve_detects=True)
 
 
 #####
@@ -782,78 +928,509 @@ class Solver():
 #####
 
 #####
-##### START src_james/solver_multimodel/queries/ratio.py
+##### START src_james/core/functions.py
 #####
 
-from itertools import chain
+from collections import UserList
+from typing import Any
+from typing import Callable
 from typing import List
+from typing import Union
 
 import numpy as np
-from fastcache._lrucache import clru_cache
+
+# from src_james.util.np_cache import np_cache
+
+
+def bind(function_or_value: Union[Callable,Any], *args, **kwargs) -> Callable:
+    if callable(function_or_value):
+        def _bind(*runtime_args, **runtime_kwargs):
+            return function_or_value(*args, *runtime_args, **runtime_kwargs, **kwargs)
+        return _bind
+    else:
+        def _passthrough(*runtime_args, **runtime_kwargs):
+            return function_or_value
+        return _passthrough
+
+@np_cache()
+def invoke(function_or_value, *args, **kwargs) -> List[Any]:
+    if callable(function_or_value):
+        return function_or_value(*args, **kwargs)
+    else:
+        return function_or_value
+
+
+def append_flat(iterable: List, *args) -> List:
+    if not isinstance(iterable, list):
+        iterable = list(iterable)
+    for arg in args:
+        if isinstance(arg, (list,tuple,set,np.ndarray,UserList)):
+            iterable += list(arg)
+        else:
+            iterable.append(arg)
+    return iterable
+
+
+def flatten_deep(iterable, types=(list,tuple,set,np.ndarray,UserList)) -> List:
+    output = []
+    for item in iterable:
+        if isinstance(item, types):
+            output += flatten_deep(item)
+        else:
+            output.append(item)
+    return output
+
+#####
+##### END   src_james/core/functions.py
+#####
+
+#####
+##### START src_james/solver_multimodel/transforms/singlecolor.py
+#####
+
+from typing import Tuple
+
+import numpy as np
 
 # from src_james.core.DataModel import Task
 # from src_james.util.np_cache import np_cache
 
 
+def identity(input: np.ndarray) -> np.ndarray:
+    return input
+
+def np_shape(input: np.ndarray) -> Tuple[int,int]:
+    return np.array(input).shape
+
+def np_flatten(input: np.ndarray) -> np.ndarray:
+    return np.array(input).flatten()
+
+def np_tobytes(input: np.ndarray) -> bytes:
+    return np.array(input).tobytes()
+
+def np_hash(input: np.ndarray) -> int:
+    return hash(np.array(input).tobytes())
+
+@np_cache()
+def np_bincount(grid: np.ndarray, minlength=11):
+    return np.bincount(grid.flatten(), minlength=minlength).tolist()  # features requires a fixed length array
+
+@np_cache()
+def unique_colors_sorted(grid: np.ndarray, minsize=11):
+    bincount = np_bincount(grid)
+    colors   = sorted(np.unique(grid), key=lambda color: bincount[color], reverse=True)
+    output   = np.zeros(minsize, dtype=np.int8)
+    output[:len(colors)] = colors
+    return output
+
+@np_cache()
+def task_output_unique_sorted_colors(task: Task):
+    grid   = np.concatenate([ problem['output'] for problem in task['train'] ])
+    output = unique_colors_sorted(grid)
+    return output
+
+#####
+##### END   src_james/solver_multimodel/transforms/singlecolor.py
+#####
+
+#####
+##### START src_james/solver_multimodel/queries/grid.py
+#####
+
+import numpy as np
+
+# from skimage.measure import block_reduce
+# from numpy_lru_cache_decorator import np_cache  # https://gist.github.com/Susensio/61f4fee01150caaac1e10fc5f005eb75
+# from src_james.util.np_cache import np_cache
+
+
+def query_true(     grid: np.ndarray, x: int, y: int ):            return True
+def query_not_zero( grid: np.ndarray, x: int, y: int ):            return grid[x,y]
+def query_color(    grid: np.ndarray, x: int, y: int, color: int): return grid[x,y] == color
+
+
+# evaluation/15696249.json - max(1d.argmax())
 @np_cache
-def grid_shape_ratio(grid1, grid2):
-    try:
-        return ( grid2.shape[0] / grid1.shape[0], grid2.shape[1] / grid1.shape[1] )
-    except:
-        return (0, 0)  # For tests
+def query_max_color(grid,x,y,exclude_zero=True):
+    return grid[x,y] == max_color(grid, exclude_zero)
+
+@np_cache
+def max_color(grid, exclude_zero=True):
+    bincount = np.bincount(grid.flatten())
+    if exclude_zero:
+        bincount[0] = np.min(bincount)  # exclude 0
+    return bincount.argmax()
+
+@np_cache
+def query_min_color(grid:np.ndarray, x:int, y:int, exclude_zero=True):
+    return grid[x,y] == min_color(grid, exclude_zero)
+
+@np_cache
+def min_color(grid:np.ndarray, exclude_zero=True):
+    bincount = np.bincount(grid.flatten())
+    if exclude_zero:
+        bincount[0] = np.max(bincount)  # exclude 0
+    return bincount.argmin()
+
+@np_cache
+def query_max_color_1d(grid:np.ndarray, x:int, y:int, exclude_zero=True):
+    return grid[x,y] == max_color_1d(grid, exclude_zero=exclude_zero)
+
+@np_cache
+def max_color_1d(grid: np.ndarray, exclude_zero=True):
+    return max(
+        [ max_color(row,exclude_zero) for row in grid ] +
+        [ max_color(col,exclude_zero) for col in np.swapaxes(grid, 0,1) ]
+    )
+
+@np_cache
+def query_min_color_1d(grid: np.ndarray, x: int, y: int):
+    return grid[x,y] == min_color_1d(grid)
+
+@np_cache
+def min_color_1d(grid: np.ndarray):
+    return min(
+        [ min_color(row) for row in grid ] +
+        [ min_color(col) for col in np.swapaxes(grid, 0,1) ]
+    )
+
+@np_cache
+def query_count_colors(grid: np.ndarray, x: int, y: int):
+    return grid[x,y] >= count_colors(grid)
+
+@np_cache
+def query_count_colors_row(grid: np.ndarray, x: int, y: int):
+    return x + grid.shape[0]*y <= count_colors(grid)
+
+@np_cache
+def query_count_colors_col(grid: np.ndarray, x: int, y: int):
+    return y + grid.shape[1]*x <= count_colors(grid)
+
+
+@np_cache
+def count_colors(grid: np.ndarray):
+    bincount = np.bincount(grid.flatten())
+    return np.count_nonzero(bincount[1:]) # exclude 0
+
+@np_cache
+def query_count_squares(grid: np.ndarray, x: int, y: int):
+    return grid[x,y] >= count_squares(grid)
+
+@np_cache
+def query_count_squares_row(grid: np.ndarray, x: int, y: int):
+    return x + grid.shape[0]*y <= count_squares(grid)
+
+@np_cache
+def query_count_squares_col(grid: np.ndarray, x: int, y: int):
+    return y + grid.shape[1]*x <= count_squares(grid)
+
+@np_cache
+def count_squares(grid: np.ndarray):
+    return np.count_nonzero(grid.flatten())
+
+@np_cache
+def grid_unique_colors(grid: np.ndarray):
+    return np.unique(grid.flatten())
+
+
+#####
+##### END   src_james/solver_multimodel/queries/grid.py
+#####
+
+#####
+##### START src_james/solver_multimodel/queries/colors.py
+#####
+
+from fastcache._lrucache import clru_cache
+
+# from src_james.solver_multimodel.queries.grid import grid_unique_colors
+# from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_consistant
+
 
 @clru_cache()
-def task_grids(task):
-    grids = []
-    for test_train in ['test','train']:
-        for spec in task[test_train]:
-            grids += [ spec.get('input',[]), spec.get('output',[]) ]  # tests not gaurenteed to have outputs
-    return grids
-
-@clru_cache()
-def task_grid_shapes(task):
-    return [ np.array(grid).shape for grid in task_grids(task) ]
-
-@clru_cache()
-def task_grid_max_dim(task):
-    return max(chain(*task_grid_shapes(task)))
-
-@clru_cache()
-def is_task_shape_ratio_unchanged(task):
-    return task_shape_ratios(task) == [ (1,1) ]
-
-@clru_cache()
-def is_task_shape_ratio_consistant(task):
-    return len(task_shape_ratios(task)) == 1
-
-@clru_cache()
-def is_task_shape_ratio_integer_multiple(task):
-    ratios = task_shape_ratios(task)
-    return all([ isinstance(d, int) or d.is_integer() for d in chain(*ratios) ])
-
-@clru_cache()
-def task_shape_ratios(task: Task) -> List:
-    ratios = list(set([
-        grid_shape_ratio(problem.get('input',[]), problem.get('output',[]))
-        for problem in task['train']
-    ]))
-    # ratios = set([ int(ratio) if ratio.is_integer() else ratio for ratio in chain(*ratios) ])
-    return ratios
-
-
-@clru_cache()
-def is_task_shape_ratio_consistent(task):
-    return len(task_shape_ratios(task)) == 1
-
-@clru_cache()
-def is_task_shape_ratio_integer_multiple(task):
-    ratios = task_shape_ratios(task)
-    return all([ isinstance(d, int) or d.is_integer() for d in chain(*ratios) ])
+def task_is_singlecolor(task) -> bool:
+    if not is_task_shape_ratio_consistant(task): return False
+    return all([ len(grid_unique_colors(spec['output'])) == 1 for spec in task['train'] ])
 
 
 
 #####
-##### END   src_james/solver_multimodel/queries/ratio.py
+##### END   src_james/solver_multimodel/queries/colors.py
+#####
+
+#####
+##### START src_james/solver_multimodel/XGBEncoder.py
+#####
+
+from collections import Callable
+from itertools import product
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Union
+
+import numpy as np
+from xgboost import XGBClassifier
+
+# from src_james.core.DataModel import Problem
+# from src_james.core.DataModel import ProblemSet
+# from src_james.core.DataModel import Task
+# from src_james.core.functions import flatten_deep
+# from src_james.core.functions import invoke
+# from src_james.solver_multimodel.Solver import Solver
+# from src_james.solver_multimodel.transforms.singlecolor import identity
+
+
+class ProblemSetSolver(Solver):
+    def solve_task(self, _task_: Task, _function_: Callable, *args, _inplace_=False, **kwargs) -> List[Problem]:
+        self.fit(_task_)
+        if not _task_.filename in self.cache:   return []
+        if self.cache[_task_.filename] is None: return []
+
+        solutions = self.solve_grid(_task_['test'])
+        if solutions is None: return []
+
+        problemset = self.cast_problemset(solutions, task=_task_)
+        problems   = list(problemset)
+        return problems
+
+
+    def cast_problems(self, solutions: List[np.ndarray], task: Task) -> List[Problem]:
+        problemset = task['test']
+        problems   = []
+        for index, solution in enumerate(solutions):
+            problem = Problem({
+                "input":  problemset[index]['input'],
+                "output": solution,
+            }, problemset=problemset)
+            problems.append(problem)
+        return problems
+
+
+    def cast_problemset(self, solutions: List[np.ndarray], task: Task) -> ProblemSet:
+        problems = self.cast_problems(solutions, task=task)
+        output   = ProblemSet(problems, task=task, test_or_train='solutions')
+        return output
+
+
+    def predict(self, problemset: Union[ProblemSet,Task], *args, task: Task=None, **kwargs) -> Union[None,List[np.ndarray]]:
+        task       = task or (problemset if isinstance(problemset, Task) else problemset.task)
+        problemset = (problemset['test'] if isinstance(problemset, Task) else problemset )
+        if task.filename not in self.cache:   self.fit(task)
+        if self.cache[task.filename] is None: return None  # Unsolvable mapping
+        raise NotImplementedError
+
+
+    def test(self, task: Task) -> bool:
+        """test if .predict() correctly solves the task"""
+        self.fit(task)
+        if not task.filename in self.cache:   return False
+        if self.cache[task.filename] is None: return False
+
+        problemset = task['train']
+        training_predictions = self.predict(problemset, task=task)
+        tests_pass = bool( len(training_predictions) == len(problemset) )
+        for index, prediction in enumerate(training_predictions):
+            if not tests_pass: break
+            if not np.array_equal( task['train'][index]['output'], prediction ):
+                tests_pass = False
+        return tests_pass
+
+
+
+class ProblemSetEncoder(ProblemSetSolver):
+    debug    = False,
+    encoders = {
+        np.array: [identity],
+    }
+    features = {
+        np.array:   [],
+        ProblemSet: [],
+        Problem:    [],
+        Task:       []
+    }
+    encoder_defaults = {}
+
+    def __init__(self,
+                 input_encoder:  Callable = None,
+                 output_encoder: Callable = None,
+                 features:       Dict = None,
+                 xgb_args:       Dict = {}
+    ):
+        super().__init__()
+        self.input_encoder  = input_encoder
+        self.output_encoder = output_encoder
+        self.features       = features if features is not None else self.__class__.features
+        self.encoder_args   = {**self.encoder_defaults, **xgb_args}
+
+
+    def __call__(self, problemset: ProblemSet, task: Task):
+        return self.predict(problemset=problemset, task=task, **self._chained_args)
+
+
+    def create_encoder(self):
+        """Return an Encoder that implements .fit() and .predict()"""
+        raise NotImplementedError
+
+
+    def fit(self, task: Task) -> bool:
+        """Find the best input_encoder/output_encodr for the task """
+        if task.filename in self.cache: return True
+
+        problemset      = task['train']
+        input_encoders  = (self.input_encoder, ) if self.input_encoder  else self.encoders[np.array]
+        output_encoders = (self.output_encoder,) if self.output_encoder else self.encoders[np.array]
+        for input_encoder, output_encoder in product(input_encoders, output_encoders):
+            if not callable(input_encoder):  continue
+            if not callable(output_encoder): continue
+            self.input_encoder  = input_encoder   # this is idempotent for a one element list
+            self.output_encoder = output_encoder  # cache the last value in this loop
+
+            inputs  = self.generate_input_array(  problemset )
+            outputs = self.generate_output_array( problemset )
+
+            # See: venv/lib/python3.6/site-packages/xgboost/sklearn.py:762
+            encoder = self.create_encoder()
+            encoder.fit(inputs, outputs, verbose=False)
+
+            self.cache[task.filename] = (encoder,)  # Needs to be set for self.test() to read and prevent an infinite loop
+            self._chained_args = { "task": task }
+            if self.test(task):
+                return True
+        else:
+            self.cache[task.filename] = None
+            return False
+
+
+    def predict(self,
+                problemset: Union[ProblemSet, Task],
+                xgb:   XGBClassifier = None,
+                task:  Task = None,
+                *args, **kwargs
+    ) -> Any:
+        task       = task or (problemset if isinstance(problemset, Task) else problemset.task)
+        problemset = (problemset['test'] if isinstance(problemset, Task) else problemset )
+        if task.filename not in self.cache:   self.fit(task)
+        if self.cache[task.filename] is None: return None  # Unsolvable mapping
+
+        task: Task          = task or self._chained_args.get('task')
+        xgb:  XGBClassifier = xgb  or self.cache[task.filename][0]
+
+        input  = self.generate_input_array(problemset)
+        output = xgb.predict(input)
+        return output
+
+
+    def test(self, task: Task) -> bool:
+        """test if .predict() correctly solves the task"""
+        if task.filename not in self.cache:             self.fit(task)
+        if self.cache.get(task.filename, True) is None: return False
+
+        train_problemset = task['train']  # we test on the train side, to validate if we can .predict() on test
+        train_expected   = self.generate_output_array(train_problemset)
+        train_actual     = self.predict(train_problemset)
+        train_valid      = np.array_equal(train_expected, train_actual)
+
+        if self.debug:
+            test_problemset = task['test']  # we test on the train side, to validate if we can .predict() on test
+            test_expected = self.generate_output_array(test_problemset)
+            test_actual   = self.predict(test_problemset)
+            test_valid = np.array_equal(test_expected, test_actual)
+            print(" | ".join([
+                task.filename.ljust(24),
+                f'{str(train_valid).ljust(5)} -> {str(test_valid).ljust(5)}',
+                f'{train_expected} -> {train_actual}',
+                f'{test_expected} -> {test_actual}',
+            ]))
+
+        return train_valid
+
+
+    # def onehotencode(self, input, maxsize=11):
+    #     output = []
+    #     for item in input:
+    #         if isinstance(item, (list, UserList, np.ndarray)):
+    #             item = self.onehotencode(item, maxsize)
+    #         value = int(item)
+    #         encoded = np.zeros(maxsize, dtype=np.int8)
+    #         encoded[value] = 1
+    #         output.append(encoded)
+    #     return np.array(output)
+
+
+    # @np_cache()
+    def generate_output_array(self, problemset: ProblemSet, output_encoder=None):
+        output_encoder = output_encoder or self.output_encoder
+        outputs = []
+        for problem in problemset:
+            if problem['output'] is None: continue
+            input  = problem['input']
+            output = problem['output']
+            if callable(output_encoder):
+                encoded = output_encoder(output)
+                outputs.append(encoded)
+        return np.array(outputs, dtype=np.int8).flatten()
+
+
+    # @np_cache()
+    def generate_input_array(self, problemset: ProblemSet, input_encoder=None) -> np.ndarray:
+        mappings = self.generate_input_mappings(problemset, self.features)
+        for index, mapping in enumerate(mappings):
+            # noinspection PyTypeChecker
+            mappings[index] = flatten_deep(mapping.values())
+        mappings_array = np.array(mappings, dtype=np.int8)  # dtype=np.int8 is broken
+        assert mappings_array.shape[0] == len(problemset)
+        return mappings_array
+
+    # @np_cache()
+    def generate_input_mappings(self, problemset: ProblemSet, input_encoder=None) -> List[Dict[Callable, Any]]:
+        # XGBoost requires a 2D array, one slice for each problem
+        input_encoder = input_encoder or self.input_encoder
+        mappings  = []
+        for problem in problemset:
+            mapping = {}
+            for feature_fn in self.features[Task]:
+                mapping[feature_fn] = invoke(feature_fn, problemset.task)
+            for feature_fn in self.features[ProblemSet]:
+                mapping[feature_fn] = invoke(feature_fn, problemset)
+            for feature_fn in self.features[Problem]:
+                mapping[feature_fn] = invoke(feature_fn, problem)
+            for feature_fn in self.features[np.array]:
+                input               = input_encoder(problem['input']) if callable(input_encoder) else problem['input']
+                mapping[feature_fn] = invoke(feature_fn, input)
+            mappings.append(mapping)
+        return mappings
+
+
+
+class XGBEncoder(ProblemSetEncoder):
+    # DOCS: https://xgboost.readthedocs.io/en/latest/parameter.html
+    # See:  src_james/solver_multimodel/XGBGridSolver.hyperopt.py
+    # Be very conservative here as this is an inheritable class
+    encoder_defaults = {
+        **ProblemSetEncoder.encoder_defaults,
+        'eval_metric': 'error',
+        'n_jobs':      -1,
+        # 'objective':       'reg:squarederror',
+        # 'max_delta_step':   1,
+        # 'max_depth':        1,
+        # 'min_child_weight': 0,
+        # 'num_classes':     11,
+        # 'n_estimators':    1,
+        # 'max_depth':       1,
+    }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        encoder = XGBClassifier(**self.encoder_args)
+
+    def create_encoder(self):
+        encoder = XGBClassifier(**self.encoder_args)
+        return encoder
+
+
+#####
+##### END   src_james/solver_multimodel/XGBEncoder.py
 #####
 
 #####
@@ -976,119 +1553,17 @@ def same_ratio(basic_task):
 #####
 
 #####
-##### START src_james/solver_multimodel/queries/grid.py
-#####
-
-import numpy as np
-
-# from skimage.measure import block_reduce
-# from numpy_lru_cache_decorator import np_cache  # https://gist.github.com/Susensio/61f4fee01150caaac1e10fc5f005eb75
-# from src_james.util.np_cache import np_cache
-
-
-def query_true(grid,x,y):          return True
-def query_not_zero(grid,x,y):      return grid[x,y]
-def query_color(grid,x,y,color):   return grid[x,y] == color
-
-
-# evaluation/15696249.json - max(1d.argmax())
-@np_cache
-def query_max_color(grid,x,y,exclude_zero=True):
-    return grid[x,y] == max_color(grid, exclude_zero)
-
-@np_cache
-def max_color(grid, exclude_zero=True):
-    bincount = np.bincount(grid.flatten())
-    if exclude_zero:
-        bincount[0] = np.min(bincount)  # exclude 0
-    return bincount.argmax()
-
-@np_cache
-def query_min_color(grid,x,y, exclude_zero=True):
-    return grid[x,y] == min_color(grid, exclude_zero)
-
-@np_cache
-def min_color(grid,exclude_zero=True):
-    bincount = np.bincount(grid.flatten())
-    if exclude_zero:
-        bincount[0] = np.max(bincount)  # exclude 0
-    return bincount.argmin()
-
-@np_cache
-def query_max_color_1d(grid,x,y,exclude_zero=True):
-    return grid[x,y] == max_color_1d(grid)
-
-@np_cache
-def max_color_1d(grid,exclude_zero=True):
-    return max(
-        [ max_color(row,exclude_zero) for row in grid ] +
-        [ max_color(col,exclude_zero) for col in np.swapaxes(grid, 0,1) ]
-    )
-
-@np_cache
-def query_min_color_1d(grid,x,y):
-    return grid[x,y] == min_color_1d(grid)
-
-@np_cache
-def min_color_1d(grid):
-    return min(
-        [ min_color(row) for row in grid ] +
-        [ min_color(col) for col in np.swapaxes(grid, 0,1) ]
-    )
-
-@np_cache
-def query_count_colors(grid,x,y):
-    return grid[x,y] >= count_colors(grid)
-
-@np_cache
-def query_count_colors_row(grid,x,y):
-    return x + grid.shape[0]*y <= count_colors(grid)
-
-@np_cache
-def query_count_colors_col(grid,x,y):
-    return y + grid.shape[1]*x <= count_colors(grid)
-
-
-@np_cache
-def count_colors(grid):
-    bincount = np.bincount(grid.flatten())
-    return np.count_nonzero(bincount[1:]) # exclude 0
-
-@np_cache
-def query_count_squares(grid,x,y):
-    return grid[x,y] >= count_squares(grid)
-
-@np_cache
-def query_count_squares_row(grid,x,y):
-    return x + grid.shape[0]*y <= count_squares(grid)
-
-@np_cache
-def query_count_squares_col(grid,x,y):
-    return y + grid.shape[1]*x <= count_squares(grid)
-
-@np_cache
-def count_squares(grid):
-    return np.count_nonzero(grid.flatten())
-
-@np_cache
-def grid_unique_colors(grid):
-    return np.unique(grid.flatten())
-
-
-#####
-##### END   src_james/solver_multimodel/queries/grid.py
-#####
-
-#####
 ##### START src_james/solver_multimodel/GeometrySolver.py
 #####
 
-from itertools import combinations, product
+from itertools import combinations
+from itertools import product
 
 import numpy as np
 
+# from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
+# from src_james.solver_multimodel.queries.ratio import task_grid_max_dim
 # from src_james.solver_multimodel.Solver import Solver
-# from src_james.solver_multimodel.queries.ratio import task_grid_max_dim, is_task_shape_ratio_unchanged
 
 
 class GeometrySolver(Solver):
@@ -1134,62 +1609,16 @@ class GeometrySolver(Solver):
                     return True
         return False
 
-    def action(self, grid, function=None, args=None, task=None):
+    def solve_grid(self, grid, function=None, args=None, task=None):
         try:
             return function(grid, *args)
         except Exception as exception:
-            if self.debug: print('Exception', self.__class__.__name__, 'action()', function, args, exception)
+            if self.debug: print('Exception', self.__class__.__name__, 'solve_grid()', function, args, exception)
             return grid
 
 
 #####
 ##### END   src_james/solver_multimodel/GeometrySolver.py
-#####
-
-#####
-##### START src_james/solver_multimodel/ZoomSolver.py
-#####
-
-import cv2
-import skimage.measure
-
-# from src_james.solver_multimodel.Solver import Solver
-# from src_james.solver_multimodel.queries.ratio import task_shape_ratios
-
-
-class ZoomSolver(Solver):
-    verbose = False
-
-    def detect(self, task):
-        ratios = task_shape_ratios(task)
-        ratio  = list(ratios)[0]
-        detect = (
-                ratios != { (1,1) }   # not no scaling
-                and len(ratios) == 1      # not multiple scalings
-                and ratio[0] == ratio[1]  # single consistant scaling
-        )
-        return detect
-
-    def get_scale(self, task):
-        return task_shape_ratios(task)[0][0]
-
-    def action( self, grid, task=None, *args ):
-        scale = self.get_scale(task)
-        if scale > 1:
-            resize = tuple( int(d*scale) for d in grid.shape )
-            output = cv2.resize(grid, resize, interpolation=cv2.INTER_NEAREST)
-        else:
-            resize = tuple( int(1/scale) for d in grid.shape )
-            output = skimage.measure.block_reduce(grid, resize)
-        if self.verbose:
-            print('scale', scale, 'grid.shape', grid.shape, 'output.shape', output.shape)
-            print('grid', grid)
-            print('output', output)
-        return output
-
-
-#####
-##### END   src_james/solver_multimodel/ZoomSolver.py
 #####
 
 #####
@@ -1324,6 +1753,52 @@ def invert(grid, color=None):
 #####
 
 #####
+##### START src_james/solver_multimodel/ZoomSolver.py
+#####
+
+import cv2
+import skimage.measure
+
+# from src_james.solver_multimodel.queries.ratio import task_shape_ratios
+# from src_james.solver_multimodel.Solver import Solver
+
+
+class ZoomSolver(Solver):
+    verbose = False
+
+    def detect(self, task):
+        ratios = task_shape_ratios(task)
+        ratio  = list(ratios)[0]
+        detect = (
+                ratios != { (1,1) }   # not no scaling
+                and len(ratios) == 1      # not multiple scalings
+                and ratio[0] == ratio[1]  # single consistant scaling
+        )
+        return detect
+
+    def get_scale(self, task):
+        return task_shape_ratios(task)[0][0]
+
+    def solve_grid(self, grid, task=None, *args):
+        scale = self.get_scale(task)
+        if scale > 1:
+            resize = tuple( int(d*scale) for d in grid.shape )
+            output = cv2.resize(grid, resize, interpolation=cv2.INTER_NEAREST)
+        else:
+            resize = tuple( int(1/scale) for d in grid.shape )
+            output = skimage.measure.block_reduce(grid, resize)
+        if self.verbose:
+            print('scale', scale, 'grid.shape', grid.shape, 'output.shape', output.shape)
+            print('grid', grid)
+            print('output', output)
+        return output
+
+
+#####
+##### END   src_james/solver_multimodel/ZoomSolver.py
+#####
+
+#####
 ##### START src_james/util/make_tuple.py
 #####
 
@@ -1335,24 +1810,6 @@ def make_tuple(args):
 
 #####
 ##### END   src_james/util/make_tuple.py
-#####
-
-#####
-##### START src_james/solver_multimodel/queries/colors.py
-#####
-
-# from src_james.solver_multimodel.queries.grid import grid_unique_colors
-# from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_consistant
-
-
-def task_is_singlecolor(task):
-    if not is_task_shape_ratio_consistant(task): return False
-    return all([ len(grid_unique_colors(spec['output'])) == 1 for spec in task['train'] ])
-
-
-
-#####
-##### END   src_james/solver_multimodel/queries/colors.py
 #####
 
 #####
@@ -1369,9 +1826,10 @@ def task_is_singlecolor(task):
 ##### START src_james/solver_multimodel/BorderSolver.py
 #####
 
-# from src_james.solver_multimodel.Solver import Solver
 # from src_james.solver_multimodel.queries.grid import *
-# from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_consistant, task_shape_ratios
+# from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_consistant
+# from src_james.solver_multimodel.queries.ratio import task_shape_ratio
+# from src_james.solver_multimodel.Solver import Solver
 
 
 class BorderSolver(Solver):
@@ -1409,16 +1867,19 @@ class BorderSolver(Solver):
         if task.filename in self.cache: return True
         for query in self.queries:
             args = [ query ]
-            if self.is_lambda_valid(task, self.action, *args, task=task):
+            if self.is_lambda_valid(task, self.solve_grid, *args, task=task):
                 self.cache[task.filename] = args
                 return True
         return False
 
-    def action(self, grid, query=None, task=None):
-        ratio  = task_shape_ratios(task)[0]
-        output = np.zeros(( int(grid.shape[0] * ratio[0]), int(grid.shape[1] * ratio[1]) ))
+    def solve_grid(self, grid: np.ndarray, *args, query=None, task=None, **kwargs):
         color  = query(grid) if callable(query) else query
-        output[:,:] = color
+        ratio  = task_shape_ratio(task)
+        if color is None: return None
+        if ratio is None: return None
+
+        shape  = ( int(grid.shape[0] * ratio[0]), int(grid.shape[1] * ratio[1]) )
+        output = np.full(shape, color, dtype=np.int8)
         output[1:-1,1:-1] = 0
         return output
 
@@ -1436,7 +1897,7 @@ class BorderSolver(Solver):
 
 
 class DoNothingSolver(Solver):
-    def action( self, grid, task=None, *args ):
+    def solve_grid(self, grid, task=None, *args):
         return grid
 
 
@@ -1448,10 +1909,11 @@ class DoNothingSolver(Solver):
 ##### START src_james/solver_multimodel/GlobSolver.py
 #####
 
+# from submission.submission import Competition
+
 # from src_james.settings import settings
 # from src_james.solver_multimodel.queries.grid import *
 # from src_james.solver_multimodel.Solver import Solver
-# from submission.submission import Competition
 
 
 class GlobSolver(Solver):
@@ -1499,7 +1961,7 @@ class GlobSolver(Solver):
         return False
 
 
-    def action(self, grid: np.ndarray, filename:str=None, task=None, *args):
+    def solve_grid(self, grid: np.ndarray, filename:str=None, task=None, *args):
         """If we have seen the input before, then propose the same output"""
         hash = grid.tobytes()
         if hash in self.solutions:
@@ -1514,7 +1976,7 @@ if __name__ == '__main__' and not settings['production']:
     solver.verbose = True
 
     competition = Competition()
-    competition.map(solver.solve_all)
+    competition.map(solver.solve_dataset)
     print(competition)
 
 #####
@@ -1525,14 +1987,12 @@ if __name__ == '__main__' and not settings['production']:
 ##### START src_james/solver_multimodel/SingleColorSolver.py
 #####
 
-import os
-
 # from src_james.core.DataModel import Task
 # from src_james.settings import settings
-# from src_james.solver_multimodel.Solver import Solver
 # from src_james.solver_multimodel.queries.colors import task_is_singlecolor
 # from src_james.solver_multimodel.queries.grid import *
-# from src_james.solver_multimodel.queries.ratio import task_shape_ratios
+# from src_james.solver_multimodel.queries.ratio import task_shape_ratio
+# from src_james.solver_multimodel.Solver import Solver
 
 
 class SingleColorSolver(Solver):
@@ -1557,14 +2017,18 @@ class SingleColorSolver(Solver):
         if task.filename in self.cache: return True
         for query in self.queries:
             args = ( query, )
-            if self.is_lambda_valid(task, self.action, *args, task=task):
+            if self.is_lambda_valid(task, self.solve_grid, *args, task=task):
                 self.cache[task.filename] = args
                 break
 
-    def action(self, grid, query=None, task=None):
-        ratio  = task_shape_ratios(task)[0]
-        output = np.zeros(( int(grid.shape[0] * ratio[0]), int(grid.shape[1] * ratio[1]) ))
+    # noinspection PyMethodOverriding
+    def solve_grid(self, grid: np.ndarray, query=None, *args, task=None, **kwargs):
         color  = query(grid) if callable(query) else query
+        ratio  = task_shape_ratio(task)
+        if color is None: return None
+        if ratio is None: return None
+
+        output = np.zeros(( int(grid.shape[0] * ratio[0]), int(grid.shape[1] * ratio[1]) ), dtype=np.int8)
         output[:,:] = color
         return output
 
@@ -1587,8 +2051,8 @@ if __name__ == '__main__' and not settings['production']:
         solver.plot_detects([task])
 
     # competition = Competition()
-    # # competition['test'].apply(solver.solve_all)
-    # competition.map(solver.solve_all)
+    # # competition['test'].apply(solver.solve_dataset)
+    # competition.map(solver.solve_dataset)
     # print(competition)
 
 #####
@@ -1600,19 +2064,19 @@ if __name__ == '__main__' and not settings['production']:
 #####
 
 import inspect
-import os
 from itertools import product
 
 # from src_james.core.DataModel import Task
 # from src_james.settings import settings
 # from src_james.solver_multimodel.GeometrySolver import GeometrySolver
-# from src_james.solver_multimodel.ZoomSolver import ZoomSolver
 # from src_james.solver_multimodel.queries.grid import *
 # from src_james.solver_multimodel.queries.loops import *
 # from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_integer_multiple
 # from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
-# from src_james.solver_multimodel.transforms.crop import crop_inner, crop_outer
+# from src_james.solver_multimodel.transforms.crop import crop_inner
+# from src_james.solver_multimodel.transforms.crop import crop_outer
 # from src_james.solver_multimodel.transforms.grid import invert
+# from src_james.solver_multimodel.ZoomSolver import ZoomSolver
 # from src_james.util.make_tuple import make_tuple
 
 
@@ -1695,13 +2159,13 @@ class TessellationSolver(GeometrySolver):
                 "query":      query,  # TODO: max_colour limit counter
                 "q_arg":      q_arg,
                 }
-            if self.is_lambda_valid(task, self.action, **kwargs, task=task):
+            if self.is_lambda_valid(task, self.solve_grid, **kwargs, task=task):
                 self.cache[task.filename] = kwargs
                 return True
         return False
 
 
-    def action(self, grid, preprocess=np.copy, p_arg=(), transform=np.copy, t_arg=(), query=query_true, q_arg=(), task=None):
+    def solve_grid(self, grid, preprocess=np.copy, p_arg=(), transform=np.copy, t_arg=(), query=query_true, q_arg=(), task=None):
         if inspect.isgeneratorfunction(transform):
             generator = transform(grid, *t_arg)
             transform = lambda grid, *args: next(generator)
@@ -1714,7 +2178,7 @@ class TessellationSolver(GeometrySolver):
             ratio   = ( int(output.shape[0] / grid.shape[0]), int(output.shape[1] / grid.shape[1]) )
             (gx,gy) = grid.shape
             for x,y in product(range(ratio[0]),range(ratio[1])):
-                copy = np.zeros(grid.shape)
+                copy = np.zeros(grid.shape, dtype=np.int8)
                 # noinspection PyArgumentList
                 if query(grid,x%gx,y%gy, *q_arg):
                     copy = transform(grid, *t_arg)
@@ -1736,7 +2200,7 @@ class TessellationSolver(GeometrySolver):
                 ratio = task_shape_ratios(task)[0]
                 ratio = list(map(int, ratio))
                 shape = ( int(grid.shape[0]*ratio[0]), int(grid.shape[1]*ratio[1]) )
-                return np.zeros(shape)
+                return np.zeros(shape, dtype=np.int8)
         except Exception as exception:
             if self.debug: print(exception)
             pass
@@ -1755,7 +2219,7 @@ if __name__ == '__main__' and not settings['production']:
 #####
 
 #####
-##### START src_james/solver_multimodel/XGBSolver.py
+##### START src_james/solver_multimodel/XGBGridSolver.py
 #####
 
 from itertools import product
@@ -1773,16 +2237,31 @@ from xgboost import XGBClassifier
 # from src_james.solver_multimodel.queries.grid import *
 # from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
 # from src_james.solver_multimodel.Solver import Solver
+# from src_james.solver_multimodel.transforms.singlecolor import np_bincount
 # from src_james.util.np_cache import np_cache
 
 
-class XGBSolver(Solver):
+class XGBGridSolver(Solver):
     optimise = True
     verbose  = True
+    xgb_defaults = {
+        'tree_method':      'exact',
+        'eval_metric':      'error',
+        'objective':        'reg:squarederror',
+        'n_estimators':     32,
+        # 'max_depth':        100,
+        'min_child_weight': 0,
+        # 'sampling_method':  'uniform',
+        # 'max_delta_step':   1,
+        # 'min_child_weight': 0,
+    }
 
     def __init__(self, n_estimators=24, max_depth=10, **kwargs):
         super().__init__()
-        self.kwargs = { "n_estimators": n_estimators, "max_depth": max_depth, **kwargs }
+        self.kwargs = {
+            **self.xgb_defaults,
+            **kwargs,
+        }
         if self.kwargs.get('booster') == 'gblinear':
             self.kwargs = pydash.omit(self.kwargs, *['max_depth'])
 
@@ -1798,6 +2277,11 @@ class XGBSolver(Solver):
         # if not_valid: return False
         return True
 
+    def create_classifier(self, **kwargs):
+        kwargs     = { **self.kwargs, **kwargs }
+        classifier = XGBClassifier(kwargs)
+        return classifier
+
     def fit(self, task):
         if task.filename not in self.cache:
             # inputs  = task['train'].inputs + task['test'].inputs
@@ -1806,16 +2290,24 @@ class XGBSolver(Solver):
             if not_valid:
                 self.cache[task.filename] = None
             else:
-                xgb = XGBClassifier(**self.kwargs, n_jobs=-1)
-                xgb.fit(inputs, outputs, verbose=False)
-                self.cache[task.filename] = (xgb,)
-
+                # BUGFIX: occasionally throws exceptions in jupyter
+                classifier = None
+                try:
+                    classifier = self.create_classifier()
+                    classifier.fit(inputs, outputs, verbose=False)
+                    self.cache[task.filename] = (classifier,)
+                except Exception as exception:
+                    if self.debug:
+                        print(f'{self.__class__.__name__}:fit({task}] | Exception: ')
+                        print(classifier)
+                        print(type(exception), exception)
+                    pass
     def test(self, task: Task) -> bool:
-        """test if the given action correctly solves the task"""
+        """test if the given solve_grid correctly solves the task"""
         args = self.cache.get(task.filename, ())
-        return self.is_lambda_valid(task, self.action, *args, task=task)
+        return self.is_lambda_valid(task, self.solve_grid, *args, task=task)
 
-    def action(self, grid, xgb=None, task=None):
+    def solve_grid(self, grid: np.ndarray, xgb=None, task=None, **kwargs):
         if task and task.filename not in self.cache: self.fit(task)
         xgb      = xgb or self.cache[task.filename][0]
         features = self.make_features(grid, )
@@ -1870,7 +2362,7 @@ class XGBSolver(Solver):
             *grid.shape, nrows*ncols,       # grid shape and pixel size
             grid[i][j],                     # grid[i][j]+1, grid[i][j]-1 = can produce worse results
 
-            *cls.bincount(grid),
+            *np_bincount(grid),
             *cls.get_moore_neighbours(grid, i, j),
             *cls.get_tl_tr(grid, i, j),
 
@@ -1910,11 +2402,6 @@ class XGBSolver(Solver):
 
     @classmethod
     @np_cache()
-    def bincount(cls, grid: np.ndarray):
-        return np.bincount(grid.flatten(), minlength=11).tolist()  # features requires a fixed length array
-
-    @classmethod
-    @np_cache()
     def get_neighbourhood(cls, grid: np.ndarray, i: int, j: int, distance=1):
         try:
             output = np.full((2*distance+1, 2*distance+1), 11)  # 11 = outside of grid pixel
@@ -1947,27 +2434,43 @@ class XGBSolver(Solver):
         return top_left, top_right
 
 
-class XGBSolverDart(XGBSolver):
-    def __init__(self, booster='dart', **kwargs):
-        self.kwargs = { "booster": booster, **kwargs }
+class XGBGridSolverDart(XGBGridSolver):
+    kwargs_defaults = {
+        'booster': 'dart',
+        'eval_metric': 'error',
+        'grow_policy': 'lossguide',
+        'objective': 'reg:squaredlogerror',
+        'sampling_method': 'gradient_based',
+        'tree_method': 'hist'
+    }
+    def __init__(self, **kwargs):
+        self.kwargs = { **self.kwargs_defaults, **kwargs }
         super().__init__(**self.kwargs)
 
-class XGBSolverGBtree(XGBSolver):
+class XGBGridSolverGBtree(XGBGridSolver):
+    kwargs_defaults = {
+        'booster': 'gbtree',
+        'eval_metric': 'ndcg',
+        'grow_policy': 'depthwise',
+        'objective': 'reg:squarederror',
+        'sampling_method': 'uniform',
+        'tree_method': 'exact'
+    }
     def __init__(self, booster='gbtree', **kwargs):
-        self.kwargs = { "booster": booster, **kwargs }
+        self.kwargs = { **self.kwargs_defaults, **kwargs }
         super().__init__(**self.kwargs)
 
-class XGBSolverGBlinear(XGBSolver):
+class XGBGridSolverGBlinear(XGBGridSolver):
     def __init__(self, booster='gblinear', **kwargs):
         self.kwargs = { "booster": booster, "max_depth": None, **kwargs }
         super().__init__(**self.kwargs)
 
 
 if __name__ == '__main__' and not settings['production']:
-    solver = XGBSolver()
+    solver = XGBGridSolver()
     solver.verbose = True
     competition = Competition()
-    competition.map(solver.solve_all)
+    competition.map(solver.solve_dataset)
     print(competition)
 
 
@@ -2076,13 +2579,13 @@ if __name__ == '__main__' and not settings['production']:
 # test       : {'correct': 33, 'total': 104, 'error': 0.6827, 'time': '00:00:00', 'name': 'test'}
 # time       : 00:03:10
 
-# XGBSolver(n_estimators=10)
+# XGBGridSolver(n_estimators=10)
 # training   : {'correct': 22, 'guesses': 148, 'total': 416, 'error': 0.9471, 'time': '00:00:00', 'name': 'training'}
 # evaluation : {'correct': 9, 'guesses': 116, 'total': 419, 'error': 0.9785, 'time': '00:00:00', 'name': 'evaluation'}
 # test       : {'correct': 0, 'guesses': 33, 'total': 104, 'error': 1.0, 'time': '00:00:00', 'name': 'test'}
 # time       : 00:00:53
 
-# XGBSolver(n_estimators=32)
+# XGBGridSolver(n_estimators=32)
 # training   : {'correct': 25, 'guesses': 255, 'total': 416, 'error': 0.9399, 'time': '00:00:00', 'name': 'training'}
 # evaluation : {'correct': 10, 'guesses': 257, 'total': 419, 'error': 0.9761, 'time': '00:00:00', 'name': 'evaluation'}
 # test       : {'correct': 0, 'guesses': 64, 'total': 104, 'error': 1.0, 'time': '00:00:00', 'name': 'test'}
@@ -2102,7 +2605,162 @@ if __name__ == '__main__' and not settings['production']:
 
 
 #####
-##### END   src_james/solver_multimodel/XGBSolver.py
+##### END   src_james/solver_multimodel/XGBGridSolver.py
+#####
+
+#####
+##### START src_james/solver_multimodel/XGBSingleColorSolver.py
+#####
+
+from typing import List
+from typing import Union
+
+# from src_james.core.DataModel import Competition
+# from src_james.core.DataModel import Problem
+# from src_james.core.DataModel import ProblemSet
+# from src_james.core.DataModel import Task
+# from src_james.plot import plot_task
+# from src_james.settings import settings
+# from src_james.solver_multimodel.queries.colors import task_is_singlecolor
+# from src_james.solver_multimodel.queries.grid import *
+# from src_james.solver_multimodel.queries.ratio import is_task_output_grid_shape_constant
+# from src_james.solver_multimodel.queries.ratio import task_output_grid_shape
+# from src_james.solver_multimodel.transforms.singlecolor import identity
+# from src_james.solver_multimodel.transforms.singlecolor import np_bincount
+# from src_james.solver_multimodel.transforms.singlecolor import np_hash
+# from src_james.solver_multimodel.transforms.singlecolor import np_shape
+# from src_james.solver_multimodel.transforms.singlecolor import unique_colors_sorted
+# from src_james.solver_multimodel.XGBEncoder import ProblemSetSolver
+# from src_james.solver_multimodel.XGBEncoder import XGBEncoder
+
+
+class SingleColorXGBEncoder(XGBEncoder):
+    dtype    = np.int8,
+    encoders = {
+        np.array: [ identity ],
+    }
+    features = {
+        np.array:   [
+            unique_colors_sorted,
+            max_color,
+            max_color_1d,
+            min_color,
+            min_color_1d,
+            np_bincount,
+            np_hash,
+            np_shape,
+            count_colors,
+            count_squares,
+        ],
+        ProblemSet: [],
+        Problem:    [],
+        Task:       [
+            # task_output_unique_sorted_colors
+        ]
+    }
+    encoder_defaults = {
+        **XGBEncoder.encoder_defaults,
+        'max_delta_step':   np.inf,  # unsure if this has an effect
+        'max_depth':        1,       # possibly required for this problem
+        'n_estimators':     1,       # possibly required for this problem
+        'min_child_weight': 0,       # possibly required for this problem
+        # 'max_delta_step':   1,
+        # 'objective':       'rank:map',
+        # 'objective':       'reg:squarederror',
+        # 'max_delta_step':   1,
+        # 'n_jobs':          -1,
+    }
+    def __init__(self, encoders=None, features=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.encoders = encoders if encoders is not None else self.__class__.encoders
+        self.features = features if features is not None else self.__class__.features
+
+
+    ### DEBUG
+    # def predict(self,
+    #             problemset: Union[ProblemSet, Task],
+    #             xgb:   XGBClassifier = None,
+    #             task:  Task = None,
+    #             *args, **kwargs
+    # ) -> Any:
+    #     task       = task or (problemset if isinstance(problemset, Task) else problemset.task)
+    #     problemset = (problemset['test'] if isinstance(problemset, Task) else problemset )
+    #     if task.filename not in self.cache:   self.fit(task)
+    #     # if self.cache[task.filename] is None: return None  # Unsolvable mapping
+    #
+    #     output = [ 8 ] * len(task['test'])
+    #     return output
+
+
+
+# BUG: XGBoost only works if the output colors have already been seen in the input
+class XGBSingleColorSolver(ProblemSetSolver):
+    verbose = True
+    debug   = True
+    cache   = {}
+
+    def detect(self, task):
+        return all([
+            task_is_singlecolor(task),
+            is_task_output_grid_shape_constant(task)  # TODO: OutputGridSizeSolver
+        ])
+
+
+    def fit(self, task: Task):
+        if task.filename in self.cache: return True
+        encoder = SingleColorXGBEncoder(output_encoder=max_color)
+        encoder.fit(task)
+        colors  = encoder.predict(task)
+        self.cache[task.filename] = colors
+
+    ### DEBUG
+    # def test(self, task: Task = None) -> Any:
+    #     return True
+
+    # BUGFIX: TypeError: solve_grid() got multiple values for argument 'task'
+    def predict(self, problemset: Union[ProblemSet,Task], *args, task: Task=None, **kwargs) -> Union[None,List[np.ndarray]]:
+        task       = task or (problemset if isinstance(problemset, Task) else problemset.task)
+        problemset = (problemset['test'] if isinstance(problemset, Task) else problemset )
+        if task.filename not in self.cache:   self.fit(task)
+        if self.cache[task.filename] is None: return None  # Unsolvable mapping
+
+        colors = self.cache[task.filename]
+        output_size = task_output_grid_shape(task) # TODO: Replace with OutputGridSizeSolver().solve_grid() per problem
+        outputs = [
+            np.full(output_size, fill_value=color)
+            for color in colors
+        ]
+        return outputs
+
+
+
+if __name__ == '__main__' and not settings['production']:
+    solver = XGBSingleColorSolver()
+    solver.verbose = True
+    filenames = [
+        'training/5582e5ca.json',  # solved by SingleColorSolver
+        'training/445eab21.json',  # solved by SingleColorSolver
+        'training/27a28665.json',
+        'training/44f52bb0.json',
+        'evaluation/3194b014.json',
+        'test/3194b014.json',
+    ]
+    for filename in filenames:
+        task = Task(filename)
+        plot_task(task)
+        solver.plot(task)
+
+    competition = Competition()
+
+    for name, dataset in competition.items():
+        solver.plot(dataset)
+
+    # competition['test'].apply(solver.solve_dataset)
+    competition.map(solver.solve_dataset)
+    print(competition)
+
+#####
+##### END   src_james/solver_multimodel/XGBSingleColorSolver.py
 #####
 
 #####
@@ -2118,13 +2776,12 @@ from typing import List
 # from src_james.solver_multimodel.SingleColorSolver import SingleColorSolver
 # from src_james.solver_multimodel.Solver import Solver
 # from src_james.solver_multimodel.TessellationSolver import TessellationSolver
-# from src_james.solver_multimodel.XGBSolver import XGBSolver
-# from src_james.solver_multimodel.XGBSolver import XGBSolverDart
-# from src_james.solver_multimodel.XGBSolver import XGBSolverGBlinear
-# from src_james.solver_multimodel.XGBSolver import XGBSolverGBtree
+# from src_james.solver_multimodel.XGBGridSolver import XGBGridSolver
+# from src_james.solver_multimodel.XGBSingleColorSolver import XGBSingleColorSolver
 # from src_james.solver_multimodel.ZoomSolver import ZoomSolver
 
 solvers: List[Solver] = [
+    # Deterministic (all solved answers are correct)
     GlobSolver(),
     DoNothingSolver(),
     BorderSolver(),
@@ -2132,9 +2789,13 @@ solvers: List[Solver] = [
     SingleColorSolver(),
     ZoomSolver(),
     TessellationSolver(),
-    XGBSolverDart(),
-    XGBSolverGBtree(),
-    XGBSolverGBlinear(),
+
+    # Non-Deterministic (lots of random guesses)
+    XGBSingleColorSolver(),
+    XGBGridSolver(),
+    # XGBGridSolverDart(),     # These don't provide any additional value
+    # XGBGridSolverGBtree(),
+    # XGBGridSolverGBlinear(),
 ]
 
 
@@ -2147,7 +2808,6 @@ solvers: List[Solver] = [
 #####
 
 import gc
-import os
 import time
 from operator import itemgetter
 
@@ -2175,7 +2835,7 @@ if __name__ == '__main__':
             if plot_results:
                 scores[dataset_name][solver.__class__.__name__] += solver.plot(dataset)
             else:
-                scores[dataset_name][solver.__class__.__name__] += solver.solve_all(dataset)
+                scores[dataset_name][solver.__class__.__name__] += solver.solve_dataset(dataset)
             # Running on Kaggle uses up nearly all 16GB of RAM
             solver.cache = {}
             gc.collect()
@@ -2205,12 +2865,13 @@ if __name__ == '__main__':
 ##### 
 ##### ./submission/kaggle_compile.py ./src_james/solver_multimodel/main.py
 ##### 
-##### 2020-05-26 01:33:42+01:00
+##### 2020-05-27 21:45:45+01:00
 ##### 
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### 
-##### * master db7b972 Solver | reenable all solvers
+#####   james-wip c81cf89 Solvers | work in progress - broken
+##### * master    620f07e XGBGridSolver | rerun noteboook
 ##### 
-##### db7b9722fb4d6a56cbf12149b5d84915503fe38a
+##### 620f07e2820831d29e329e5484cf0e88d79c848f
 ##### 

@@ -15,7 +15,7 @@ from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_intege
 from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
 from src_james.solver_multimodel.transforms.crop import crop_inner
 from src_james.solver_multimodel.transforms.crop import crop_outer
-from src_james.solver_multimodel.transforms.grid import invert
+from src_james.solver_multimodel.transforms.grid import grid_invert_color
 from src_james.solver_multimodel.ZoomSolver import ZoomSolver
 from src_james.util.make_tuple import make_tuple
 
@@ -30,22 +30,23 @@ class TessellationSolver(GeometrySolver):
             "crop_outer":  (crop_outer, range(0,9)),
         },
         "transform": {
-            "none":              ( np.copy,      []        ),
-            "flip":              ( np.flip,      [0,1]     ),
-            "rot90":             ( np.rot90,     [1,2,3]   ),
-            "roll":              ( np.roll,      product([-1,1],[0,1]) ),
-            "swapaxes":          ( np.swapaxes,  [(0, 1)]  ),
+            "none":              ( np.copy,             []        ),
+            "flip":              ( np.flip,             [0,1]     ),
+            "rot90":             ( np.rot90,            [1,2,3]   ),
+            "roll":              ( np.roll,             product([-1,1],[0,1]) ),
+            "swapaxes":          ( np.swapaxes,         [(0, 1)]  ),
             "rotate_loop":       ( rotate_loop,         range(-4,4) ),
             "rotate_loop_rows":  ( rotate_loop_rows,    range(-4,4) ),  # BROKEN ?
             "rotate_loop_cols":  ( rotate_loop_cols,    range(-4,4) ),  # BROKEN ?
             "flip_loop":         ( flip_loop,           range(0,2)  ),  # BROKEN ?
             "flip_loop_rows":    ( flip_loop_rows,      range(0,2)  ),  # BROKEN ?
             "flip_loop_cols":    ( flip_loop_cols,      range(0,2)  ),  # BROKEN ?
-            "invert":            ( invert,              [max_color, min_color, max_color_1d, count_colors, count_squares, *range(1,9)]  ), # BROKEN
+            "invert":            ( grid_invert_color,   []), # BROKEN
             # TODO: Invert
         },
         "query": {
             "query_true":              ( query_true,          [] ),
+            "query_false":             ( query_false,          [] ),
             "query_not_zero":          ( query_not_zero,      [] ),
             "query_max_color":         ( query_max_color,     [] ),
             "query_min_color":         ( query_min_color,     [] ),
@@ -57,11 +58,11 @@ class TessellationSolver(GeometrySolver):
             "query_count_squares":     ( query_count_squares,     [] ),
             "query_count_squares_row": ( query_count_squares_row, [] ),
             "query_count_squares_col": ( query_count_squares_col, [] ),
-            "query_color":             ( query_color,         range(0,10) ),  # TODO: query_max_color() / query_min_color()
+            "query_color":             ( query_color,            range(0,10) ),
             "query_period_length0":    ( query_period_length0,    []),
             "query_period_length1":    ( query_period_length1,    []),
-            "query_bincount":          ( query_bincount,    []),
-            "query_bincount_sorted":   ( query_bincount_sorted,    []),
+            "query_bincount":          ( query_bincount,         range(0,10)),
+            "query_bincount_sorted":   ( query_bincount_sorted,  range(0,10)),
         }
     }
 

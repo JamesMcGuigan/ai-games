@@ -10,7 +10,15 @@ def identity(input: np.ndarray) -> np.ndarray:
     return input
 
 def np_shape(input: np.ndarray) -> Tuple[int,int]:
+    if input is None: return (0,0)
     return np.array(input).shape
+
+def np_resize(grid: np.ndarray, shape: Tuple[int,int]) -> np.ndarray:
+    output = np.zeros(shape, dtype=np.int8)
+    w = min(shape[0], grid.shape[0])
+    h = min(shape[1], grid.shape[1])
+    output[:w, :h] = grid[:w, :h]
+    return output
 
 def np_flatten(input: np.ndarray) -> np.ndarray:
     return np.array(input).flatten()

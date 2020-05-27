@@ -44,7 +44,7 @@ class BorderSolver(Solver):
                 return True
         return False
 
-    def predict(self, grid, query=None, task=None):
+    def predict(self, grid, query=None, *args, task=None, **kwargs):
         ratio  = task_shape_ratios(task)[0]
         output = np.zeros(( int(grid.shape[0] * ratio[0]), int(grid.shape[1] * ratio[1]) ), dtype=np.int8)
         color  = query(grid) if callable(query) else query

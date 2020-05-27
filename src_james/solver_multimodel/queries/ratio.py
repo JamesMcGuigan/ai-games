@@ -55,6 +55,11 @@ def task_shape_ratios(task: Task) -> List[Tuple[float,float]]:
     # ratios = set([ int(ratio) if ratio.is_integer() else ratio for ratio in chain(*ratios) ])
     return ratios
 
+@clru_cache(maxsize=None)
+def task_shape_ratio(task: Task) -> Union[Tuple[float,float],None]:
+    ratios = task_shape_ratios(task)
+    if len(ratios) != 1: return None
+    return ratios[0]
 
 @clru_cache(maxsize=None)
 def is_task_shape_ratio_consistent(task: Task) -> bool:

@@ -2,7 +2,7 @@ from src_james.core.DataModel import Task
 from src_james.settings import settings
 from src_james.solver_multimodel.queries.colors import task_is_singlecolor
 from src_james.solver_multimodel.queries.grid import *
-from src_james.solver_multimodel.queries.ratio import task_shape_ratios
+from src_james.solver_multimodel.queries.ratio import task_shape_ratio
 from src_james.solver_multimodel.Solver import Solver
 
 
@@ -32,10 +32,14 @@ class SingleColorSolver(Solver):
                 self.cache[task.filename] = args
                 break
 
-    def predict(self, grid, query=None, task=None):
-        ratio  = task_shape_ratios(task)[0]
-        output = np.zeros(( int(grid.shape[0] * ratio[0]), int(grid.shape[1] * ratio[1]) ), dtype=np.int8)
+    # noinspection PyMethodOverriding
+    def predict(self, grid: np.ndarray, query=None, *args, task=None, **kwargs):
         color  = query(grid) if callable(query) else query
+        ratio  = task_shape_ratio(task)
+        if color is None: return None
+        if ratio is None: return None
+
+        output = np.zeros(( int(grid.shape[0] * ratio[0]), int(grid.shape[1] * ratio[1]) ), dtype=np.int8)
         output[:,:] = color
         return output
 

@@ -136,7 +136,7 @@ class Solver():
         return solutions
 
 
-    def solve_problem(self, _problem_: Problem, _task_: Task, _function_: Callable, *args, **kwargs) -> Problem:
+    def solve_problem(self, *args, _problem_: Problem, _task_: Task, _function_: Callable, **kwargs) -> Problem:
         output = _function_(_problem_['input'], *args, **kwargs)
         solution = Problem({
             "input":  _problem_['input'],

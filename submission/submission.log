@@ -36,265 +36,199 @@ solved: training/445eab21.json SingleColorSolver ('<function:max_color>',)
 solved: training/5582e5ca.json SingleColorSolver ('<function:max_color>',)
 ####### training ZoomSolver
 ####### training TessellationSolver
-solved: training/007bbfb7.json TessellationSolver {'preprocess': <function copy at 0x7fc1c7fe1840>, 'p_arg': (), 'transform': <function copy at 0x7fc1c7fe1840>, 't_arg': (), 'query': <function query_not_zero at 0x7fc1d8d1f400>, 'q_arg': ()}
-solved: training/a416b8f3.json TessellationSolver {'preprocess': <function copy at 0x7fc1c7fe1840>, 'p_arg': (), 'transform': <function copy at 0x7fc1c7fe1840>, 't_arg': (), 'query': <function query_true at 0x7fc1d8d1d7b8>, 'q_arg': ()}
-solved: training/c3e719e8.json TessellationSolver {'preprocess': <function copy at 0x7fc1c7fe1840>, 'p_arg': (), 'transform': <function copy at 0x7fc1c7fe1840>, 't_arg': (), 'query': <function query_max_color at 0x7fc1d8d1f950>, 'q_arg': ()}
-solved: training/cce03e0d.json TessellationSolver {'preprocess': <function copy at 0x7fc1c7fe1840>, 'p_arg': (), 'transform': <function copy at 0x7fc1c7fe1840>, 't_arg': (), 'query': <function query_count_colors at 0x7fc1d8d29158>, 'q_arg': ()}
+solved: training/007bbfb7.json TessellationSolver {'preprocess': <function copy at 0x7fa8d137cae8>, 'p_arg': (), 'transform': <function copy at 0x7fa8d137cae8>, 't_arg': (), 'query': <function query_not_zero at 0x7fa8cd38b8c8>, 'q_arg': ()}
+solved: training/a416b8f3.json TessellationSolver {'preprocess': <function copy at 0x7fa8d137cae8>, 'p_arg': (), 'transform': <function copy at 0x7fa8d137cae8>, 't_arg': (), 'query': <function query_true at 0x7fa8cd3798c8>, 'q_arg': ()}
+solved: training/c3e719e8.json TessellationSolver {'preprocess': <function copy at 0x7fa8d137cae8>, 'p_arg': (), 'transform': <function copy at 0x7fa8d137cae8>, 't_arg': (), 'query': <function query_max_color at 0x7fa8cd38bae8>, 'q_arg': ()}
+solved: training/cce03e0d.json TessellationSolver {'preprocess': <function copy at 0x7fa8d137cae8>, 'p_arg': (), 'transform': <function copy at 0x7fa8d137cae8>, 't_arg': (), 'query': <function query_count_colors at 0x7fa8cd36f2f0>, 'q_arg': ()}
 ####### training XGBSingleColorSolver
-training/27a28665.json   | False -> False | [1 2 2 3 3 1 6] -> [3 2 2 3 3 1 2] | [6 1 2] -> [2 2 3]
+training/27a28665.json   | False -> False | [1 2 2 3 3 1 6] -> [1 1 3 3 3 1 6] | [6 1 2] -> [3 3 3]
 training/445eab21.json   | True  -> False | [8 7 4] -> [8 7 4] | [3] -> [4]
 training/44f52bb0.json   | False -> True  | [1 7 1 1 7 7] -> [1 7 1 7 7 7] | [1 7] -> [1 7]
 training/5582e5ca.json   | True  -> False | [4 9 6] -> [4 9 6] | [8] -> [6]
 ####### training XGBGridSolver
-guess : training/00d62c1b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/025d127b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/045e512c.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/05269061.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/05f2a901.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/06df4c85.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/08ed6ac7.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/09629e4f.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/0962bcdd.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/0a938d79.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/0ca9ddb6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-solved: training/0d3d703e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/0dfd9992.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/0e206a2e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/11852cab.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/150deff5.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-solved: training/178fcbfb.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/1a07d186.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/1b60fb0c.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/1bfc4729.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/1caeab9d.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/1e0a9b12.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/1e32b0e9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/1f0c79e5.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/1f642eb9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/1f876c06.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/2204b7a8.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/22168020.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/22233c11.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-solved: training/2281f1f4.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/228f6490.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/22eb0ac0.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/23581191.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/253bf280.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/25d487eb.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-solved: training/25ff71a9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/264363fd.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/272f95fa.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/29623171.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/29c11459.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/29ec7d0e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/2bcee788.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-solved: training/2bee17df.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/2c608aff.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/2dd70a9a.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/31aa019c.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/321b1fc6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-solved: training/32597951.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/3345333e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-solved: training/3618c87e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/3631a71a.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/363442ee.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/36d67576.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/36fdfd69.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/3906de3d.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/39e1d7f9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/3aa6fb7a.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/3ac3eb23.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/3bd67248.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/3bdb4ada.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/3befdf3e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/3c9b0459.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/3e980e27.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/3eda0437.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/40853293.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/41e4d17e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/4258a5f9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/42a50994.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/4347f46a.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/444801d8.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/447fd412.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/44d8ac46.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/4612dd53.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/484b58aa.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/4938f0c2.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/496994bd.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/4c5c2cf0.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/50846271.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/508bd3b6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/50cb2852.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/5168d44c.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/543a7ed5.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/54d82841.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/54d9e175.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/5521c0d9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/5582e5ca.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/56dc2b01.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/56ff96f3.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/57aa92db.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/5c0a986e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/5c2c9af4.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/60b61512.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/6150a2bd.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/623ea044.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/63613498.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/6455b5f5.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-solved: training/67385a82.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/673ef223.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/67a3c6ac.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/67a423a3.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/6855a6e4.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/68b16354.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/694f12f3.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/6a1e5592.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/6aa20dc0.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/6c434453.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/6cdd2623.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/6cf79266.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/6d0160f0.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/6d58a25d.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-solved: training/6d75e8bb.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/6e19193c.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/6e82a1ae.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/72322fa7.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/73251a56.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/7447852a.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/74dd1130.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/760b3cac.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/776ffc46.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/7b6016b9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/7ddcd7ec.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/7df24a62.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/7e0986d6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/7f4411dc.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/810b9b61.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/82819916.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/83302e8f.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/834ec97d.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/8403a5d5.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/855e0971.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/85c4e7cd.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/868de0fa.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/88a10436.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/890034e9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/8d510a79.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/8e5a5113.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/8eb1be9a.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/8f2ea7aa.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/90f3ed37.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/913fb3ed.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/91714a58.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/928ad970.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/93b581b8.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/941d9a10.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/952a094c.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/9565186b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/95990924.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/97999447.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/98cf29f8.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/99fa7670.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/9d9215db.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/9dfd6313.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/9edfc990.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/a1570a43.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-solved: training/a2fd1cf0.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/a48eeaf7.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/a5313dff.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/a5f85a15.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/a61f2674.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/a64e4611.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/a65b410d.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-solved: training/a699fb00.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/a78176bb.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/a85d4709.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/a8d7556c.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/a9f96cdd.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/aabf363d.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/aba27056.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/ae3edfdc.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/aedd82e4.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/af902bf9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/b230c067.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/b27ca6d3.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/b2862040.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/b527c5c6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/b548a754.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/b60334d2.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-solved: training/b6afb2da.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/b7249182.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/b775ac94.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/b782dc8a.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/b8825c91.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/b8cdaf2b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/ba26e723.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/ba97ae07.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-solved: training/bb43febb.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/bd4472b8.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/bda2d7a6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-solved: training/bdad9b1f.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/beb8660c.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/c0f76784.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/c1d99e64.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/c3f564a4.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/c444b776.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-solved: training/c8f0f002.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/c9f8e694.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/caa06a1f.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/cbded52d.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/ce9e57f2.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/d037b0a7.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/d06dbe63.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/d07ae81c.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/d22278a0.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/d23f8c26.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/d2abd087.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-solved: training/d364b489.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/d406998b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/d43fd935.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/d4a91cb9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/d4f3cd78.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/d511f180.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/d687bc17.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/d6ad076f.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/d89b689b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/d8c310e9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/d90796e8.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/d9f24cd1.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/db3e9e38.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/db93a21d.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/dbc1a6ce.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/dc1df850.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-solved: training/dc433765.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/ddf7fa4f.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/e21d9049.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/e26a3af2.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/e40b9e2f.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/e48d4e1a.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/e5062a87.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/e509e548.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/e73095fd.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/e76a88a6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/e8593010.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/e8dc4411.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/e9614598.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/e9afcf9a.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/ea32f347.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/ea786f4a.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/ec883f72.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/ecdecbb3.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/ed36ccf7.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-solved: training/ef135b50.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/f15e1fac.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/f1cefba8.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/f25ffba3.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/f35d900a.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/f76d97a5.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/f8a8fe49.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/f8c80d96.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : training/fcc82909.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
+guess : training/00d62c1b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/05269061.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/05f2a901.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/08ed6ac7.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/09629e4f.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/0962bcdd.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/0a938d79.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+solved: training/0d3d703e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/0e206a2e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/11852cab.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/150deff5.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+solved: training/178fcbfb.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/1b60fb0c.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/1bfc4729.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/1caeab9d.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/1e32b0e9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/1f0c79e5.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/2204b7a8.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/22233c11.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+solved: training/2281f1f4.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/228f6490.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/23581191.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/253bf280.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/25d487eb.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+solved: training/25ff71a9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/272f95fa.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/29623171.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/2bcee788.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+solved: training/2bee17df.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/2c608aff.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/2dd70a9a.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+solved: training/32597951.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/3345333e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+solved: training/3618c87e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/3631a71a.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/36d67576.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/36fdfd69.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/3906de3d.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/3aa6fb7a.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/3bd67248.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/3befdf3e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/40853293.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/41e4d17e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/4258a5f9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/42a50994.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/447fd412.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/44d8ac46.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/4612dd53.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/4938f0c2.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/496994bd.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/4c5c2cf0.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/50846271.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/508bd3b6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/5168d44c.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/543a7ed5.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/5521c0d9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/56dc2b01.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/5c0a986e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/5c2c9af4.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/60b61512.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/623ea044.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/6455b5f5.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+solved: training/67385a82.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/673ef223.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/67a3c6ac.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/67a423a3.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/6855a6e4.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/68b16354.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/694f12f3.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/6a1e5592.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/6aa20dc0.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/6c434453.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/6cdd2623.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/6cf79266.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/6d58a25d.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+solved: training/6d75e8bb.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/6e19193c.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/6e82a1ae.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/7447852a.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/74dd1130.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/760b3cac.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/776ffc46.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/7b6016b9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/7ddcd7ec.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/7df24a62.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/7e0986d6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/7f4411dc.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/810b9b61.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/83302e8f.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/834ec97d.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/8403a5d5.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/868de0fa.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/88a10436.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/890034e9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/8d510a79.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/8e5a5113.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/8eb1be9a.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/8f2ea7aa.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/90f3ed37.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/91714a58.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/928ad970.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/93b581b8.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/941d9a10.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/952a094c.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/95990924.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/98cf29f8.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/9edfc990.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/a1570a43.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+solved: training/a2fd1cf0.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/a48eeaf7.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/a5313dff.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/a5f85a15.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/a61f2674.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/a64e4611.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/a65b410d.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+solved: training/a699fb00.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/a78176bb.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/a85d4709.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/a8d7556c.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/a9f96cdd.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/aabf363d.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/aba27056.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/ae3edfdc.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/aedd82e4.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/af902bf9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/b230c067.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/b27ca6d3.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/b2862040.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/b527c5c6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/b548a754.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/b60334d2.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+solved: training/b6afb2da.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/b7249182.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/b782dc8a.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/b8cdaf2b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/ba26e723.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/ba97ae07.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+solved: training/bb43febb.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/bda2d7a6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+solved: training/bdad9b1f.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/c0f76784.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/c1d99e64.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+solved: training/c8f0f002.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/ce9e57f2.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/d06dbe63.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/d07ae81c.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/d2abd087.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+solved: training/d364b489.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/d406998b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/d4a91cb9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/d4f3cd78.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/d6ad076f.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/d89b689b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/d90796e8.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/d9f24cd1.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/db3e9e38.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/db93a21d.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/dbc1a6ce.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+solved: training/dc433765.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/ddf7fa4f.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/e26a3af2.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/e40b9e2f.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/e48d4e1a.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/e5062a87.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/e509e548.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/e73095fd.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/e76a88a6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/e8593010.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/e8dc4411.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/e9614598.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/e9afcf9a.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/ea32f347.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/ea786f4a.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/ec883f72.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/ecdecbb3.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/ed36ccf7.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+solved: training/ef135b50.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/f15e1fac.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/f1cefba8.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/f35d900a.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/f76d97a5.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/f8a8fe49.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : training/f8c80d96.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 ####### evaluation GlobSolver
 ####### evaluation DoNothingSolver
 ####### evaluation BorderSolver
@@ -302,266 +236,160 @@ guess : training/fcc82909.json XGBGridSolver {'tree_method': 'exact', 'eval_metr
 ####### evaluation SingleColorSolver
 ####### evaluation ZoomSolver
 ####### evaluation TessellationSolver
-solved: evaluation/27f8ce4f.json TessellationSolver {'preprocess': <function copy at 0x7fc1c7fe1840>, 'p_arg': (), 'transform': <function copy at 0x7fc1c7fe1840>, 't_arg': (), 'query': <function query_max_color at 0x7fc1d8d1f950>, 'q_arg': ()}
-solved: evaluation/5b6cbef5.json TessellationSolver {'preprocess': <function copy at 0x7fc1c7fe1840>, 'p_arg': (), 'transform': <function copy at 0x7fc1c7fe1840>, 't_arg': (), 'query': <function query_not_zero at 0x7fc1d8d1f400>, 'q_arg': ()}
+solved: evaluation/27f8ce4f.json TessellationSolver {'preprocess': <function copy at 0x7fa8d137cae8>, 'p_arg': (), 'transform': <function copy at 0x7fa8d137cae8>, 't_arg': (), 'query': <function query_max_color at 0x7fa8cd38bae8>, 'q_arg': ()}
+solved: evaluation/5b6cbef5.json TessellationSolver {'preprocess': <function copy at 0x7fa8d137cae8>, 'p_arg': (), 'transform': <function copy at 0x7fa8d137cae8>, 't_arg': (), 'query': <function query_not_zero at 0x7fa8cd38b8c8>, 'q_arg': ()}
 ####### evaluation XGBSingleColorSolver
 evaluation/3194b014.json | True  -> False | [4 3 8] -> [4 3 8] | [5] -> [4]
 ####### evaluation XGBGridSolver
-guess : evaluation/009d5c81.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/00dbd492.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/03560426.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/05a7bcf2.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/0607ce86.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/070dd51e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/08573cc6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/09c534e7.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/0a2355a6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/0becf7df.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/0d87d2a6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/0e671a1a.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/0f63c0b9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/103eff5b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/11e1fe23.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/12422b43.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/12eac192.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/13713586.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/137f0df0.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/140c817e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/14754a24.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/15113be4.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/15663ba9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/16b78196.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/17b80ad2.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/17cae0c1.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/18419cfa.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/184a9768.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/1acc24af.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/1c02dbbe.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/1c56ad9f.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/1d0a4b61.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/1d398264.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/1da012fc.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/1e81d6f9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/1e97544e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/20981f0e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/212895b5.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-solved: evaluation/21f83797.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/22a4bbc2.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/25094a63.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/2546ccf6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/256b0a75.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/2685904e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/27a77e38.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/292dd178.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/29700607.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/2a5f8217.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/2b01abd0.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/2c737e39.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-solved: evaluation/319f2597.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/31adaf00.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/3391f8c0.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/33b52de3.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/3490cc26.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/37d3e8b2.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/3a301edc.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/3ed85e70.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/3f23242b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/40f6cd08.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/423a55dc.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/42918530.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/4364c1c4.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/456873bc.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/45737921.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/45bbe264.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/477d2879.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/47996f11.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/4aab4007.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/4acc7107.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/4b6b68e5.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/4cd1b7b2.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/4e45f183.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/4e469f39.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/4f537728.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/4ff4c9da.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/50a16a69.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/50f325b5.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/516b51b7.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/5207a7b5.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/52fd389e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/54db823b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/55059096.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/551d5bf1.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/55783887.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/575b1a71.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/58743b76.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/58e15b12.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/5a5a2103.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/5af49b42.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-solved: evaluation/5b526a93.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/5b692c0f.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/5ffb2104.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/604001fa.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/60a26a3e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/626c0bcc.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/62ab2642.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/62b74c02.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/639f5a19.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/642248e4.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/67c52801.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/692cd3b6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/696d4842.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/69889d6e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/6ad5bdfd.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/6df30ad6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/705a3229.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/712bf12e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/72207abc.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/72a961c9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/73c3b0d8.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/759f3fd3.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/762cd429.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/770cc55f.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/782b5218.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/79369cc6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/79fb03f4.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/7c8af763.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/7d1f7ee8.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/7d419a02.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/7e02026e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/7ee1c6ea.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/817e6c09.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/845d6e51.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/84db8fc4.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/84f2aca1.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/85b81ff1.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/85fa5666.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/88207623.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/891232d6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/896d5239.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/8a371977.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/8cb8642d.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/8dae5dfc.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/8ee62060.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/8fbca751.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/90347967.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/903d1b4a.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/917bccba.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/929ab4e9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/92e50de0.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/9356391f.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/93c31fbe.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/94414823.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/94be5b80.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/95a58926.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/963f59bc.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/96a8c0cd.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/97239e3d.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/9772c176.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/981571dc.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/992798f6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/99306f82.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/9b2a60aa.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/9b365c51.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/9b4c17c4.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/9c1e755f.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/9c56f360.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/9caba7c3.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/9ddd00f0.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/9def23fe.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/9f27f097.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/a04b2602.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/a096bf4d.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/a3f84088.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/a406ac07.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/a57f2f04.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/a8610ef7.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/a934301b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/aa18de87.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/aa300dc3.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/aa4ec2a5.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/ac0c5833.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/ac2e8ecf.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/ac3e2b04.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/ac605cbb.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/ae58858e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/af22c60d.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/b15fca0b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/b20f7c8b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/b457fec5.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/b7f8a4d8.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/b942fd60.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/ba9d41b8.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/baf41dbf.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/bb52a14b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/bcb3040b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/bd14c3bf.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/bf32578f.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/bf89d739.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/c074846d.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/c35c1b4c.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/c62e2108.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/c663677b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/c6e1b8da.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/c7d4e6ad.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/c87289bb.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/c97c0139.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/ca8f78db.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/cb227835.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/ce039d91.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/cf133acc.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/cfb2ce5a.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/d282b262.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/d2acf2cb.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/d304284e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/d37a1ef5.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/d492a647.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/d931c21c.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/d94c3b52.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-solved: evaluation/da2b0fe3.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/dc2aa30b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/dc2e9a9d.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/dd2401ed.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/df8cc377.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/e0fb7511.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/e1d2900e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/e2092e0c.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/e21a174a.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/e4075551.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/e41c6fd3.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/e5790162.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/e5c44e8f.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/e681b708.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/e69241bd.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/e74e1818.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/e760a62e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/e7639916.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/e7b06bea.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-solved: evaluation/e7dd8335.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/e88171ec.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/e95e3d8e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/e9ac8c9e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/e9bb6954.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/e9c9d9a1.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/ea959feb.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/ecaa0ec1.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/ef26cbf6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/f0df5ff0.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/f21745ec.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/f3b10344.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/f3cdc58f.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/f3e62deb.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-solved: evaluation/f45f5ca7.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/f823c43c.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/f83cb3f6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/f8be4b64.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/f9a67cb5.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/f9d67f8b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/fafd9572.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/fd096ab6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/fd4b2b02.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/fe9372f3.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/fea12743.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-guess : evaluation/ff72ca3e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
+guess : evaluation/009d5c81.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/00dbd492.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/05a7bcf2.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/070dd51e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/08573cc6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/0a2355a6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/0becf7df.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/0d87d2a6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/0e671a1a.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/11e1fe23.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/137f0df0.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/140c817e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/14754a24.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/15113be4.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/15663ba9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/17cae0c1.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/18419cfa.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/1acc24af.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/1c56ad9f.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/20981f0e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/212895b5.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+solved: evaluation/21f83797.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/22a4bbc2.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/25094a63.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/292dd178.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/29700607.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/2b01abd0.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+solved: evaluation/319f2597.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/31adaf00.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/3391f8c0.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/3490cc26.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/37d3e8b2.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/3a301edc.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/3f23242b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/423a55dc.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/456873bc.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/47996f11.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/4acc7107.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/4cd1b7b2.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/4e45f183.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/4e469f39.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/4f537728.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/4ff4c9da.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/50f325b5.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/516b51b7.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/5207a7b5.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/54db823b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/55059096.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/551d5bf1.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/575b1a71.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/58743b76.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/58e15b12.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+solved: evaluation/5b526a93.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/604001fa.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/60a26a3e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/626c0bcc.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/62ab2642.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/639f5a19.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/642248e4.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/692cd3b6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/696d4842.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/712bf12e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/73c3b0d8.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/759f3fd3.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/770cc55f.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/782b5218.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/79369cc6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/79fb03f4.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/7c8af763.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/7d419a02.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/7e02026e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/7ee1c6ea.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/817e6c09.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/84db8fc4.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/85b81ff1.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/85fa5666.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/891232d6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/896d5239.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/8a371977.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/8ee62060.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/8fbca751.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/917bccba.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/92e50de0.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/9356391f.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/93c31fbe.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/94414823.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/95a58926.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/96a8c0cd.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/9772c176.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/992798f6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/9b4c17c4.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/9c56f360.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/9caba7c3.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/9ddd00f0.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/9def23fe.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/9f27f097.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/a04b2602.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/a3f84088.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/a8610ef7.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/a934301b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/aa18de87.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/aa300dc3.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/aa4ec2a5.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/ac0c5833.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/ac3e2b04.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/ae58858e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/b15fca0b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/baf41dbf.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/bb52a14b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/bcb3040b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/bf32578f.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/bf89d739.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/c074846d.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/c35c1b4c.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/c62e2108.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/c87289bb.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/c97c0139.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/cb227835.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/ce039d91.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/d304284e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/d37a1ef5.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/d492a647.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/d931c21c.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/d94c3b52.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+solved: evaluation/da2b0fe3.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/dc2aa30b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/dc2e9a9d.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/dd2401ed.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/e0fb7511.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/e1d2900e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/e2092e0c.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/e4075551.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/e760a62e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/e7639916.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+solved: evaluation/e7dd8335.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/e9c9d9a1.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/ecaa0ec1.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/ef26cbf6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/f3cdc58f.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/f3e62deb.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+solved: evaluation/f45f5ca7.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/f823c43c.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/f83cb3f6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/f9a67cb5.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/f9d67f8b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/fd4b2b02.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/fe9372f3.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/fea12743.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+guess : evaluation/ff72ca3e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 ####### test GlobSolver
 test  : test/00576224.json GlobSolver ('evaluation/00576224.json',)
 test  : test/009d5c81.json GlobSolver ('evaluation/009d5c81.json',)
@@ -667,150 +495,44 @@ test  : test/423a55dc.json GlobSolver ('evaluation/423a55dc.json',)
 ####### test SingleColorSolver
 ####### test ZoomSolver
 ####### test TessellationSolver
-test  : test/27f8ce4f.json TessellationSolver {'preprocess': <function copy at 0x7fc1c7fe1840>, 'p_arg': (), 'transform': <function copy at 0x7fc1c7fe1840>, 't_arg': (), 'query': <function query_max_color at 0x7fc1d8d1f950>, 'q_arg': ()}
+test  : test/27f8ce4f.json TessellationSolver {'preprocess': <function copy at 0x7fa8d137cae8>, 'p_arg': (), 'transform': <function copy at 0x7fa8d137cae8>, 't_arg': (), 'query': <function query_max_color at 0x7fa8cd38bae8>, 'q_arg': ()}
 ####### test XGBSingleColorSolver
 test/3194b014.json       | True  -> False | [4 3 8] -> [4 3 8] | [] -> [4]
 ####### test XGBGridSolver
-test  : test/009d5c81.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/00dbd492.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/03560426.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/05a7bcf2.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/0607ce86.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/070dd51e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/08573cc6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/09c534e7.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/0a2355a6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/0becf7df.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/0d87d2a6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/0e671a1a.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/0f63c0b9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/103eff5b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/11e1fe23.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/12422b43.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/12eac192.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/13713586.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/137f0df0.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/140c817e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/14754a24.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/15113be4.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/15663ba9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/16b78196.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/17b80ad2.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/17cae0c1.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/18419cfa.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/184a9768.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/1acc24af.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/1c02dbbe.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/1c56ad9f.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/1d0a4b61.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/1d398264.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/1da012fc.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/1e81d6f9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/1e97544e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/20981f0e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/212895b5.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/21f83797.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/22a4bbc2.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/25094a63.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/2546ccf6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/256b0a75.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/2685904e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/27a77e38.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/292dd178.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/29700607.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/2a5f8217.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/2b01abd0.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/2c737e39.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/319f2597.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/31adaf00.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/3391f8c0.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/33b52de3.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/3490cc26.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/37d3e8b2.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/3a301edc.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/3ed85e70.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/3f23242b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/40f6cd08.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-test  : test/423a55dc.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'min_child_weight': 0}
-
-wrote: /home/jamie/code/kaggle-arc/./submission/submission5.csv | 105 lines
-
-wrote: /home/jamie/code/kaggle-arc/./submission/submission.csv | 105 lines
---------------------
-Solver Scores:
-
-# training
-249 XGBGridSolver
-8 GeometrySolver
-4 TessellationSolver
-2 SingleColorSolver
-2 ZoomSolver
-
-# evaluation
-255 XGBGridSolver
-2 ZoomSolver
-2 TessellationSolver
-
-# test
-98 GlobSolver
-61 XGBGridSolver
-1 TessellationSolver
---------------------
-Dataset Scores:
-training   : {'correct': 34, 'guesses': 260, 'total': 416, 'error': 0.9183, 'time': '00:03:07', 'name': 'training'}
-evaluation : {'correct': 10, 'guesses': 265, 'total': 419, 'error': 0.9761, 'time': '00:05:47', 'name': 'evaluation'}
-test       : {'correct': 3.9, 'guesses': 103, 'total': 104, 'error': 1.0, 'time': '00:01:09', 'name': 'test'}
-time       : 00:10:03
-dSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+test  : test/009d5c81.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+test  : test/00dbd492.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+test  : test/05a7bcf2.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+test  : test/070dd51e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+test  : test/08573cc6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+test  : test/0a2355a6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+test  : test/0becf7df.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
+test  : test/0d87d2a6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 test  : test/0e671a1a.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
-test  : test/0f63c0b9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
-test  : test/103eff5b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 test  : test/11e1fe23.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
-test  : test/12422b43.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
-test  : test/12eac192.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
-test  : test/13713586.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 test  : test/137f0df0.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 test  : test/140c817e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 test  : test/14754a24.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 test  : test/15113be4.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 test  : test/15663ba9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
-test  : test/16b78196.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
-test  : test/17b80ad2.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 test  : test/17cae0c1.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 test  : test/18419cfa.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
-test  : test/184a9768.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 test  : test/1acc24af.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
-test  : test/1c02dbbe.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 test  : test/1c56ad9f.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
-test  : test/1d0a4b61.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
-test  : test/1d398264.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
-test  : test/1da012fc.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
-test  : test/1e81d6f9.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
-test  : test/1e97544e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 test  : test/20981f0e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 test  : test/212895b5.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 test  : test/21f83797.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 test  : test/22a4bbc2.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 test  : test/25094a63.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
-test  : test/2546ccf6.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
-test  : test/256b0a75.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
-test  : test/2685904e.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
-test  : test/27a77e38.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 test  : test/292dd178.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 test  : test/29700607.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
-test  : test/2a5f8217.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 test  : test/2b01abd0.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
-test  : test/2c737e39.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 test  : test/319f2597.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 test  : test/31adaf00.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 test  : test/3391f8c0.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
-test  : test/33b52de3.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 test  : test/3490cc26.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 test  : test/37d3e8b2.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 test  : test/3a301edc.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
-test  : test/3ed85e70.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 test  : test/3f23242b.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
-test  : test/40f6cd08.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 test  : test/423a55dc.json XGBGridSolver {'tree_method': 'exact', 'eval_metric': 'error', 'objective': 'reg:squarederror', 'n_estimators': 32, 'max_depth': 100, 'min_child_weight': 0}
 
 wrote: /home/jamie/code/kaggle-arc/./submission/submission5.csv | 105 lines
@@ -820,24 +542,24 @@ wrote: /home/jamie/code/kaggle-arc/./submission/submission.csv | 105 lines
 Solver Scores:
 
 # training
-249 XGBGridSolver
+183 XGBGridSolver
 8 GeometrySolver
 4 TessellationSolver
 2 SingleColorSolver
 2 ZoomSolver
 
 # evaluation
-255 XGBGridSolver
+149 XGBGridSolver
 2 ZoomSolver
 2 TessellationSolver
 
 # test
 98 GlobSolver
-61 XGBGridSolver
+35 XGBGridSolver
 1 TessellationSolver
 --------------------
 Dataset Scores:
-training   : {'correct': 34, 'guesses': 260, 'total': 416, 'error': 0.9183, 'time': '00:02:52', 'name': 'training'}
-evaluation : {'correct': 10, 'guesses': 265, 'total': 419, 'error': 0.9761, 'time': '00:05:44', 'name': 'evaluation'}
-test       : {'correct': 3.9, 'guesses': 103, 'total': 104, 'error': 1.0, 'time': '00:01:16', 'name': 'test'}
-time       : 00:09:52
+training   : {'correct': 34, 'guesses': 198, 'total': 416, 'error': 0.9183, 'time': '00:02:36', 'name': 'training'}
+evaluation : {'correct': 10, 'guesses': 157, 'total': 419, 'error': 0.9761, 'time': '00:03:55', 'name': 'evaluation'}
+test       : {'correct': 6.5, 'guesses': 102, 'total': 104, 'error': 1.0, 'time': '00:00:57', 'name': 'test'}
+time       : 00:07:28

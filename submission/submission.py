@@ -3,15 +3,15 @@
 ##### 
 ##### ./submission/kaggle_compile.py ./src_james/solver_multimodel/main.py
 ##### 
-##### 2020-05-27 21:45:45+01:00
+##### 2020-05-27 22:36:57+01:00
 ##### 
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### 
 #####   james-wip c81cf89 Solvers | work in progress - broken
-##### * master    620f07e XGBGridSolver | rerun noteboook
+##### * master    85c9706 [ahead 6] XGBGridSolver | + grid_unique_colors() + is_grid_symmetry()
 ##### 
-##### 620f07e2820831d29e329e5484cf0e88d79c848f
+##### 85c9706561ac26e2fb800b6fb15c6651797328b0
 ##### 
 
 #####
@@ -1000,7 +1000,15 @@ def identity(input: np.ndarray) -> np.ndarray:
     return input
 
 def np_shape(input: np.ndarray) -> Tuple[int,int]:
+    if input is None: return (0,0)
     return np.array(input).shape
+
+def np_resize(grid: np.ndarray, shape: Tuple[int,int]) -> np.ndarray:
+    output = np.zeros(shape, dtype=np.int8)
+    w = min(shape[0], grid.shape[0])
+    h = min(shape[1], grid.shape[1])
+    output[:w, :h] = grid[:w, :h]
+    return output
 
 def np_flatten(input: np.ndarray) -> np.ndarray:
     return np.array(input).flatten()
@@ -1045,90 +1053,93 @@ import numpy as np
 
 
 def query_true(     grid: np.ndarray, x: int, y: int ):            return True
+def query_false(    grid: np.ndarray, x: int, y: int ):            return False
 def query_not_zero( grid: np.ndarray, x: int, y: int ):            return grid[x,y]
 def query_color(    grid: np.ndarray, x: int, y: int, color: int): return grid[x,y] == color
 
 
 # evaluation/15696249.json - max(1d.argmax())
-@np_cache
+@np_cache()
 def query_max_color(grid,x,y,exclude_zero=True):
     return grid[x,y] == max_color(grid, exclude_zero)
 
-@np_cache
+@np_cache()
 def max_color(grid, exclude_zero=True):
     bincount = np.bincount(grid.flatten())
     if exclude_zero:
         bincount[0] = np.min(bincount)  # exclude 0
     return bincount.argmax()
 
-@np_cache
+@np_cache()
 def query_min_color(grid:np.ndarray, x:int, y:int, exclude_zero=True):
     return grid[x,y] == min_color(grid, exclude_zero)
 
-@np_cache
+@np_cache()
 def min_color(grid:np.ndarray, exclude_zero=True):
     bincount = np.bincount(grid.flatten())
     if exclude_zero:
         bincount[0] = np.max(bincount)  # exclude 0
     return bincount.argmin()
 
-@np_cache
+@np_cache()
 def query_max_color_1d(grid:np.ndarray, x:int, y:int, exclude_zero=True):
     return grid[x,y] == max_color_1d(grid, exclude_zero=exclude_zero)
 
-@np_cache
+@np_cache()
 def max_color_1d(grid: np.ndarray, exclude_zero=True):
+    if grid is None: return 0
+    if len(grid.shape) == 1: return max_color(grid)
     return max(
         [ max_color(row,exclude_zero) for row in grid ] +
         [ max_color(col,exclude_zero) for col in np.swapaxes(grid, 0,1) ]
     )
 
-@np_cache
+@np_cache()
 def query_min_color_1d(grid: np.ndarray, x: int, y: int):
     return grid[x,y] == min_color_1d(grid)
 
-@np_cache
+@np_cache()
 def min_color_1d(grid: np.ndarray):
     return min(
         [ min_color(row) for row in grid ] +
         [ min_color(col) for col in np.swapaxes(grid, 0,1) ]
     )
 
-@np_cache
+@np_cache()
 def query_count_colors(grid: np.ndarray, x: int, y: int):
     return grid[x,y] >= count_colors(grid)
 
-@np_cache
+@np_cache()
 def query_count_colors_row(grid: np.ndarray, x: int, y: int):
     return x + grid.shape[0]*y <= count_colors(grid)
 
-@np_cache
+@np_cache()
 def query_count_colors_col(grid: np.ndarray, x: int, y: int):
     return y + grid.shape[1]*x <= count_colors(grid)
 
 
-@np_cache
+@np_cache()
 def count_colors(grid: np.ndarray):
     bincount = np.bincount(grid.flatten())
     return np.count_nonzero(bincount[1:]) # exclude 0
 
-@np_cache
+@np_cache()
 def query_count_squares(grid: np.ndarray, x: int, y: int):
     return grid[x,y] >= count_squares(grid)
 
-@np_cache
+@np_cache()
 def query_count_squares_row(grid: np.ndarray, x: int, y: int):
     return x + grid.shape[0]*y <= count_squares(grid)
 
-@np_cache
+@np_cache()
 def query_count_squares_col(grid: np.ndarray, x: int, y: int):
     return y + grid.shape[1]*x <= count_squares(grid)
 
-@np_cache
+@np_cache()
 def count_squares(grid: np.ndarray):
     return np.count_nonzero(grid.flatten())
 
-@np_cache
+@np_cache()
 def grid_unique_colors(grid: np.ndarray):
     return np.unique(grid.flatten())
 
@@ -1553,6 +1564,82 @@ def same_ratio(basic_task):
 #####
 
 #####
+##### START src_james/solver_multimodel/queries/symmetry.py
+#####
+
+import numpy as np
+
+# from src_james.util.np_cache import np_cache
+
+
+@np_cache()
+def is_grid_symmetry(grid) -> bool:
+    return (
+        is_grid_symmetry_horz(grid)
+     or is_grid_symmetry_vert(grid)
+     or is_grid_symmetry_rot90(grid)
+     or is_grid_symmetry_rot180(grid)
+     or is_grid_symmetry_transpose(grid)
+    )
+
+@np_cache()
+def is_grid_symmetry_horz(grid) -> bool:
+    return np.array_equal(grid, np.flip(grid, 0))
+
+@np_cache()
+def is_grid_symmetry_vert(grid) -> bool:
+    return np.array_equal(grid, np.flip(grid, 1))
+
+@np_cache()
+def is_grid_symmetry_rot90(grid) -> bool:
+    return np.array_equal(grid, np.rot90(grid))
+
+@np_cache()
+def is_grid_symmetry_rot180(grid) -> bool:
+    return np.array_equal(grid, np.rot90(grid,2))
+
+def is_grid_symmetry_transpose(grid) -> bool:
+    return np.array_equal(grid, np.transpose(grid))
+
+#####
+##### END   src_james/solver_multimodel/queries/symmetry.py
+#####
+
+#####
+##### START src_james/solver_multimodel/transforms/grid.py
+#####
+
+
+# BROKEN?
+
+import numpy as np
+
+# from src_james.solver_multimodel.queries.grid import grid_unique_colors
+# from src_james.util.np_cache import np_cache
+
+
+@np_cache
+def grid_invert_color(grid: np.ndarray):
+    colors = grid_unique_colors(grid)
+    if len(colors) != 2:
+        output = np.zeros(grid.shape, dtype=np.int8)
+        return output
+    else:
+        color1 = colors[0]
+        color2 = colors[1]
+        mask   = grid[ grid == color1 ]
+        output = np.full(grid.shape, color1, dtype=np.int8)
+        output[mask] = color2
+        return output
+
+
+
+
+#####
+##### END   src_james/solver_multimodel/transforms/grid.py
+#####
+
+#####
 ##### START src_james/solver_multimodel/GeometrySolver.py
 #####
 
@@ -1561,9 +1648,12 @@ from itertools import product
 
 import numpy as np
 
+# from src_james.core.DataModel import Competition
+# from src_james.settings import settings
 # from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
 # from src_james.solver_multimodel.queries.ratio import task_grid_max_dim
 # from src_james.solver_multimodel.Solver import Solver
+# from src_james.solver_multimodel.transforms.grid import grid_invert_color
 
 
 class GeometrySolver(Solver):
@@ -1576,7 +1666,9 @@ class GeometrySolver(Solver):
         "roll":      ( np.roll,      product(range(-5,5),[0,1]) ),
         "swapaxes":  ( np.swapaxes,  [(0, 1),(1, 0)] ),
         "transpose": ( np.transpose, []       ),                      # this doesn't find anything
-        }
+        "none":      ( np.copy,             []        ),
+        "grid_invert_color": ( grid_invert_color,   []), # BROKEN
+    }
 
     def __init__(self):
         super().__init__()
@@ -1617,8 +1709,45 @@ class GeometrySolver(Solver):
             return grid
 
 
+if __name__ == '__main__' and not settings['production']:
+    solver = GeometrySolver()
+    solver.verbose = True
+    competition = Competition()
+    competition.map(solver.solve_dataset)
+    print(competition)
+
 #####
 ##### END   src_james/solver_multimodel/GeometrySolver.py
+#####
+
+#####
+##### START src_james/solver_multimodel/queries/bincount.py
+#####
+
+import numpy as np
+
+# from src_james.solver_multimodel.transforms.singlecolor import np_bincount
+# from src_james.solver_multimodel.transforms.singlecolor import unique_colors_sorted
+# from src_james.util.np_cache import np_cache
+
+
+@np_cache()
+def query_bincount(grid: np.ndarray, i:int, j:int, pos: 0) -> bool:
+    bincount = np_bincount(grid)
+    if len(bincount) >= pos: return False
+    result = grid[i,j] == bincount[pos]
+    return result
+
+@np_cache()
+def query_bincount_sorted(grid: np.ndarray, i:int, j:int, pos: 0) -> bool:
+    bincount = unique_colors_sorted(grid)
+    if len(bincount) >= pos: return False
+    result = grid[i,j] == bincount[pos]
+    return result
+
+
+#####
+##### END   src_james/solver_multimodel/queries/bincount.py
 #####
 
 #####
@@ -1695,6 +1824,35 @@ def flip_loop_cols(grid, start=0):
 #####
 
 #####
+##### START src_james/solver_multimodel/queries/period.py
+#####
+
+import numpy as np
+
+# from src_james.ensemble.period import get_period_length0
+# from src_james.ensemble.period import get_period_length1
+# from src_james.util.np_cache import np_cache
+
+
+@np_cache
+def query_period_length0(grid: np.ndarray, i:int, j:int) -> bool:
+    period = get_period_length0(grid)
+    result = grid[i,j] == period
+    return result
+
+
+@np_cache
+def query_period_length1(grid: np.ndarray, i:int, j:int) -> bool:
+    period = get_period_length1(grid)
+    result = grid[i,j] == period
+    return result
+
+
+#####
+##### END   src_james/solver_multimodel/queries/period.py
+#####
+
+#####
 ##### START src_james/solver_multimodel/transforms/crop.py
 #####
 
@@ -1723,33 +1881,6 @@ def crop_outer(grid,tol=0):
 
 #####
 ##### END   src_james/solver_multimodel/transforms/crop.py
-#####
-
-#####
-##### START src_james/solver_multimodel/transforms/grid.py
-#####
-
-
-# BROKEN?
-# from src_james.solver_multimodel.queries.grid import max_color
-# from src_james.util.np_cache import np_cache
-
-
-@np_cache
-def invert(grid, color=None):
-    if callable(color): color = color(grid)
-    if color is None:   color = max_color(grid)
-    if color:
-        grid        = grid.copy()
-        mask_zero   = grid[ grid == 0 ]
-        mask_square = grid[ grid != 0 ]
-        grid[mask_zero]   = color
-        grid[mask_square] = 0
-    return grid
-
-
-#####
-##### END   src_james/solver_multimodel/transforms/grid.py
 #####
 
 #####
@@ -1992,6 +2123,7 @@ if __name__ == '__main__' and not settings['production']:
 # from src_james.solver_multimodel.queries.colors import task_is_singlecolor
 # from src_james.solver_multimodel.queries.grid import *
 # from src_james.solver_multimodel.queries.ratio import task_shape_ratio
+# from src_james.solver_multimodel.queries.symmetry import is_grid_symmetry
 # from src_james.solver_multimodel.Solver import Solver
 
 
@@ -2008,6 +2140,7 @@ class SingleColorSolver(Solver):
         count_colors,
         count_squares,
         np.count_nonzero,
+        is_grid_symmetry,
     ]
 
     def detect(self, task):
@@ -2031,7 +2164,6 @@ class SingleColorSolver(Solver):
         output = np.zeros(( int(grid.shape[0] * ratio[0]), int(grid.shape[1] * ratio[1]) ), dtype=np.int8)
         output[:,:] = color
         return output
-
 
 
 
@@ -2066,16 +2198,22 @@ if __name__ == '__main__' and not settings['production']:
 import inspect
 from itertools import product
 
+# from src_james.core.DataModel import Competition
 # from src_james.core.DataModel import Task
 # from src_james.settings import settings
 # from src_james.solver_multimodel.GeometrySolver import GeometrySolver
+# from src_james.solver_multimodel.queries.bincount import query_bincount
+# from src_james.solver_multimodel.queries.bincount import query_bincount_sorted
 # from src_james.solver_multimodel.queries.grid import *
 # from src_james.solver_multimodel.queries.loops import *
+# from src_james.solver_multimodel.queries.period import query_period_length0
+# from src_james.solver_multimodel.queries.period import query_period_length1
 # from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_integer_multiple
 # from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
+# from src_james.solver_multimodel.queries.symmetry import is_grid_symmetry
 # from src_james.solver_multimodel.transforms.crop import crop_inner
 # from src_james.solver_multimodel.transforms.crop import crop_outer
-# from src_james.solver_multimodel.transforms.grid import invert
+# from src_james.solver_multimodel.transforms.grid import grid_invert_color
 # from src_james.solver_multimodel.ZoomSolver import ZoomSolver
 # from src_james.util.make_tuple import make_tuple
 
@@ -2085,27 +2223,28 @@ class TessellationSolver(GeometrySolver):
     debug   = False
     options = {
         "preprocess": {
-            "np.copy":    (np.copy, []),
-            "crop_inner": (crop_inner, range(0,9)),
-            "crop_outer": (crop_outer, range(0,9)),
-            },
+            "np.copy":     (np.copy, []),
+            "crop_inner":  (crop_inner, range(0,9)),
+            "crop_outer":  (crop_outer, range(0,9)),
+        },
         "transform": {
-            "none":              ( np.copy,      []        ),
-            "flip":              ( np.flip,      [0,1]     ),
-            "rot90":             ( np.rot90,     [1,2,3]   ),
-            "roll":              ( np.roll,      product([-1,1],[0,1]) ),
-            "swapaxes":          ( np.swapaxes,  [(0, 1)]  ),
+            "none":              ( np.copy,             []        ),
+            "flip":              ( np.flip,             [0,1]     ),
+            "rot90":             ( np.rot90,            [1,2,3]   ),
+            "roll":              ( np.roll,             product([-1,1],[0,1]) ),
+            "swapaxes":          ( np.swapaxes,         [(0, 1)]  ),
             "rotate_loop":       ( rotate_loop,         range(-4,4) ),
             "rotate_loop_rows":  ( rotate_loop_rows,    range(-4,4) ),  # BROKEN ?
             "rotate_loop_cols":  ( rotate_loop_cols,    range(-4,4) ),  # BROKEN ?
             "flip_loop":         ( flip_loop,           range(0,2)  ),  # BROKEN ?
             "flip_loop_rows":    ( flip_loop_rows,      range(0,2)  ),  # BROKEN ?
             "flip_loop_cols":    ( flip_loop_cols,      range(0,2)  ),  # BROKEN ?
-            "invert":            ( invert,              [max_color, min_color, max_color_1d, count_colors, count_squares, *range(1,9)]  ), # BROKEN
+            "grid_invert_color": ( grid_invert_color,   []), # BROKEN
             # TODO: Invert
-            },
+        },
         "query": {
             "query_true":              ( query_true,          [] ),
+            "query_false":             ( query_false,          [] ),
             "query_not_zero":          ( query_not_zero,      [] ),
             "query_max_color":         ( query_max_color,     [] ),
             "query_min_color":         ( query_min_color,     [] ),
@@ -2117,9 +2256,14 @@ class TessellationSolver(GeometrySolver):
             "query_count_squares":     ( query_count_squares,     [] ),
             "query_count_squares_row": ( query_count_squares_row, [] ),
             "query_count_squares_col": ( query_count_squares_col, [] ),
-            "query_color":             ( query_color,         range(0,10) ),  # TODO: query_max_color() / query_min_color()
-            }
+            "query_color":             ( query_color,            range(0,10) ),
+            "query_period_length0":    ( query_period_length0,    []),
+            "query_period_length1":    ( query_period_length1,    []),
+            "query_bincount":          ( query_bincount,         range(0,10)),
+            "query_bincount_sorted":   ( query_bincount_sorted,  range(0,10)),
+            "is_grid_symmetry":        ( is_grid_symmetry )
         }
+    }
 
 
     def detect(self, task):
@@ -2213,6 +2357,12 @@ if __name__ == '__main__' and not settings['production']:
     solver.plot([ task ])
     print('task.score(): ', task.score())
 
+if __name__ == '__main__' and not settings['production']:
+    solver = GeometrySolver()
+    solver.verbose = True
+    competition = Competition()
+    competition.map(solver.solve_dataset)
+    print(competition)
 
 #####
 ##### END   src_james/solver_multimodel/TessellationSolver.py
@@ -2236,6 +2386,7 @@ from xgboost import XGBClassifier
 # from src_james.settings import settings
 # from src_james.solver_multimodel.queries.grid import *
 # from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
+# from src_james.solver_multimodel.queries.symmetry import is_grid_symmetry
 # from src_james.solver_multimodel.Solver import Solver
 # from src_james.solver_multimodel.transforms.singlecolor import np_bincount
 # from src_james.util.np_cache import np_cache
@@ -2249,7 +2400,7 @@ class XGBGridSolver(Solver):
         'eval_metric':      'error',
         'objective':        'reg:squarederror',
         'n_estimators':     32,
-        # 'max_depth':        100,
+        'max_depth':        100,
         'min_child_weight': 0,
         # 'sampling_method':  'uniform',
         # 'max_delta_step':   1,
@@ -2363,6 +2514,7 @@ class XGBGridSolver(Solver):
             grid[i][j],                     # grid[i][j]+1, grid[i][j]-1 = can produce worse results
 
             *np_bincount(grid),
+            *grid_unique_colors(grid),
             *cls.get_moore_neighbours(grid, i, j),
             *cls.get_tl_tr(grid, i, j),
 
@@ -2381,6 +2533,7 @@ class XGBGridSolver(Solver):
             min_color_1d(grid),
             get_period_length1(grid),  # has no effect
             get_period_length0(grid),  # has no effect
+            is_grid_symmetry(grid),
         ]
 
         neighbourhoods = [
@@ -2865,13 +3018,13 @@ if __name__ == '__main__':
 ##### 
 ##### ./submission/kaggle_compile.py ./src_james/solver_multimodel/main.py
 ##### 
-##### 2020-05-27 21:45:45+01:00
+##### 2020-05-27 22:36:57+01:00
 ##### 
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### origin	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### 
 #####   james-wip c81cf89 Solvers | work in progress - broken
-##### * master    620f07e XGBGridSolver | rerun noteboook
+##### * master    85c9706 [ahead 6] XGBGridSolver | + grid_unique_colors() + is_grid_symmetry()
 ##### 
-##### 620f07e2820831d29e329e5484cf0e88d79c848f
+##### 85c9706561ac26e2fb800b6fb15c6651797328b0
 ##### 

@@ -217,7 +217,7 @@ if __name__ == '__main__' and not os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
     ]
     hyperopt(param_hyperopt, 50, points_to_evaluate=points_to_evaluate, verbose=True, timeout_seconds=180)
 
-
+### The problem with running hyperopt on XGBoost for this dataset is that the results are highly variable - 9s score 4-7 on rerun
 ### Best keyword results - score = 9
 # {'score': 9, 'time': 85,  'booster': 'dart',   'eval_metric': 'error',          'grow_policy': 'lossguide', 'objective': 'reg:squaredlogerror', 'sampling_method': 'gradient_based', 'tree_method': 'hist'}
 # {'score': 9, 'time': 94,  'booster': 'gbtree', 'eval_metric': 'ndcg',           'grow_policy': 'depthwise', 'objective': 'reg:squarederror',    'sampling_method': 'uniform',        'tree_method': 'exact'}

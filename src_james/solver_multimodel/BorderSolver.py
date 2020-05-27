@@ -1,6 +1,7 @@
-from src_james.solver_multimodel.Solver import Solver
 from src_james.solver_multimodel.queries.grid import *
-from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_consistant, task_shape_ratios
+from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_consistant
+from src_james.solver_multimodel.queries.ratio import task_shape_ratios
+from src_james.solver_multimodel.Solver import Solver
 
 
 class BorderSolver(Solver):
@@ -45,7 +46,7 @@ class BorderSolver(Solver):
 
     def action(self, grid, query=None, task=None):
         ratio  = task_shape_ratios(task)[0]
-        output = np.zeros(( int(grid.shape[0] * ratio[0]), int(grid.shape[1] * ratio[1]) ))
+        output = np.zeros(( int(grid.shape[0] * ratio[0]), int(grid.shape[1] * ratio[1]) ), dtype=np.int8)
         color  = query(grid) if callable(query) else query
         output[:,:] = color
         output[1:-1,1:-1] = 0

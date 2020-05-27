@@ -1,17 +1,17 @@
 import inspect
-import os
 from itertools import product
 
 from src_james.core.DataModel import Task
 from src_james.settings import settings
 from src_james.solver_multimodel.GeometrySolver import GeometrySolver
-from src_james.solver_multimodel.ZoomSolver import ZoomSolver
 from src_james.solver_multimodel.queries.grid import *
 from src_james.solver_multimodel.queries.loops import *
 from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_integer_multiple
 from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
-from src_james.solver_multimodel.transforms.crop import crop_inner, crop_outer
+from src_james.solver_multimodel.transforms.crop import crop_inner
+from src_james.solver_multimodel.transforms.crop import crop_outer
 from src_james.solver_multimodel.transforms.grid import invert
+from src_james.solver_multimodel.ZoomSolver import ZoomSolver
 from src_james.util.make_tuple import make_tuple
 
 
@@ -113,7 +113,7 @@ class TessellationSolver(GeometrySolver):
             ratio   = ( int(output.shape[0] / grid.shape[0]), int(output.shape[1] / grid.shape[1]) )
             (gx,gy) = grid.shape
             for x,y in product(range(ratio[0]),range(ratio[1])):
-                copy = np.zeros(grid.shape)
+                copy = np.zeros(grid.shape, dtype=np.int8)
                 # noinspection PyArgumentList
                 if query(grid,x%gx,y%gy, *q_arg):
                     copy = transform(grid, *t_arg)
@@ -135,7 +135,7 @@ class TessellationSolver(GeometrySolver):
                 ratio = task_shape_ratios(task)[0]
                 ratio = list(map(int, ratio))
                 shape = ( int(grid.shape[0]*ratio[0]), int(grid.shape[1]*ratio[1]) )
-                return np.zeros(shape)
+                return np.zeros(shape, dtype=np.int8)
         except Exception as exception:
             if self.debug: print(exception)
             pass

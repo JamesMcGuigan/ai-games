@@ -26,13 +26,14 @@ def task_min_shape(task: Task) -> Tuple[int,int]:
     x,y = zip(task_shapes(task))
     return (min(x), min(y))
 
-
+@clru_cache(None)
 def task_pixels(task: Task) -> np.ndarray:
     pixels = [ problem['input'].flatten() for problem in task['train'] ]
     pixels = np.concatenate(pixels).flatten()
     return pixels
 
 
+@clru_cache(None)
 def task_difference_mask(task: Task) -> np.ndarray:
     output = np.concatenate([
         problem_difference_mask(problem)
@@ -40,6 +41,7 @@ def task_difference_mask(task: Task) -> np.ndarray:
     ])
     return output
 
+@clru_cache(None)
 def task_difference_input(task: Task):
     output = np.concatenate([
         problem_difference_input(problem)
@@ -47,6 +49,7 @@ def task_difference_input(task: Task):
     ])
     return output
 
+@clru_cache(None)
 def task_difference_output(task: Task):
     output = np.concatenate([
         problem_difference_output(problem)

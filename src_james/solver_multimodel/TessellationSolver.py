@@ -13,6 +13,7 @@ from src_james.solver_multimodel.queries.period import query_period_length0
 from src_james.solver_multimodel.queries.period import query_period_length1
 from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_integer_multiple
 from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
+from src_james.solver_multimodel.queries.symmetry import is_grid_symmetry
 from src_james.solver_multimodel.transforms.crop import crop_inner
 from src_james.solver_multimodel.transforms.crop import crop_outer
 from src_james.solver_multimodel.transforms.grid import grid_invert_color
@@ -63,6 +64,7 @@ class TessellationSolver(GeometrySolver):
             "query_period_length1":    ( query_period_length1,    []),
             "query_bincount":          ( query_bincount,         range(0,10)),
             "query_bincount_sorted":   ( query_bincount_sorted,  range(0,10)),
+            "is_grid_symmetry":        ( is_grid_symmetry )
         }
     }
 

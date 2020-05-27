@@ -3,6 +3,7 @@ from src_james.settings import settings
 from src_james.solver_multimodel.queries.colors import task_is_singlecolor
 from src_james.solver_multimodel.queries.grid import *
 from src_james.solver_multimodel.queries.ratio import task_shape_ratio
+from src_james.solver_multimodel.queries.symmetry import is_grid_symmetry
 from src_james.solver_multimodel.Solver import Solver
 
 
@@ -19,6 +20,7 @@ class SingleColorSolver(Solver):
         count_colors,
         count_squares,
         np.count_nonzero,
+        is_grid_symmetry,
     ]
 
     def detect(self, task):
@@ -42,7 +44,6 @@ class SingleColorSolver(Solver):
         output = np.zeros(( int(grid.shape[0] * ratio[0]), int(grid.shape[1] * ratio[1]) ), dtype=np.int8)
         output[:,:] = color
         return output
-
 
 
 

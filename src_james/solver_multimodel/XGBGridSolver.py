@@ -12,6 +12,7 @@ from src_james.ensemble.period import get_period_length1
 from src_james.settings import settings
 from src_james.solver_multimodel.queries.grid import *
 from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
+from src_james.solver_multimodel.queries.symmetry import is_grid_symmetry
 from src_james.solver_multimodel.Solver import Solver
 from src_james.solver_multimodel.transforms.singlecolor import np_bincount
 from src_james.util.np_cache import np_cache
@@ -139,6 +140,7 @@ class XGBGridSolver(Solver):
             grid[i][j],                     # grid[i][j]+1, grid[i][j]-1 = can produce worse results
 
             *np_bincount(grid),
+            *grid_unique_colors(grid),
             *cls.get_moore_neighbours(grid, i, j),
             *cls.get_tl_tr(grid, i, j),
 
@@ -157,6 +159,7 @@ class XGBGridSolver(Solver):
             min_color_1d(grid),
             get_period_length1(grid),  # has no effect
             get_period_length0(grid),  # has no effect
+            is_grid_symmetry(grid),
         ]
 
         neighbourhoods = [

@@ -1,6 +1,6 @@
 from src_james.solver_multimodel.queries.grid import *
 from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_consistant
-from src_james.solver_multimodel.queries.ratio import task_shape_ratios
+from src_james.solver_multimodel.queries.ratio import task_shape_ratio
 from src_james.solver_multimodel.Solver import Solver
 
 
@@ -39,15 +39,18 @@ class BorderSolver(Solver):
         if task.filename in self.cache: return True
         for query in self.queries:
             args = [ query ]
-            if self.is_lambda_valid(task, self.predict, *args, task=task):
+            if self.is_lambda_valid(task, self.solve_grid, *args, task=task):
                 self.cache[task.filename] = args
                 return True
         return False
 
-    def predict(self, grid, query=None, *args, task=None, **kwargs):
-        ratio  = task_shape_ratios(task)[0]
-        output = np.zeros(( int(grid.shape[0] * ratio[0]), int(grid.shape[1] * ratio[1]) ), dtype=np.int8)
+    def solve_grid(self, grid: np.ndarray, *args, query=None, task=None, **kwargs):
         color  = query(grid) if callable(query) else query
-        output[:,:] = color
+        ratio  = task_shape_ratio(task)
+        if color is None: return None
+        if ratio is None: return None
+
+        shape  = ( int(grid.shape[0] * ratio[0]), int(grid.shape[1] * ratio[1]) )
+        output = np.full(shape, color, dtype=np.int8)
         output[1:-1,1:-1] = 0
         return output

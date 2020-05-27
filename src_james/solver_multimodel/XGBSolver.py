@@ -38,6 +38,11 @@ class XGBSolver(Solver):
         # if not_valid: return False
         return True
 
+    def create_classifier(self, **kwargs):
+        kwargs     = { **self.kwargs, **kwargs }
+        classifier = XGBClassifier(kwargs)
+        return classifier
+
     def fit(self, task):
         if task.filename not in self.cache:
             # inputs  = task['train'].inputs + task['test'].inputs
@@ -46,7 +51,7 @@ class XGBSolver(Solver):
             if not_valid:
                 self.cache[task.filename] = None
             else:
-                xgb = XGBClassifier(**self.kwargs, n_jobs=-1)
+                xgb = self.create_classifier()
                 xgb.fit(inputs, outputs, verbose=False)
                 self.cache[task.filename] = (xgb,)
 

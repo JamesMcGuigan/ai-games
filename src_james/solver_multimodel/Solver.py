@@ -31,7 +31,8 @@ class Solver():
 
     def predict(self, grid: np.ndarray, *args, task=None, **kwargs):
         """ @override | This is the primary method this needs to be defined"""
-        return grid
+        raise NotImplementedError
+        # return grid
         # raise NotImplementedError()
 
 

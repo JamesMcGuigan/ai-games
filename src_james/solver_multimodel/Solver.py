@@ -1,3 +1,4 @@
+from collections import UserList
 from typing import Callable
 from typing import List
 from typing import Union
@@ -16,48 +17,39 @@ class Solver():
     def __init__(self):
         self.cache = {}
 
-    @staticmethod
-    def is_lambda_valid(_task_: Task, _function_: Callable, *args, **kwargs):  # _task_ = avoid namespace conflicts with kwargs=task
+
+    def detect(self, task: Task) -> bool:
+        """ @override | default heuristic is simply to run the solver"""
+        return self.test(task)
+
+
+    def fit(self, task: Task):
+        """ @override | sets: self.cache[task.filename] """
+        if task.filename in self.cache: return
+        pass
+
+
+    def predict(self, grid: np.ndarray, *args, task=None, **kwargs):
+        """ @override | This is the primary method this needs to be defined"""
+        return grid
+        # raise NotImplementedError()
+
+
+    def test(self, task: Task) -> bool:
+        """test if the given predict correctly solves the task"""
+        if task.filename not in self.cache: self.fit(task)
+        if self.cache.get(task.filename, True) is None: return False
+
+        args = self.cache.get(task.filename, ())
+        return self.is_lambda_valid(task, self.predict, *args, task=task)
+
+
+    def is_lambda_valid(self, _task_: Task, _function_: Callable, *args, **kwargs):  # _task_ = avoid namespace conflicts with kwargs=task
         for problem in _task_['train']:
             output = _function_(problem['input'], *args, **kwargs)
             if not np.array_equal( problem['output'], output):
                 return False
         return True
-
-    @staticmethod
-    def solve_lambda( _task_: Task, _function_: Callable, *args, _inplace_=False, **kwargs) -> List[Problem]:
-        solutions = []
-        for index, problem in enumerate(_task_['test']):
-            output = _function_(problem['input'], *args, **kwargs)
-            output.flags.writeable = False
-            solution = Problem({
-                "input":  problem['input'],
-                "output": output,
-            }, problemset=_task_['test'])
-            solutions.append(solution)
-            if _inplace_:
-                _task_['solutions'][index].append(solution)
-        return solutions
-
-    def predict(self, grid: np.ndarray, task=None, *args):
-        """This is the primary method this needs to be defined"""
-        return grid
-        # raise NotImplementedError()
-
-    def detect(self, task: Task) -> bool:
-        """default heuristic is simply to run the solver"""
-        return self.test(task)
-
-    def fit(self, task: Task):
-        if task.filename in self.cache: return
-        pass
-
-    def test(self, task: Task) -> bool:
-        """test if the given predict correctly solves the task"""
-        if task.filename not in self.cache: self.fit(task)
-
-        args = self.cache.get(task.filename, ())
-        return self.is_lambda_valid(task, self.predict, *args, task=task)
 
 
     def format_args(self, args):
@@ -74,6 +66,7 @@ class Solver():
             args = tuple(args)
         return args
 
+
     def log_solved(self, task: Task, args: Union[list,tuple,set], solutions: List[Problem]):
         if self.verbose:
             if 'test' in task.filename:           label = 'test  '
@@ -83,6 +76,7 @@ class Solver():
             args  = self.format_args(args) if len(args) else None
             print(f'{label}:', task.filename, self.__class__.__name__, args)
 
+
     def is_solved(self, task: Task, solutions: List[Problem]):
         for solution in solutions:
             for problem in task['test']:
@@ -90,23 +84,26 @@ class Solver():
                     return True
         return False
 
+
     def solve(self, task: Task, force=False, inplace=True) -> Union[List[Problem],None]:
         """solve test case and persist"""
-        if task.filename not in self.cache: self.fit(task)
+        if task.filename not in self.cache:   self.fit(task)
         try:
             if self.detect(task) or force:    # may generate cache
                 if self.test(task) or force:  # may generate cache
-                    args = self.cache.get(task.filename, ())
+                    args = self.cache.get(task.filename, ()) or ()
+                    if args is None: return None
                     if isinstance(args, dict):
-                        solutions = self.solve_lambda(task, self.predict, **args, task=task, _inplace_=True)
+                        solutions = self.solve_task(task, self.predict, **args, task=task, _inplace_=True)
                     else:
-                        solutions = self.solve_lambda(task, self.predict, *args, task=task, _inplace_=True)
+                        solutions = self.solve_task(task, self.predict, *args, task=task, _inplace_=True)
                     if len(solutions):
                         self.log_solved(task, args, solutions)
                     return solutions
         except Exception as exception:
             if self.debug: raise exception
         return None
+
 
     def solve_dataset(self, tasks: Union[Dataset, List[Task]], plot=False, solve_detects=False):
         count = 0
@@ -119,12 +116,39 @@ class Solver():
                         plot_task(task)
         return count
 
+
+    def solve_task(self, _task_: Task, _function_: Callable, *args, _inplace_=False, **kwargs) -> List[Problem]:
+        solutions = []
+        for index, problem in enumerate(_task_['test']):
+            solution = self.solve_problem(
+                _problem_  = problem,
+                _task_     = _task_,
+                _function_ = _function_,
+                *args,
+                **kwargs
+            )
+            solutions.append(solution)
+            if _inplace_:
+                _task_['solutions'][index].append_flat(solution)
+        return solutions
+
+
+    def solve_problem(self, _problem_: Problem, _task_: Task, _function_: Callable, *args, **kwargs) -> Problem:
+        output = _function_(_problem_['input'], *args, **kwargs)
+        solution = Problem({
+            "input":  _problem_['input'],
+            "output": output,
+        }, problemset=_task_['test'])
+        return solution
+
+
     def plot(self, tasks: Union[Dataset,List[Task], Task]):
-        if isinstance(tasks, Task): tasks = [ tasks ]
+        if not isinstance(tasks, (list,UserList)): tasks = [ tasks ]
         return self.solve_dataset(tasks, plot=True, solve_detects=False)
 
+
     def plot_detects(self, tasks: Union[Dataset,List[Task],Task], unsolved=True):
-        if isinstance(tasks, Task): tasks = [ tasks ]
+        if not isinstance(tasks, (list,UserList)): tasks = [ tasks ]
         if unsolved:
             tasks = [ task for task in tasks if not task.solutions_count ]
         return self.solve_dataset(tasks, plot=True, solve_detects=True)

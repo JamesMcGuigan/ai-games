@@ -73,6 +73,7 @@ def task_output_grid_shapes(task: Task) -> List[Tuple[int,int]]:
         if problem['output'] is not None
     ))
 
+# TODO: Replace with OutputGridSizeSolver().predict()
 @clru_cache(maxsize=None)
 def task_output_grid_shape(task) -> Union[Tuple[int,int], None]:
     grid_sizes = task_output_grid_shapes(task)

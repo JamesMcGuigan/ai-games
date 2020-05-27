@@ -39,7 +39,7 @@ class Solver():
                 _task_['solutions'][index].append(solution)
         return solutions
 
-    def action(self, grid: np.ndarray, task=None, *args):
+    def predict(self, grid: np.ndarray, task=None, *args):
         """This is the primary method this needs to be defined"""
         return grid
         # raise NotImplementedError()
@@ -53,11 +53,11 @@ class Solver():
         pass
 
     def test(self, task: Task) -> bool:
-        """test if the given action correctly solves the task"""
+        """test if the given predict correctly solves the task"""
         if task.filename not in self.cache: self.fit(task)
 
         args = self.cache.get(task.filename, ())
-        return self.is_lambda_valid(task, self.action, *args, task=task)
+        return self.is_lambda_valid(task, self.predict, *args, task=task)
 
 
     def format_args(self, args):
@@ -98,9 +98,9 @@ class Solver():
                 if self.test(task) or force:  # may generate cache
                     args = self.cache.get(task.filename, ())
                     if isinstance(args, dict):
-                        solutions = self.solve_lambda(task, self.action, **args, task=task, _inplace_=True)
+                        solutions = self.solve_lambda(task, self.predict, **args, task=task, _inplace_=True)
                     else:
-                        solutions = self.solve_lambda(task, self.action,  *args, task=task, _inplace_=True )
+                        solutions = self.solve_lambda(task, self.predict, *args, task=task, _inplace_=True)
                     if len(solutions):
                         self.log_solved(task, args, solutions)
                     return solutions

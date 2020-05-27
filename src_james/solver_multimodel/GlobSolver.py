@@ -50,7 +50,7 @@ class GlobSolver(Solver):
         return False
 
 
-    def action(self, grid: np.ndarray, filename:str=None, task=None, *args):
+    def predict(self, grid: np.ndarray, filename:str=None, task=None, *args):
         """If we have seen the input before, then propose the same output"""
         hash = grid.tobytes()
         if hash in self.solutions:

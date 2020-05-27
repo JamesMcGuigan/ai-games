@@ -1,8 +1,8 @@
 import cv2
 import skimage.measure
 
-from src_james.solver_multimodel.Solver import Solver
 from src_james.solver_multimodel.queries.ratio import task_shape_ratios
+from src_james.solver_multimodel.Solver import Solver
 
 
 class ZoomSolver(Solver):
@@ -21,7 +21,7 @@ class ZoomSolver(Solver):
     def get_scale(self, task):
         return task_shape_ratios(task)[0][0]
 
-    def action( self, grid, task=None, *args ):
+    def predict(self, grid, task=None, *args):
         scale = self.get_scale(task)
         if scale > 1:
             resize = tuple( int(d*scale) for d in grid.shape )

@@ -94,13 +94,13 @@ class TessellationSolver(GeometrySolver):
                 "query":      query,  # TODO: max_colour limit counter
                 "q_arg":      q_arg,
                 }
-            if self.is_lambda_valid(task, self.action, **kwargs, task=task):
+            if self.is_lambda_valid(task, self.predict, **kwargs, task=task):
                 self.cache[task.filename] = kwargs
                 return True
         return False
 
 
-    def action(self, grid, preprocess=np.copy, p_arg=(), transform=np.copy, t_arg=(), query=query_true, q_arg=(), task=None):
+    def predict(self, grid, preprocess=np.copy, p_arg=(), transform=np.copy, t_arg=(), query=query_true, q_arg=(), task=None):
         if inspect.isgeneratorfunction(transform):
             generator = transform(grid, *t_arg)
             transform = lambda grid, *args: next(generator)

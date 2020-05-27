@@ -1,9 +1,11 @@
-from itertools import combinations, product
+from itertools import combinations
+from itertools import product
 
 import numpy as np
 
+from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
+from src_james.solver_multimodel.queries.ratio import task_grid_max_dim
 from src_james.solver_multimodel.Solver import Solver
-from src_james.solver_multimodel.queries.ratio import task_grid_max_dim, is_task_shape_ratio_unchanged
 
 
 class GeometrySolver(Solver):
@@ -49,9 +51,9 @@ class GeometrySolver(Solver):
                     return True
         return False
 
-    def action(self, grid, function=None, args=None, task=None):
+    def predict(self, grid, function=None, args=None, task=None):
         try:
             return function(grid, *args)
         except Exception as exception:
-            if self.debug: print('Exception', self.__class__.__name__, 'action()', function, args, exception)
+            if self.debug: print('Exception', self.__class__.__name__, 'predict()', function, args, exception)
             return grid

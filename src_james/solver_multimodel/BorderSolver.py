@@ -39,12 +39,12 @@ class BorderSolver(Solver):
         if task.filename in self.cache: return True
         for query in self.queries:
             args = [ query ]
-            if self.is_lambda_valid(task, self.action, *args, task=task):
+            if self.is_lambda_valid(task, self.predict, *args, task=task):
                 self.cache[task.filename] = args
                 return True
         return False
 
-    def action(self, grid, query=None, task=None):
+    def predict(self, grid, query=None, task=None):
         ratio  = task_shape_ratios(task)[0]
         output = np.zeros(( int(grid.shape[0] * ratio[0]), int(grid.shape[1] * ratio[1]) ), dtype=np.int8)
         color  = query(grid) if callable(query) else query

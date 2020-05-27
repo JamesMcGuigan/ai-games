@@ -8,6 +8,7 @@ from src_james.settings import settings
 from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
 from src_james.solver_multimodel.queries.ratio import task_grid_max_dim
 from src_james.solver_multimodel.Solver import Solver
+from src_james.solver_multimodel.transforms.grid import grid_invert_color
 
 
 class GeometrySolver(Solver):
@@ -20,7 +21,9 @@ class GeometrySolver(Solver):
         "roll":      ( np.roll,      product(range(-5,5),[0,1]) ),
         "swapaxes":  ( np.swapaxes,  [(0, 1),(1, 0)] ),
         "transpose": ( np.transpose, []       ),                      # this doesn't find anything
-        }
+        "none":      ( np.copy,             []        ),
+        "grid_invert_color": ( grid_invert_color,   []), # BROKEN
+    }
 
     def __init__(self):
         super().__init__()

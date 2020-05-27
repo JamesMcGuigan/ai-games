@@ -41,7 +41,7 @@ class TessellationSolver(GeometrySolver):
             "flip_loop":         ( flip_loop,           range(0,2)  ),  # BROKEN ?
             "flip_loop_rows":    ( flip_loop_rows,      range(0,2)  ),  # BROKEN ?
             "flip_loop_cols":    ( flip_loop_cols,      range(0,2)  ),  # BROKEN ?
-            "invert":            ( grid_invert_color,   []), # BROKEN
+            "grid_invert_color": ( grid_invert_color,   []), # BROKEN
             # TODO: Invert
         },
         "query": {

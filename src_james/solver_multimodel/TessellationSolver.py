@@ -1,11 +1,16 @@
 import inspect
 from itertools import product
 
+from src_james.core.DataModel import Competition
 from src_james.core.DataModel import Task
 from src_james.settings import settings
 from src_james.solver_multimodel.GeometrySolver import GeometrySolver
+from src_james.solver_multimodel.queries.bincount import query_bincount
+from src_james.solver_multimodel.queries.bincount import query_bincount_sorted
 from src_james.solver_multimodel.queries.grid import *
 from src_james.solver_multimodel.queries.loops import *
+from src_james.solver_multimodel.queries.period import query_period_length0
+from src_james.solver_multimodel.queries.period import query_period_length1
 from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_integer_multiple
 from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
 from src_james.solver_multimodel.transforms.crop import crop_inner
@@ -20,10 +25,10 @@ class TessellationSolver(GeometrySolver):
     debug   = False
     options = {
         "preprocess": {
-            "np.copy":    (np.copy, []),
-            "crop_inner": (crop_inner, range(0,9)),
-            "crop_outer": (crop_outer, range(0,9)),
-            },
+            "np.copy":     (np.copy, []),
+            "crop_inner":  (crop_inner, range(0,9)),
+            "crop_outer":  (crop_outer, range(0,9)),
+        },
         "transform": {
             "none":              ( np.copy,      []        ),
             "flip":              ( np.flip,      [0,1]     ),
@@ -38,7 +43,7 @@ class TessellationSolver(GeometrySolver):
             "flip_loop_cols":    ( flip_loop_cols,      range(0,2)  ),  # BROKEN ?
             "invert":            ( invert,              [max_color, min_color, max_color_1d, count_colors, count_squares, *range(1,9)]  ), # BROKEN
             # TODO: Invert
-            },
+        },
         "query": {
             "query_true":              ( query_true,          [] ),
             "query_not_zero":          ( query_not_zero,      [] ),
@@ -53,8 +58,12 @@ class TessellationSolver(GeometrySolver):
             "query_count_squares_row": ( query_count_squares_row, [] ),
             "query_count_squares_col": ( query_count_squares_col, [] ),
             "query_color":             ( query_color,         range(0,10) ),  # TODO: query_max_color() / query_min_color()
-            }
+            "query_period_length0":    ( query_period_length0,    []),
+            "query_period_length1":    ( query_period_length1,    []),
+            "query_bincount":          ( query_bincount,    []),
+            "query_bincount_sorted":   ( query_bincount_sorted,    []),
         }
+    }
 
 
     def detect(self, task):
@@ -147,3 +156,10 @@ if __name__ == '__main__' and not settings['production']:
     solver = TessellationSolver()
     solver.plot([ task ])
     print('task.score(): ', task.score())
+
+if __name__ == '__main__' and not settings['production']:
+    solver = GeometrySolver()
+    solver.verbose = True
+    competition = Competition()
+    competition.map(solver.solve_dataset)
+    print(competition)

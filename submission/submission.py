@@ -3,15 +3,17 @@
 ##### 
 ##### ./submission/kaggle_compile.py ./src_james/solver_multimodel/main.py
 ##### 
-##### 2020-05-27 22:36:57+01:00
+##### 2020-05-28 14:20:57+01:00
 ##### 
-##### origin	git@github.com:seshurajup/kaggle-arc.git (fetch)
-##### origin	git@github.com:seshurajup/kaggle-arc.git (push)
+##### archive	git@github.com:seshurajup/kaggle-arc.git (fetch)
+##### archive	git@github.com:seshurajup/kaggle-arc.git (push)
+##### origin	git@github.com:JamesMcGuigan/kaggle-arc.git (fetch)
+##### origin	git@github.com:JamesMcGuigan/kaggle-arc.git (push)
 ##### 
 #####   james-wip c81cf89 Solvers | work in progress - broken
-##### * master    85c9706 [ahead 6] XGBGridSolver | + grid_unique_colors() + is_grid_symmetry()
+##### * master    01cd888 kaggle_compile.py -> submission.py + submission.csv
 ##### 
-##### 85c9706561ac26e2fb800b6fb15c6651797328b0
+##### 01cd8881afa5cf6d0f2afaa46b10d443318cae5d
 ##### 
 
 #####
@@ -3018,13 +3020,15 @@ if __name__ == '__main__':
 ##### 
 ##### ./submission/kaggle_compile.py ./src_james/solver_multimodel/main.py
 ##### 
-##### 2020-05-27 22:36:57+01:00
+##### 2020-05-28 14:20:57+01:00
 ##### 
-##### origin	git@github.com:seshurajup/kaggle-arc.git (fetch)
-##### origin	git@github.com:seshurajup/kaggle-arc.git (push)
+##### archive	git@github.com:seshurajup/kaggle-arc.git (fetch)
+##### archive	git@github.com:seshurajup/kaggle-arc.git (push)
+##### origin	git@github.com:JamesMcGuigan/kaggle-arc.git (fetch)
+##### origin	git@github.com:JamesMcGuigan/kaggle-arc.git (push)
 ##### 
 #####   james-wip c81cf89 Solvers | work in progress - broken
-##### * master    85c9706 [ahead 6] XGBGridSolver | + grid_unique_colors() + is_grid_symmetry()
+##### * master    01cd888 kaggle_compile.py -> submission.py + submission.csv
 ##### 
-##### 85c9706561ac26e2fb800b6fb15c6651797328b0
+##### 01cd8881afa5cf6d0f2afaa46b10d443318cae5d
 ##### 

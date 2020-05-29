@@ -1,13 +1,12 @@
 # Source: https://www.kaggle.com/jamesmcguigan/arc-geometry-solvers/
-from itertools import chain
-
 import matplotlib.pyplot as plt
 import numpy as np
 from fastcache._lrucache import clru_cache
+from itertools import chain
 from matplotlib import colors
 
 # Modified from: https://www.kaggle.com/zaharch/visualizing-all-tasks-updated
-from src.datamodel.DataModel import Task
+from src.datamodel.Task import Task
 
 
 @clru_cache()

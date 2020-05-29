@@ -1,8 +1,9 @@
-import gc
-import time
 from operator import itemgetter
 
-from src.datamodel.DataModel import Competition
+import gc
+import time
+
+from src.datamodel.Competition import Competition
 from src.settings import settings
 from src.solvers import solvers
 

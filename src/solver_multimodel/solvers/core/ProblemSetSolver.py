@@ -4,9 +4,9 @@ from typing import Union
 
 import numpy as np
 
-from src.datamodel.DataModel import Problem
-from src.datamodel.DataModel import ProblemSet
-from src.datamodel.DataModel import Task
+from src.datamodel.Problem import Problem
+from src.datamodel.ProblemSet import ProblemSet
+from src.datamodel.Task import Task
 from src.solver_multimodel.core.Solver import Solver
 
 

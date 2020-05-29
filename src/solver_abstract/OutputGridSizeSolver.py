@@ -1,13 +1,13 @@
 from collections import defaultdict
-from itertools import chain
 from pprint import pprint
 from typing import Any
 from typing import Tuple
 
 import numpy as np
+from itertools import chain
 
-from src.datamodel.DataModel import Competition
-from src.datamodel.DataModel import Task
+from src.datamodel.Competition import Competition
+from src.datamodel.Task import Task
 from src.settings import settings
 from src.solver_abstract.core.AbstractSolver import AbstractSolver
 from src.solver_abstract.heuristics.Queries import Query

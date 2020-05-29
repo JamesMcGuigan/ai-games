@@ -1,4 +1,4 @@
-from src.datamodel.DataModel import Competition
+from src.datamodel.Competition import Competition
 from src.settings import settings
 from src.solver_multimodel.core.Solver import Solver
 from src.solver_multimodel.queries.grid import *

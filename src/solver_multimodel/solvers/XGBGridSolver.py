@@ -1,12 +1,12 @@
-from itertools import product
 from typing import List
 
 import pydash
 from fastcache._lrucache import clru_cache
+from itertools import product
 from xgboost import XGBClassifier
 
-from src.datamodel.DataModel import Competition
-from src.datamodel.DataModel import Task
+from src.datamodel.Competition import Competition
+from src.datamodel.Task import Task
 from src.ensemble.period import get_period_length0
 from src.ensemble.period import get_period_length1
 from src.settings import settings

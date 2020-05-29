@@ -1,16 +1,16 @@
 from collections import Callable
-from itertools import product
 from typing import Any
 from typing import Dict
 from typing import List
 from typing import Union
 
 import numpy as np
+from itertools import product
 from xgboost import XGBClassifier
 
-from src.datamodel.DataModel import Problem
-from src.datamodel.DataModel import ProblemSet
-from src.datamodel.DataModel import Task
+from src.datamodel.Problem import Problem
+from src.datamodel.ProblemSet import ProblemSet
+from src.datamodel.Task import Task
 from src.solver_multimodel.solvers.core.ProblemSetSolver import ProblemSetSolver
 from src.solver_multimodel.transforms.singlecolor import identity
 from src.util.functions import flatten_deep

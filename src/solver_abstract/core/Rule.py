@@ -3,7 +3,6 @@ import traceback
 from collections import defaultdict
 from collections import UserDict
 from functools import lru_cache
-from itertools import product
 from typing import Any
 from typing import Callable
 from typing import DefaultDict
@@ -14,7 +13,9 @@ from typing import Tuple
 from typing import Type
 from typing import Union
 
-from src.datamodel.DataModel import Problem
+from itertools import product
+
+from src.datamodel.Problem import Problem
 from src.settings import settings
 from src.solver_abstract.core.Context import Context
 from src.solver_abstract.core.Symbol import Symbol

@@ -5,8 +5,8 @@ from typing import Set
 
 import numpy as np
 
-from src.datamodel.DataModel import Problem
-from src.datamodel.DataModel import Task
+from src.datamodel.Problem import Problem
+from src.datamodel.Task import Task
 
 
 class Context(UserDict):

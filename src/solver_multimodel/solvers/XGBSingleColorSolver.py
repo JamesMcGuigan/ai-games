@@ -1,9 +1,9 @@
 from typing import List
 from typing import Union
 
-from src.datamodel.DataModel import Competition
-from src.datamodel.DataModel import ProblemSet
-from src.datamodel.DataModel import Task
+from src.datamodel.Competition import Competition
+from src.datamodel.ProblemSet import ProblemSet
+from src.datamodel.Task import Task
 from src.settings import settings
 from src.solver_multimodel.queries.colors import task_is_singlecolor
 from src.solver_multimodel.queries.grid import *

@@ -5,9 +5,9 @@ from typing import Union
 
 import numpy as np
 
-from src.datamodel.DataModel import Dataset
-from src.datamodel.DataModel import Problem
-from src.datamodel.DataModel import Task
+from src.datamodel.Dataset import Dataset
+from src.datamodel.Problem import Problem
+from src.datamodel.Task import Task
 from src.util.plot import plot_task
 
 

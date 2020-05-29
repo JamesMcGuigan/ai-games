@@ -1,9 +1,8 @@
+import numpy as np
 from itertools import combinations
 from itertools import product
 
-import numpy as np
-
-from src.datamodel.DataModel import Competition
+from src.datamodel.Competition import Competition
 from src.settings import settings
 from src.solver_multimodel.core.Solver import Solver
 from src.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged

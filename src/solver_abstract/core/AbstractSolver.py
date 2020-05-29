@@ -7,8 +7,8 @@ from typing import Union
 
 import numpy as np
 
-from src.datamodel.DataModel import Problem
-from src.datamodel.DataModel import Task
+from src.datamodel.Problem import Problem
+from src.datamodel.Task import Task
 from src.solver_abstract.core.Context import Context
 from src.solver_abstract.core.Rule import Rule
 

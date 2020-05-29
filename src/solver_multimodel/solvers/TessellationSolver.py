@@ -1,8 +1,9 @@
 import inspect
+
 from itertools import product
 
-from src.datamodel.DataModel import Competition
-from src.datamodel.DataModel import Task
+from src.datamodel.Competition import Competition
+from src.datamodel.Task import Task
 from src.settings import settings
 from src.solver_multimodel.queries.bincount import query_bincount
 from src.solver_multimodel.queries.bincount import query_bincount_sorted

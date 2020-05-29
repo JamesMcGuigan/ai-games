@@ -1,4 +1,4 @@
-from src.datamodel.DataModel import Task
+from src.datamodel.Task import Task
 from src.settings import settings
 from src.solver_multimodel.core.Solver import Solver
 from src.solver_multimodel.queries.colors import task_is_singlecolor

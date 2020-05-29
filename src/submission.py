@@ -1,5 +1,5 @@
-from src.datamodel.DataModel import Competition
-from src.datamodel.DataModel import Dataset
+from src.datamodel.Competition import Competition
+from src.datamodel.Dataset import Dataset
 from src.settings import settings
 
 if __name__ == '__main__':

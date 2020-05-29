@@ -2,10 +2,10 @@
 # DOCS: https://medium.com/vantageai/bringing-back-the-time-spent-on-hyperparameter-tuning-with-bayesian-optimisation-2e21a3198afb
 import os
 import random
-import time
 from copy import deepcopy
 
 import numpy as np
+import time
 from hyperopt import fmin
 from hyperopt import hp
 from hyperopt import STATUS_FAIL
@@ -14,7 +14,7 @@ from hyperopt import tpe
 from hyperopt import Trials
 from hyperopt.pyll import scope
 
-from src.datamodel.DataModel import Competition
+from src.datamodel.Competition import Competition
 from src.solver_multimodel.solvers.XGBGridSolver import XGBGridSolver
 from src.util.timeout import timeout
 

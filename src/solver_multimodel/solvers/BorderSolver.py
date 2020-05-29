@@ -1,7 +1,7 @@
+from src.functions.queries.grid import *
+from src.functions.queries.ratio import is_task_shape_ratio_consistant
+from src.functions.queries.ratio import task_shape_ratio
 from src.solver_multimodel.core.Solver import Solver
-from src.solver_multimodel.functions.queries.grid import *
-from src.solver_multimodel.functions.queries.ratio import is_task_shape_ratio_consistant
-from src.solver_multimodel.functions.queries.ratio import task_shape_ratio
 
 
 class BorderSolver(Solver):

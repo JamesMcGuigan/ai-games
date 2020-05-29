@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.solver_multimodel.functions.queries.ratio import task_shape_ratios
+from src.functions.queries.ratio import task_shape_ratios
 from src.util.np_cache import np_cache
 
 

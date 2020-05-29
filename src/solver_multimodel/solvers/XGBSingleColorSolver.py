@@ -4,12 +4,12 @@ from typing import Union
 from src.datamodel.Competition import Competition
 from src.datamodel.ProblemSet import ProblemSet
 from src.datamodel.Task import Task
+from src.functions.queries.colors import task_is_singlecolor
+from src.functions.queries.grid import *
+from src.functions.queries.ratio import is_task_output_grid_shape_constant
+from src.functions.queries.ratio import task_output_grid_shape
 from src.settings import settings
 from src.solver_multimodel.core.ProblemSetSolver import ProblemSetSolver
-from src.solver_multimodel.functions.queries.colors import task_is_singlecolor
-from src.solver_multimodel.functions.queries.grid import *
-from src.solver_multimodel.functions.queries.ratio import is_task_output_grid_shape_constant
-from src.solver_multimodel.functions.queries.ratio import task_output_grid_shape
 from src.solver_multimodel.solvers.XGBSingleColorEncoder import SingleColorXGBEncoder
 from src.util.plot import plot_task
 

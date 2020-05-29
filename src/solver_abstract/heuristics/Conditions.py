@@ -1,8 +1,8 @@
 import numpy as np
 from itertools import chain
 
-from src.solver_multimodel.functions.queries.ratio import grid_shape_ratio
-from src.solver_multimodel.functions.queries.ratio import task_shape_ratios
+from src.functions.queries.ratio import grid_shape_ratio
+from src.functions.queries.ratio import task_shape_ratios
 
 
 class GridConditions:

@@ -1,7 +1,7 @@
 from fastcache._lrucache import clru_cache
 
-from src.solver_multimodel.functions.queries.grid import grid_unique_colors
-from src.solver_multimodel.functions.queries.ratio import is_task_shape_ratio_consistant
+from src.functions.queries.grid import grid_unique_colors
+from src.functions.queries.ratio import is_task_shape_ratio_consistant
 
 
 @clru_cache()

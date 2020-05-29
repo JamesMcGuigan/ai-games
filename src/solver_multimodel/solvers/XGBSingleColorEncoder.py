@@ -1,13 +1,13 @@
 from src.datamodel.Problem import Problem
 from src.datamodel.ProblemSet import ProblemSet
 from src.datamodel.Task import Task
+from src.functions.queries.grid import *
+from src.functions.transforms.singlecolor import identity
+from src.functions.transforms.singlecolor import np_bincount
+from src.functions.transforms.singlecolor import np_hash
+from src.functions.transforms.singlecolor import np_shape
+from src.functions.transforms.singlecolor import unique_colors_sorted
 from src.solver_multimodel.core.XGBEncoder import XGBEncoder
-from src.solver_multimodel.functions.queries.grid import *
-from src.solver_multimodel.functions.transforms.singlecolor import identity
-from src.solver_multimodel.functions.transforms.singlecolor import np_bincount
-from src.solver_multimodel.functions.transforms.singlecolor import np_hash
-from src.solver_multimodel.functions.transforms.singlecolor import np_shape
-from src.solver_multimodel.functions.transforms.singlecolor import unique_colors_sorted
 
 
 class SingleColorXGBEncoder(XGBEncoder):

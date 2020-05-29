@@ -11,8 +11,8 @@ from xgboost import XGBClassifier
 from src.datamodel.Problem import Problem
 from src.datamodel.ProblemSet import ProblemSet
 from src.datamodel.Task import Task
+from src.functions.transforms.singlecolor import identity
 from src.solver_multimodel.core.ProblemSetSolver import ProblemSetSolver
-from src.solver_multimodel.functions.transforms.singlecolor import identity
 from src.util.functions import flatten_deep
 from src.util.functions import invoke
 

@@ -1,20 +1,156 @@
 #!/usr/bin/env python3
 
 ##### 
-##### ./submission/kaggle_compile.py ./src/solver_multimodel/main.py
+##### ./submission/kaggle_compile.py ./src/main.py
 ##### 
-##### 2020-05-29 00:55:18+01:00
+##### 2020-05-29 18:07:36+01:00
 ##### 
 ##### archive	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### archive	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### origin	git@github.com:JamesMcGuigan/kaggle-arc.git (fetch)
 ##### origin	git@github.com:JamesMcGuigan/kaggle-arc.git (push)
 ##### 
-#####   james-wip c81cf89 Solvers | work in progress - broken
-##### * master    6501bc3 XGBSolver.hyperopt.py | update hyperopt search space
+##### * master 39c4143 CSV | replace list(set()) with pydash.uniq() for deterministic sorting
 ##### 
-##### 6501bc3b03a7b79bd4f845ac68457bab03376c21
+##### 39c414351778328f56038f537735d894ed4585a7
 ##### 
+
+#####
+##### START src/datamodel/Problem.py
+#####
+
+from collections import UserDict
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Union
+
+import numpy as np
+
+
+# noinspection PyUnresolvedReferences
+class Problem(UserDict):
+    """ Problem: An input + output Grid pair """
+    dtype = np.int8
+    def __init__(self, problem: Union[Dict[str,np.ndarray],'Problem'], problemset: 'ProblemSet'):
+        super().__init__()
+        self._hash = 0
+        self.problemset: 'ProblemSet'         = problemset
+        self.task:       'Task'               = problemset.task
+        self.raw:        Dict[str,np.ndarray] = problem.raw if isinstance(problem, Problem) else problem
+
+        self.data = {}
+        for key in ['input', 'output']:
+            value = self.cast(problem.get(key, None))
+            self.data[key] = value
+
+    def cast(self, value: Any):
+        if value is None: return None
+        value = np.array(value, dtype=self.dtype)
+        # value = np.ascontiguousarray(value, dtype=self.dtype)  # disable: could potentially mess with hashing
+        value.flags.writeable = False
+        return value
+
+    @property
+    def grids(self) -> List[np.ndarray]:
+        return  [ self.data[label]
+                  for label in ['input','output']
+                  if self.data[label] is not None ]
+
+    @property
+    def filename(self): return self.task.filename
+
+    def __eq__(self, other):
+        if not isinstance(other, (Problem, dict, UserDict)): return False
+        for label in ['input','output']:
+            if label in self  and label not in other: return False
+            if label in other and label not in self:  return False
+            if not np.array_equal(self[label], other[label]):
+                return False
+        return True
+
+    def __hash__(self):
+        if not self._hash:
+            for item in [ self.data['input'], self.data['output'] ]:
+                item = item.tobytes() if isinstance(item, np.ndarray) else item
+                self._hash += hash(item)
+        return self._hash
+
+
+#####
+##### END   src/datamodel/Problem.py
+#####
+
+#####
+##### START src/datamodel/ProblemSet.py
+#####
+
+from collections import UserList
+from typing import Dict
+from typing import List
+from typing import Union
+
+import numpy as np
+
+# from src.datamodel.Problem import Problem
+
+
+# noinspection PyUnresolvedReferences
+class ProblemSet(UserList):
+    """ ProblemSet: An array of either test or training Problems """
+    _instance_count = 0
+
+    # def __new__(cls, input_outputs: Union[List[Dict[str, np.ndarray]],ProblemSet], *args, **kwargs):
+    #     if isinstance(input_outputs, ProblemSet): return input_outputs
+    #     else:                                     return super(ProblemSet, cls).__new__(cls, *args, **kwargs)
+
+    def __init__(self,
+                 input_outputs: Union[List[Dict[str, np.ndarray]],List[Problem],'ProblemSet'],
+                 test_or_train: str,
+                 task: 'Task'
+                 ):
+        super().__init__()
+        self.task:          'Task'                       = task
+        self.test_or_train: str                        = test_or_train
+        self.raw:           List[Dict[str,np.ndarray]] = input_outputs.raw if isinstance(input_outputs, ProblemSet) else input_outputs
+        self.data:          List[Problem]              = [ Problem(problem, self) for problem in self.raw ]
+        self._id = self.__class__._instance_count = self.__class__._instance_count + 1
+
+    def __eq__(self, other):
+        if not isinstance(other, ProblemSet): return False
+        return self._id == other._id
+
+    def __hash__(self):
+        return self._id
+
+    def unique(self) -> 'ProblemSet':
+        # unique = list({ hash(problem): problem for problem in self.data }.values())
+        unique = set( problem for problem in self.data )
+        if len(self.data) == len(unique):
+            return self
+        else:
+            unique = [ problem.raw for problem in self.data ]
+            return ProblemSet(unique, test_or_train=self.test_or_train, task=self.task)
+
+    @property
+    def filename(self): return self.task.filename
+
+    @property
+    def inputs(self) -> List[np.ndarray]:
+        return [ problem['input'] for problem in self.data if problem ]
+
+    @property
+    def outputs(self) -> List[np.ndarray]:
+        return [ problem['output'] for problem in self.data if problem ]
+
+    @property
+    def grids(self) -> List[np.ndarray]:
+        return self.inputs + self.outputs
+
+
+#####
+##### END   src/datamodel/ProblemSet.py
+#####
 
 #####
 ##### START src/settings.py
@@ -27,7 +163,7 @@ try:    root_dir = pathlib.Path(__file__).parent.parent.absolute()
 except: root_dir = ''
 
 settings = {
-    'production': os.environ.get('KAGGLE_KERNEL_RUN_TYPE', None) != None or 'submission' in __file__
+    'production': bool( os.environ.get('KAGGLE_KERNEL_RUN_TYPE', False) ) or 'submission' in __file__
 }
 settings = {
     **settings,
@@ -61,256 +197,32 @@ if __name__ == '__main__':
 #####
 
 #####
-##### START src/core/CSV.py
-#####
-
-import os
-import re
-
-import numpy as np
-
-# from src.settings import settings
-
-
-class CSV:
-    @classmethod
-    def write_submission(cls, dataset: 'Dataset', filename='submission.csv'):
-        csv        = CSV.to_csv(dataset)
-        line_count = len(csv.split('\n'))
-        filename   = os.path.join(settings['dir']['output'], filename)
-        with open(filename, 'w') as file:
-            file.write(csv)
-            print(f"\nwrote: {filename} | {line_count} lines")
-
-    ### No need to extend sample_submission.csv, just sort the CSV
-    # @classmethod
-    # def sample_submission(cls):
-    #     filename = os.path.join(settings['dir']['data'],'sample_submission.csv')
-    #     sample_submission = pd.read_csv(filename)
-    #     return sample_submission
-    #
-    # @classmethod
-    # def write_submission(cls, dataset: 'Dataset', filename='submission.csv'):
-    #     csv        = CSV.to_csv(dataset)
-    #     lines      = csv.split('\n')
-    #     line_count = len(lines)
-    #     data       = []
-    #
-    #     submission = cls.sample_submission()
-    #     submission = submission.set_index('output_id', drop=False)
-    #     for line in lines[1:]:  # ignore header
-    #         object_id,output = line.split(',',2)
-    #         submission.loc[object_id]['output'] = output
-    #
-    #     submission.to_csv(filename, index=False)
-    #     print(f"\nwrote: {filename} | {line_count} lines")
-
-
-    @classmethod
-    def object_id(cls, filename, index=0) -> str:
-        return re.sub('^.*/|\.json$', '', filename) + '_' + str(index)
-
-    @classmethod
-    def to_csv(cls, dataset: 'Dataset'):
-        csv = []
-        for task in dataset:
-            line = CSV.to_csv_line(task)
-            if line: csv.append(line)
-        csv = ['output_id,output'] + sorted(csv) # object_id keys are sorted in sample_submission.csv
-        return "\n".join(csv)
-
-    @classmethod
-    def default_csv_line(cls, task: 'Task') -> str:
-        return '|123|456|789|'
-
-    @classmethod
-    def to_csv_line(cls, task: 'Task') -> str:
-        csv = []
-        for index, problemset in enumerate(task['solutions']):
-            solutions = list(set(
-                cls.grid_to_csv_string(problem['output'])
-                for problem in problemset
-            ))
-            solution_str = " ".join(solutions[:3]) if len(solutions) else cls.default_csv_line(task)
-            line = ",".join([
-                cls.object_id(task.filename, index),
-                solution_str
-            ])
-            csv.append(line)
-        return "\n".join(csv)
-
-    # Source: https://www.kaggle.com/c/abstraction-and-reasoning-challenge/overview/evaluation
-    # noinspection PyTypeChecker
-    @staticmethod
-    def grid_to_csv_string(grid: np.ndarray) -> str:
-        if grid is None: return None
-        grid = np.array(grid).astype('int8').tolist()
-        str_pred = str([ row for row in grid ])
-        str_pred = str_pred.replace(', ', '')
-        str_pred = str_pred.replace('[[', '|')
-        str_pred = str_pred.replace('][', '|')
-        str_pred = str_pred.replace(']]', '|')
-        return str_pred
-
-
-#####
-##### END   src/core/CSV.py
-#####
-
-#####
-##### START src/core/DataModel.py
+##### START src/datamodel/Task.py
 #####
 
 import json
 import os
 import re
-import time
 from collections import UserDict
-from collections import UserList
-from itertools import chain
-from typing import Any
 from typing import Dict
 from typing import List
-from typing import Union
 
-import glob2
 import numpy as np
+from itertools import chain
 
-# from src.core.CSV import CSV
+# from src.datamodel.ProblemSet import ProblemSet
 # from src.settings import settings
 
 
-# Conceptual Mapping
-# - Competition: The collection of all Dataset in the competition
-# - Dataset:     An array of all Tasks in the competition
-# - Task:        The entire contents of a json file, outputs 1-3 lines of CSV
-# - ProblemSet:  An array of either test or training Problems
-# - Problem:     An input + output Grid pair
-# - Grid:        An individual grid represented as a numpy array
-
-
-class Competition(UserDict):
-    """ Competition: The collection of all Dataset in the competition """
-
-    def __init__(self):
-        super().__init__()
-        self.time_taken  = 0
-        self.directories = {
-            name: f"{settings['dir']['data']}/{name}"
-            for name in ['training', 'evaluation', 'test']
-        }
-        self.data = {
-            name: Dataset(directory, name)
-            for name, directory in self.directories.items()
-        }
-
-    def __str__(self):
-        return "\n".join([ f"{key:11s}: {value}" for key, value in self.score().items() ])
-
-    def solve(self) -> 'Competition':
-        time_start = time.perf_counter()
-        for name, dataset in self.data.items():
-            dataset.solve()
-        self.time_taken = time.perf_counter() - time_start
-        return self  # for chaining
-
-    def score(self) -> Dict[str,Any]:
-        score = { name: dataset.score() for name, dataset in self.data.items() }
-        success_ratio = score['evaluation']['correct'] / max(1e-10, score['evaluation']['guesses'])
-        score['test']['correct'] = round(score['test']['guesses'] * success_ratio, 1)
-        score['time'] = Dataset.format_clock(self.time_taken)
-        return score
-
-    @classmethod
-    def format_clock(cls, time_taken: float) -> str:
-        return Dataset.format_clock(time_taken)
-
-    def map(self, function):
-        output = []
-        competition = self
-        competition.time_start = time.perf_counter()
-        for name, dataset in competition.items():
-            result = dataset.apply(function)
-            output.append( result )
-        competition.time_taken = time.perf_counter() - competition.time_start
-        return output
-
-
-
-class Dataset(UserList):
-    """ Dataset: An array of all Tasks in the competition """
-
-    def __init__(self, directory: str, name: str = ''):
-        super().__init__()
-        self.name       = name
-        self.directory  = directory
-        self.filenames  = glob2.glob( self.directory + '/**/*.json' )
-        self.filenames  = sorted([ Task.format_filename(filename) for filename in self.filenames ])
-        assert len(self.filenames), f'invalid directory: {directory}'
-        self.data       = [Task(filename, self) for filename in self.filenames]
-        self.time_taken = 0
-
-    def __repr__(self):
-        return f'<{self.__class__.__name__}:{self.directory}>'
-
-    def __hash__(self):
-        return hash(self.directory)
-
-    def __eq__(self, other):
-        if not isinstance(other, Dataset): return False
-        return self.directory == other.directory
-
-    def apply(self, function):
-        dataset = self
-        dataset.time_start = time.perf_counter()
-        result = function(dataset)
-        dataset.time_taken = time.perf_counter() - dataset.time_start
-        return result
-
-    def solve(self) -> 'Dataset':
-        time_start = time.perf_counter()
-        for task in self:
-            task.solve()
-        self.time_taken = time.perf_counter() - time_start
-        return self  # for chaining
-
-    def score(self) -> Dict[str,Union[int,float]]:
-        score = {}
-        score['correct'] = sum([task.score()   for task in self])
-        score['guesses'] = sum([task.guesses() for task in self])
-        score['total']   = len(self.test_outputs)
-        score['error']   = round(1 - score['correct'] / score['total'],4) if score['total'] else 0
-        score['time']    = self.format_clock(self.time_taken)
-        score['name']    = self.name
-        return score
-
-    @classmethod
-    def format_clock(cls, time_taken: float) -> str:
-        hours   = time_taken // (60 * 60)
-        minutes = time_taken // (60)
-        seconds = time_taken % 60
-        clock   = "{:02.0f}:{:02.0f}:{:02.0f}".format(hours,minutes,seconds)
-        return clock
-
-    def to_csv(self):
-        return CSV.to_csv(self)
-
-    def write_submission(self, filename='submission.csv'):
-        return CSV.write_submission(self, filename)
-
-    @property
-    def test_outputs(self) -> List[np.ndarray]:
-        return list(chain(*[task.test_outputs for task in self.data]))
-
-
+# noinspection PyUnresolvedReferences
 class Task(UserDict):
     """ Task: The entire contents of a json file, outputs 1-3 lines of CSV """
 
-    def __init__(self, filename: str, dataset: Dataset = None):
+    def __init__(self, filename: str, dataset: 'Dataset' = None):
         super().__init__()
 
-        self.dataset: Dataset = dataset
-        self.filename: str    = self.format_filename(filename)
+        self.dataset: 'Dataset' = dataset
+        self.filename: str      = self.format_filename(filename)
         self.raw  = self.read_file( os.path.join(settings['dir']['data'], self.filename) )
         self.data = {
             test_or_train: ProblemSet(input_outputs, test_or_train, self)
@@ -389,124 +301,212 @@ class Task(UserDict):
         return len(self.data['test'])
 
 
-class ProblemSet(UserList):
-    """ ProblemSet: An array of either test or training Problems """
-    _instance_count = 0
 
-    # def __new__(cls, input_outputs: Union[List[Dict[str, np.ndarray]],ProblemSet], *args, **kwargs):
-    #     if isinstance(input_outputs, ProblemSet): return input_outputs
-    #     else:                                     return super(ProblemSet, cls).__new__(cls, *args, **kwargs)
+#####
+##### END   src/datamodel/Task.py
+#####
 
-    def __init__(self,
-                 input_outputs: Union[List[Dict[str, np.ndarray]],List['Problem'],'ProblemSet'],
-                 test_or_train: str,
-                 task: Task
-    ):
+#####
+##### START src/datamodel/CSV.py
+#####
+
+import os
+import re
+
+import numpy as np
+import pydash
+
+# from src.settings import settings
+
+
+# noinspection PyUnresolvedReferences
+class CSV:
+    @classmethod
+    def write_submission(cls, dataset: 'Dataset', filename='submission.csv'):
+        csv        = CSV.to_csv(dataset)
+        line_count = len(csv.split('\n'))
+        filename   = os.path.join(settings['dir']['output'], filename)
+        with open(filename, 'w') as file:
+            file.write(csv)
+            print(f"\nwrote: {filename} | {line_count} lines")
+
+    ### No need to extend sample_submission.csv, just sort the CSV
+    # @classmethod
+    # def sample_submission(cls):
+    #     filename = os.path.join(settings['dir']['data'],'sample_submission.csv')
+    #     sample_submission = pd.read_csv(filename)
+    #     return sample_submission
+    #
+    # @classmethod
+    # def write_submission(cls, dataset: 'Dataset', filename='submission.csv'):
+    #     csv        = CSV.to_csv(dataset)
+    #     lines      = csv.split('\n')
+    #     line_count = len(lines)
+    #     data       = []
+    #
+    #     submission = cls.sample_submission()
+    #     submission = submission.set_index('output_id', drop=False)
+    #     for line in lines[1:]:  # ignore header
+    #         object_id,output = line.split(',',2)
+    #         submission.loc[object_id]['output'] = output
+    #
+    #     submission.to_csv(filename, index=False)
+    #     print(f"\nwrote: {filename} | {line_count} lines")
+
+
+    @classmethod
+    def object_id(cls, filename, index=0) -> str:
+        return re.sub('^.*/|\.json$', '', filename) + '_' + str(index)
+
+    @classmethod
+    def to_csv(cls, dataset: 'Dataset'):
+        csv = []
+        for task in dataset:
+            line = CSV.to_csv_line(task)
+            if line: csv.append(line)
+        csv = ['output_id,output'] + sorted(csv) # object_id keys are sorted in sample_submission.csv
+        return "\n".join(csv)
+
+    # noinspection PyUnusedLocal
+    @classmethod
+    def default_csv_line(cls, task: 'Task' = None) -> str:
+        return '|123|456|789|'
+
+    @classmethod
+    def to_csv_line(cls, task: 'Task') -> str:
+        csv = []
+        for index, problemset in enumerate(task['solutions']):
+            solutions = pydash.uniq(list(
+                cls.grid_to_csv_string(problem['output'])
+                for problem in problemset
+            ))
+            solution_str = " ".join(solutions[:3]) if len(solutions) else cls.default_csv_line(task)
+            line = ",".join([
+                cls.object_id(task.filename, index),
+                solution_str
+            ])
+            csv.append(line)
+        return "\n".join(csv)
+
+    # Source: https://www.kaggle.com/c/abstraction-and-reasoning-challenge/overview/evaluation
+    # noinspection PyTypeChecker
+    @staticmethod
+    def grid_to_csv_string(grid: np.ndarray) -> str:
+        if grid is None: return None
+        grid = np.array(grid).astype('int8').tolist()
+        str_pred = str([ row for row in grid ])
+        str_pred = str_pred.replace(', ', '')
+        str_pred = str_pred.replace('[[', '|')
+        str_pred = str_pred.replace('][', '|')
+        str_pred = str_pred.replace(']]', '|')
+        return str_pred
+
+
+#####
+##### END   src/datamodel/CSV.py
+#####
+
+#####
+##### START src/datamodel/Dataset.py
+#####
+
+from collections import UserList
+from typing import Dict
+from typing import List
+from typing import Union
+
+import glob2
+import numpy as np
+import time
+from itertools import chain
+
+# from src.datamodel.CSV import CSV
+# from src.datamodel.Task import Task
+
+
+class Dataset(UserList):
+    """ Dataset: An array of all Tasks in the competition """
+
+    def __init__(self, directory: str, name: str = ''):
         super().__init__()
-        self.task:          Task                       = task
-        self.test_or_train: str                        = test_or_train
-        self.raw:           List[Dict[str,np.ndarray]] = input_outputs.raw if isinstance(input_outputs, ProblemSet) else input_outputs
-        self.data:          List[Problem]              = [ Problem(problem, self) for problem in self.raw ]
-        self._id = self.__class__._instance_count = self.__class__._instance_count + 1
+        self.name       = name
+        self.directory  = directory
+        self.filenames  = glob2.glob( self.directory + '/**/*.json' )
+        self.filenames  = sorted([ Task.format_filename(filename) for filename in self.filenames ])
+        assert len(self.filenames), f'invalid directory: {directory}'
+        self.data       = [Task(filename, self) for filename in self.filenames]
+        self.time_taken = 0
 
-    def __eq__(self, other):
-        if not isinstance(other, ProblemSet): return False
-        return self._id == other._id
+    def __repr__(self):
+        return f'<{self.__class__.__name__}:{self.directory}>'
 
     def __hash__(self):
-        return self._id
-
-    def unique(self) -> 'ProblemSet':
-        # unique = list({ hash(problem): problem for problem in self.data }.values())
-        unique = set( problem for problem in self.data )
-        if len(self.data) == len(unique):
-            return self
-        else:
-            unique = [ problem.raw for problem in self.data ]
-            return ProblemSet(unique, test_or_train=self.test_or_train, task=self.task)
-
-    @property
-    def filename(self): return self.task.filename
-
-    @property
-    def inputs(self) -> List[np.ndarray]:
-        return [ problem['input'] for problem in self.data if problem ]
-
-    @property
-    def outputs(self) -> List[np.ndarray]:
-        return [ problem['output'] for problem in self.data if problem ]
-
-    @property
-    def grids(self) -> List[np.ndarray]:
-        return self.inputs + self.outputs
-
-class Problem(UserDict):
-    """ Problem: An input + output Grid pair """
-    dtype = np.int8
-    def __init__(self, problem: Union[Dict[str,np.ndarray],'Problem'], problemset: ProblemSet):
-        super().__init__()
-        self._hash = 0
-        self.problemset: ProblemSet           = problemset
-        self.task:       Task                 = problemset.task
-        self.raw:        Dict[str,np.ndarray] = problem.raw if isinstance(problem, Problem) else problem
-
-        self.data = {}
-        for key in ['input', 'output']:
-            value = self.cast(problem.get(key, None))
-            self.data[key] = value
-
-    def cast(self, value: Any):
-        if value is None: return None
-        value = np.array(value, dtype=self.dtype)
-        # value = np.ascontiguousarray(value, dtype=self.dtype)  # disable: could potntually mess with hashing
-        value.flags.writeable = False
-        return value
-
-    @property
-    def grids(self) -> List[np.ndarray]:
-        return  [ self.data[label]
-                  for label in ['input','output']
-                  if self.data[label] is not None ]
-
-    @property
-    def filename(self): return self.task.filename
+        return hash(self.directory)
 
     def __eq__(self, other):
-        if not isinstance(other, (Problem, dict, UserDict)): return False
-        for label in ['input','output']:
-            if label in self  and label not in other: return False
-            if label in other and label not in self:  return False
-            if not np.array_equal(self[label], other[label]):
-                return False
-        return True
+        if not isinstance(other, Dataset): return False
+        return self.directory == other.directory
 
-    def __hash__(self):
-        if not self._hash:
-            for item in [ self.data['input'], self.data['output'] ]:
-                item = item.tobytes() if isinstance(item, np.ndarray) else item
-                self._hash += hash(item)
-        return self._hash
+    def apply(self, function):
+        dataset = self
+        dataset.time_start = time.perf_counter()
+        result = function(dataset)
+        dataset.time_taken = time.perf_counter() - dataset.time_start
+        return result
 
+    def solve(self) -> 'Dataset':
+        time_start = time.perf_counter()
+        for task in self:
+            task.solve()
+        self.time_taken = time.perf_counter() - time_start
+        return self  # for chaining
+
+    def score(self) -> Dict[str,Union[int,float]]:
+        score = {}
+        score['correct'] = sum([task.score()   for task in self])
+        score['guesses'] = sum([task.guesses() for task in self])
+        score['total']   = len(self.test_outputs)
+        score['error']   = round(1 - score['correct'] / score['total'],4) if score['total'] else 0
+        score['time']    = self.format_clock(self.time_taken)
+        score['name']    = self.name
+        return score
+
+    @classmethod
+    def format_clock(cls, time_taken: float) -> str:
+        hours   = time_taken // (60 * 60)
+        minutes = time_taken // 60
+        seconds = time_taken % 60
+        clock   = "{:02.0f}:{:02.0f}:{:02.0f}".format(hours,minutes,seconds)
+        return clock
+
+    def to_csv(self):
+        return CSV.to_csv(self)
+
+    def write_submission(self, filename='submission.csv'):
+        return CSV.write_submission(self, filename)
+
+    @property
+    def test_outputs(self) -> List[np.ndarray]:
+        return list(chain(*[task.test_outputs for task in self.data]))
 
 
 #####
-##### END   src/core/DataModel.py
+##### END   src/datamodel/Dataset.py
 #####
 
 #####
-##### START src/plot.py
+##### START src/util/plot.py
 #####
 
 # Source: https://www.kaggle.com/jamesmcguigan/arc-geometry-solvers/
-from itertools import chain
-
 import matplotlib.pyplot as plt
 import numpy as np
 from fastcache._lrucache import clru_cache
+from itertools import chain
 from matplotlib import colors
 
 # Modified from: https://www.kaggle.com/zaharch/visualizing-all-tasks-updated
-# from src.core.DataModel import Task
+# from src.datamodel.Task import Task
 
 
 @clru_cache()
@@ -581,7 +581,7 @@ def plot_task(task: Task, scale=2):
 
 
 #####
-##### END   src/plot.py
+##### END   src/util/plot.py
 #####
 
 #####
@@ -663,18 +663,18 @@ def np_cache(maxsize=1024, typed=True):
 #####
 
 #####
-##### START src/solver_multimodel/queries/ratio.py
+##### START src/functions/queries/ratio.py
 #####
 
-from itertools import chain
 from typing import List
 from typing import Tuple
 from typing import Union
 
 import numpy as np
 from fastcache._lrucache import clru_cache
+from itertools import chain
 
-# from src.core.DataModel import Task
+# from src.datamodel.Task import Task
 # from src.util.np_cache import np_cache
 
 
@@ -690,7 +690,7 @@ def task_grids(task) -> List[np.ndarray]:
     grids = []
     for test_train in ['test','train']:
         for spec in task[test_train]:
-            grids += [ spec.get('input',[]), spec.get('output',[]) ]  # tests not gaurenteed to have outputs
+            grids += [ spec.get('input',[]), spec.get('output',[]) ]  # tests not guaranteed to have outputs
     return grids
 
 @clru_cache(maxsize=None)
@@ -706,7 +706,7 @@ def is_task_shape_ratio_unchanged(task: Task) -> bool:
     return task_shape_ratios(task) == [ (1,1) ]
 
 @clru_cache(maxsize=None)
-def is_task_shape_ratio_consistant(task: Task) -> bool:
+def is_task_shape_ratio_consistent(task: Task) -> bool:
     return len(task_shape_ratios(task)) == 1
 
 @clru_cache(maxsize=None)
@@ -728,10 +728,6 @@ def task_shape_ratio(task: Task) -> Union[Tuple[float,float],None]:
     ratios = task_shape_ratios(task)
     if len(ratios) != 1: return None
     return ratios[0]
-
-@clru_cache(maxsize=None)
-def is_task_shape_ratio_consistent(task: Task) -> bool:
-    return len(task_shape_ratios(task)) == 1
 
 @clru_cache(maxsize=None)
 def is_task_shape_ratio_integer_multiple(task: Task) -> bool:
@@ -759,11 +755,11 @@ def is_task_output_grid_shape_constant(task: Task) -> bool:
 
 
 #####
-##### END   src/solver_multimodel/queries/ratio.py
+##### END   src/functions/queries/ratio.py
 #####
 
 #####
-##### START src/solver_multimodel/Solver.py
+##### START src/solver_multimodel/core/Solver.py
 #####
 
 from collections import UserList
@@ -773,13 +769,13 @@ from typing import Union
 
 import numpy as np
 
-# from src.core.DataModel import Dataset
-# from src.core.DataModel import Problem
-# from src.core.DataModel import Task
-# from src.plot import plot_task
+# from src.datamodel.Dataset import Dataset
+# from src.datamodel.Problem import Problem
+# from src.datamodel.Task import Task
+# from src.util.plot import plot_task
 
 
-class Solver():
+class Solver:
     verbose = False
     debug   = False
     def __init__(self):
@@ -854,7 +850,7 @@ class Solver():
         return False
 
 
-    def solve(self, task: Task, force=False, inplace=True) -> Union[List[Problem],None]:
+    def solve(self, task: Task, force=False) -> Union[List[Problem],None]:
         """solve test case and persist"""
         if task.filename not in self.cache:             self.fit(task)
         if self.cache.get(task.filename, True) is None: return None
@@ -885,7 +881,7 @@ class Solver():
                 solution = self.solve(task, force=solve_detects)
                 if solution or (solve_detects and self.test(task)):
                     count += 1
-                    if plot == True:
+                    if plot:
                         plot_task(task)
         return count
 
@@ -926,75 +922,18 @@ class Solver():
 
 
 #####
-##### END   src/solver_multimodel/Solver.py
+##### END   src/solver_multimodel/core/Solver.py
 #####
 
 #####
-##### START src/core/functions.py
-#####
-
-from collections import UserList
-from typing import Any
-from typing import Callable
-from typing import List
-from typing import Union
-
-import numpy as np
-
-# from src.util.np_cache import np_cache
-
-
-def bind(function_or_value: Union[Callable,Any], *args, **kwargs) -> Callable:
-    if callable(function_or_value):
-        def _bind(*runtime_args, **runtime_kwargs):
-            return function_or_value(*args, *runtime_args, **runtime_kwargs, **kwargs)
-        return _bind
-    else:
-        def _passthrough(*runtime_args, **runtime_kwargs):
-            return function_or_value
-        return _passthrough
-
-@np_cache()
-def invoke(function_or_value, *args, **kwargs) -> List[Any]:
-    if callable(function_or_value):
-        return function_or_value(*args, **kwargs)
-    else:
-        return function_or_value
-
-
-def append_flat(iterable: List, *args) -> List:
-    if not isinstance(iterable, list):
-        iterable = list(iterable)
-    for arg in args:
-        if isinstance(arg, (list,tuple,set,np.ndarray,UserList)):
-            iterable += list(arg)
-        else:
-            iterable.append(arg)
-    return iterable
-
-
-def flatten_deep(iterable, types=(list,tuple,set,np.ndarray,UserList)) -> List:
-    output = []
-    for item in iterable:
-        if isinstance(item, types):
-            output += flatten_deep(item)
-        else:
-            output.append(item)
-    return output
-
-#####
-##### END   src/core/functions.py
-#####
-
-#####
-##### START src/solver_multimodel/transforms/singlecolor.py
+##### START src/functions/transforms/singlecolor.py
 #####
 
 from typing import Tuple
 
 import numpy as np
 
-# from src.core.DataModel import Task
+# from src.datamodel.Task import Task
 # from src.util.np_cache import np_cache
 
 
@@ -1040,11 +979,340 @@ def task_output_unique_sorted_colors(task: Task):
     return output
 
 #####
-##### END   src/solver_multimodel/transforms/singlecolor.py
+##### END   src/functions/transforms/singlecolor.py
 #####
 
 #####
-##### START src/solver_multimodel/queries/grid.py
+##### START src/solver_multimodel/core/ProblemSetSolver.py
+#####
+
+from collections import Callable
+from typing import List
+from typing import Union
+
+import numpy as np
+
+# from src.datamodel.Problem import Problem
+# from src.datamodel.ProblemSet import ProblemSet
+# from src.datamodel.Task import Task
+# from src.solver_multimodel.core.Solver import Solver
+
+
+class ProblemSetSolver(Solver):
+    def solve_task(self, _task_: Task, _function_: Callable, *args, _inplace_=False, **kwargs) -> List[Problem]:
+        self.fit(_task_)
+        if not _task_.filename in self.cache:   return []
+        if self.cache[_task_.filename] is None: return []
+
+        solutions = self.solve_grid(_task_['test'])
+        if solutions is None: return []
+
+        problemset = self.cast_problemset(solutions, task=_task_)
+        problems   = list(problemset)
+        return problems
+
+
+    def cast_problems(self, solutions: List[np.ndarray], task: Task) -> List[Problem]:
+        problemset = task['test']
+        problems   = []
+        for index, solution in enumerate(solutions):
+            problem = Problem({
+                "input":  problemset[index]['input'],
+                "output": solution,
+            }, problemset=problemset)
+            problems.append(problem)
+        return problems
+
+
+    def cast_problemset(self, solutions: List[np.ndarray], task: Task) -> ProblemSet:
+        problems = self.cast_problems(solutions, task=task)
+        output   = ProblemSet(problems, task=task, test_or_train='solutions')
+        return output
+
+
+    def predict(self, problemset: Union[ProblemSet,Task], *args, task: Task=None, **kwargs) -> Union[None,List[np.ndarray]]:
+        task       = task or (problemset if isinstance(problemset, Task) else problemset.task)
+        # problemset = (problemset['test'] if isinstance(problemset, Task) else problemset )
+        if task.filename not in self.cache:   self.fit(task)
+        if self.cache[task.filename] is None: return None  # Unsolvable mapping
+        raise NotImplementedError
+
+
+    def test(self, task: Task) -> bool:
+        """test if .predict() correctly solves the task"""
+        self.fit(task)
+        if not task.filename in self.cache:   return False
+        if self.cache[task.filename] is None: return False
+
+        problemset = task['train']
+        training_predictions = self.predict(problemset, task=task)
+        tests_pass = bool( len(training_predictions) == len(problemset) )
+        for index, prediction in enumerate(training_predictions):
+            if not tests_pass: break
+            if not np.array_equal( task['train'][index]['output'], prediction ):
+                tests_pass = False
+        return tests_pass
+
+
+
+#####
+##### END   src/solver_multimodel/core/ProblemSetSolver.py
+#####
+
+#####
+##### START src/util/functions.py
+#####
+
+from collections import UserList
+from typing import Any
+from typing import Callable
+from typing import List
+from typing import Union
+
+import numpy as np
+
+# from src.util.np_cache import np_cache
+
+
+def bind(function_or_value: Union[Callable,Any], *args, **kwargs) -> Callable:
+    if callable(function_or_value):
+        def _bind(*runtime_args, **runtime_kwargs):
+            return function_or_value(*args, *runtime_args, **runtime_kwargs, **kwargs)
+        return _bind
+    else:
+        # noinspection PyUnusedLocal
+        def _passthrough(*args, **kwargs):
+            return function_or_value
+        return _passthrough
+
+@np_cache()
+def invoke(function_or_value, *args, **kwargs) -> List[Any]:
+    if callable(function_or_value):
+        return function_or_value(*args, **kwargs)
+    else:
+        return function_or_value
+
+
+def append_flat(iterable: List, *args) -> List:
+    if not isinstance(iterable, list):
+        iterable = list(iterable)
+    for arg in args:
+        if isinstance(arg, (list,tuple,set,np.ndarray,UserList)):
+            iterable += list(arg)
+        else:
+            iterable.append(arg)
+    return iterable
+
+
+def flatten_deep(iterable, types=(list,tuple,set,np.ndarray,UserList)) -> List:
+    output = []
+    for item in iterable:
+        if isinstance(item, types):
+            output += flatten_deep(item)
+        else:
+            output.append(item)
+    return output
+
+#####
+##### END   src/util/functions.py
+#####
+
+#####
+##### START src/solver_multimodel/core/ProblemSetEncoder.py
+#####
+
+from collections import Callable
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Union
+
+import numpy as np
+from itertools import product
+from xgboost import XGBClassifier
+
+# from src.datamodel.Problem import Problem
+# from src.datamodel.ProblemSet import ProblemSet
+# from src.datamodel.Task import Task
+# from src.functions.transforms.singlecolor import identity
+# from src.solver_multimodel.core.ProblemSetSolver import ProblemSetSolver
+# from src.util.functions import flatten_deep
+# from src.util.functions import invoke
+
+
+class ProblemSetEncoder(ProblemSetSolver):
+    debug    = False,
+    encoders = {
+        np.array: [identity],
+    }
+    features = {
+        np.array:   [],
+        ProblemSet: [],
+        Problem:    [],
+        Task:       []
+    }
+    encoder_defaults = {}
+
+    def __init__(self,
+                 input_encoder:  Callable = None,
+                 output_encoder: Callable = None,
+                 features:       Dict = None,
+                 xgb_args:       Dict = {}
+                 ):
+        super().__init__()
+        self.input_encoder  = input_encoder
+        self.output_encoder = output_encoder
+        self.features       = features if features is not None else self.__class__.features
+        self.encoder_args   = {**self.encoder_defaults, **xgb_args}
+        self._chained_args = { "task": None }
+
+
+    def __call__(self, problemset: ProblemSet, task: Task):
+        return self.predict(problemset=problemset, task=task, **self._chained_args)
+
+
+    def create_encoder(self):
+        """Return an Encoder that implements .fit() and .predict()"""
+        raise NotImplementedError
+
+
+    def fit(self, task: Task) -> bool:
+        """Find the best input_encoder/output_encoder for the task """
+        if task.filename in self.cache: return True
+
+        problemset      = task['train']
+        input_encoders  = (self.input_encoder, ) if self.input_encoder  else self.encoders[np.array]
+        output_encoders = (self.output_encoder,) if self.output_encoder else self.encoders[np.array]
+        for input_encoder, output_encoder in product(input_encoders, output_encoders):
+            if not callable(input_encoder):  continue
+            if not callable(output_encoder): continue
+            self.input_encoder  = input_encoder   # this is idempotent for a one element list
+            self.output_encoder = output_encoder  # cache the last value in this loop
+
+            inputs  = self.generate_input_array(  problemset )
+            outputs = self.generate_output_array( problemset )
+
+            # See: venv/lib/python3.6/site-packages/xgboost/sklearn.py:762
+            encoder = self.create_encoder()
+            encoder.fit(inputs, outputs, verbose=False)
+
+            self.cache[task.filename] = (encoder,)  # Needs to be set for self.test() to read and prevent an infinite loop
+            self._chained_args = { "task": task }
+            if self.test(task):
+                return True
+        else:
+            self.cache[task.filename] = None
+            return False
+
+
+    def predict(self,
+                problemset: Union[ProblemSet, Task],
+                xgb:   XGBClassifier = None,
+                task:  Task = None,
+                *args, **kwargs
+                ) -> Any:
+        task       = task or (problemset if isinstance(problemset, Task) else problemset.task)
+        problemset = (problemset['test'] if isinstance(problemset, Task) else problemset )
+        if task.filename not in self.cache:   self.fit(task)
+        if self.cache[task.filename] is None: return None  # Unsolvable mapping
+
+        task: Task          = task or self._chained_args.get('task')
+        xgb:  XGBClassifier = xgb  or self.cache[task.filename][0]
+
+        input  = self.generate_input_array(problemset)
+        output = xgb.predict(input)
+        return output
+
+
+    def test(self, task: Task) -> bool:
+        """test if .predict() correctly solves the task"""
+        if task.filename not in self.cache:             self.fit(task)
+        if self.cache.get(task.filename, True) is None: return False
+
+        train_problemset = task['train']  # we test on the train side, to validate if we can .predict() on test
+        train_expected   = self.generate_output_array(train_problemset)
+        train_actual     = self.predict(train_problemset)
+        train_valid      = np.array_equal(train_expected, train_actual)
+
+        if self.debug:
+            test_problemset = task['test']  # we test on the train side, to validate if we can .predict() on test
+            test_expected = self.generate_output_array(test_problemset)
+            test_actual   = self.predict(test_problemset)
+            test_valid = np.array_equal(test_expected, test_actual)
+            print(" | ".join([
+                task.filename.ljust(24),
+                f'{str(train_valid).ljust(5)} -> {str(test_valid).ljust(5)}',
+                f'{train_expected} -> {train_actual}',
+                f'{test_expected} -> {test_actual}',
+            ]))
+
+        return train_valid
+
+
+    # def onehotencode(self, input, maxsize=11):
+    #     output = []
+    #     for item in input:
+    #         if isinstance(item, (list, UserList, np.ndarray)):
+    #             item = self.onehotencode(item, maxsize)
+    #         value = int(item)
+    #         encoded = np.zeros(maxsize, dtype=np.int8)
+    #         encoded[value] = 1
+    #         output.append(encoded)
+    #     return np.array(output)
+
+
+    # @np_cache()
+    def generate_output_array(self, problemset: ProblemSet, output_encoder=None):
+        output_encoder = output_encoder or self.output_encoder
+        outputs = []
+        for problem in problemset:
+            if problem['output'] is None: continue
+            # input  = problem['input']
+            output = problem['output']
+            if callable(output_encoder):
+                encoded = output_encoder(output)
+                outputs.append(encoded)
+        return np.array(outputs, dtype=np.int8).flatten()
+
+
+    # @np_cache()
+    def generate_input_array(self, problemset: ProblemSet, input_encoder=None) -> np.ndarray:
+        mappings = self.generate_input_mappings(problemset, input_encoder=input_encoder)
+        for index, mapping in enumerate(mappings):
+            # noinspection PyTypeChecker
+            mappings[index] = flatten_deep(mapping.values())
+        mappings_array = np.array(mappings, dtype=np.int8)  # dtype=np.int8 is broken
+        assert mappings_array.shape[0] == len(problemset)
+        return mappings_array
+
+    # @np_cache()
+    def generate_input_mappings(self, problemset: ProblemSet, input_encoder=None) -> List[Dict[Callable, Any]]:
+        # XGBoost requires a 2D array, one slice for each problem
+        input_encoder = input_encoder or self.input_encoder
+        mappings  = []
+        for problem in problemset:
+            mapping = {}
+            for feature_fn in self.features[Task]:
+                mapping[feature_fn] = invoke(feature_fn, problemset.task)
+            for feature_fn in self.features[ProblemSet]:
+                mapping[feature_fn] = invoke(feature_fn, problemset)
+            for feature_fn in self.features[Problem]:
+                mapping[feature_fn] = invoke(feature_fn, problem)
+            for feature_fn in self.features[np.array]:
+                input               = input_encoder(problem['input']) if callable(input_encoder) else problem['input']
+                mapping[feature_fn] = invoke(feature_fn, input)
+            mappings.append(mapping)
+        return mappings
+
+
+
+
+#####
+##### END   src/solver_multimodel/core/ProblemSetEncoder.py
+#####
+
+#####
+##### START src/functions/queries/grid.py
 #####
 
 import numpy as np
@@ -1147,273 +1415,16 @@ def grid_unique_colors(grid: np.ndarray):
 
 
 #####
-##### END   src/solver_multimodel/queries/grid.py
+##### END   src/functions/queries/grid.py
 #####
 
 #####
-##### START src/solver_multimodel/queries/colors.py
+##### START src/solver_multimodel/core/XGBEncoder.py
 #####
 
-from fastcache._lrucache import clru_cache
-
-# from src.solver_multimodel.queries.grid import grid_unique_colors
-# from src.solver_multimodel.queries.ratio import is_task_shape_ratio_consistant
-
-
-@clru_cache()
-def task_is_singlecolor(task) -> bool:
-    if not is_task_shape_ratio_consistant(task): return False
-    return all([ len(grid_unique_colors(spec['output'])) == 1 for spec in task['train'] ])
-
-
-
-#####
-##### END   src/solver_multimodel/queries/colors.py
-#####
-
-#####
-##### START src/solver_multimodel/XGBEncoder.py
-#####
-
-from collections import Callable
-from itertools import product
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import Union
-
-import numpy as np
 from xgboost import XGBClassifier
 
-# from src.core.DataModel import Problem
-# from src.core.DataModel import ProblemSet
-# from src.core.DataModel import Task
-# from src.core.functions import flatten_deep
-# from src.core.functions import invoke
-# from src.solver_multimodel.Solver import Solver
-# from src.solver_multimodel.transforms.singlecolor import identity
-
-
-class ProblemSetSolver(Solver):
-    def solve_task(self, _task_: Task, _function_: Callable, *args, _inplace_=False, **kwargs) -> List[Problem]:
-        self.fit(_task_)
-        if not _task_.filename in self.cache:   return []
-        if self.cache[_task_.filename] is None: return []
-
-        solutions = self.solve_grid(_task_['test'])
-        if solutions is None: return []
-
-        problemset = self.cast_problemset(solutions, task=_task_)
-        problems   = list(problemset)
-        return problems
-
-
-    def cast_problems(self, solutions: List[np.ndarray], task: Task) -> List[Problem]:
-        problemset = task['test']
-        problems   = []
-        for index, solution in enumerate(solutions):
-            problem = Problem({
-                "input":  problemset[index]['input'],
-                "output": solution,
-            }, problemset=problemset)
-            problems.append(problem)
-        return problems
-
-
-    def cast_problemset(self, solutions: List[np.ndarray], task: Task) -> ProblemSet:
-        problems = self.cast_problems(solutions, task=task)
-        output   = ProblemSet(problems, task=task, test_or_train='solutions')
-        return output
-
-
-    def predict(self, problemset: Union[ProblemSet,Task], *args, task: Task=None, **kwargs) -> Union[None,List[np.ndarray]]:
-        task       = task or (problemset if isinstance(problemset, Task) else problemset.task)
-        problemset = (problemset['test'] if isinstance(problemset, Task) else problemset )
-        if task.filename not in self.cache:   self.fit(task)
-        if self.cache[task.filename] is None: return None  # Unsolvable mapping
-        raise NotImplementedError
-
-
-    def test(self, task: Task) -> bool:
-        """test if .predict() correctly solves the task"""
-        self.fit(task)
-        if not task.filename in self.cache:   return False
-        if self.cache[task.filename] is None: return False
-
-        problemset = task['train']
-        training_predictions = self.predict(problemset, task=task)
-        tests_pass = bool( len(training_predictions) == len(problemset) )
-        for index, prediction in enumerate(training_predictions):
-            if not tests_pass: break
-            if not np.array_equal( task['train'][index]['output'], prediction ):
-                tests_pass = False
-        return tests_pass
-
-
-
-class ProblemSetEncoder(ProblemSetSolver):
-    debug    = False,
-    encoders = {
-        np.array: [identity],
-    }
-    features = {
-        np.array:   [],
-        ProblemSet: [],
-        Problem:    [],
-        Task:       []
-    }
-    encoder_defaults = {}
-
-    def __init__(self,
-                 input_encoder:  Callable = None,
-                 output_encoder: Callable = None,
-                 features:       Dict = None,
-                 xgb_args:       Dict = {}
-    ):
-        super().__init__()
-        self.input_encoder  = input_encoder
-        self.output_encoder = output_encoder
-        self.features       = features if features is not None else self.__class__.features
-        self.encoder_args   = {**self.encoder_defaults, **xgb_args}
-
-
-    def __call__(self, problemset: ProblemSet, task: Task):
-        return self.predict(problemset=problemset, task=task, **self._chained_args)
-
-
-    def create_encoder(self):
-        """Return an Encoder that implements .fit() and .predict()"""
-        raise NotImplementedError
-
-
-    def fit(self, task: Task) -> bool:
-        """Find the best input_encoder/output_encodr for the task """
-        if task.filename in self.cache: return True
-
-        problemset      = task['train']
-        input_encoders  = (self.input_encoder, ) if self.input_encoder  else self.encoders[np.array]
-        output_encoders = (self.output_encoder,) if self.output_encoder else self.encoders[np.array]
-        for input_encoder, output_encoder in product(input_encoders, output_encoders):
-            if not callable(input_encoder):  continue
-            if not callable(output_encoder): continue
-            self.input_encoder  = input_encoder   # this is idempotent for a one element list
-            self.output_encoder = output_encoder  # cache the last value in this loop
-
-            inputs  = self.generate_input_array(  problemset )
-            outputs = self.generate_output_array( problemset )
-
-            # See: venv/lib/python3.6/site-packages/xgboost/sklearn.py:762
-            encoder = self.create_encoder()
-            encoder.fit(inputs, outputs, verbose=False)
-
-            self.cache[task.filename] = (encoder,)  # Needs to be set for self.test() to read and prevent an infinite loop
-            self._chained_args = { "task": task }
-            if self.test(task):
-                return True
-        else:
-            self.cache[task.filename] = None
-            return False
-
-
-    def predict(self,
-                problemset: Union[ProblemSet, Task],
-                xgb:   XGBClassifier = None,
-                task:  Task = None,
-                *args, **kwargs
-    ) -> Any:
-        task       = task or (problemset if isinstance(problemset, Task) else problemset.task)
-        problemset = (problemset['test'] if isinstance(problemset, Task) else problemset )
-        if task.filename not in self.cache:   self.fit(task)
-        if self.cache[task.filename] is None: return None  # Unsolvable mapping
-
-        task: Task          = task or self._chained_args.get('task')
-        xgb:  XGBClassifier = xgb  or self.cache[task.filename][0]
-
-        input  = self.generate_input_array(problemset)
-        output = xgb.predict(input)
-        return output
-
-
-    def test(self, task: Task) -> bool:
-        """test if .predict() correctly solves the task"""
-        if task.filename not in self.cache:             self.fit(task)
-        if self.cache.get(task.filename, True) is None: return False
-
-        train_problemset = task['train']  # we test on the train side, to validate if we can .predict() on test
-        train_expected   = self.generate_output_array(train_problemset)
-        train_actual     = self.predict(train_problemset)
-        train_valid      = np.array_equal(train_expected, train_actual)
-
-        if self.debug:
-            test_problemset = task['test']  # we test on the train side, to validate if we can .predict() on test
-            test_expected = self.generate_output_array(test_problemset)
-            test_actual   = self.predict(test_problemset)
-            test_valid = np.array_equal(test_expected, test_actual)
-            print(" | ".join([
-                task.filename.ljust(24),
-                f'{str(train_valid).ljust(5)} -> {str(test_valid).ljust(5)}',
-                f'{train_expected} -> {train_actual}',
-                f'{test_expected} -> {test_actual}',
-            ]))
-
-        return train_valid
-
-
-    # def onehotencode(self, input, maxsize=11):
-    #     output = []
-    #     for item in input:
-    #         if isinstance(item, (list, UserList, np.ndarray)):
-    #             item = self.onehotencode(item, maxsize)
-    #         value = int(item)
-    #         encoded = np.zeros(maxsize, dtype=np.int8)
-    #         encoded[value] = 1
-    #         output.append(encoded)
-    #     return np.array(output)
-
-
-    # @np_cache()
-    def generate_output_array(self, problemset: ProblemSet, output_encoder=None):
-        output_encoder = output_encoder or self.output_encoder
-        outputs = []
-        for problem in problemset:
-            if problem['output'] is None: continue
-            input  = problem['input']
-            output = problem['output']
-            if callable(output_encoder):
-                encoded = output_encoder(output)
-                outputs.append(encoded)
-        return np.array(outputs, dtype=np.int8).flatten()
-
-
-    # @np_cache()
-    def generate_input_array(self, problemset: ProblemSet, input_encoder=None) -> np.ndarray:
-        mappings = self.generate_input_mappings(problemset, self.features)
-        for index, mapping in enumerate(mappings):
-            # noinspection PyTypeChecker
-            mappings[index] = flatten_deep(mapping.values())
-        mappings_array = np.array(mappings, dtype=np.int8)  # dtype=np.int8 is broken
-        assert mappings_array.shape[0] == len(problemset)
-        return mappings_array
-
-    # @np_cache()
-    def generate_input_mappings(self, problemset: ProblemSet, input_encoder=None) -> List[Dict[Callable, Any]]:
-        # XGBoost requires a 2D array, one slice for each problem
-        input_encoder = input_encoder or self.input_encoder
-        mappings  = []
-        for problem in problemset:
-            mapping = {}
-            for feature_fn in self.features[Task]:
-                mapping[feature_fn] = invoke(feature_fn, problemset.task)
-            for feature_fn in self.features[ProblemSet]:
-                mapping[feature_fn] = invoke(feature_fn, problemset)
-            for feature_fn in self.features[Problem]:
-                mapping[feature_fn] = invoke(feature_fn, problem)
-            for feature_fn in self.features[np.array]:
-                input               = input_encoder(problem['input']) if callable(input_encoder) else problem['input']
-                mapping[feature_fn] = invoke(feature_fn, input)
-            mappings.append(mapping)
-        return mappings
-
+# from src.solver_multimodel.core.ProblemSetEncoder import ProblemSetEncoder
 
 
 class XGBEncoder(ProblemSetEncoder):
@@ -1435,7 +1446,6 @@ class XGBEncoder(ProblemSetEncoder):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        encoder = XGBClassifier(**self.encoder_args)
 
     def create_encoder(self):
         encoder = XGBClassifier(**self.encoder_args)
@@ -1443,7 +1453,173 @@ class XGBEncoder(ProblemSetEncoder):
 
 
 #####
-##### END   src/solver_multimodel/XGBEncoder.py
+##### END   src/solver_multimodel/core/XGBEncoder.py
+#####
+
+#####
+##### START src/datamodel/Competition.py
+#####
+
+from collections import UserDict
+from typing import Any
+from typing import Dict
+
+import time
+
+# from src.datamodel.Dataset import Dataset
+# from src.settings import settings
+
+
+class Competition(UserDict):
+    """ Competition: The collection of all Dataset in the competition """
+
+    def __init__(self):
+        super().__init__()
+        self.time_taken  = 0
+        self.directories = {
+            name: f"{settings['dir']['data']}/{name}"
+            for name in ['training', 'evaluation', 'test']
+        }
+        self.data = {
+            name: Dataset(directory, name)
+            for name, directory in self.directories.items()
+        }
+
+    def __str__(self):
+        return "\n".join([ f"{key:11s}: {value}" for key, value in self.score().items() ])
+
+    def solve(self) -> 'Competition':
+        time_start = time.perf_counter()
+        for name, dataset in self.data.items():
+            dataset.solve()
+        self.time_taken = time.perf_counter() - time_start
+        return self  # for chaining
+
+    def score(self) -> Dict[str,Any]:
+        score = { name: dataset.score() for name, dataset in self.data.items() }
+        success_ratio = score['evaluation']['correct'] / max(1e-10, score['evaluation']['guesses'])
+        score['test']['correct'] = round(score['test']['guesses'] * success_ratio, 1)
+        score['time'] = Dataset.format_clock(self.time_taken)
+        return score
+
+    @classmethod
+    def format_clock(cls, time_taken: float) -> str:
+        return Dataset.format_clock(time_taken)
+
+    def map(self, function):
+        output = []
+        competition = self
+        competition.time_start = time.perf_counter()
+        for name, dataset in competition.items():
+            result = dataset.apply(function)
+            output.append( result )
+        competition.time_taken = time.perf_counter() - competition.time_start
+        return output
+
+
+
+
+#####
+##### END   src/datamodel/Competition.py
+#####
+
+#####
+##### START src/functions/queries/colors.py
+#####
+
+from fastcache._lrucache import clru_cache
+
+# from src.functions.queries.grid import grid_unique_colors
+# from src.functions.queries.ratio import is_task_shape_ratio_consistent
+
+
+@clru_cache()
+def task_is_singlecolor(task) -> bool:
+    if not is_task_shape_ratio_consistent(task): return False
+    return all([ len(grid_unique_colors(spec['output'])) == 1 for spec in task['train'] ])
+
+
+
+#####
+##### END   src/functions/queries/colors.py
+#####
+
+#####
+##### START src/solver_multimodel/solvers/XGBSingleColorEncoder.py
+#####
+
+# from src.datamodel.Problem import Problem
+# from src.datamodel.ProblemSet import ProblemSet
+# from src.datamodel.Task import Task
+# from src.functions.queries.grid import *
+# from src.functions.transforms.singlecolor import identity
+# from src.functions.transforms.singlecolor import np_bincount
+# from src.functions.transforms.singlecolor import np_hash
+# from src.functions.transforms.singlecolor import np_shape
+# from src.functions.transforms.singlecolor import unique_colors_sorted
+# from src.solver_multimodel.core.XGBEncoder import XGBEncoder
+
+
+class SingleColorXGBEncoder(XGBEncoder):
+    dtype    = np.int8,
+    encoders = {
+        np.array: [ identity ],
+    }
+    features = {
+        np.array:   [
+            unique_colors_sorted,
+            max_color,
+            max_color_1d,
+            min_color,
+            min_color_1d,
+            np_bincount,
+            np_hash,
+            np_shape,
+            count_colors,
+            count_squares,
+        ],
+        ProblemSet: [],
+        Problem:    [],
+        Task:       [
+            # task_output_unique_sorted_colors
+        ]
+    }
+    encoder_defaults = {
+        **XGBEncoder.encoder_defaults,
+        'max_delta_step':   np.inf,  # unsure if this has an effect
+        'max_depth':        1,       # possibly required for this problem
+        'n_estimators':     1,       # possibly required for this problem
+        'min_child_weight': 0,       # possibly required for this problem
+        # 'max_delta_step':   1,
+        # 'objective':       'rank:map',
+        # 'objective':       'reg:squarederror',
+        # 'max_delta_step':   1,
+        # 'n_jobs':          -1,
+    }
+    def __init__(self, encoders=None, features=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.encoders = encoders if encoders is not None else self.__class__.encoders
+        self.features = features if features is not None else self.__class__.features
+
+
+    ### DEBUG
+    # def predict(self,
+    #             problemset: Union[ProblemSet, Task],
+    #             xgb:   XGBClassifier = None,
+    #             task:  Task = None,
+    #             *args, **kwargs
+    # ) -> Any:
+    #     task       = task or (problemset if isinstance(problemset, Task) else problemset.task)
+    #     problemset = (problemset['test'] if isinstance(problemset, Task) else problemset )
+    #     if task.filename not in self.cache:   self.fit(task)
+    #     # if self.cache[task.filename] is None: return None  # Unsolvable mapping
+    #
+    #     output = [ 8 ] * len(task['test'])
+    #     return output
+
+
+#####
+##### END   src/solver_multimodel/solvers/XGBSingleColorEncoder.py
 #####
 
 #####
@@ -1471,6 +1647,7 @@ def Create(task, task_id=0):
     return Input, Output
 
 
+# noinspection PyTypeChecker
 def flattener(pred):
     if pred is None: return ''
     pred = np.array(pred).astype(np.int8).tolist()
@@ -1566,7 +1743,7 @@ def same_ratio(basic_task):
 #####
 
 #####
-##### START src/solver_multimodel/queries/symmetry.py
+##### START src/functions/queries/symmetry.py
 #####
 
 import numpy as np
@@ -1604,11 +1781,11 @@ def is_grid_symmetry_transpose(grid) -> bool:
     return np.array_equal(grid, np.transpose(grid))
 
 #####
-##### END   src/solver_multimodel/queries/symmetry.py
+##### END   src/functions/queries/symmetry.py
 #####
 
 #####
-##### START src/solver_multimodel/transforms/grid.py
+##### START src/functions/transforms/grid.py
 #####
 
 
@@ -1616,7 +1793,7 @@ def is_grid_symmetry_transpose(grid) -> bool:
 
 import numpy as np
 
-# from src.solver_multimodel.queries.grid import grid_unique_colors
+# from src.functions.queries.grid import grid_unique_colors
 # from src.util.np_cache import np_cache
 
 
@@ -1638,98 +1815,17 @@ def grid_invert_color(grid: np.ndarray):
 
 
 #####
-##### END   src/solver_multimodel/transforms/grid.py
+##### END   src/functions/transforms/grid.py
 #####
 
 #####
-##### START src/solver_multimodel/GeometrySolver.py
-#####
-
-from itertools import combinations
-from itertools import product
-
-import numpy as np
-
-# from src.core.DataModel import Competition
-# from src.settings import settings
-# from src.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
-# from src.solver_multimodel.queries.ratio import task_grid_max_dim
-# from src.solver_multimodel.Solver import Solver
-# from src.solver_multimodel.transforms.grid import grid_invert_color
-
-
-class GeometrySolver(Solver):
-    optimise = True
-    verbose  = True
-    debug    = False
-    actions = {
-        "flip":      ( np.flip,      [0,1]    ),
-        "rot90":     ( np.rot90,     [1,2,3]  ),
-        "roll":      ( np.roll,      product(range(-5,5),[0,1]) ),
-        "swapaxes":  ( np.swapaxes,  [(0, 1),(1, 0)] ),
-        "transpose": ( np.transpose, []       ),                      # this doesn't find anything
-        "none":      ( np.copy,             []        ),
-        "grid_invert_color": ( grid_invert_color,   []), # BROKEN
-    }
-
-    def __init__(self):
-        super().__init__()
-        for key, (function, arglist) in self.actions.items():
-            self.actions[key] = (function, [ (args,) if not isinstance(args, tuple) else args for args in arglist ])
-
-    def detect(self, task):
-        return is_task_shape_ratio_unchanged(task)  # grids must remain the exact same size
-
-    def test(self, task):
-        if task.filename in self.cache: return True
-
-        max_roll = (task_grid_max_dim(task) + 1) // 2
-        for key, (function, arglist) in self.actions.items():
-            if function == np.roll: arglist = product(range(-max_roll,max_roll),[0,1])
-            for args in arglist:
-                if self.is_lambda_valid(task, function, *args):
-                    self.cache[task.filename] = (function, args)
-                    return True
-
-        # this doesn't find anything
-        if self.optimise: return False
-        for ((function1, arglist1),(function2, arglist2)) in combinations( self.actions.values(), 2 ):
-            if function1 == np.roll: arglist1 = product(range(-max_roll,max_roll),[0,1])
-            if function2 == np.roll: arglist2 = product(range(-max_roll,max_roll),[0,1])
-            for args1, args2 in product(arglist1, arglist2):
-                function = lambda grid, args1, args2: function1(function2(grid, *args2), *args1)
-                if self.is_lambda_valid(task, function, *(args1,args2)):
-                    self.cache[task.filename] = (function, (args1,args2))
-                    return True
-        return False
-
-    def solve_grid(self, grid, function=None, args=None, task=None):
-        try:
-            return function(grid, *args)
-        except Exception as exception:
-            if self.debug: print('Exception', self.__class__.__name__, 'solve_grid()', function, args, exception)
-            return grid
-
-
-if __name__ == '__main__' and not settings['production']:
-    solver = GeometrySolver()
-    solver.verbose = True
-    competition = Competition()
-    competition.map(solver.solve_dataset)
-    print(competition)
-
-#####
-##### END   src/solver_multimodel/GeometrySolver.py
-#####
-
-#####
-##### START src/solver_multimodel/queries/bincount.py
+##### START src/functions/queries/bincount.py
 #####
 
 import numpy as np
 
-# from src.solver_multimodel.transforms.singlecolor import np_bincount
-# from src.solver_multimodel.transforms.singlecolor import unique_colors_sorted
+# from src.functions.transforms.singlecolor import np_bincount
+# from src.functions.transforms.singlecolor import unique_colors_sorted
 # from src.util.np_cache import np_cache
 
 
@@ -1749,16 +1845,16 @@ def query_bincount_sorted(grid: np.ndarray, i:int, j:int, pos: 0) -> bool:
 
 
 #####
-##### END   src/solver_multimodel/queries/bincount.py
+##### END   src/functions/queries/bincount.py
 #####
 
 #####
-##### START src/solver_multimodel/queries/loops.py
+##### START src/functions/queries/loops.py
 #####
 
 import numpy as np
 
-# from src.solver_multimodel.queries.ratio import task_shape_ratios
+# from src.functions.queries.ratio import task_shape_ratios
 # from src.util.np_cache import np_cache
 
 
@@ -1822,11 +1918,11 @@ def flip_loop_cols(grid, start=0):
 
 
 #####
-##### END   src/solver_multimodel/queries/loops.py
+##### END   src/functions/queries/loops.py
 #####
 
 #####
-##### START src/solver_multimodel/queries/period.py
+##### START src/functions/queries/period.py
 #####
 
 import numpy as np
@@ -1851,11 +1947,11 @@ def query_period_length1(grid: np.ndarray, i:int, j:int) -> bool:
 
 
 #####
-##### END   src/solver_multimodel/queries/period.py
+##### END   src/functions/queries/period.py
 #####
 
 #####
-##### START src/solver_multimodel/transforms/crop.py
+##### START src/functions/transforms/crop.py
 #####
 
 
@@ -1882,18 +1978,98 @@ def crop_outer(grid,tol=0):
 
 
 #####
-##### END   src/solver_multimodel/transforms/crop.py
+##### END   src/functions/transforms/crop.py
 #####
 
 #####
-##### START src/solver_multimodel/ZoomSolver.py
+##### START src/solver_multimodel/solvers/GeometrySolver.py
+#####
+
+import numpy as np
+from itertools import combinations
+from itertools import product
+
+# from src.datamodel.Competition import Competition
+# from src.functions.queries.ratio import is_task_shape_ratio_unchanged
+# from src.functions.queries.ratio import task_grid_max_dim
+# from src.functions.transforms.grid import grid_invert_color
+# from src.settings import settings
+# from src.solver_multimodel.core.Solver import Solver
+
+
+class GeometrySolver(Solver):
+    optimise = True
+    verbose  = True
+    debug    = False
+    actions = {
+        "flip":      ( np.flip,      [0,1]    ),
+        "rot90":     ( np.rot90,     [1,2,3]  ),
+        "roll":      ( np.roll,      product(range(-5,5),[0,1]) ),
+        "swapaxes":  ( np.swapaxes,  [(0, 1),(1, 0)] ),
+        "transpose": ( np.transpose, []       ),                      # this doesn't find anything
+        "none":      ( np.copy,             []        ),
+        "grid_invert_color": ( grid_invert_color,   []), # BROKEN
+    }
+
+    def __init__(self):
+        super().__init__()
+        for key, (function, arglist) in self.actions.items():
+            self.actions[key] = (function, [ (args,) if not isinstance(args, tuple) else args for args in arglist ])
+
+    def detect(self, task):
+        return is_task_shape_ratio_unchanged(task)  # grids must remain the exact same size
+
+    def test(self, task):
+        if task.filename in self.cache: return True
+
+        max_roll = (task_grid_max_dim(task) + 1) // 2
+        for key, (function, arglist) in self.actions.items():
+            if function == np.roll: arglist = product(range(-max_roll,max_roll),[0,1])
+            for args in arglist:
+                if self.is_lambda_valid(task, function, *args):
+                    self.cache[task.filename] = (function, args)
+                    return True
+
+        # this doesn't find anything
+        if self.optimise: return False
+        for ((function1, arglist1),(function2, arglist2)) in combinations( self.actions.values(), 2 ):
+            if function1 == np.roll: arglist1 = product(range(-max_roll,max_roll),[0,1])
+            if function2 == np.roll: arglist2 = product(range(-max_roll,max_roll),[0,1])
+            for args1, args2 in product(arglist1, arglist2):
+                function = lambda grid, args1, args2: function1(function2(grid, *args2), *args1)
+                if self.is_lambda_valid(task, function, *(args1,args2)):
+                    self.cache[task.filename] = (function, (args1,args2))
+                    return True
+        return False
+
+    def solve_grid(self, grid, function=None, args=None, task=None):
+        try:
+            return function(grid, *args)
+        except Exception as exception:
+            if self.debug: print('Exception', self.__class__.__name__, 'solve_grid()', function, args, exception)
+            return grid
+
+
+if __name__ == '__main__' and not settings['production']:
+    solver = GeometrySolver()
+    solver.verbose = True
+    competition = Competition()
+    competition.map(solver.solve_dataset)
+    print(competition)
+
+#####
+##### END   src/solver_multimodel/solvers/GeometrySolver.py
+#####
+
+#####
+##### START src/solver_multimodel/solvers/ZoomSolver.py
 #####
 
 import cv2
 import skimage.measure
 
-# from src.solver_multimodel.queries.ratio import task_shape_ratios
-# from src.solver_multimodel.Solver import Solver
+# from src.functions.queries.ratio import task_shape_ratios
+# from src.solver_multimodel.core.Solver import Solver
 
 
 class ZoomSolver(Solver):
@@ -1905,7 +2081,7 @@ class ZoomSolver(Solver):
         detect = (
                 ratios != { (1,1) }   # not no scaling
                 and len(ratios) == 1      # not multiple scalings
-                and ratio[0] == ratio[1]  # single consistant scaling
+                and ratio[0] == ratio[1]  # single consistent scaling
         )
         return detect
 
@@ -1918,7 +2094,7 @@ class ZoomSolver(Solver):
             resize = tuple( int(d*scale) for d in grid.shape )
             output = cv2.resize(grid, resize, interpolation=cv2.INTER_NEAREST)
         else:
-            resize = tuple( int(1/scale) for d in grid.shape )
+            resize = tuple( int(1/scale) for number in grid.shape )
             output = skimage.measure.block_reduce(grid, resize)
         if self.verbose:
             print('scale', scale, 'grid.shape', grid.shape, 'output.shape', output.shape)
@@ -1928,7 +2104,7 @@ class ZoomSolver(Solver):
 
 
 #####
-##### END   src/solver_multimodel/ZoomSolver.py
+##### END   src/solver_multimodel/solvers/ZoomSolver.py
 #####
 
 #####
@@ -1946,23 +2122,13 @@ def make_tuple(args):
 #####
 
 #####
-##### START submission/submission.py
+##### START src/solver_multimodel/solvers/BorderSolver.py
 #####
 
-
-
-#####
-##### END   submission/submission.py
-#####
-
-#####
-##### START src/solver_multimodel/BorderSolver.py
-#####
-
-# from src.solver_multimodel.queries.grid import *
-# from src.solver_multimodel.queries.ratio import is_task_shape_ratio_consistant
-# from src.solver_multimodel.queries.ratio import task_shape_ratio
-# from src.solver_multimodel.Solver import Solver
+# from src.functions.queries.grid import *
+# from src.functions.queries.ratio import is_task_shape_ratio_consistent
+# from src.functions.queries.ratio import task_shape_ratio
+# from src.solver_multimodel.core.Solver import Solver
 
 
 class BorderSolver(Solver):
@@ -1981,7 +2147,7 @@ class BorderSolver(Solver):
     ]
 
     def task_has_border(self, task):
-        if not is_task_shape_ratio_consistant(task): return False
+        if not is_task_shape_ratio_consistent(task): return False
         return all([ self.grid_has_border(spec['output']) for spec in task['train'] ])
 
     def grid_has_border(self, grid):
@@ -2018,15 +2184,14 @@ class BorderSolver(Solver):
 
 
 #####
-##### END   src/solver_multimodel/BorderSolver.py
+##### END   src/solver_multimodel/solvers/BorderSolver.py
 #####
 
 #####
-##### START src/solver_multimodel/DoNothingSolver.py
+##### START src/solver_multimodel/solvers/DoNothingSolver.py
 #####
 
-# from src.solver_multimodel.Solver import Solver
-
+# from src.solver_multimodel.core.Solver import Solver
 
 
 class DoNothingSolver(Solver):
@@ -2035,18 +2200,17 @@ class DoNothingSolver(Solver):
 
 
 #####
-##### END   src/solver_multimodel/DoNothingSolver.py
+##### END   src/solver_multimodel/solvers/DoNothingSolver.py
 #####
 
 #####
-##### START src/solver_multimodel/GlobSolver.py
+##### START src/solver_multimodel/solvers/GlobSolver.py
 #####
 
-# from submission.submission import Competition
-
+# from src.datamodel.Competition import Competition
+# from src.functions.queries.grid import *
 # from src.settings import settings
-# from src.solver_multimodel.queries.grid import *
-# from src.solver_multimodel.Solver import Solver
+# from src.solver_multimodel.core.Solver import Solver
 
 
 class GlobSolver(Solver):
@@ -2064,8 +2228,8 @@ class GlobSolver(Solver):
     def init_cache(self):
         if len(self.cache): return
         competition = Competition()
-        for name, dataset in competition.items():
-            if name == 'test': continue  # exclude test from the cache
+        for dataset_name, dataset in competition.items():
+            if dataset_name == 'test': continue  # exclude test from the cache
             for task in dataset:
                 for name, problemset in task.items():
                     for problem in problemset:
@@ -2113,20 +2277,20 @@ if __name__ == '__main__' and not settings['production']:
     print(competition)
 
 #####
-##### END   src/solver_multimodel/GlobSolver.py
+##### END   src/solver_multimodel/solvers/GlobSolver.py
 #####
 
 #####
-##### START src/solver_multimodel/SingleColorSolver.py
+##### START src/solver_multimodel/solvers/SingleColorSolver.py
 #####
 
-# from src.core.DataModel import Task
+# from src.datamodel.Task import Task
+# from src.functions.queries.colors import task_is_singlecolor
+# from src.functions.queries.grid import *
+# from src.functions.queries.ratio import task_shape_ratio
+# from src.functions.queries.symmetry import is_grid_symmetry
 # from src.settings import settings
-# from src.solver_multimodel.queries.colors import task_is_singlecolor
-# from src.solver_multimodel.queries.grid import *
-# from src.solver_multimodel.queries.ratio import task_shape_ratio
-# from src.solver_multimodel.queries.symmetry import is_grid_symmetry
-# from src.solver_multimodel.Solver import Solver
+# from src.solver_multimodel.core.Solver import Solver
 
 
 class SingleColorSolver(Solver):
@@ -2190,33 +2354,34 @@ if __name__ == '__main__' and not settings['production']:
     # print(competition)
 
 #####
-##### END   src/solver_multimodel/SingleColorSolver.py
+##### END   src/solver_multimodel/solvers/SingleColorSolver.py
 #####
 
 #####
-##### START src/solver_multimodel/TessellationSolver.py
+##### START src/solver_multimodel/solvers/TessellationSolver.py
 #####
 
 import inspect
+
 from itertools import product
 
-# from src.core.DataModel import Competition
-# from src.core.DataModel import Task
+# from src.datamodel.Competition import Competition
+# from src.datamodel.Task import Task
+# from src.functions.queries.bincount import query_bincount
+# from src.functions.queries.bincount import query_bincount_sorted
+# from src.functions.queries.grid import *
+# from src.functions.queries.loops import *
+# from src.functions.queries.period import query_period_length0
+# from src.functions.queries.period import query_period_length1
+# from src.functions.queries.ratio import is_task_shape_ratio_integer_multiple
+# from src.functions.queries.ratio import is_task_shape_ratio_unchanged
+# from src.functions.queries.symmetry import is_grid_symmetry
+# from src.functions.transforms.crop import crop_inner
+# from src.functions.transforms.crop import crop_outer
+# from src.functions.transforms.grid import grid_invert_color
 # from src.settings import settings
-# from src.solver_multimodel.GeometrySolver import GeometrySolver
-# from src.solver_multimodel.queries.bincount import query_bincount
-# from src.solver_multimodel.queries.bincount import query_bincount_sorted
-# from src.solver_multimodel.queries.grid import *
-# from src.solver_multimodel.queries.loops import *
-# from src.solver_multimodel.queries.period import query_period_length0
-# from src.solver_multimodel.queries.period import query_period_length1
-# from src.solver_multimodel.queries.ratio import is_task_shape_ratio_integer_multiple
-# from src.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
-# from src.solver_multimodel.queries.symmetry import is_grid_symmetry
-# from src.solver_multimodel.transforms.crop import crop_inner
-# from src.solver_multimodel.transforms.crop import crop_outer
-# from src.solver_multimodel.transforms.grid import grid_invert_color
-# from src.solver_multimodel.ZoomSolver import ZoomSolver
+# from src.solver_multimodel.solvers.GeometrySolver import GeometrySolver
+# from src.solver_multimodel.solvers.ZoomSolver import ZoomSolver
 # from src.util.make_tuple import make_tuple
 
 
@@ -2263,17 +2428,17 @@ class TessellationSolver(GeometrySolver):
             "query_period_length1":    ( query_period_length1,    []),
             "query_bincount":          ( query_bincount,         range(0,10)),
             "query_bincount_sorted":   ( query_bincount_sorted,  range(0,10)),
-            "is_grid_symmetry":        ( is_grid_symmetry )
+            "is_grid_symmetry":        ( is_grid_symmetry,       () )
         }
     }
 
 
     def detect(self, task):
         if is_task_shape_ratio_unchanged(task):            return False  # Use GeometrySolver
-        if not is_task_shape_ratio_integer_multiple(task): return False  # Not a Tessalation problem
+        if not is_task_shape_ratio_integer_multiple(task): return False  # Not a Tesselation problem
         if not all([ count_colors(spec['input']) == count_colors(spec['output']) for spec in task['train'] ]): return False  # Different colors
         if ZoomSolver().solve(task):                            return False
-        #if not self.is_task_shape_ratio_consistant(task):       return False  # Some inconsistant grids are tessalations
+        #if not self.is_task_shape_ratio_consistent(task):       return False  # Some inconsistent grids are tessellations
         return True
 
 
@@ -2293,7 +2458,7 @@ class TessellationSolver(GeometrySolver):
                                 yield (preprocess, p_arg),(transform,t_arg),(query,q_arg)
 
 
-    # TODO: hieraracharical nesting of solves and solutions/rules array generator
+    # TODO: hierarchical nesting of solves and solutions/rules array generator
     def test(self, task):
         if task.filename in self.cache: return True
         for (preprocess,p_arg),(transform,t_arg),(query,q_arg) in self.loop_options():
@@ -2316,7 +2481,7 @@ class TessellationSolver(GeometrySolver):
             generator = transform(grid, *t_arg)
             transform = lambda grid, *args: next(generator)
 
-        # Some combinations of functions will throw gemoetry
+        # Some combinations of functions will throw geometry
         output = None
         try:
             grid    = preprocess(grid, *p_arg)
@@ -2367,30 +2532,30 @@ if __name__ == '__main__' and not settings['production']:
     print(competition)
 
 #####
-##### END   src/solver_multimodel/TessellationSolver.py
+##### END   src/solver_multimodel/solvers/TessellationSolver.py
 #####
 
 #####
-##### START src/solver_multimodel/XGBGridSolver.py
+##### START src/solver_multimodel/solvers/XGBGridSolver.py
 #####
 
-from itertools import product
 from typing import List
 
 import pydash
 from fastcache._lrucache import clru_cache
-from xgboost import XGBClassifier
-
-# from src.core.DataModel import Competition
-# from src.core.DataModel import Task
+from itertools import product
 # from src.ensemble.period import get_period_length0
 # from src.ensemble.period import get_period_length1
+from xgboost import XGBClassifier
+
+# from src.datamodel.Competition import Competition
+# from src.datamodel.Task import Task
+# from src.functions.queries.grid import *
+# from src.functions.queries.ratio import is_task_shape_ratio_unchanged
+# from src.functions.queries.symmetry import is_grid_symmetry
+# from src.functions.transforms.singlecolor import np_bincount
 # from src.settings import settings
-# from src.solver_multimodel.queries.grid import *
-# from src.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
-# from src.solver_multimodel.queries.symmetry import is_grid_symmetry
-# from src.solver_multimodel.Solver import Solver
-# from src.solver_multimodel.transforms.singlecolor import np_bincount
+# from src.solver_multimodel.core.Solver import Solver
 # from src.util.np_cache import np_cache
 
 
@@ -2398,12 +2563,15 @@ class XGBGridSolver(Solver):
     optimise = True
     verbose  = True
     xgb_defaults = {
-        'tree_method':      'exact',
-        'eval_metric':      'error',
-        'objective':        'reg:squarederror',
         'n_estimators':     32,
-        'max_depth':        100,
-        'min_child_weight': 0,
+        'max_depth':        10,
+
+        ### Untested
+        # 'tree_method':      'exact',
+        # 'eval_metric':      'error',
+        # 'objective':        'reg:squarederror',
+        # 'min_child_weight': 0,
+        #
         # 'sampling_method':  'uniform',
         # 'max_delta_step':   1,
         # 'min_child_weight': 0,
@@ -2413,6 +2581,8 @@ class XGBGridSolver(Solver):
         super().__init__()
         self.kwargs = {
             **self.xgb_defaults,
+            'n_estimators': n_estimators,
+            'max_depth':    max_depth,
             **kwargs,
         }
         if self.kwargs.get('booster') == 'gblinear':
@@ -2455,6 +2625,7 @@ class XGBGridSolver(Solver):
                         print(classifier)
                         print(type(exception), exception)
                     pass
+
     def test(self, task: Task) -> bool:
         """test if the given solve_grid correctly solves the task"""
         args = self.cache.get(task.filename, ())
@@ -2481,14 +2652,10 @@ class XGBGridSolver(Solver):
             nrows, ncols             = len(task[mode][task_num]['input']),  len(task[mode][task_num]['input'][0])
             target_rows, target_cols = len(task[mode][task_num]['output']), len(task[mode][task_num]['output'][0])
 
+            # TODO: Reshape all input/outputs to largest size
             if (target_rows != nrows) or (target_cols != ncols):
-                # print('Number of input rows:', nrows, 'cols:', ncols)
-                # print('Number of target rows:', target_rows, 'cols:', target_cols)
-                not_valid = 1
                 return None, None, 1
 
-            imsize = nrows * ncols
-            # offset = imsize*task_num*3 #since we are using three types of aug
             feat.extend(cls.make_features(input_color))
             target.extend(np.array(target_color).reshape(-1, ))
 
@@ -2553,6 +2720,7 @@ class XGBGridSolver(Solver):
                 count_colors(neighbourhood)        if len(neighbourhood) else 0,
                 count_squares(neighbourhood)       if len(neighbourhood) else 0,
             ]
+
         return features
 
     @classmethod
@@ -2560,11 +2728,11 @@ class XGBGridSolver(Solver):
     def get_neighbourhood(cls, grid: np.ndarray, i: int, j: int, distance=1):
         try:
             output = np.full((2*distance+1, 2*distance+1), 11)  # 11 = outside of grid pixel
-            for xo, xg in enumerate(range(-distance, distance+1)):
-                for yo, yg in enumerate(range(-distance, distance+1)):
-                    if not 0 <= xo < grid.shape[0]: continue
-                    if not 0 <= yo < grid.shape[1]: continue
-                    output[xo,yo] = grid[xg,yg]
+            for x_out, x_grid in enumerate(range(-distance, distance+1)):
+                for y_out, y_grid in enumerate(range(-distance, distance+1)):
+                    if not 0 <= x_out < grid.shape[0]: continue
+                    if not 0 <= y_out < grid.shape[1]: continue
+                    output[x_out,y_out] = grid[i+x_grid,j+y_grid]
             return output
         except:
             return np.full((2*distance+1, 2*distance+1), 11)  # 11 = outside of grid pixel
@@ -2612,7 +2780,7 @@ class XGBGridSolverGBtree(XGBGridSolver):
         'tree_method': 'exact'
     }
     def __init__(self, booster='gbtree', **kwargs):
-        self.kwargs = { **self.kwargs_defaults, **kwargs }
+        self.kwargs = { "booster": booster, **self.kwargs_defaults, **kwargs }
         super().__init__(**self.kwargs)
 
 class XGBGridSolverGBlinear(XGBGridSolver):
@@ -2760,92 +2928,27 @@ if __name__ == '__main__' and not settings['production']:
 
 
 #####
-##### END   src/solver_multimodel/XGBGridSolver.py
+##### END   src/solver_multimodel/solvers/XGBGridSolver.py
 #####
 
 #####
-##### START src/solver_multimodel/XGBSingleColorSolver.py
+##### START src/solver_multimodel/solvers/XGBSingleColorSolver.py
 #####
 
 from typing import List
 from typing import Union
 
-# from src.core.DataModel import Competition
-# from src.core.DataModel import Problem
-# from src.core.DataModel import ProblemSet
-# from src.core.DataModel import Task
-# from src.plot import plot_task
+# from src.datamodel.Competition import Competition
+# from src.datamodel.ProblemSet import ProblemSet
+# from src.datamodel.Task import Task
+# from src.functions.queries.colors import task_is_singlecolor
+# from src.functions.queries.grid import *
+# from src.functions.queries.ratio import is_task_output_grid_shape_constant
+# from src.functions.queries.ratio import task_output_grid_shape
 # from src.settings import settings
-# from src.solver_multimodel.queries.colors import task_is_singlecolor
-# from src.solver_multimodel.queries.grid import *
-# from src.solver_multimodel.queries.ratio import is_task_output_grid_shape_constant
-# from src.solver_multimodel.queries.ratio import task_output_grid_shape
-# from src.solver_multimodel.transforms.singlecolor import identity
-# from src.solver_multimodel.transforms.singlecolor import np_bincount
-# from src.solver_multimodel.transforms.singlecolor import np_hash
-# from src.solver_multimodel.transforms.singlecolor import np_shape
-# from src.solver_multimodel.transforms.singlecolor import unique_colors_sorted
-# from src.solver_multimodel.XGBEncoder import ProblemSetSolver
-# from src.solver_multimodel.XGBEncoder import XGBEncoder
-
-
-class SingleColorXGBEncoder(XGBEncoder):
-    dtype    = np.int8,
-    encoders = {
-        np.array: [ identity ],
-    }
-    features = {
-        np.array:   [
-            unique_colors_sorted,
-            max_color,
-            max_color_1d,
-            min_color,
-            min_color_1d,
-            np_bincount,
-            np_hash,
-            np_shape,
-            count_colors,
-            count_squares,
-        ],
-        ProblemSet: [],
-        Problem:    [],
-        Task:       [
-            # task_output_unique_sorted_colors
-        ]
-    }
-    encoder_defaults = {
-        **XGBEncoder.encoder_defaults,
-        'max_delta_step':   np.inf,  # unsure if this has an effect
-        'max_depth':        1,       # possibly required for this problem
-        'n_estimators':     1,       # possibly required for this problem
-        'min_child_weight': 0,       # possibly required for this problem
-        # 'max_delta_step':   1,
-        # 'objective':       'rank:map',
-        # 'objective':       'reg:squarederror',
-        # 'max_delta_step':   1,
-        # 'n_jobs':          -1,
-    }
-    def __init__(self, encoders=None, features=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.encoders = encoders if encoders is not None else self.__class__.encoders
-        self.features = features if features is not None else self.__class__.features
-
-
-    ### DEBUG
-    # def predict(self,
-    #             problemset: Union[ProblemSet, Task],
-    #             xgb:   XGBClassifier = None,
-    #             task:  Task = None,
-    #             *args, **kwargs
-    # ) -> Any:
-    #     task       = task or (problemset if isinstance(problemset, Task) else problemset.task)
-    #     problemset = (problemset['test'] if isinstance(problemset, Task) else problemset )
-    #     if task.filename not in self.cache:   self.fit(task)
-    #     # if self.cache[task.filename] is None: return None  # Unsolvable mapping
-    #
-    #     output = [ 8 ] * len(task['test'])
-    #     return output
-
+# from src.solver_multimodel.core.ProblemSetSolver import ProblemSetSolver
+# from src.solver_multimodel.solvers.XGBSingleColorEncoder import SingleColorXGBEncoder
+# from src.util.plot import plot_task
 
 
 # BUG: XGBoost only works if the output colors have already been seen in the input
@@ -2875,7 +2978,7 @@ class XGBSingleColorSolver(ProblemSetSolver):
     # BUGFIX: TypeError: solve_grid() got multiple values for argument 'task'
     def predict(self, problemset: Union[ProblemSet,Task], *args, task: Task=None, **kwargs) -> Union[None,List[np.ndarray]]:
         task       = task or (problemset if isinstance(problemset, Task) else problemset.task)
-        problemset = (problemset['test'] if isinstance(problemset, Task) else problemset )
+        # problemset = (problemset['test'] if isinstance(problemset, Task) else problemset )
         if task.filename not in self.cache:   self.fit(task)
         if self.cache[task.filename] is None: return None  # Unsolvable mapping
 
@@ -2915,25 +3018,25 @@ if __name__ == '__main__' and not settings['production']:
     print(competition)
 
 #####
-##### END   src/solver_multimodel/XGBSingleColorSolver.py
+##### END   src/solver_multimodel/solvers/XGBSingleColorSolver.py
 #####
 
 #####
-##### START src/solver_multimodel/solvers.py
+##### START src/solvers.py
 #####
 
 from typing import List
 
-# from src.solver_multimodel.BorderSolver import BorderSolver
-# from src.solver_multimodel.DoNothingSolver import DoNothingSolver
-# from src.solver_multimodel.GeometrySolver import GeometrySolver
-# from src.solver_multimodel.GlobSolver import GlobSolver
-# from src.solver_multimodel.SingleColorSolver import SingleColorSolver
-# from src.solver_multimodel.Solver import Solver
-# from src.solver_multimodel.TessellationSolver import TessellationSolver
-# from src.solver_multimodel.XGBGridSolver import XGBGridSolver
-# from src.solver_multimodel.XGBSingleColorSolver import XGBSingleColorSolver
-# from src.solver_multimodel.ZoomSolver import ZoomSolver
+# from src.solver_multimodel.core.Solver import Solver
+# from src.solver_multimodel.solvers.BorderSolver import BorderSolver
+# from src.solver_multimodel.solvers.DoNothingSolver import DoNothingSolver
+# from src.solver_multimodel.solvers.GeometrySolver import GeometrySolver
+# from src.solver_multimodel.solvers.GlobSolver import GlobSolver
+# from src.solver_multimodel.solvers.SingleColorSolver import SingleColorSolver
+# from src.solver_multimodel.solvers.TessellationSolver import TessellationSolver
+# from src.solver_multimodel.solvers.XGBGridSolver import XGBGridSolver
+# from src.solver_multimodel.solvers.XGBSingleColorSolver import XGBSingleColorSolver
+# from src.solver_multimodel.solvers.ZoomSolver import ZoomSolver
 
 solvers: List[Solver] = [
     # Deterministic (all solved answers are correct)
@@ -2955,20 +3058,21 @@ solvers: List[Solver] = [
 
 
 #####
-##### END   src/solver_multimodel/solvers.py
+##### END   src/solvers.py
 #####
 
 #####
-##### START ./src/solver_multimodel/main.py
+##### START ./src/main.py
 #####
+
+from operator import itemgetter
 
 import gc
 import time
-from operator import itemgetter
 
-# from src.core.DataModel import Competition
+# from src.datamodel.Competition import Competition
 # from src.settings import settings
-# from src.solver_multimodel.solvers import solvers
+# from src.solvers import solvers
 
 if __name__ == '__main__':
     print('\n','-'*20,'\n')
@@ -3014,21 +3118,20 @@ if __name__ == '__main__':
 
 
 #####
-##### END   ./src/solver_multimodel/main.py
+##### END   ./src/main.py
 #####
 
 ##### 
-##### ./submission/kaggle_compile.py ./src/solver_multimodel/main.py
+##### ./submission/kaggle_compile.py ./src/main.py
 ##### 
-##### 2020-05-29 00:55:18+01:00
+##### 2020-05-29 18:07:36+01:00
 ##### 
 ##### archive	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### archive	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### origin	git@github.com:JamesMcGuigan/kaggle-arc.git (fetch)
 ##### origin	git@github.com:JamesMcGuigan/kaggle-arc.git (push)
 ##### 
-#####   james-wip c81cf89 Solvers | work in progress - broken
-##### * master    6501bc3 XGBSolver.hyperopt.py | update hyperopt search space
+##### * master 39c4143 CSV | replace list(set()) with pydash.uniq() for deterministic sorting
 ##### 
-##### 6501bc3b03a7b79bd4f845ac68457bab03376c21
+##### 39c414351778328f56038f537735d894ed4585a7
 ##### 

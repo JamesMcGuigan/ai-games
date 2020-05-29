@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 ##### 
-##### ./submission/kaggle_compile.py ./src_james/solver_multimodel/main.py
+##### ./submission/kaggle_compile.py ./src/solver_multimodel/main.py
 ##### 
-##### 2020-05-28 14:20:57+01:00
+##### 2020-05-29 00:55:18+01:00
 ##### 
 ##### archive	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### archive	git@github.com:seshurajup/kaggle-arc.git (push)
@@ -11,13 +11,13 @@
 ##### origin	git@github.com:JamesMcGuigan/kaggle-arc.git (push)
 ##### 
 #####   james-wip c81cf89 Solvers | work in progress - broken
-##### * master    01cd888 kaggle_compile.py -> submission.py + submission.csv
+##### * master    6501bc3 XGBSolver.hyperopt.py | update hyperopt search space
 ##### 
-##### 01cd8881afa5cf6d0f2afaa46b10d443318cae5d
+##### 6501bc3b03a7b79bd4f845ac68457bab03376c21
 ##### 
 
 #####
-##### START src_james/settings.py
+##### START src/settings.py
 #####
 
 # DOCS: https://www.kaggle.com/WinningModelDocumentationGuidelines
@@ -57,11 +57,11 @@ if __name__ == '__main__':
 
 
 #####
-##### END   src_james/settings.py
+##### END   src/settings.py
 #####
 
 #####
-##### START src_james/core/CSV.py
+##### START src/core/CSV.py
 #####
 
 import os
@@ -69,7 +69,7 @@ import re
 
 import numpy as np
 
-# from src_james.settings import settings
+# from src.settings import settings
 
 
 class CSV:
@@ -154,11 +154,11 @@ class CSV:
 
 
 #####
-##### END   src_james/core/CSV.py
+##### END   src/core/CSV.py
 #####
 
 #####
-##### START src_james/core/DataModel.py
+##### START src/core/DataModel.py
 #####
 
 import json
@@ -176,8 +176,8 @@ from typing import Union
 import glob2
 import numpy as np
 
-# from src_james.core.CSV import CSV
-# from src_james.settings import settings
+# from src.core.CSV import CSV
+# from src.settings import settings
 
 
 # Conceptual Mapping
@@ -490,11 +490,11 @@ class Problem(UserDict):
 
 
 #####
-##### END   src_james/core/DataModel.py
+##### END   src/core/DataModel.py
 #####
 
 #####
-##### START src_james/plot.py
+##### START src/plot.py
 #####
 
 # Source: https://www.kaggle.com/jamesmcguigan/arc-geometry-solvers/
@@ -506,7 +506,7 @@ from fastcache._lrucache import clru_cache
 from matplotlib import colors
 
 # Modified from: https://www.kaggle.com/zaharch/visualizing-all-tasks-updated
-# from src_james.core.DataModel import Task
+# from src.core.DataModel import Task
 
 
 @clru_cache()
@@ -581,11 +581,11 @@ def plot_task(task: Task, scale=2):
 
 
 #####
-##### END   src_james/plot.py
+##### END   src/plot.py
 #####
 
 #####
-##### START src_james/util/np_cache.py
+##### START src/util/np_cache.py
 #####
 
 # Inspired by: https://stackoverflow.com/questions/52331944/cache-decorator-for-numpy-arrays/52332109
@@ -595,7 +595,7 @@ import numpy as np
 from fastcache._lrucache import clru_cache
 
 ### Profiler: 2x speedup
-# from src_james.settings import settings
+# from src.settings import settings
 
 __np_cache = {}
 def np_cache(maxsize=1024, typed=True):
@@ -659,11 +659,11 @@ def np_cache(maxsize=1024, typed=True):
         return np_cache_generator
 
 #####
-##### END   src_james/util/np_cache.py
+##### END   src/util/np_cache.py
 #####
 
 #####
-##### START src_james/solver_multimodel/queries/ratio.py
+##### START src/solver_multimodel/queries/ratio.py
 #####
 
 from itertools import chain
@@ -674,8 +674,8 @@ from typing import Union
 import numpy as np
 from fastcache._lrucache import clru_cache
 
-# from src_james.core.DataModel import Task
-# from src_james.util.np_cache import np_cache
+# from src.core.DataModel import Task
+# from src.util.np_cache import np_cache
 
 
 @np_cache()
@@ -759,11 +759,11 @@ def is_task_output_grid_shape_constant(task: Task) -> bool:
 
 
 #####
-##### END   src_james/solver_multimodel/queries/ratio.py
+##### END   src/solver_multimodel/queries/ratio.py
 #####
 
 #####
-##### START src_james/solver_multimodel/Solver.py
+##### START src/solver_multimodel/Solver.py
 #####
 
 from collections import UserList
@@ -773,10 +773,10 @@ from typing import Union
 
 import numpy as np
 
-# from src_james.core.DataModel import Dataset
-# from src_james.core.DataModel import Problem
-# from src_james.core.DataModel import Task
-# from src_james.plot import plot_task
+# from src.core.DataModel import Dataset
+# from src.core.DataModel import Problem
+# from src.core.DataModel import Task
+# from src.plot import plot_task
 
 
 class Solver():
@@ -926,11 +926,11 @@ class Solver():
 
 
 #####
-##### END   src_james/solver_multimodel/Solver.py
+##### END   src/solver_multimodel/Solver.py
 #####
 
 #####
-##### START src_james/core/functions.py
+##### START src/core/functions.py
 #####
 
 from collections import UserList
@@ -941,7 +941,7 @@ from typing import Union
 
 import numpy as np
 
-# from src_james.util.np_cache import np_cache
+# from src.util.np_cache import np_cache
 
 
 def bind(function_or_value: Union[Callable,Any], *args, **kwargs) -> Callable:
@@ -983,19 +983,19 @@ def flatten_deep(iterable, types=(list,tuple,set,np.ndarray,UserList)) -> List:
     return output
 
 #####
-##### END   src_james/core/functions.py
+##### END   src/core/functions.py
 #####
 
 #####
-##### START src_james/solver_multimodel/transforms/singlecolor.py
+##### START src/solver_multimodel/transforms/singlecolor.py
 #####
 
 from typing import Tuple
 
 import numpy as np
 
-# from src_james.core.DataModel import Task
-# from src_james.util.np_cache import np_cache
+# from src.core.DataModel import Task
+# from src.util.np_cache import np_cache
 
 
 def identity(input: np.ndarray) -> np.ndarray:
@@ -1040,18 +1040,18 @@ def task_output_unique_sorted_colors(task: Task):
     return output
 
 #####
-##### END   src_james/solver_multimodel/transforms/singlecolor.py
+##### END   src/solver_multimodel/transforms/singlecolor.py
 #####
 
 #####
-##### START src_james/solver_multimodel/queries/grid.py
+##### START src/solver_multimodel/queries/grid.py
 #####
 
 import numpy as np
 
 # from skimage.measure import block_reduce
 # from numpy_lru_cache_decorator import np_cache  # https://gist.github.com/Susensio/61f4fee01150caaac1e10fc5f005eb75
-# from src_james.util.np_cache import np_cache
+# from src.util.np_cache import np_cache
 
 
 def query_true(     grid: np.ndarray, x: int, y: int ):            return True
@@ -1147,17 +1147,17 @@ def grid_unique_colors(grid: np.ndarray):
 
 
 #####
-##### END   src_james/solver_multimodel/queries/grid.py
+##### END   src/solver_multimodel/queries/grid.py
 #####
 
 #####
-##### START src_james/solver_multimodel/queries/colors.py
+##### START src/solver_multimodel/queries/colors.py
 #####
 
 from fastcache._lrucache import clru_cache
 
-# from src_james.solver_multimodel.queries.grid import grid_unique_colors
-# from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_consistant
+# from src.solver_multimodel.queries.grid import grid_unique_colors
+# from src.solver_multimodel.queries.ratio import is_task_shape_ratio_consistant
 
 
 @clru_cache()
@@ -1168,11 +1168,11 @@ def task_is_singlecolor(task) -> bool:
 
 
 #####
-##### END   src_james/solver_multimodel/queries/colors.py
+##### END   src/solver_multimodel/queries/colors.py
 #####
 
 #####
-##### START src_james/solver_multimodel/XGBEncoder.py
+##### START src/solver_multimodel/XGBEncoder.py
 #####
 
 from collections import Callable
@@ -1185,13 +1185,13 @@ from typing import Union
 import numpy as np
 from xgboost import XGBClassifier
 
-# from src_james.core.DataModel import Problem
-# from src_james.core.DataModel import ProblemSet
-# from src_james.core.DataModel import Task
-# from src_james.core.functions import flatten_deep
-# from src_james.core.functions import invoke
-# from src_james.solver_multimodel.Solver import Solver
-# from src_james.solver_multimodel.transforms.singlecolor import identity
+# from src.core.DataModel import Problem
+# from src.core.DataModel import ProblemSet
+# from src.core.DataModel import Task
+# from src.core.functions import flatten_deep
+# from src.core.functions import invoke
+# from src.solver_multimodel.Solver import Solver
+# from src.solver_multimodel.transforms.singlecolor import identity
 
 
 class ProblemSetSolver(Solver):
@@ -1418,7 +1418,7 @@ class ProblemSetEncoder(ProblemSetSolver):
 
 class XGBEncoder(ProblemSetEncoder):
     # DOCS: https://xgboost.readthedocs.io/en/latest/parameter.html
-    # See:  src_james/solver_multimodel/XGBGridSolver.hyperopt.py
+    # See:  src/solver_multimodel/XGBGridSolver.hyperopt.py
     # Be very conservative here as this is an inheritable class
     encoder_defaults = {
         **ProblemSetEncoder.encoder_defaults,
@@ -1443,11 +1443,11 @@ class XGBEncoder(ProblemSetEncoder):
 
 
 #####
-##### END   src_james/solver_multimodel/XGBEncoder.py
+##### END   src/solver_multimodel/XGBEncoder.py
 #####
 
 #####
-##### START src_james/ensemble/util.py
+##### START src/ensemble/util.py
 #####
 
 import numpy as np
@@ -1483,17 +1483,17 @@ def flattener(pred):
 
 
 #####
-##### END   src_james/ensemble/util.py
+##### END   src/ensemble/util.py
 #####
 
 #####
-##### START src_james/ensemble/period.py
+##### START src/ensemble/period.py
 #####
 
 import numpy as np
 
-# from src_james.ensemble.util import Defensive_Copy
-# from src_james.util.np_cache import np_cache
+# from src.ensemble.util import Defensive_Copy
+# from src.util.np_cache import np_cache
 
 
 @np_cache()
@@ -1562,16 +1562,16 @@ def same_ratio(basic_task):
 
 
 #####
-##### END   src_james/ensemble/period.py
+##### END   src/ensemble/period.py
 #####
 
 #####
-##### START src_james/solver_multimodel/queries/symmetry.py
+##### START src/solver_multimodel/queries/symmetry.py
 #####
 
 import numpy as np
 
-# from src_james.util.np_cache import np_cache
+# from src.util.np_cache import np_cache
 
 
 @np_cache()
@@ -1604,11 +1604,11 @@ def is_grid_symmetry_transpose(grid) -> bool:
     return np.array_equal(grid, np.transpose(grid))
 
 #####
-##### END   src_james/solver_multimodel/queries/symmetry.py
+##### END   src/solver_multimodel/queries/symmetry.py
 #####
 
 #####
-##### START src_james/solver_multimodel/transforms/grid.py
+##### START src/solver_multimodel/transforms/grid.py
 #####
 
 
@@ -1616,8 +1616,8 @@ def is_grid_symmetry_transpose(grid) -> bool:
 
 import numpy as np
 
-# from src_james.solver_multimodel.queries.grid import grid_unique_colors
-# from src_james.util.np_cache import np_cache
+# from src.solver_multimodel.queries.grid import grid_unique_colors
+# from src.util.np_cache import np_cache
 
 
 @np_cache
@@ -1638,11 +1638,11 @@ def grid_invert_color(grid: np.ndarray):
 
 
 #####
-##### END   src_james/solver_multimodel/transforms/grid.py
+##### END   src/solver_multimodel/transforms/grid.py
 #####
 
 #####
-##### START src_james/solver_multimodel/GeometrySolver.py
+##### START src/solver_multimodel/GeometrySolver.py
 #####
 
 from itertools import combinations
@@ -1650,12 +1650,12 @@ from itertools import product
 
 import numpy as np
 
-# from src_james.core.DataModel import Competition
-# from src_james.settings import settings
-# from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
-# from src_james.solver_multimodel.queries.ratio import task_grid_max_dim
-# from src_james.solver_multimodel.Solver import Solver
-# from src_james.solver_multimodel.transforms.grid import grid_invert_color
+# from src.core.DataModel import Competition
+# from src.settings import settings
+# from src.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
+# from src.solver_multimodel.queries.ratio import task_grid_max_dim
+# from src.solver_multimodel.Solver import Solver
+# from src.solver_multimodel.transforms.grid import grid_invert_color
 
 
 class GeometrySolver(Solver):
@@ -1719,18 +1719,18 @@ if __name__ == '__main__' and not settings['production']:
     print(competition)
 
 #####
-##### END   src_james/solver_multimodel/GeometrySolver.py
+##### END   src/solver_multimodel/GeometrySolver.py
 #####
 
 #####
-##### START src_james/solver_multimodel/queries/bincount.py
+##### START src/solver_multimodel/queries/bincount.py
 #####
 
 import numpy as np
 
-# from src_james.solver_multimodel.transforms.singlecolor import np_bincount
-# from src_james.solver_multimodel.transforms.singlecolor import unique_colors_sorted
-# from src_james.util.np_cache import np_cache
+# from src.solver_multimodel.transforms.singlecolor import np_bincount
+# from src.solver_multimodel.transforms.singlecolor import unique_colors_sorted
+# from src.util.np_cache import np_cache
 
 
 @np_cache()
@@ -1749,17 +1749,17 @@ def query_bincount_sorted(grid: np.ndarray, i:int, j:int, pos: 0) -> bool:
 
 
 #####
-##### END   src_james/solver_multimodel/queries/bincount.py
+##### END   src/solver_multimodel/queries/bincount.py
 #####
 
 #####
-##### START src_james/solver_multimodel/queries/loops.py
+##### START src/solver_multimodel/queries/loops.py
 #####
 
 import numpy as np
 
-# from src_james.solver_multimodel.queries.ratio import task_shape_ratios
-# from src_james.util.np_cache import np_cache
+# from src.solver_multimodel.queries.ratio import task_shape_ratios
+# from src.util.np_cache import np_cache
 
 
 @np_cache
@@ -1822,18 +1822,18 @@ def flip_loop_cols(grid, start=0):
 
 
 #####
-##### END   src_james/solver_multimodel/queries/loops.py
+##### END   src/solver_multimodel/queries/loops.py
 #####
 
 #####
-##### START src_james/solver_multimodel/queries/period.py
+##### START src/solver_multimodel/queries/period.py
 #####
 
 import numpy as np
 
-# from src_james.ensemble.period import get_period_length0
-# from src_james.ensemble.period import get_period_length1
-# from src_james.util.np_cache import np_cache
+# from src.ensemble.period import get_period_length0
+# from src.ensemble.period import get_period_length1
+# from src.util.np_cache import np_cache
 
 
 @np_cache
@@ -1851,18 +1851,18 @@ def query_period_length1(grid: np.ndarray, i:int, j:int) -> bool:
 
 
 #####
-##### END   src_james/solver_multimodel/queries/period.py
+##### END   src/solver_multimodel/queries/period.py
 #####
 
 #####
-##### START src_james/solver_multimodel/transforms/crop.py
+##### START src/solver_multimodel/transforms/crop.py
 #####
 
 
 # Source: https://codereview.stackexchange.com/questions/132914/crop-black-border-of-image-using-numpy
 import numpy as np
 
-# from src_james.util.np_cache import np_cache
+# from src.util.np_cache import np_cache
 
 
 @np_cache
@@ -1882,18 +1882,18 @@ def crop_outer(grid,tol=0):
 
 
 #####
-##### END   src_james/solver_multimodel/transforms/crop.py
+##### END   src/solver_multimodel/transforms/crop.py
 #####
 
 #####
-##### START src_james/solver_multimodel/ZoomSolver.py
+##### START src/solver_multimodel/ZoomSolver.py
 #####
 
 import cv2
 import skimage.measure
 
-# from src_james.solver_multimodel.queries.ratio import task_shape_ratios
-# from src_james.solver_multimodel.Solver import Solver
+# from src.solver_multimodel.queries.ratio import task_shape_ratios
+# from src.solver_multimodel.Solver import Solver
 
 
 class ZoomSolver(Solver):
@@ -1928,11 +1928,11 @@ class ZoomSolver(Solver):
 
 
 #####
-##### END   src_james/solver_multimodel/ZoomSolver.py
+##### END   src/solver_multimodel/ZoomSolver.py
 #####
 
 #####
-##### START src_james/util/make_tuple.py
+##### START src/util/make_tuple.py
 #####
 
 
@@ -1942,7 +1942,7 @@ def make_tuple(args):
     return (args,)
 
 #####
-##### END   src_james/util/make_tuple.py
+##### END   src/util/make_tuple.py
 #####
 
 #####
@@ -1956,13 +1956,13 @@ def make_tuple(args):
 #####
 
 #####
-##### START src_james/solver_multimodel/BorderSolver.py
+##### START src/solver_multimodel/BorderSolver.py
 #####
 
-# from src_james.solver_multimodel.queries.grid import *
-# from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_consistant
-# from src_james.solver_multimodel.queries.ratio import task_shape_ratio
-# from src_james.solver_multimodel.Solver import Solver
+# from src.solver_multimodel.queries.grid import *
+# from src.solver_multimodel.queries.ratio import is_task_shape_ratio_consistant
+# from src.solver_multimodel.queries.ratio import task_shape_ratio
+# from src.solver_multimodel.Solver import Solver
 
 
 class BorderSolver(Solver):
@@ -2018,14 +2018,14 @@ class BorderSolver(Solver):
 
 
 #####
-##### END   src_james/solver_multimodel/BorderSolver.py
+##### END   src/solver_multimodel/BorderSolver.py
 #####
 
 #####
-##### START src_james/solver_multimodel/DoNothingSolver.py
+##### START src/solver_multimodel/DoNothingSolver.py
 #####
 
-# from src_james.solver_multimodel.Solver import Solver
+# from src.solver_multimodel.Solver import Solver
 
 
 
@@ -2035,18 +2035,18 @@ class DoNothingSolver(Solver):
 
 
 #####
-##### END   src_james/solver_multimodel/DoNothingSolver.py
+##### END   src/solver_multimodel/DoNothingSolver.py
 #####
 
 #####
-##### START src_james/solver_multimodel/GlobSolver.py
+##### START src/solver_multimodel/GlobSolver.py
 #####
 
 # from submission.submission import Competition
 
-# from src_james.settings import settings
-# from src_james.solver_multimodel.queries.grid import *
-# from src_james.solver_multimodel.Solver import Solver
+# from src.settings import settings
+# from src.solver_multimodel.queries.grid import *
+# from src.solver_multimodel.Solver import Solver
 
 
 class GlobSolver(Solver):
@@ -2113,20 +2113,20 @@ if __name__ == '__main__' and not settings['production']:
     print(competition)
 
 #####
-##### END   src_james/solver_multimodel/GlobSolver.py
+##### END   src/solver_multimodel/GlobSolver.py
 #####
 
 #####
-##### START src_james/solver_multimodel/SingleColorSolver.py
+##### START src/solver_multimodel/SingleColorSolver.py
 #####
 
-# from src_james.core.DataModel import Task
-# from src_james.settings import settings
-# from src_james.solver_multimodel.queries.colors import task_is_singlecolor
-# from src_james.solver_multimodel.queries.grid import *
-# from src_james.solver_multimodel.queries.ratio import task_shape_ratio
-# from src_james.solver_multimodel.queries.symmetry import is_grid_symmetry
-# from src_james.solver_multimodel.Solver import Solver
+# from src.core.DataModel import Task
+# from src.settings import settings
+# from src.solver_multimodel.queries.colors import task_is_singlecolor
+# from src.solver_multimodel.queries.grid import *
+# from src.solver_multimodel.queries.ratio import task_shape_ratio
+# from src.solver_multimodel.queries.symmetry import is_grid_symmetry
+# from src.solver_multimodel.Solver import Solver
 
 
 class SingleColorSolver(Solver):
@@ -2190,34 +2190,34 @@ if __name__ == '__main__' and not settings['production']:
     # print(competition)
 
 #####
-##### END   src_james/solver_multimodel/SingleColorSolver.py
+##### END   src/solver_multimodel/SingleColorSolver.py
 #####
 
 #####
-##### START src_james/solver_multimodel/TessellationSolver.py
+##### START src/solver_multimodel/TessellationSolver.py
 #####
 
 import inspect
 from itertools import product
 
-# from src_james.core.DataModel import Competition
-# from src_james.core.DataModel import Task
-# from src_james.settings import settings
-# from src_james.solver_multimodel.GeometrySolver import GeometrySolver
-# from src_james.solver_multimodel.queries.bincount import query_bincount
-# from src_james.solver_multimodel.queries.bincount import query_bincount_sorted
-# from src_james.solver_multimodel.queries.grid import *
-# from src_james.solver_multimodel.queries.loops import *
-# from src_james.solver_multimodel.queries.period import query_period_length0
-# from src_james.solver_multimodel.queries.period import query_period_length1
-# from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_integer_multiple
-# from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
-# from src_james.solver_multimodel.queries.symmetry import is_grid_symmetry
-# from src_james.solver_multimodel.transforms.crop import crop_inner
-# from src_james.solver_multimodel.transforms.crop import crop_outer
-# from src_james.solver_multimodel.transforms.grid import grid_invert_color
-# from src_james.solver_multimodel.ZoomSolver import ZoomSolver
-# from src_james.util.make_tuple import make_tuple
+# from src.core.DataModel import Competition
+# from src.core.DataModel import Task
+# from src.settings import settings
+# from src.solver_multimodel.GeometrySolver import GeometrySolver
+# from src.solver_multimodel.queries.bincount import query_bincount
+# from src.solver_multimodel.queries.bincount import query_bincount_sorted
+# from src.solver_multimodel.queries.grid import *
+# from src.solver_multimodel.queries.loops import *
+# from src.solver_multimodel.queries.period import query_period_length0
+# from src.solver_multimodel.queries.period import query_period_length1
+# from src.solver_multimodel.queries.ratio import is_task_shape_ratio_integer_multiple
+# from src.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
+# from src.solver_multimodel.queries.symmetry import is_grid_symmetry
+# from src.solver_multimodel.transforms.crop import crop_inner
+# from src.solver_multimodel.transforms.crop import crop_outer
+# from src.solver_multimodel.transforms.grid import grid_invert_color
+# from src.solver_multimodel.ZoomSolver import ZoomSolver
+# from src.util.make_tuple import make_tuple
 
 
 class TessellationSolver(GeometrySolver):
@@ -2367,11 +2367,11 @@ if __name__ == '__main__' and not settings['production']:
     print(competition)
 
 #####
-##### END   src_james/solver_multimodel/TessellationSolver.py
+##### END   src/solver_multimodel/TessellationSolver.py
 #####
 
 #####
-##### START src_james/solver_multimodel/XGBGridSolver.py
+##### START src/solver_multimodel/XGBGridSolver.py
 #####
 
 from itertools import product
@@ -2381,17 +2381,17 @@ import pydash
 from fastcache._lrucache import clru_cache
 from xgboost import XGBClassifier
 
-# from src_james.core.DataModel import Competition
-# from src_james.core.DataModel import Task
-# from src_james.ensemble.period import get_period_length0
-# from src_james.ensemble.period import get_period_length1
-# from src_james.settings import settings
-# from src_james.solver_multimodel.queries.grid import *
-# from src_james.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
-# from src_james.solver_multimodel.queries.symmetry import is_grid_symmetry
-# from src_james.solver_multimodel.Solver import Solver
-# from src_james.solver_multimodel.transforms.singlecolor import np_bincount
-# from src_james.util.np_cache import np_cache
+# from src.core.DataModel import Competition
+# from src.core.DataModel import Task
+# from src.ensemble.period import get_period_length0
+# from src.ensemble.period import get_period_length1
+# from src.settings import settings
+# from src.solver_multimodel.queries.grid import *
+# from src.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
+# from src.solver_multimodel.queries.symmetry import is_grid_symmetry
+# from src.solver_multimodel.Solver import Solver
+# from src.solver_multimodel.transforms.singlecolor import np_bincount
+# from src.util.np_cache import np_cache
 
 
 class XGBGridSolver(Solver):
@@ -2760,33 +2760,33 @@ if __name__ == '__main__' and not settings['production']:
 
 
 #####
-##### END   src_james/solver_multimodel/XGBGridSolver.py
+##### END   src/solver_multimodel/XGBGridSolver.py
 #####
 
 #####
-##### START src_james/solver_multimodel/XGBSingleColorSolver.py
+##### START src/solver_multimodel/XGBSingleColorSolver.py
 #####
 
 from typing import List
 from typing import Union
 
-# from src_james.core.DataModel import Competition
-# from src_james.core.DataModel import Problem
-# from src_james.core.DataModel import ProblemSet
-# from src_james.core.DataModel import Task
-# from src_james.plot import plot_task
-# from src_james.settings import settings
-# from src_james.solver_multimodel.queries.colors import task_is_singlecolor
-# from src_james.solver_multimodel.queries.grid import *
-# from src_james.solver_multimodel.queries.ratio import is_task_output_grid_shape_constant
-# from src_james.solver_multimodel.queries.ratio import task_output_grid_shape
-# from src_james.solver_multimodel.transforms.singlecolor import identity
-# from src_james.solver_multimodel.transforms.singlecolor import np_bincount
-# from src_james.solver_multimodel.transforms.singlecolor import np_hash
-# from src_james.solver_multimodel.transforms.singlecolor import np_shape
-# from src_james.solver_multimodel.transforms.singlecolor import unique_colors_sorted
-# from src_james.solver_multimodel.XGBEncoder import ProblemSetSolver
-# from src_james.solver_multimodel.XGBEncoder import XGBEncoder
+# from src.core.DataModel import Competition
+# from src.core.DataModel import Problem
+# from src.core.DataModel import ProblemSet
+# from src.core.DataModel import Task
+# from src.plot import plot_task
+# from src.settings import settings
+# from src.solver_multimodel.queries.colors import task_is_singlecolor
+# from src.solver_multimodel.queries.grid import *
+# from src.solver_multimodel.queries.ratio import is_task_output_grid_shape_constant
+# from src.solver_multimodel.queries.ratio import task_output_grid_shape
+# from src.solver_multimodel.transforms.singlecolor import identity
+# from src.solver_multimodel.transforms.singlecolor import np_bincount
+# from src.solver_multimodel.transforms.singlecolor import np_hash
+# from src.solver_multimodel.transforms.singlecolor import np_shape
+# from src.solver_multimodel.transforms.singlecolor import unique_colors_sorted
+# from src.solver_multimodel.XGBEncoder import ProblemSetSolver
+# from src.solver_multimodel.XGBEncoder import XGBEncoder
 
 
 class SingleColorXGBEncoder(XGBEncoder):
@@ -2915,25 +2915,25 @@ if __name__ == '__main__' and not settings['production']:
     print(competition)
 
 #####
-##### END   src_james/solver_multimodel/XGBSingleColorSolver.py
+##### END   src/solver_multimodel/XGBSingleColorSolver.py
 #####
 
 #####
-##### START src_james/solver_multimodel/solvers.py
+##### START src/solver_multimodel/solvers.py
 #####
 
 from typing import List
 
-# from src_james.solver_multimodel.BorderSolver import BorderSolver
-# from src_james.solver_multimodel.DoNothingSolver import DoNothingSolver
-# from src_james.solver_multimodel.GeometrySolver import GeometrySolver
-# from src_james.solver_multimodel.GlobSolver import GlobSolver
-# from src_james.solver_multimodel.SingleColorSolver import SingleColorSolver
-# from src_james.solver_multimodel.Solver import Solver
-# from src_james.solver_multimodel.TessellationSolver import TessellationSolver
-# from src_james.solver_multimodel.XGBGridSolver import XGBGridSolver
-# from src_james.solver_multimodel.XGBSingleColorSolver import XGBSingleColorSolver
-# from src_james.solver_multimodel.ZoomSolver import ZoomSolver
+# from src.solver_multimodel.BorderSolver import BorderSolver
+# from src.solver_multimodel.DoNothingSolver import DoNothingSolver
+# from src.solver_multimodel.GeometrySolver import GeometrySolver
+# from src.solver_multimodel.GlobSolver import GlobSolver
+# from src.solver_multimodel.SingleColorSolver import SingleColorSolver
+# from src.solver_multimodel.Solver import Solver
+# from src.solver_multimodel.TessellationSolver import TessellationSolver
+# from src.solver_multimodel.XGBGridSolver import XGBGridSolver
+# from src.solver_multimodel.XGBSingleColorSolver import XGBSingleColorSolver
+# from src.solver_multimodel.ZoomSolver import ZoomSolver
 
 solvers: List[Solver] = [
     # Deterministic (all solved answers are correct)
@@ -2955,20 +2955,20 @@ solvers: List[Solver] = [
 
 
 #####
-##### END   src_james/solver_multimodel/solvers.py
+##### END   src/solver_multimodel/solvers.py
 #####
 
 #####
-##### START ./src_james/solver_multimodel/main.py
+##### START ./src/solver_multimodel/main.py
 #####
 
 import gc
 import time
 from operator import itemgetter
 
-# from src_james.core.DataModel import Competition
-# from src_james.settings import settings
-# from src_james.solver_multimodel.solvers import solvers
+# from src.core.DataModel import Competition
+# from src.settings import settings
+# from src.solver_multimodel.solvers import solvers
 
 if __name__ == '__main__':
     print('\n','-'*20,'\n')
@@ -3014,13 +3014,13 @@ if __name__ == '__main__':
 
 
 #####
-##### END   ./src_james/solver_multimodel/main.py
+##### END   ./src/solver_multimodel/main.py
 #####
 
 ##### 
-##### ./submission/kaggle_compile.py ./src_james/solver_multimodel/main.py
+##### ./submission/kaggle_compile.py ./src/solver_multimodel/main.py
 ##### 
-##### 2020-05-28 14:20:57+01:00
+##### 2020-05-29 00:55:18+01:00
 ##### 
 ##### archive	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### archive	git@github.com:seshurajup/kaggle-arc.git (push)
@@ -3028,7 +3028,7 @@ if __name__ == '__main__':
 ##### origin	git@github.com:JamesMcGuigan/kaggle-arc.git (push)
 ##### 
 #####   james-wip c81cf89 Solvers | work in progress - broken
-##### * master    01cd888 kaggle_compile.py -> submission.py + submission.csv
+##### * master    6501bc3 XGBSolver.hyperopt.py | update hyperopt search space
 ##### 
-##### 01cd8881afa5cf6d0f2afaa46b10d443318cae5d
+##### 6501bc3b03a7b79bd4f845ac68457bab03376c21
 ##### 

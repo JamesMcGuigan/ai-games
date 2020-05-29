@@ -25,15 +25,6 @@ python3 ./submission/kaggle_compile.py src/solver_multimodel/main.py            
 python3 ./submission/kaggle_compile.py src/ensemble/sample_sub/sample_sub_combine.py | tee ./submission/submission.py
 ```
 
-
-# Team Ensemble
-Solutions from other members of the _"Mathematicians + Experts"_ team
-- [src/ensemble](src/ensemble)
-- [team/ged](team/ged)
-- [team/joe](team/joe)
-- [team/seshu](team/seshu)
-
-
 # Gallery
 Jupyter Notebook visualization of the solved and unsolved results for each of the Solvers 
 - [notebooks_gallery/solved](notebooks_gallery/solved)

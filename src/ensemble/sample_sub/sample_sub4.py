@@ -6,13 +6,13 @@ from src.ensemble.sample_sub.example_grid import example_grid
 from src.ensemble.sample_sub.path import data_path
 from src.ensemble.sample_sub.path import output_dir
 from src.ensemble.sample_sub.path import test_path
-from src.ensemble.solvers.Solve_split_shape import solve_cross_map
-from src.ensemble.solvers.Solve_split_shape import solve_cross_map_line
-from src.ensemble.solvers.Solve_split_shape import Solve_juxt
-from src.ensemble.solvers.Solve_split_shape import Solve_mul_color_bound_negative
-from src.ensemble.solvers.Solve_split_shape import Solve_mul_color_negative
-from src.ensemble.solvers.Solve_split_shape import Solve_split_shape
-from src.ensemble.solvers.Solve_split_shape import Solve_split_shape_negative
+# from src.ensemble.solvers.Solve_split_shape import solve_cross_map
+# from src.ensemble.solvers.Solve_split_shape import solve_cross_map_line
+# from src.ensemble.solvers.Solve_split_shape import Solve_juxt
+# from src.ensemble.solvers.Solve_split_shape import Solve_mul_color_bound_negative
+# from src.ensemble.solvers.Solve_split_shape import Solve_mul_color_negative
+# from src.ensemble.solvers.Solve_split_shape import Solve_split_shape
+# from src.ensemble.solvers.Solve_split_shape import Solve_split_shape_negative
 from src.ensemble.util import Create
 from src.ensemble.util import flattener
 
@@ -38,34 +38,36 @@ for i in range(len(Problems)):
         task = json.load(read_file)
 
     basic_task = Create(task, pair_id)
-    try:
-        predict_solution.append(Solve_split_shape_negative(basic_task))
-    except:
-        predict_solution.append(-1)
-    try:
-        predict_solution.append(solve_cross_map(basic_task))
-    except:
-        predict_solution.append(-1)
-    try:
-        predict_solution.append(solve_cross_map_line(basic_task))
-    except:
-        predict_solution.append(-1)
-    try:
-        predict_solution.append(Solve_mul_color_negative(basic_task))
-    except:
-        predict_solution.append(-1)
-    try:
-        predict_solution.append(Solve_mul_color_bound_negative(basic_task))
-    except:
-        predict_solution.append(-1)
-    try:
-        predict_solution.append(Solve_juxt(basic_task))
-    except:
-        predict_solution.append(-1)
-    try:
-        predict_solution.append(Solve_split_shape(basic_task))
-    except:
-        predict_solution.append(-1)
+
+    ### Team contributions removed from public repository
+    # try:
+    #     predict_solution.append(Solve_split_shape_negative(basic_task))
+    # except:
+    #     predict_solution.append(-1)
+    # try:
+    #     predict_solution.append(solve_cross_map(basic_task))
+    # except:
+    #     predict_solution.append(-1)
+    # try:
+    #     predict_solution.append(solve_cross_map_line(basic_task))
+    # except:
+    #     predict_solution.append(-1)
+    # try:
+    #     predict_solution.append(Solve_mul_color_negative(basic_task))
+    # except:
+    #     predict_solution.append(-1)
+    # try:
+    #     predict_solution.append(Solve_mul_color_bound_negative(basic_task))
+    # except:
+    #     predict_solution.append(-1)
+    # try:
+    #     predict_solution.append(Solve_juxt(basic_task))
+    # except:
+    #     predict_solution.append(-1)
+    # try:
+    #     predict_solution.append(Solve_split_shape(basic_task))
+    # except:
+    #     predict_solution.append(-1)
 
     for j in range(len(predict_solution)):
         if predict_solution[j] != -1 and predict_solution[j] not in preds:

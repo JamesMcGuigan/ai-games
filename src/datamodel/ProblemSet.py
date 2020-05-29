@@ -8,6 +8,7 @@ import numpy as np
 from src.datamodel.Problem import Problem
 
 
+# noinspection PyUnresolvedReferences
 class ProblemSet(UserList):
     """ ProblemSet: An array of either test or training Problems """
     _instance_count = 0

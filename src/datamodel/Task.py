@@ -12,6 +12,7 @@ from src.datamodel.ProblemSet import ProblemSet
 from src.settings import settings
 
 
+# noinspection PyUnresolvedReferences
 class Task(UserDict):
     """ Task: The entire contents of a json file, outputs 1-3 lines of CSV """
 

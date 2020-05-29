@@ -7,6 +7,7 @@ from typing import Union
 import numpy as np
 
 
+# noinspection PyUnresolvedReferences
 class Problem(UserDict):
     """ Problem: An input + output Grid pair """
     dtype = np.int8

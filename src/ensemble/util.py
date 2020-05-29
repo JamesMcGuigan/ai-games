@@ -19,6 +19,7 @@ def Create(task, task_id=0):
     return Input, Output
 
 
+# noinspection PyTypeChecker
 def flattener(pred):
     if pred is None: return ''
     pred = np.array(pred).astype(np.int8).tolist()

@@ -6,6 +6,7 @@ import numpy as np
 from src.settings import settings
 
 
+# noinspection PyUnresolvedReferences
 class CSV:
     @classmethod
     def write_submission(cls, dataset: 'Dataset', filename='submission.csv'):

@@ -44,7 +44,7 @@ for task_id in all_task_ids:
         continue
 
     xgb =  XGBClassifier(n_estimators=10, n_jobs=-1)
-    xgb.fit(feat, target, verbose=-1)
+    xgb.fit(feat, target, verbose=False)
 
 
     #     training on input pairs is done.

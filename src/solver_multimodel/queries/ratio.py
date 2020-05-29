@@ -6,7 +6,7 @@ from typing import Union
 import numpy as np
 from fastcache._lrucache import clru_cache
 
-from src.core.DataModel import Task
+from src.datamodel.DataModel import Task
 from src.util.np_cache import np_cache
 
 

@@ -8,13 +8,13 @@ from typing import Union
 import numpy as np
 from xgboost import XGBClassifier
 
-from src.core.DataModel import Problem
-from src.core.DataModel import ProblemSet
-from src.core.DataModel import Task
-from src.core.functions import flatten_deep
-from src.core.functions import invoke
-from src.solver_multimodel.Solver import Solver
+from src.datamodel.DataModel import Problem
+from src.datamodel.DataModel import ProblemSet
+from src.datamodel.DataModel import Task
+from src.solver_multimodel.core.Solver import Solver
 from src.solver_multimodel.transforms.singlecolor import identity
+from src.util.functions import flatten_deep
+from src.util.functions import invoke
 
 
 class ProblemSetSolver(Solver):

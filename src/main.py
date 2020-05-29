@@ -2,9 +2,9 @@ import gc
 import time
 from operator import itemgetter
 
-from src.core.DataModel import Competition
+from src.datamodel.DataModel import Competition
 from src.settings import settings
-from src.solver_multimodel.solvers import solvers
+from src.solvers import solvers
 
 if __name__ == '__main__':
     print('\n','-'*20,'\n')

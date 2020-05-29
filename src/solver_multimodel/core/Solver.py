@@ -5,10 +5,10 @@ from typing import Union
 
 import numpy as np
 
-from src.core.DataModel import Dataset
-from src.core.DataModel import Problem
-from src.core.DataModel import Task
-from src.plot import plot_task
+from src.datamodel.DataModel import Dataset
+from src.datamodel.DataModel import Problem
+from src.datamodel.DataModel import Task
+from src.util.plot import plot_task
 
 
 class Solver():

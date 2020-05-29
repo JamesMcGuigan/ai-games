@@ -1,7 +1,7 @@
+from src.datamodel.DataModel import Competition
 from src.settings import settings
+from src.solver_multimodel.core.Solver import Solver
 from src.solver_multimodel.queries.grid import *
-from src.solver_multimodel.Solver import Solver
-from submission.submission import Competition
 
 
 class GlobSolver(Solver):

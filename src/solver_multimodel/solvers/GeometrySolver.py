@@ -3,11 +3,11 @@ from itertools import product
 
 import numpy as np
 
-from src.core.DataModel import Competition
+from src.datamodel.DataModel import Competition
 from src.settings import settings
+from src.solver_multimodel.core.Solver import Solver
 from src.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
 from src.solver_multimodel.queries.ratio import task_grid_max_dim
-from src.solver_multimodel.Solver import Solver
 from src.solver_multimodel.transforms.grid import grid_invert_color
 
 

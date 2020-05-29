@@ -1,23 +1,23 @@
 from typing import List
 from typing import Union
 
-from src.core.DataModel import Competition
-from src.core.DataModel import Problem
-from src.core.DataModel import ProblemSet
-from src.core.DataModel import Task
-from src.plot import plot_task
+from src.datamodel.DataModel import Competition
+from src.datamodel.DataModel import Problem
+from src.datamodel.DataModel import ProblemSet
+from src.datamodel.DataModel import Task
 from src.settings import settings
 from src.solver_multimodel.queries.colors import task_is_singlecolor
 from src.solver_multimodel.queries.grid import *
 from src.solver_multimodel.queries.ratio import is_task_output_grid_shape_constant
 from src.solver_multimodel.queries.ratio import task_output_grid_shape
+from src.solver_multimodel.solvers.XGBEncoder import ProblemSetSolver
+from src.solver_multimodel.solvers.XGBEncoder import XGBEncoder
 from src.solver_multimodel.transforms.singlecolor import identity
 from src.solver_multimodel.transforms.singlecolor import np_bincount
 from src.solver_multimodel.transforms.singlecolor import np_hash
 from src.solver_multimodel.transforms.singlecolor import np_shape
 from src.solver_multimodel.transforms.singlecolor import unique_colors_sorted
-from src.solver_multimodel.XGBEncoder import ProblemSetSolver
-from src.solver_multimodel.XGBEncoder import XGBEncoder
+from src.util.plot import plot_task
 
 
 class SingleColorXGBEncoder(XGBEncoder):

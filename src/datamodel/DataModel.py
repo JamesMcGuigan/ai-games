@@ -13,7 +13,7 @@ from typing import Union
 import glob2
 import numpy as np
 
-from src.core.CSV import CSV
+from src.datamodel.CSV import CSV
 from src.settings import settings
 
 

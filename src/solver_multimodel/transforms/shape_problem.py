@@ -3,8 +3,8 @@ from typing import Tuple
 import numpy as np
 from fastcache._lrucache import clru_cache
 
-from src.core.DataModel import Problem
-from src.core.DataModel import Task
+from src.datamodel.DataModel import Problem
+from src.datamodel.DataModel import Task
 from src.solver_multimodel.transforms.singlecolor import np_resize
 from src.solver_multimodel.transforms.singlecolor import np_shape
 

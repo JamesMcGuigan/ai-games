@@ -10,11 +10,11 @@ from typing import Union
 import numpy as np
 import pydash as py
 
-from src.core.DataModel import Competition
-from src.core.DataModel import ProblemSet
-from src.core.DataModel import Task
-from src.heuristics.Queries import Query
+from src.datamodel.DataModel import Competition
+from src.datamodel.DataModel import ProblemSet
+from src.datamodel.DataModel import Task
 from src.settings import settings
+from src.solver_abstract.heuristics.Queries import Query
 
 
 # from pydash import group_by

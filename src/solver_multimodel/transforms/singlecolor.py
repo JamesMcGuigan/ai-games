@@ -2,7 +2,7 @@ from typing import Tuple
 
 import numpy as np
 
-from src.core.DataModel import Task
+from src.datamodel.DataModel import Task
 from src.util.np_cache import np_cache
 
 

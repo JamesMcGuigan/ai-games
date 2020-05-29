@@ -7,7 +7,7 @@ from fastcache._lrucache import clru_cache
 from matplotlib import colors
 
 # Modified from: https://www.kaggle.com/zaharch/visualizing-all-tasks-updated
-from src.core.DataModel import Task
+from src.datamodel.DataModel import Task
 
 
 @clru_cache()

@@ -4,9 +4,9 @@ from typing import Union
 
 import numpy as np
 
-from src.core.DataModel import Problem
-from src.core.DataModel import ProblemSet
-from src.core.DataModel import Task
+from src.datamodel.DataModel import Problem
+from src.datamodel.DataModel import ProblemSet
+from src.datamodel.DataModel import Task
 from src.util.np_cache import np_cache
 
 

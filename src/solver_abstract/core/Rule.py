@@ -14,10 +14,10 @@ from typing import Tuple
 from typing import Type
 from typing import Union
 
-from src.core.Context import Context
-from src.core.DataModel import Problem
-from src.core.Symbol import Symbol
+from src.datamodel.DataModel import Problem
 from src.settings import settings
+from src.solver_abstract.core.Context import Context
+from src.solver_abstract.core.Symbol import Symbol
 
 
 class Rule(object):

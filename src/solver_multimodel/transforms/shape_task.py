@@ -4,7 +4,7 @@ from typing import Tuple
 import numpy as np
 from fastcache._lrucache import clru_cache
 
-from src.core.DataModel import Task
+from src.datamodel.DataModel import Task
 from src.solver_multimodel.transforms.shape_problem import problem_difference_input
 from src.solver_multimodel.transforms.shape_problem import problem_difference_mask
 from src.solver_multimodel.transforms.shape_problem import problem_difference_output

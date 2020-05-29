@@ -1,5 +1,4 @@
-from src.solver_multimodel.Solver import Solver
-
+from src.solver_multimodel.core.Solver import Solver
 
 
 class DoNothingSolver(Solver):

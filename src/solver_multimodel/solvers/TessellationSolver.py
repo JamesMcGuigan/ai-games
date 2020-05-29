@@ -1,10 +1,9 @@
 import inspect
 from itertools import product
 
-from src.core.DataModel import Competition
-from src.core.DataModel import Task
+from src.datamodel.DataModel import Competition
+from src.datamodel.DataModel import Task
 from src.settings import settings
-from src.solver_multimodel.GeometrySolver import GeometrySolver
 from src.solver_multimodel.queries.bincount import query_bincount
 from src.solver_multimodel.queries.bincount import query_bincount_sorted
 from src.solver_multimodel.queries.grid import *
@@ -14,10 +13,11 @@ from src.solver_multimodel.queries.period import query_period_length1
 from src.solver_multimodel.queries.ratio import is_task_shape_ratio_integer_multiple
 from src.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
 from src.solver_multimodel.queries.symmetry import is_grid_symmetry
+from src.solver_multimodel.solvers.GeometrySolver import GeometrySolver
+from src.solver_multimodel.solvers.ZoomSolver import ZoomSolver
 from src.solver_multimodel.transforms.crop import crop_inner
 from src.solver_multimodel.transforms.crop import crop_outer
 from src.solver_multimodel.transforms.grid import grid_invert_color
-from src.solver_multimodel.ZoomSolver import ZoomSolver
 from src.util.make_tuple import make_tuple
 
 

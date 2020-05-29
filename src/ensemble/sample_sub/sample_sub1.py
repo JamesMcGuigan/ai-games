@@ -10,7 +10,7 @@ import pandas as pd
 from xgboost import XGBClassifier
 
 # mode = 'eval'
-from src.core.CSV import CSV
+from src.datamodel.CSV import CSV
 from src.ensemble.features import features
 from src.ensemble.features import make_features
 from src.ensemble.sample_sub.path import data_path

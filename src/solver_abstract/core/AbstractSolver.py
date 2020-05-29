@@ -7,10 +7,10 @@ from typing import Union
 
 import numpy as np
 
-from src.core.Context import Context
-from src.core.DataModel import Problem
-from src.core.DataModel import Task
-from src.core.Rule import Rule
+from src.datamodel.DataModel import Problem
+from src.datamodel.DataModel import Task
+from src.solver_abstract.core.Context import Context
+from src.solver_abstract.core.Rule import Rule
 
 
 class AbstractSolver:

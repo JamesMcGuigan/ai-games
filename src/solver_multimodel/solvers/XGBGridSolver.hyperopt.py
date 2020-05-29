@@ -14,8 +14,8 @@ from hyperopt import tpe
 from hyperopt import Trials
 from hyperopt.pyll import scope
 
-from src.core.DataModel import Competition
-from src.solver_multimodel.XGBGridSolver import XGBGridSolver
+from src.datamodel.DataModel import Competition
+from src.solver_multimodel.solvers.XGBGridSolver import XGBGridSolver
 from src.util.timeout import timeout
 
 

@@ -2,7 +2,7 @@ import cv2
 import skimage.measure
 
 from src.solver_multimodel.core.Solver import Solver
-from src.solver_multimodel.queries.ratio import task_shape_ratios
+from src.solver_multimodel.functions.queries.ratio import task_shape_ratios
 
 
 class ZoomSolver(Solver):

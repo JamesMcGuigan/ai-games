@@ -1,10 +1,10 @@
 from src.datamodel.Task import Task
 from src.settings import settings
 from src.solver_multimodel.core.Solver import Solver
-from src.solver_multimodel.queries.colors import task_is_singlecolor
-from src.solver_multimodel.queries.grid import *
-from src.solver_multimodel.queries.ratio import task_shape_ratio
-from src.solver_multimodel.queries.symmetry import is_grid_symmetry
+from src.solver_multimodel.functions.queries.colors import task_is_singlecolor
+from src.solver_multimodel.functions.queries.grid import *
+from src.solver_multimodel.functions.queries.ratio import task_shape_ratio
+from src.solver_multimodel.functions.queries.symmetry import is_grid_symmetry
 
 
 class SingleColorSolver(Solver):

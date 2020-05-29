@@ -1,7 +1,7 @@
 import numpy as np
 
-from src.solver_multimodel.transforms.singlecolor import np_bincount
-from src.solver_multimodel.transforms.singlecolor import unique_colors_sorted
+from src.solver_multimodel.functions.transforms.singlecolor import np_bincount
+from src.solver_multimodel.functions.transforms.singlecolor import unique_colors_sorted
 from src.util.np_cache import np_cache
 
 

@@ -11,10 +11,10 @@ from src.ensemble.period import get_period_length0
 from src.ensemble.period import get_period_length1
 from src.settings import settings
 from src.solver_multimodel.core.Solver import Solver
-from src.solver_multimodel.queries.grid import *
-from src.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
-from src.solver_multimodel.queries.symmetry import is_grid_symmetry
-from src.solver_multimodel.transforms.singlecolor import np_bincount
+from src.solver_multimodel.functions.queries.grid import *
+from src.solver_multimodel.functions.queries.ratio import is_task_shape_ratio_unchanged
+from src.solver_multimodel.functions.queries.symmetry import is_grid_symmetry
+from src.solver_multimodel.functions.transforms.singlecolor import np_bincount
 from src.util.np_cache import np_cache
 
 

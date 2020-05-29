@@ -3,7 +3,7 @@
 
 import numpy as np
 
-from src.solver_multimodel.queries.grid import grid_unique_colors
+from src.solver_multimodel.functions.queries.grid import grid_unique_colors
 from src.util.np_cache import np_cache
 
 

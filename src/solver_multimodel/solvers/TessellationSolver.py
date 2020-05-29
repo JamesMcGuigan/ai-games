@@ -5,20 +5,20 @@ from itertools import product
 from src.datamodel.Competition import Competition
 from src.datamodel.Task import Task
 from src.settings import settings
-from src.solver_multimodel.queries.bincount import query_bincount
-from src.solver_multimodel.queries.bincount import query_bincount_sorted
-from src.solver_multimodel.queries.grid import *
-from src.solver_multimodel.queries.loops import *
-from src.solver_multimodel.queries.period import query_period_length0
-from src.solver_multimodel.queries.period import query_period_length1
-from src.solver_multimodel.queries.ratio import is_task_shape_ratio_integer_multiple
-from src.solver_multimodel.queries.ratio import is_task_shape_ratio_unchanged
-from src.solver_multimodel.queries.symmetry import is_grid_symmetry
+from src.solver_multimodel.functions.queries.bincount import query_bincount
+from src.solver_multimodel.functions.queries.bincount import query_bincount_sorted
+from src.solver_multimodel.functions.queries.grid import *
+from src.solver_multimodel.functions.queries.loops import *
+from src.solver_multimodel.functions.queries.period import query_period_length0
+from src.solver_multimodel.functions.queries.period import query_period_length1
+from src.solver_multimodel.functions.queries.ratio import is_task_shape_ratio_integer_multiple
+from src.solver_multimodel.functions.queries.ratio import is_task_shape_ratio_unchanged
+from src.solver_multimodel.functions.queries.symmetry import is_grid_symmetry
+from src.solver_multimodel.functions.transforms.crop import crop_inner
+from src.solver_multimodel.functions.transforms.crop import crop_outer
+from src.solver_multimodel.functions.transforms.grid import grid_invert_color
 from src.solver_multimodel.solvers.GeometrySolver import GeometrySolver
 from src.solver_multimodel.solvers.ZoomSolver import ZoomSolver
-from src.solver_multimodel.transforms.crop import crop_inner
-from src.solver_multimodel.transforms.crop import crop_outer
-from src.solver_multimodel.transforms.grid import grid_invert_color
 from src.util.make_tuple import make_tuple
 
 

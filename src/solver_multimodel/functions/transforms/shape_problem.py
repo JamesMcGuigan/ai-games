@@ -5,8 +5,8 @@ from fastcache._lrucache import clru_cache
 
 from src.datamodel.Problem import Problem
 from src.datamodel.Task import Task
-from src.solver_multimodel.transforms.singlecolor import np_resize
-from src.solver_multimodel.transforms.singlecolor import np_shape
+from src.solver_multimodel.functions.transforms.singlecolor import np_resize
+from src.solver_multimodel.functions.transforms.singlecolor import np_shape
 
 
 @clru_cache(None)

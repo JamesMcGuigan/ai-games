@@ -1,6 +1,6 @@
 from xgboost import XGBClassifier
 
-from src.solver_multimodel.solvers.core.ProblemSetEncoder import ProblemSetEncoder
+from src.solver_multimodel.core.ProblemSetEncoder import ProblemSetEncoder
 
 
 class XGBEncoder(ProblemSetEncoder):

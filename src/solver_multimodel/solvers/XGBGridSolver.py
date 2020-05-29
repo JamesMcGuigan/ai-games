@@ -81,6 +81,7 @@ class XGBGridSolver(Solver):
                         print(classifier)
                         print(type(exception), exception)
                     pass
+
     def test(self, task: Task) -> bool:
         """test if the given solve_grid correctly solves the task"""
         args = self.cache.get(task.filename, ())
@@ -175,6 +176,7 @@ class XGBGridSolver(Solver):
                 count_colors(neighbourhood)        if len(neighbourhood) else 0,
                 count_squares(neighbourhood)       if len(neighbourhood) else 0,
             ]
+
         return features
 
     @classmethod
@@ -182,11 +184,11 @@ class XGBGridSolver(Solver):
     def get_neighbourhood(cls, grid: np.ndarray, i: int, j: int, distance=1):
         try:
             output = np.full((2*distance+1, 2*distance+1), 11)  # 11 = outside of grid pixel
-            for x_out, x_grid in enumerate(range(i-distance, i+distance+1)):
-                for y_out, y_grid in enumerate(range(j-distance, j+distance+1)):
+            for x_out, x_grid in enumerate(range(-distance, distance+1)):
+                for y_out, y_grid in enumerate(range(-distance, distance+1)):
                     if not 0 <= x_out < grid.shape[0]: continue
                     if not 0 <= y_out < grid.shape[1]: continue
-                    output[x_out,y_out] = grid[x_grid,x_grid]
+                    output[x_out,y_out] = grid[i+x_grid,j+y_grid]
             return output
         except:
             return np.full((2*distance+1, 2*distance+1), 11)  # 11 = outside of grid pixel

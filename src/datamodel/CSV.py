@@ -2,6 +2,7 @@ import os
 import re
 
 import numpy as np
+import pydash
 
 from src.settings import settings
 
@@ -63,7 +64,7 @@ class CSV:
     def to_csv_line(cls, task: 'Task') -> str:
         csv = []
         for index, problemset in enumerate(task['solutions']):
-            solutions = list(set(
+            solutions = pydash.uniq(list(
                 cls.grid_to_csv_string(problem['output'])
                 for problem in problemset
             ))

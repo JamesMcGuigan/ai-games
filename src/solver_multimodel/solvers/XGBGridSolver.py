@@ -22,12 +22,15 @@ class XGBGridSolver(Solver):
     optimise = True
     verbose  = True
     xgb_defaults = {
-        'tree_method':      'exact',
-        'eval_metric':      'error',
-        'objective':        'reg:squarederror',
         'n_estimators':     32,
-        'max_depth':        100,
-        'min_child_weight': 0,
+        'max_depth':        10,
+
+        ### Untested
+        # 'tree_method':      'exact',
+        # 'eval_metric':      'error',
+        # 'objective':        'reg:squarederror',
+        # 'min_child_weight': 0,
+        #
         # 'sampling_method':  'uniform',
         # 'max_delta_step':   1,
         # 'min_child_weight': 0,

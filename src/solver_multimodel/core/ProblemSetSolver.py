@@ -44,7 +44,7 @@ class ProblemSetSolver(Solver):
 
     def predict(self, problemset: Union[ProblemSet,Task], *args, task: Task=None, **kwargs) -> Union[None,List[np.ndarray]]:
         task       = task or (problemset if isinstance(problemset, Task) else problemset.task)
-        problemset = (problemset['test'] if isinstance(problemset, Task) else problemset )
+        # problemset = (problemset['test'] if isinstance(problemset, Task) else problemset )
         if task.filename not in self.cache:   self.fit(task)
         if self.cache[task.filename] is None: return None  # Unsolvable mapping
         raise NotImplementedError

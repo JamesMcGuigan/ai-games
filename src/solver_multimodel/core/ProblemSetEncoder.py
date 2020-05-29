@@ -41,6 +41,7 @@ class ProblemSetEncoder(ProblemSetSolver):
         self.output_encoder = output_encoder
         self.features       = features if features is not None else self.__class__.features
         self.encoder_args   = {**self.encoder_defaults, **xgb_args}
+        self._chained_args = { "task": None }
 
 
     def __call__(self, problemset: ProblemSet, task: Task):
@@ -53,7 +54,7 @@ class ProblemSetEncoder(ProblemSetSolver):
 
 
     def fit(self, task: Task) -> bool:
-        """Find the best input_encoder/output_encodr for the task """
+        """Find the best input_encoder/output_encoder for the task """
         if task.filename in self.cache: return True
 
         problemset      = task['train']
@@ -143,7 +144,7 @@ class ProblemSetEncoder(ProblemSetSolver):
         outputs = []
         for problem in problemset:
             if problem['output'] is None: continue
-            input  = problem['input']
+            # input  = problem['input']
             output = problem['output']
             if callable(output_encoder):
                 encoded = output_encoder(output)
@@ -153,7 +154,7 @@ class ProblemSetEncoder(ProblemSetSolver):
 
     # @np_cache()
     def generate_input_array(self, problemset: ProblemSet, input_encoder=None) -> np.ndarray:
-        mappings = self.generate_input_mappings(problemset, self.features)
+        mappings = self.generate_input_mappings(problemset, input_encoder=input_encoder)
         for index, mapping in enumerate(mappings):
             # noinspection PyTypeChecker
             mappings[index] = flatten_deep(mapping.values())

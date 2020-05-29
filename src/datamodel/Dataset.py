@@ -62,7 +62,7 @@ class Dataset(UserList):
     @classmethod
     def format_clock(cls, time_taken: float) -> str:
         hours   = time_taken // (60 * 60)
-        minutes = time_taken // (60)
+        minutes = time_taken // 60
         seconds = time_taken % 60
         clock   = "{:02.0f}:{:02.0f}:{:02.0f}".format(hours,minutes,seconds)
         return clock

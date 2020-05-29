@@ -107,10 +107,10 @@ class Rule(object):
             if settings['debug']: cls.print_exception(exception, function, kwargs, arguments, context)
 
         if output is None and settings['debug']:
-            kwargs = cls.kwargs_from_context(function, context, arguments)
+            output = cls.kwargs_from_context(function, context, arguments)
         return output
 
-
+    # noinspection PyUnusedLocal
     @classmethod
     def print_exception(cls, exception, function=None, kwargs=None, arguments=None, context=None ):
         if settings['debug']:

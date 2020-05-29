@@ -22,7 +22,7 @@ def task_grids(task) -> List[np.ndarray]:
     grids = []
     for test_train in ['test','train']:
         for spec in task[test_train]:
-            grids += [ spec.get('input',[]), spec.get('output',[]) ]  # tests not gaurenteed to have outputs
+            grids += [ spec.get('input',[]), spec.get('output',[]) ]  # tests not guaranteed to have outputs
     return grids
 
 @clru_cache(maxsize=None)
@@ -38,7 +38,7 @@ def is_task_shape_ratio_unchanged(task: Task) -> bool:
     return task_shape_ratios(task) == [ (1,1) ]
 
 @clru_cache(maxsize=None)
-def is_task_shape_ratio_consistant(task: Task) -> bool:
+def is_task_shape_ratio_consistent(task: Task) -> bool:
     return len(task_shape_ratios(task)) == 1
 
 @clru_cache(maxsize=None)
@@ -60,10 +60,6 @@ def task_shape_ratio(task: Task) -> Union[Tuple[float,float],None]:
     ratios = task_shape_ratios(task)
     if len(ratios) != 1: return None
     return ratios[0]
-
-@clru_cache(maxsize=None)
-def is_task_shape_ratio_consistent(task: Task) -> bool:
-    return len(task_shape_ratios(task)) == 1
 
 @clru_cache(maxsize=None)
 def is_task_shape_ratio_integer_multiple(task: Task) -> bool:

@@ -54,8 +54,9 @@ class CSV:
         csv = ['output_id,output'] + sorted(csv) # object_id keys are sorted in sample_submission.csv
         return "\n".join(csv)
 
+    # noinspection PyUnusedLocal
     @classmethod
-    def default_csv_line(cls, task: 'Task') -> str:
+    def default_csv_line(cls, task: 'Task' = None) -> str:
         return '|123|456|789|'
 
     @classmethod

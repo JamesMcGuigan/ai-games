@@ -19,8 +19,8 @@ class GlobSolver(Solver):
     def init_cache(self):
         if len(self.cache): return
         competition = Competition()
-        for name, dataset in competition.items():
-            if name == 'test': continue  # exclude test from the cache
+        for dataset_name, dataset in competition.items():
+            if dataset_name == 'test': continue  # exclude test from the cache
             for task in dataset:
                 for name, problemset in task.items():
                     for problem in problemset:

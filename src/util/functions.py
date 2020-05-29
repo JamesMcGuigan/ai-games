@@ -15,7 +15,8 @@ def bind(function_or_value: Union[Callable,Any], *args, **kwargs) -> Callable:
             return function_or_value(*args, *runtime_args, **runtime_kwargs, **kwargs)
         return _bind
     else:
-        def _passthrough(*runtime_args, **runtime_kwargs):
+        # noinspection PyUnusedLocal
+        def _passthrough(*args, **kwargs):
             return function_or_value
         return _passthrough
 

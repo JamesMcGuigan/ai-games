@@ -11,7 +11,7 @@ from src.datamodel.Task import Task
 from src.util.plot import plot_task
 
 
-class Solver():
+class Solver:
     verbose = False
     debug   = False
     def __init__(self):
@@ -86,7 +86,7 @@ class Solver():
         return False
 
 
-    def solve(self, task: Task, force=False, inplace=True) -> Union[List[Problem],None]:
+    def solve(self, task: Task, force=False) -> Union[List[Problem],None]:
         """solve test case and persist"""
         if task.filename not in self.cache:             self.fit(task)
         if self.cache.get(task.filename, True) is None: return None
@@ -117,7 +117,7 @@ class Solver():
                 solution = self.solve(task, force=solve_detects)
                 if solution or (solve_detects and self.test(task)):
                     count += 1
-                    if plot == True:
+                    if plot:
                         plot_task(task)
         return count
 

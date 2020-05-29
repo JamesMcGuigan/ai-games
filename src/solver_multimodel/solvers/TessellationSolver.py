@@ -65,17 +65,17 @@ class TessellationSolver(GeometrySolver):
             "query_period_length1":    ( query_period_length1,    []),
             "query_bincount":          ( query_bincount,         range(0,10)),
             "query_bincount_sorted":   ( query_bincount_sorted,  range(0,10)),
-            "is_grid_symmetry":        ( is_grid_symmetry )
+            "is_grid_symmetry":        ( is_grid_symmetry,       () )
         }
     }
 
 
     def detect(self, task):
         if is_task_shape_ratio_unchanged(task):            return False  # Use GeometrySolver
-        if not is_task_shape_ratio_integer_multiple(task): return False  # Not a Tessalation problem
+        if not is_task_shape_ratio_integer_multiple(task): return False  # Not a Tesselation problem
         if not all([ count_colors(spec['input']) == count_colors(spec['output']) for spec in task['train'] ]): return False  # Different colors
         if ZoomSolver().solve(task):                            return False
-        #if not self.is_task_shape_ratio_consistant(task):       return False  # Some inconsistant grids are tessalations
+        #if not self.is_task_shape_ratio_consistent(task):       return False  # Some inconsistent grids are tessellations
         return True
 
 
@@ -95,7 +95,7 @@ class TessellationSolver(GeometrySolver):
                                 yield (preprocess, p_arg),(transform,t_arg),(query,q_arg)
 
 
-    # TODO: hieraracharical nesting of solves and solutions/rules array generator
+    # TODO: hierarchical nesting of solves and solutions/rules array generator
     def test(self, task):
         if task.filename in self.cache: return True
         for (preprocess,p_arg),(transform,t_arg),(query,q_arg) in self.loop_options():
@@ -118,7 +118,7 @@ class TessellationSolver(GeometrySolver):
             generator = transform(grid, *t_arg)
             transform = lambda grid, *args: next(generator)
 
-        # Some combinations of functions will throw gemoetry
+        # Some combinations of functions will throw geometry
         output = None
         try:
             grid    = preprocess(grid, *p_arg)

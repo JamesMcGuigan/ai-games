@@ -26,7 +26,7 @@ class Problem(UserDict):
     def cast(self, value: Any):
         if value is None: return None
         value = np.array(value, dtype=self.dtype)
-        # value = np.ascontiguousarray(value, dtype=self.dtype)  # disable: could potntually mess with hashing
+        # value = np.ascontiguousarray(value, dtype=self.dtype)  # disable: could potentially mess with hashing
         value.flags.writeable = False
         return value
 

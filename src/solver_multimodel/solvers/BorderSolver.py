@@ -1,5 +1,5 @@
 from src.functions.queries.grid import *
-from src.functions.queries.ratio import is_task_shape_ratio_consistant
+from src.functions.queries.ratio import is_task_shape_ratio_consistent
 from src.functions.queries.ratio import task_shape_ratio
 from src.solver_multimodel.core.Solver import Solver
 
@@ -20,7 +20,7 @@ class BorderSolver(Solver):
     ]
 
     def task_has_border(self, task):
-        if not is_task_shape_ratio_consistant(task): return False
+        if not is_task_shape_ratio_consistent(task): return False
         return all([ self.grid_has_border(spec['output']) for spec in task['train'] ])
 
     def grid_has_border(self, grid):

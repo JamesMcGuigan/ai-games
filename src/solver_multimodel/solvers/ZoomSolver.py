@@ -14,7 +14,7 @@ class ZoomSolver(Solver):
         detect = (
                 ratios != { (1,1) }   # not no scaling
                 and len(ratios) == 1      # not multiple scalings
-                and ratio[0] == ratio[1]  # single consistant scaling
+                and ratio[0] == ratio[1]  # single consistent scaling
         )
         return detect
 
@@ -27,7 +27,7 @@ class ZoomSolver(Solver):
             resize = tuple( int(d*scale) for d in grid.shape )
             output = cv2.resize(grid, resize, interpolation=cv2.INTER_NEAREST)
         else:
-            resize = tuple( int(1/scale) for d in grid.shape )
+            resize = tuple( int(1/scale) for number in grid.shape )
             output = skimage.measure.block_reduce(grid, resize)
         if self.verbose:
             print('scale', scale, 'grid.shape', grid.shape, 'output.shape', output.shape)

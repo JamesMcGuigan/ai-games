@@ -26,10 +26,11 @@ def score_tasks(tasks: dict, label: str):
     solved = 0
 
     for task_file, task in tasks.items():
-        for index, spec in enumerate(task['test']): total += 1
+        for index, problemset in enumerate(task['test']):
+            total += 1
 
         if 'solution' in task:
-            for index, spec in enumerate(task['solution']):
+            for index, problemset in enumerate(task['solution']):
                 solved += 1
 
     print(f'{label.ljust(11)}| solutions found: {str(solved).rjust(3)}/{total} | error: {round(1-solved/total,4)}')

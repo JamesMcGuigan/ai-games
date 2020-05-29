@@ -37,6 +37,8 @@ class XGBGridSolver(Solver):
         super().__init__()
         self.kwargs = {
             **self.xgb_defaults,
+            'n_estimators': n_estimators,
+            'max_depth':    max_depth,
             **kwargs,
         }
         if self.kwargs.get('booster') == 'gblinear':
@@ -105,14 +107,10 @@ class XGBGridSolver(Solver):
             nrows, ncols             = len(task[mode][task_num]['input']),  len(task[mode][task_num]['input'][0])
             target_rows, target_cols = len(task[mode][task_num]['output']), len(task[mode][task_num]['output'][0])
 
+            # TODO: Reshape all input/outputs to largest size
             if (target_rows != nrows) or (target_cols != ncols):
-                # print('Number of input rows:', nrows, 'cols:', ncols)
-                # print('Number of target rows:', target_rows, 'cols:', target_cols)
-                not_valid = 1
                 return None, None, 1
 
-            imsize = nrows * ncols
-            # offset = imsize*task_num*3 #since we are using three types of aug
             feat.extend(cls.make_features(input_color))
             target.extend(np.array(target_color).reshape(-1, ))
 
@@ -184,11 +182,11 @@ class XGBGridSolver(Solver):
     def get_neighbourhood(cls, grid: np.ndarray, i: int, j: int, distance=1):
         try:
             output = np.full((2*distance+1, 2*distance+1), 11)  # 11 = outside of grid pixel
-            for xo, xg in enumerate(range(-distance, distance+1)):
-                for yo, yg in enumerate(range(-distance, distance+1)):
-                    if not 0 <= xo < grid.shape[0]: continue
-                    if not 0 <= yo < grid.shape[1]: continue
-                    output[xo,yo] = grid[xg,yg]
+            for x_out, x_grid in enumerate(range(i-distance, i+distance+1)):
+                for y_out, y_grid in enumerate(range(j-distance, j+distance+1)):
+                    if not 0 <= x_out < grid.shape[0]: continue
+                    if not 0 <= y_out < grid.shape[1]: continue
+                    output[x_out,y_out] = grid[x_grid,x_grid]
             return output
         except:
             return np.full((2*distance+1, 2*distance+1), 11)  # 11 = outside of grid pixel
@@ -236,7 +234,7 @@ class XGBGridSolverGBtree(XGBGridSolver):
         'tree_method': 'exact'
     }
     def __init__(self, booster='gbtree', **kwargs):
-        self.kwargs = { **self.kwargs_defaults, **kwargs }
+        self.kwargs = { "booster": booster, **self.kwargs_defaults, **kwargs }
         super().__init__(**self.kwargs)
 
 class XGBGridSolverGBlinear(XGBGridSolver):

@@ -125,7 +125,7 @@ def hyperopt(param_space, num_eval, points_to_evaluate=None, verbose=True, timeo
     print("-"*20)
 
     competition = Competition()
-    dataset     = competition['evaluation']
+    # dataset     = competition['evaluation']
     solver = XGBGridSolver(**best_param)
     solver.verbose = False
     competition.map(solver.solve_dataset)

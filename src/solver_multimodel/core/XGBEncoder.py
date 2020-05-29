@@ -22,7 +22,6 @@ class XGBEncoder(ProblemSetEncoder):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        encoder = XGBClassifier(**self.encoder_args)
 
     def create_encoder(self):
         encoder = XGBClassifier(**self.encoder_args)

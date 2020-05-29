@@ -5,7 +5,7 @@ try:    root_dir = pathlib.Path(__file__).parent.parent.absolute()
 except: root_dir = ''
 
 settings = {
-    'production': bool( os.environ.get('KAGGLE_KERNEL_RUN_TYPE') or 'submission' in __file__ )
+    'production': bool( os.environ.get('KAGGLE_KERNEL_RUN_TYPE', False) ) or 'submission' in __file__
 }
 settings = {
     **settings,

@@ -55,15 +55,15 @@ class CustomPlayerPlayTest(BaseCustomPlayerTest):
                   Agent(CustomPlayer, "Player 2"))
         initial_state = Isolation()
         winner, game_history, _ = play((agents, initial_state, self.time_limit, 0))
-        
+
         state = initial_state
         moves = deque(game_history)
         while moves: state = state.result(moves.popleft())
 
         if not state.terminal_test():
-            print(f"Your agent with id:{state.player()} was not able to make a move in state:")
+            print("Your agent with id:"+state.player()+" was not able to make a move in state:")
             debug_state = DebugState.from_state(state)
             print(debug_state)
-                       
+
             raise Exception("Your agent did not play until a terminal state.")
 

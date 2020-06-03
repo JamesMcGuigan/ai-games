@@ -4,10 +4,12 @@ from functools import lru_cache
 from itertools import chain
 from operator import itemgetter
 
-from isolation import DebugState, Isolation, play
-from isolation.isolation import Action
-from sample_players import BasePlayer, DataPlayer
 import numpy as np
+
+from isolation.isolation import Action
+from sample_players import BasePlayer
+
+
 
 # class CustomPlayer(DataPlayer):
 class CustomPlayer(BasePlayer):
@@ -27,6 +29,14 @@ class CustomPlayer(BasePlayer):
       any pickleable object to the cls.context attribute.
     **********************************************************************
     """
+
+    search_fn            = 'alphabeta'       # or 'minmax'
+    search_max_depth     = 50
+
+    heuristic_fn         = 'heuristic_area'  # or 'heuristic_liberties'
+    heuristic_area_depth = 4
+    heuristic_area_max   = len(Action) * 3
+
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -68,7 +78,7 @@ class CustomPlayer(BasePlayer):
 
         # The real trick with iterative deepening is caching, which allows us to out-depth the default minimax Agent
         if verbose: print()
-        for depth in range(1,50):
+        for depth in range(1,self.search_max_depth):
             action = self.search(state, depth=depth)
             self.queue.put(action)
             if verbose: print(depth, end=' ')
@@ -80,8 +90,11 @@ class CustomPlayer(BasePlayer):
     @classmethod
     @lru_cache(None, typed=True)
     def heuristic(cls, state, player_id):
-        return cls.heuristic_area(state, player_id)
-        # return cls.heuristic_liberties(state, player_id)  # won 45%
+        if cls.heuristic_fn == 'heuristic_area':
+            return cls.heuristic_area(state, player_id)
+        if cls.heuristic_fn == 'heuristic_liberties':
+            return cls.heuristic_liberties(state, player_id)  # won 45%
+        raise NotImplementedError('cls.heuristic_fn must be in ["heuristic_area", "heuristic_liberties"] - got: ', cls.heuristic_fn)
 
     @classmethod
     @lru_cache(None, typed=True)
@@ -101,14 +114,18 @@ class CustomPlayer(BasePlayer):
         opp_area = cls.count_area_liberties(state, opp_loc)
         return own_area - opp_area
 
-    @classmethod
+    @staticmethod
     @lru_cache(None, typed=True)
-    def liberties( cls, state, cell ):
+    def liberties( state, cell ):
+        """add a @lru_cache around this function"""
         return state.liberties(cell)
 
     @classmethod
     @lru_cache(None, typed=True)  # depth > 1 exceeds 150ms timeout (without caching)
-    def count_area_liberties( cls, state, start_loc, depth=4, max_area=len(Action) * 3 ):  # stop search at 24 liberties
+    def count_area_liberties( cls, state, start_loc ):
+        depth     = cls.heuristic_area_depth
+        max_area  = cls.heuristic_area_max
+
         area      = set()
         frontier  = { start_loc }
         seen      = set()
@@ -125,9 +142,11 @@ class CustomPlayer(BasePlayer):
     ### Search
 
     def search( self, state, depth ):
-        # return self.minmax(state, depth)
-        return self.alphabeta(state, depth)
-
+        if self.search_fn == 'minmax':
+            return self.minmax(state, depth)
+        if self.search_fn == 'alphabeta':
+            return self.alphabeta(state, depth)
+        raise NotImplementedError('cls.search_fn must be in ["minmax", "alphabeta"] - got: ', self.search_fn)
 
     ### Search: Minmax
 

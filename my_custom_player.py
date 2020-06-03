@@ -30,12 +30,14 @@ class CustomPlayer(BasePlayer):
     **********************************************************************
     """
 
+    verbose              = False
+    verbose_depth        = False
     search_fn            = 'alphabeta'       # or 'minmax'
     search_max_depth     = 50
 
     heuristic_fn         = 'heuristic_area'  # or 'heuristic_liberties'
-    heuristic_area_depth = 4
-    heuristic_area_max   = len(Action) * 3
+    heuristic_area_depth = 4                 # 4 seems to be the best number against LibertiesPlayer
+    heuristic_area_max   = len(Action) * 5   # 5 seems to be the best number against LibertiesPlayer
 
 
     def __init__(self, *args, **kwargs):
@@ -48,7 +50,7 @@ class CustomPlayer(BasePlayer):
     #     action = self.alphabeta(state, depth=depth)  # precache for first move
     #     print( 'precache()', type(action), action, int((time.perf_counter() - time_start) * 1000), 'ms' )
 
-    def get_action(self, state, verbose=False):
+    def get_action(self, state):
         """ Employ an adversarial search technique to choose an action
         available in the current state calls self.queue.put(ACTION) at least
 
@@ -77,12 +79,12 @@ class CustomPlayer(BasePlayer):
         self.queue.put( action )     # backup move incase of early timeout
 
         # The real trick with iterative deepening is caching, which allows us to out-depth the default minimax Agent
-        if verbose: print()
+        if self.verbose_depth: print('\n'+ self.__class__.__name__ +' | depth:', end=' ')
         for depth in range(1,self.search_max_depth):
             action = self.search(state, depth=depth)
             self.queue.put(action)
-            if verbose: print(depth, end=' ')
-        if verbose: print( depth, type(action), action, int((time.perf_counter() - time_start) * 1000), 'ms' )
+            if self.verbose_depth: print(depth, end=' ')
+        # if self.verbose_depth: print( depth, type(action), action, int((time.perf_counter() - time_start) * 1000), 'ms' )
 
 
     ### Heuristics
@@ -105,6 +107,12 @@ class CustomPlayer(BasePlayer):
         opp_liberties = cls.liberties(state, opp_loc)
         return len(own_liberties) - len(opp_liberties)
 
+    @staticmethod
+    @lru_cache(None, typed=True)
+    def liberties( state, cell ):
+        """add a @lru_cache around this function"""
+        return state.liberties(cell)
+
     @classmethod
     @lru_cache(None, typed=True)
     def heuristic_area( cls, state, player_id):
@@ -113,12 +121,6 @@ class CustomPlayer(BasePlayer):
         own_area = cls.count_area_liberties(state, own_loc)
         opp_area = cls.count_area_liberties(state, opp_loc)
         return own_area - opp_area
-
-    @staticmethod
-    @lru_cache(None, typed=True)
-    def liberties( state, cell ):
-        """add a @lru_cache around this function"""
-        return state.liberties(cell)
 
     @classmethod
     @lru_cache(None, typed=True)  # depth > 1 exceeds 150ms timeout (without caching)

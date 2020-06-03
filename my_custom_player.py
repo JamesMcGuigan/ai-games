@@ -80,8 +80,8 @@ class CustomPlayer(BasePlayer):
     @classmethod
     @lru_cache(None, typed=True)
     def heuristic(cls, state, player_id):
-        # return cls.heuristic_area(state, player_id)
-        return cls.heuristic_liberties(state, player_id)  # won 45%
+        return cls.heuristic_area(state, player_id)
+        # return cls.heuristic_liberties(state, player_id)  # won 45%
 
     @classmethod
     @lru_cache(None, typed=True)
@@ -94,11 +94,11 @@ class CustomPlayer(BasePlayer):
 
     @classmethod
     @lru_cache(None, typed=True)
-    def heuristic_area( cls, state, player_id, depth=4 ):
+    def heuristic_area( cls, state, player_id):
         own_loc = state.locs[player_id]
         opp_loc = state.locs[1 - player_id]
-        own_area = cls.count_area_liberties(state, own_loc, depth=depth)
-        opp_area = cls.count_area_liberties(state, opp_loc, depth=depth)
+        own_area = cls.count_area_liberties(state, own_loc)
+        opp_area = cls.count_area_liberties(state, opp_loc)
         return own_area - opp_area
 
     @classmethod
@@ -108,11 +108,11 @@ class CustomPlayer(BasePlayer):
 
     @classmethod
     @lru_cache(None, typed=True)  # depth > 1 exceeds 150ms timeout (without caching)
-    def count_area_liberties( cls, state, start_loc, depth=np.inf, max=len(Action) * 4 ):  # stop search at 24 liberties
+    def count_area_liberties( cls, state, start_loc, depth=4, max_area=len(Action) * 3 ):  # stop search at 24 liberties
         area      = set()
         frontier  = { start_loc }
         seen      = set()
-        while len(frontier) and len(area) < max and depth > 0:
+        while len(frontier) and len(area) < max_area and depth > 0:
             seen     |= frontier
             frontier |= set(chain(*[ cls.liberties(state, cell) for cell in frontier ]))
             area     |= frontier

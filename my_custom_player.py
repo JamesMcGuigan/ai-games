@@ -1,12 +1,15 @@
 import random
 import time
+from functools import lru_cache
+from itertools import chain
 from operator import itemgetter
 
+from isolation import DebugState, Isolation, play
 from sample_players import BasePlayer, DataPlayer
 import numpy as np
 
-class CustomPlayer(DataPlayer):
-# class CustomPlayer(BasePlayer):
+# class CustomPlayer(DataPlayer):
+class CustomPlayer(BasePlayer):
     """ Implement your own agent to play knight's Isolation
 
     The get_action() method is the only required method for this project.
@@ -49,24 +52,54 @@ class CustomPlayer(DataPlayer):
 
         # Iterative deepening
         time_start = time.perf_counter()
+        self.queue.put( random.choice(state.actions()) )     # backup move incase of early timeout
         for depth in range(1,100):
             # action = self.minmax(state,         depth=depth)
-            action, score = self.alphabeta(state, depth=depth)  # very slow to run for first move
+            action = self.alphabeta(state, depth=depth)  # very slow to run for first move
             self.queue.put(action)
         if verbose:
             print( type(action), action, int((time.perf_counter() - time_start) * 1000), 'ms' )
 
 
     def heuristic(self, state):
+        return self.heuristic_area(state)
+        # return self.heuristic_liberties(state)  # won 45%
+
+    def heuristic_liberties(self, state):
         own_loc = state.locs[self.player_id]
         opp_loc = state.locs[1 - self.player_id]
-        own_liberties = state.liberties(own_loc)
-        opp_liberties = state.liberties(opp_loc)
+        own_liberties = self.liberties(state, own_loc)
+        opp_liberties = self.liberties(state, opp_loc)
         return len(own_liberties) - len(opp_liberties)
 
+    def heuristic_area(self, state):
+        own_loc = state.locs[self.player_id]
+        opp_loc = state.locs[1 - self.player_id]
+        own_area = self.area_liberties(state, own_loc)
+        opp_area = self.area_liberties(state, opp_loc)
+        return len(own_area) - len(opp_area)
 
-    def random_agent( self, state ):
-        return random.choice(state.actions())
+    @classmethod
+    @lru_cache(None, typed=True)
+    def liberties( cls, state, cell ):
+        return state.liberties(cell)
+
+    @classmethod
+    @lru_cache(None, typed=True)
+    def area_liberties(cls, state, start_loc, depth=2):  # depth > 1 exceeds 150ms timeout (without caching)
+        area      = set()
+        frontier  = set(state.liberties(start_loc))
+        seen      = { start_loc }
+        while len(frontier) and depth > 0:
+            seen     |= frontier
+            frontier |= set(chain(*[ cls.liberties(state, cell) for cell in frontier ]))
+            area     |= frontier
+            frontier -= seen
+            depth    -= 1
+        return area
+
+
+
 
     def minmax( self, state, depth=np.inf ):
         def min_value(state, depth):
@@ -87,11 +120,7 @@ class CustomPlayer(DataPlayer):
             ]
             return max(scores) if len(scores) else -np.inf
 
-        # return max(state.actions(), key=lambda action: min_value(state.result(action), depth-1))
-        actions = state.actions()
-        scores  = [ min_value(state.result(action), depth=depth-1) for action in actions ]
-        score, action = max(zip(scores,actions), key=itemgetter(0))
-        return action, score
+        return max(state.actions(), key=lambda action: min_value(state.result(action), depth-1))
 
 
     def alphabeta( self, state, depth ):
@@ -120,4 +149,4 @@ class CustomPlayer(DataPlayer):
         actions = state.actions()
         scores  = [ min_value(state.result(action), depth=depth-1) for action in actions ]
         score, action = max(zip(scores,actions), key=itemgetter(0))
-        return action, score
+        return action

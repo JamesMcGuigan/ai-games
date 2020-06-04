@@ -3,8 +3,7 @@ import time
 from functools import lru_cache
 from itertools import chain
 from operator import itemgetter
-
-import numpy as np
+import math
 
 from isolation.isolation import Action
 from sample_players import BasePlayer
@@ -165,7 +164,7 @@ class CustomPlayer(BasePlayer):
             cls.minimax_max_value(state.result(action), player_id, depth - 1)
             for action in state.actions()
         ]
-        return min(scores) if len(scores) else np.inf
+        return min(scores) if len(scores) else math.inf
 
     @classmethod
     @lru_cache(None, typed=True)
@@ -176,7 +175,7 @@ class CustomPlayer(BasePlayer):
             cls.minimax_min_value(state.result(action), player_id, depth - 1)
             for action in state.actions()
         ]
-        return max(scores) if len(scores) else -np.inf
+        return max(scores) if len(scores) else -math.inf
 
 
     ### Search: AlphaBeta
@@ -192,10 +191,10 @@ class CustomPlayer(BasePlayer):
 
     @classmethod
     @lru_cache(None, typed=True)
-    def alphabeta_min_value(cls, state, player_id, depth, alpha=-np.inf, beta=np.inf):
+    def alphabeta_min_value(cls, state, player_id, depth, alpha=-math.inf, beta=math.inf):
         if state.terminal_test(): return state.utility(player_id)
         if depth == 0:            return cls.heuristic(state, player_id)
-        score = np.inf
+        score = math.inf
         for action in state.actions():
             result     = state.result(action)
             score      = min(score, cls.alphabeta_max_value(result, player_id, depth-1, alpha, beta))
@@ -205,10 +204,10 @@ class CustomPlayer(BasePlayer):
 
     @classmethod
     @lru_cache(None, typed=True)
-    def alphabeta_max_value(cls, state, player_id, depth, alpha=-np.inf, beta=np.inf):
+    def alphabeta_max_value(cls, state, player_id, depth, alpha=-math.inf, beta=math.inf):
         if state.terminal_test(): return state.utility(player_id)
         if depth == 0:            return cls.heuristic(state, player_id)
-        score = -np.inf
+        score = -math.inf
         for action in state.actions():
             result     = state.result(action)
             score      = max(score, cls.alphabeta_min_value(result, player_id, depth-1, alpha, beta))

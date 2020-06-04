@@ -6,12 +6,12 @@ from operator import itemgetter
 import math
 
 from isolation.isolation import Action
-from sample_players import BasePlayer
+from sample_players import BasePlayer, DataPlayer
 
 
 
-# class CustomPlayer(DataPlayer):
-class CustomPlayer(BasePlayer):
+# class MiniMaxPlayer(DataPlayer):
+class MiniMaxPlayer(BasePlayer):
     """ Implement your own agent to play knight's Isolation
 
     The get_action() method is the only required method for this project.
@@ -214,3 +214,8 @@ class CustomPlayer(BasePlayer):
             if score >= beta: return score
             alpha      = max(alpha, score)
         return score
+
+
+# CustomPlayer is the agent exported to the submission
+class CustomPlayer(MiniMaxPlayer):
+    pass

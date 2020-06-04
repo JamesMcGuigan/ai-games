@@ -32,7 +32,7 @@ class CustomPlayer(BasePlayer):
 
     verbose              = False
     verbose_depth        = False
-    search_fn            = 'alphabeta'       # or 'minmax'
+    search_fn            = 'alphabeta'       # or 'minimax'
     search_max_depth     = 50
 
     heuristic_fn         = 'heuristic_area'  # or 'heuristic_liberties'
@@ -144,36 +144,36 @@ class CustomPlayer(BasePlayer):
     ### Search
 
     def search( self, state, depth ):
-        if self.search_fn == 'minmax':
-            return self.minmax(state, depth)
+        if self.search_fn == 'minimax':
+            return self.minimax(state, depth)
         if self.search_fn == 'alphabeta':
             return self.alphabeta(state, depth)
-        raise NotImplementedError('cls.search_fn must be in ["minmax", "alphabeta"] - got: ', self.search_fn)
+        raise NotImplementedError('cls.search_fn must be in ["minimax", "alphabeta"] - got: ', self.search_fn)
 
     ### Search: Minmax
 
-    def minmax( self, state, depth ):
+    def minimax( self, state, depth ):
         return max(state.actions(),
-                   key=lambda action: self.minmax_min_value(state.result(action), self.player_id, depth-1))
+                   key=lambda action: self.minimax_min_value(state.result(action), self.player_id, depth - 1))
 
     @classmethod
     @lru_cache(None, typed=True)
-    def minmax_min_value(cls, state, player_id, depth):
+    def minimax_min_value( cls, state, player_id, depth ):
         if state.terminal_test(): return state.utility(player_id)
         if depth == 0:            return cls.heuristic(state, player_id)
         scores = [
-            cls.minmax_max_value(state.result(action), player_id, depth-1)
+            cls.minimax_max_value(state.result(action), player_id, depth - 1)
             for action in state.actions()
         ]
         return min(scores) if len(scores) else np.inf
 
     @classmethod
     @lru_cache(None, typed=True)
-    def minmax_max_value(cls, state, player_id, depth):
+    def minimax_max_value( cls, state, player_id, depth ):
         if state.terminal_test(): return state.utility(player_id)
         if depth == 0:            return cls.heuristic(state, player_id)
         scores = [
-            cls.minmax_min_value(state.result(action), player_id, depth-1)
+            cls.minimax_min_value(state.result(action), player_id, depth - 1)
             for action in state.actions()
         ]
         return max(scores) if len(scores) else -np.inf

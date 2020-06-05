@@ -1,6 +1,6 @@
-from player_minimax import MiniMaxPlayer
+from player_alphabeta import AlphaBetaPlayer
 
 
 # CustomPlayer is the agent exported to the submission
-class CustomPlayer(MiniMaxPlayer):
+class CustomPlayer(AlphaBetaPlayer):
     pass

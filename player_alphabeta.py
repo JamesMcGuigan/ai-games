@@ -10,8 +10,7 @@ from sample_players import BasePlayer
 
 
 
-# class MiniMaxPlayer(DataPlayer):
-class MiniMaxPlayer(BasePlayer):
+class AlphaBetaPlayer(BasePlayer):
     """ Implement your own agent to play knight's Isolation
 
     The get_action() method is the only required method for this project.

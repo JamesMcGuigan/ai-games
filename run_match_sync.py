@@ -5,7 +5,7 @@ import textwrap
 import time
 import traceback
 from queue import LifoQueue
-from typing import Callable, Tuple
+from typing import Callable, List, Tuple
 
 from isolation import Agent, DebugState, ERR_INFO, GAME_INFO, Isolation, RESULT_INFO, Status, logger
 from my_custom_player import CustomPlayer
@@ -99,12 +99,12 @@ def argparser():
 
 # Modified from Source: isolation/__init__.py:_play()
 def play_sync( agents: Tuple[Agent,Agent],
-               game_state=None,
-               time_limit=TIME_LIMIT,
-               match_id=0,
-               debug=False,
-               verbose=False,
-               callback: Callable[[Isolation, int], None]=None,
+               game_state = None,   # defaults to Isolation()
+               time_limit = TIME_LIMIT,
+               match_id   = 0,
+               debug      = False,  # disables the signal timeout
+               verbose    = False,  # prints an ASCII copy of the board after each turn
+               callbacks: List[ Callable ] = [],  # WARNING: default argument is mutable
                **kwargs ):
 
     agents        = tuple( Agent(agent, agent.__class__.name) if not isinstance(agent, Agent) else agent for agent in agents )
@@ -152,15 +152,11 @@ def play_sync( agents: Tuple[Agent,Agent],
         game_state = game_state.result(action)
         game_history.append(action)
 
-        if verbose:
-            verbose_callback(
-                game_state=game_state,
-                action=action,
-                active_player=active_player,
-                active_idx=active_idx,
-                match_id=match_id
-            )
-        if callable(callback):
+        # Callbacks can be used to hook in additional functionality after each turn, such as verbose rendering
+        callbacks = list(callbacks) if isinstance(callbacks, (tuple,list,set)) else [ callbacks ]
+        if verbose: callbacks = [ verbose_callback ] + callbacks  # default argument is mutable, avoid mutating
+        for callback in callbacks:
+            if not callable(callback): continue
             callback(
                 game_state=game_state,
                 action=action,
@@ -181,7 +177,7 @@ def verbose_callback(game_state, action, active_player, active_idx, match_id):
     summary = "match: {} | {}({}) => {}".format(
         match_id,  active_player.__class__.__name__, active_idx, DebugState.ind2xy(action)
     )
-    board   = str(DebugState.from_state(game_state))
+    board = str(DebugState.from_state(game_state))
     print(summary); logger.info(summary)
     print(board);   logger.info(board)
 

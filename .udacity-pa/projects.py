@@ -3,7 +3,7 @@ from udacity_pa import udacity
 
 nanodegree = 'nd898'
 projects = ['adversarial_search']
-filenames_all = ['my_custom_player.py', 'report.pdf', 'data.pickle']
+filenames_all = ['player_minimax.py', 'my_custom_player.py', 'report.pdf', 'data.pickle']
 
 def submit(args):
     filenames = []
@@ -20,6 +20,6 @@ def submit(args):
             "WARNING: Make sure your submission includes a file named 'report.pdf' if you " +
             "expect this to be your final submission in the classroom for review.")
 
-    udacity.submit(nanodegree, projects[0], filenames, 
+    udacity.submit(nanodegree, projects[0], filenames,
                    environment = args.environment,
                    jwt_path = args.jwt_path)

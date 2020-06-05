@@ -6,22 +6,24 @@ import pickle
 import random
 import time
 from collections import defaultdict, namedtuple
-from typing import List
+from operator import itemgetter
+from typing import Dict, List, Tuple
 
 from isolation import Agent, logger
 from isolation.isolation import Action, Isolation
-from run_match import TEST_AGENTS
+from player_alphabeta import AlphaBetaPlayer
 from run_match_sync import play_sync
-from sample_players import BasePlayer
+from sample_players import BasePlayer, GreedyPlayer, MinimaxPlayer, RandomPlayer
 
 
 
 MCTSRecord = namedtuple("MCTSRecord", ("wins","count","score"), defaults=(0,0,0))
 
 class MCTSPlayer(BasePlayer):
-    exploration = math.sqrt(2)
-    data        = defaultdict(MCTSRecord)
-    game        = Isolation
+    exploration = 0   # use math.sqrt(2) for training, and 0 for playing
+    game = Isolation
+    file = 'data.pickle'
+    data = {}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -35,23 +37,25 @@ class MCTSPlayer(BasePlayer):
         if cls.data: return  # skip loading if the file is already in class memory
         try:
             # class data may be more upto date than the pickle file, so avoid race conditions with multiple instances
-            with open("data.pickle", "rb") as file:
+            with open(cls.file, "rb") as file:
                 cls.data.update({ **pickle.load(file), **cls.data })
-                print("loaded: './data.pickle' ({:.2f}) Mb".format(os.path.getsize('./data.pickle')/1024/1024) )
+                print("loaded: './data.pickle' ({:.2f}) MB".format(os.path.getsize(cls.file)/1024/1024) )
                 pass
         except (IOError, TypeError) as exception: pass
 
     @classmethod
     def save( cls ):
         # cls.load()  # update any new information from the file
-        print("saving: './data.pickle'" )
-        with open("data.pickle", "wb") as file:
+        print("saving: " + cls.file )
+        with open(cls.file, "wb") as file:
             pickle.dump(cls.data, file)
-        print("wrote:  './data.pickle' ({:.2f}) Mb)".format(os.path.getsize('./data.pickle')/1024/1024) )
+        # for key, value in cls.data.items():
+        #     print(key, ':', value)
+        print("wrote:  "+cls.file+" ({:.2f}) MB)".format(os.path.getsize(cls.file)/1024/1024) )
 
     @classmethod
     def reset( cls ):
-        cls.data = defaultdict(MCTSRecord)
+        cls.data = defaultdict(MCTSRecord())
         cls.save()
 
 
@@ -86,9 +90,12 @@ class MCTSPlayer(BasePlayer):
         # Ni stands for the total number of simulations after the i-th move run by the parent node of the one considered
         # c is the exploration parameter—theoretically equal to √2; in practice usually chosen empirically
 
-        w = max(0, cls.data[child].wins)
-        n = max(1, cls.data[child].count)   # avoid divide by zero
-        N = max(2, cls.data[parent].count)  # encourage exploration of unexplored states | log(1) = 0
+        # Avoid using defaultdict, as it creates too many lookup entries with zero score
+        child_record  = cls.data[child]  if child  in cls.data else MCTSRecord()
+        parent_record = cls.data[parent] if parent in cls.data else MCTSRecord()
+        w = max(0, child_record.wins)
+        n = max(1, child_record.count)   # avoid divide by zero
+        N = max(2, parent_record.count)  # encourage exploration of unexplored states | log(1) = 0
         score = w/n + cls.exploration * math.sqrt(math.log(N)/n)
         return score
 
@@ -102,31 +109,39 @@ class MCTSPlayer(BasePlayer):
             idx   = (idx + 1) % 2
             win   = int(idx == winner_idx)
             child = parent.result(action)
+
+            # Avoid using defaultdict, as it creates too many lookup entries with zero score
+            child_record = cls.data[child] if child in cls.data else MCTSRecord()
             record = MCTSRecord(
-                wins  = cls.data[child].wins  + win,
-                count = cls.data[child].count + 1,
+                wins  = child_record.wins  + win,
+                count = child_record.count + 1,
                 score = cls.score(child, parent)
             )
             cls.data[child] = record
             parent = child
 
 
+class MCTSTrainer(MCTSPlayer):
+    exploration = math.sqrt(2)  # use math.sqrt(2) for training, and 0 for playing
+
+
+
 def train_mcts(args):
     atexit.register(MCTSPlayer.save)
 
-    agent1 = Agent(MCTSPlayer, "MCTSPlayer1")
-    agent2 = TEST_AGENTS.get(args['opponent'].upper(), Agent(MCTSPlayer, "MCTSPlayer2"))
+    agent1 = Agent(MCTSTrainer, "MCTSTrainer")
+    agent2 = TEST_AGENTS.get(args['opponent'].upper(), Agent(MCTSPlayer, "MCTSPlayer"))
     agents = (agent1, agent2)
 
-    history = {
+    scores = {
         agent: []
         for agent in agents
     }
     start_time = time.perf_counter()
     match_id = 0
     while True:
-        if args.get('rounds',  0) and args['rounds']  * 2 <= match_id:                         break
-        if args.get('timeout', 0) and args['timeout']     <= time.perf_counter() - start_time: break
+        if args.get('rounds',  0) and args['rounds']  <= match_id:                         break
+        if args.get('timeout', 0) and args['timeout'] <= time.perf_counter() - start_time: break
 
         match_id += 1
         agent_order = ( agents[(match_id)%2], agents[(match_id+1)%2] )  # reverse player order between matches
@@ -134,26 +149,41 @@ def train_mcts(args):
 
         winner_idx = agent_order.index(winner)
         loser      = agent_order[int(not winner_idx)]
-        history[winner] += [ 1 ]
-        history[loser]  += [ 0 ]
+        scores[winner] += [ 1 ]
+        scores[loser]  += [ 0 ]
 
         MCTSPlayer.backpropagate(winner_idx, game_history)
 
-        print('+' if winner == agent1 else '-', end='', flush=True)
-        logn = 100
-        if match_id and match_id % logn == 0:
-            message = " match_id: {:4d} | last {} = {:0.0f}%".format(match_id, logn, 100 * sum(history[agent1][-logn:]) / logn )
+        print('+' if winner == agents[0] else '-', end='', flush=True)
+        line = 100 # args['verbose']
+        if match_id and match_id % line == 0:
+            message = " match_id: {:4d} | last {} = {:3.0f}% | all = {:3.0f}% | {} vs {}" .format(
+                match_id, line,
+                100 * sum(scores[agents[0]][-line:]) / line,
+                100 * sum(scores[agents[0]]) / len(scores[agents[0]]),
+                agents[0].agent_class.__name__,
+                agents[1].agent_class.__name__,
+            )
             print(message); logger.info(message)
 
     MCTSPlayer.save()
     atexit.unregister(MCTSPlayer.save)
 
 
+TEST_AGENTS = {
+    "RANDOM":    Agent(RandomPlayer,    "Random Agent"),
+    "GREEDY":    Agent(GreedyPlayer,    "Greedy Agent"),
+    "MINIMAX":   Agent(MinimaxPlayer,   "Minimax Agent"),
+    "ALPHABETA": Agent(AlphaBetaPlayer, "AlphaBeta Agent"),
+    "MCTS":      Agent(MCTSPlayer,      "MCTS Agent"),
+    "MCTST":     Agent(MCTSTrainer,     "MCTS Trainer"),
+}
 def argparser():
     parser = argparse.ArgumentParser()
     parser.add_argument('-r', '--rounds',   type=int, default=0)
     parser.add_argument('-t', '--timeout',  type=int, default=0)
-    parser.add_argument('-o', '--opponent', type=str, default='GREEDY')
+    parser.add_argument('-a', '--agent',    type=str, default='MCTST')
+    parser.add_argument('-o', '--opponent', type=str, default='MCTST')
     return vars(parser.parse_args())
 
 if __name__ == '__main__':

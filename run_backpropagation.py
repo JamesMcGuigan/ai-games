@@ -4,17 +4,49 @@ import atexit
 import time
 
 from agents.AlphaBetaPlayer import AlphaBetaAreaPlayer, AlphaBetaPlayer
-from agents.MCTSPlayer import MCTS, MCTSPlayer, MCTSTrainer
+from agents.MCTSPlayer import MCTSPlayer, MCTSTrainer
 from isolation import Agent, logger
 from run_match_sync import play_sync
 from sample_players import GreedyPlayer, MinimaxPlayer, RandomPlayer
 
 
 
-def run_backpropagation(args):
-    if args.get('save', 1):
-        atexit.register(MCTS.save)  # Autosave on Ctrl-C
+def register_save_handlers(agents, args=None):
+    # Register save on exit handlers
+    if not args or args.get('save', 1):
+        for agent_idx, agent in enumerate(agents):
+            if callable(getattr(agent.agent_class, 'save', None)):
+                atexit.register(agent.agent_class.save)  # Autosave on Ctrl-C
 
+
+def save_and_unregister_handlers(agents, args=None):
+    # Save agents and unregister save handler
+    if not args or args.get('save', 1):
+        for agent_idx, agent in enumerate(agents):
+            if callable(getattr(agent.agent_class, 'save', None)):
+                agent.agent_class.save()
+                atexit.unregister(agent.agent_class.save)
+
+
+def log_results(agents, scores, match_id, winner):
+    if args.get('progress'):
+        print('+' if winner == agents[0] else '-', end='', flush=True)
+
+    frequency = args.get('frequency', 100)
+    if (  frequency != 0 and match_id % frequency == 0
+            or match_id != 0 and match_id == args.get('rounds')
+    ):
+        message = " match_id: {:4d} | last {} = {:3.0f}% | all = {:3.0f}% | {} vs {}" .format(
+            match_id, frequency,
+            100 * sum(scores[agents[0]][-frequency:]) / frequency,
+            100 * sum(scores[agents[0]]) / len(scores[agents[0]]),
+            agents[0].name,
+            agents[1].name,
+            )
+        print(message); logger.info(message)
+
+
+def run_backpropagation(args):
     agent1 = TEST_AGENTS.get(args['agent'].upper(),    Agent(MCTSTrainer, "MCTSTrainer"))
     agent2 = TEST_AGENTS.get(args['opponent'].upper(), Agent(MCTSTrainer, "MCTSTrainer"))
     if agent1.name == agent2.name:
@@ -22,10 +54,12 @@ def run_backpropagation(args):
         agent2 = Agent(agent2.agent_class, agent2.name+'2')
     agents = (agent1, agent2)
 
+    register_save_handlers(agents, args)
+
     scores = {
         agent: []
         for agent in agents
-        }
+    }
     start_time = time.perf_counter()
     match_id = 0
     while True:
@@ -45,25 +79,10 @@ def run_backpropagation(args):
             if callable(getattr(agent.agent_class, 'backpropagate', None)):
                 agent.agent_class.backpropagate(agent_idx, winner_idx, game_history)
 
-        if args.get('progress'):
-            print('+' if winner == agents[0] else '-', end='', flush=True)
+        log_results(agents, scores, match_id, winner)
 
-        frequency = args.get('frequency', 100)
-        if (  frequency != 0 and match_id % frequency == 0
-            or match_id != 0 and match_id == args.get('rounds')
-        ):
-            message = " match_id: {:4d} | last {} = {:3.0f}% | all = {:3.0f}% | {} vs {}" .format(
-                match_id, frequency,
-                100 * sum(scores[agents[0]][-frequency:]) / frequency,
-                100 * sum(scores[agents[0]]) / len(scores[agents[0]]),
-                agents[0].name,
-                agents[1].name,
-                )
-            print(message); logger.info(message)
+    save_and_unregister_handlers(agents, args)
 
-    if args.get('save', 1):
-        MCTS.save()
-        atexit.unregister(MCTS.save)
 
 
 TEST_AGENTS = {
@@ -74,7 +93,7 @@ TEST_AGENTS = {
     "AREA":      Agent(AlphaBetaAreaPlayer, "AlphaBeta Area Agent"),
     "MCA":       Agent(MCTSPlayer,          "MCTS Agent"),
     "MCT":       Agent(MCTSTrainer,         "MCTS Trainer"),
-    }
+}
 def argparser():
     parser = argparse.ArgumentParser()
     parser.add_argument('-r', '--rounds',     type=int, default=0)

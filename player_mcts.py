@@ -110,9 +110,9 @@ class MCTS(BasePlayer):
         return score
 
 
-    # noinspection PyTypeChecker
+    # noinspection PyTypeChecker, PyArgumentList
     @classmethod
-    def backpropagate( cls, winner_idx: int, game_history: List[Action] ):
+    def backpropagate( cls, agent_idx, winner_idx: int, game_history: List[Action] ):
         winner_idx = winner_idx % 2
         parent = cls.game()
         idx    = -1
@@ -121,15 +121,16 @@ class MCTS(BasePlayer):
             win   = int(idx == winner_idx)
             child = parent.result(action)
 
-            # Avoid using defaultdict, as it creates too many lookup entries with zero score
-            # noinspection PyArgumentList
-            child_record = cls.data[child] if child in cls.data else MCTSRecord()
-            record = MCTSRecord(
-                wins  = child_record.wins  + win,
-                count = child_record.count + 1,
-                score = cls.score(child, parent)
+            if agent_idx == idx:   # only learn from the agent's moves
+                # Avoid using defaultdict, as it creates too many lookup entries with zero score
+                child_record = cls.data[child] if child in cls.data else MCTSRecord()
+                record = MCTSRecord(
+                    wins  = child_record.wins  + win,
+                    count = child_record.count + 1,
+                    score = cls.score(child, parent)
                 )
-            cls.data[child] = record
+                cls.data[child] = record
+
             parent = child
 
 
@@ -140,7 +141,7 @@ class MCTSPlayer(MCTS):
     exploration = 0  # use math.sqrt(2) for training, and 0 for playing
 
     @classmethod
-    def backpropagate( cls, winner_idx: int, game_history: List[Action] ):
+    def backpropagate( cls, agent_idx, winner_idx: int, game_history: List[Action] ):
         return None
 
 
@@ -174,23 +175,24 @@ def train_mcts(args):
         scores[winner] += [ 1 ]
         scores[loser]  += [ 0 ]
 
-        MCTS.backpropagate(winner_idx, game_history)
+        for agent_idx, agent in enumerate(agent_order):
+            if callable(getattr(agent.agent_class, 'backpropagate', None)):
+                agent.agent_class.backpropagate(agent_idx, winner_idx, game_history)
 
         if args.get('progress'):
             print('+' if winner == agents[0] else '-', end='', flush=True)
 
         frequency = args.get('frequency', 100)
-        if (  match_id % frequency == 0
-           or match_id == args.get('rounds')
-        ) and match_id  != 0 \
-          and frequency != 0:
+        if (  frequency != 0 and match_id % frequency == 0
+           or match_id  != 0 and match_id == args.get('rounds')
+        ):
             message = " match_id: {:4d} | last {} = {:3.0f}% | all = {:3.0f}% | {} vs {}" .format(
                 match_id, frequency,
                 100 * sum(scores[agents[0]][-frequency:]) / frequency,
                 100 * sum(scores[agents[0]]) / len(scores[agents[0]]),
                 agents[0].name,
                 agents[1].name,
-                )
+            )
             print(message); logger.info(message)
 
     if args.get('save', 1):

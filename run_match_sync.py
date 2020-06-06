@@ -152,7 +152,7 @@ def play_sync( agents: Tuple[Agent,Agent],
                     if not active_player.queue.empty():
                         action = active_player.queue.get(block=False)  # raises Empty if agent did not respond
                         break                                          # accept answer generated after minimum timeout
-                if exception == TimeoutError:
+                if action is None and exception == TimeoutError:
                     print(active_player)
                     raise TimeoutError
         except Exception as err:

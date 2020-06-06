@@ -69,7 +69,7 @@ def run_backpropagation(args):
 
         match_id += 1
         agent_order = ( agents[(match_id)%2], agents[(match_id+1)%2] )  # reverse player order between matches
-        winner, game_history, match_id = play_sync(agent_order, match_id=match_id)
+        winner, game_history, match_id = play_sync(agent_order, match_id=match_id, **args)
 
         winner_idx = agent_order.index(winner)
         loser      = agent_order[int(not winner_idx)]

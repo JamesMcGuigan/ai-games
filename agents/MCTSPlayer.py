@@ -4,6 +4,7 @@ import pickle
 import random
 import time
 from collections import namedtuple
+from operator import itemgetter
 from typing import List
 
 from isolation.isolation import Action, Isolation
@@ -65,11 +66,17 @@ class MCTS(BasePlayer):
         actions  = state.actions()
         children = [ state.result(action) for action in actions ]
         scores   = [ self.score(child, state) for child in children ]
-        # action, score = max(sorted(zip(actions, scores), key=itemgetter(1)))
-        action = self.choose_with_probability(actions, scores)
+        action   = self.choose(actions, scores)
         self.queue.put(action)
         return action
 
+    def choose( self, actions: List[Action], scores: List[int] ) -> Action:
+        return self.choose_with_probability(actions, scores)
+
+    @staticmethod
+    def choose_maximum( actions: List[Action], scores: List[int] ) -> Action:
+        action, score = max(sorted(zip(actions, scores), key=itemgetter(1)))
+        return action
 
     @staticmethod
     def choose_with_probability( actions: List[Action], scores: List[int] ) -> Action:
@@ -129,11 +136,18 @@ class MCTS(BasePlayer):
 
 
 class MCTSTrainer(MCTS):
+    data = {}
+    file = './MCTSTrainer.pickle'
+    # exploration = 0  # use math.sqrt(2) for training, and 0 for playing
     exploration = math.sqrt(2)  # use math.sqrt(2) for training, and 0 for playing
 
-class MCTSPlayer(MCTS):
-    exploration = 0  # use math.sqrt(2) for training, and 0 for playing
 
-    @classmethod
-    def backpropagate( cls, agent_idx, winner_idx: int, game_history: List[Action] ):
-        return None
+class MCTSPlayer(MCTS):
+    data = {}
+    file = './MCTSPlayer.pickle'
+    # file = './MCTSTrainer.pickle'
+    exploration = 0  # use math.sqrt(2) for training, and 0 for playing
+    # exploration = math.sqrt(2)  # use math.sqrt(2) for training, and 0 for playing
+
+    def choose( self, actions: List[Action], scores: List[int] ) -> Action:
+        return self.choose_maximum(actions, scores)

@@ -36,7 +36,10 @@ class AlphaBetaPlayer(BasePlayer):
     heuristic_fn         = 'heuristic_liberties'  # 'heuristic_liberties' | 'heuristic_area'
     heuristic_area_depth = 4                      # 4 seems to be the best number against LibertiesPlayer
     heuristic_area_max   = len(Action) * 5        # 5 seems to be the best number against LibertiesPlayer
-
+    cache = {
+        "alphabeta_min_value": {},
+        "alphabeta_max_value": {}
+    }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -188,22 +191,36 @@ class AlphaBetaPlayer(BasePlayer):
         score, action = max(zip(scores,actions), key=itemgetter(0))
         return action
 
-    @classmethod
-    @lru_cache(None, typed=True)
-    def alphabeta_min_value(cls, state, player_id, depth, alpha=-math.inf, beta=math.inf):
+    def alphabeta_min_value(self, state, player_id, depth, alpha=-math.inf, beta=math.inf):
+        # Don't cache heuristic values, only terminal states
+        hash  = (player_id, state)
+        if hash in self.cache['alphabeta_min_value']:
+            return self.cache['alphabeta_min_value'][hash]
+        score = self._alphabeta_min_value(state, player_id, depth, alpha, beta)
+        if abs(score) == math.inf: self.cache['alphabeta_min_value'][hash] = score
+        return score
+
+    def alphabeta_max_value(self, state, player_id, depth, alpha=-math.inf, beta=math.inf):
+        # Don't cache heuristic values, only terminal states
+        hash  = (player_id, state)
+        if hash in self.cache['alphabeta_max_value']:
+            return self.cache['alphabeta_max_value'][hash]
+        score = self._alphabeta_max_value(state, player_id, depth, alpha, beta)
+        if abs(score) == math.inf: self.cache['alphabeta_max_value'][hash] = score
+        return score
+
+    def _alphabeta_min_value(self, state, player_id, depth, alpha=-math.inf, beta=math.inf):
         if state.terminal_test(): return state.utility(player_id)
-        if depth == 0:            return cls.heuristic(state, player_id)
+        if depth == 0:            return self.heuristic(state, player_id)
         score = math.inf
         for action in state.actions():
             result    = state.result(action)
-            score     = min(score, cls.alphabeta_max_value(result, player_id, depth-1, alpha, beta))
+            score     = min(score, self.alphabeta_max_value(result, player_id, depth-1, alpha, beta))
             if score <= alpha: return score
             beta      = min(beta,score)
         return score
 
-    @classmethod
-    @lru_cache(None, typed=True)
-    def alphabeta_max_value(cls, state, player_id, depth, alpha=-math.inf, beta=math.inf):
+    def _alphabeta_max_value(cls, state, player_id, depth, alpha=-math.inf, beta=math.inf):
         if state.terminal_test(): return state.utility(player_id)
         if depth == 0:            return cls.heuristic(state, player_id)
         score = -math.inf

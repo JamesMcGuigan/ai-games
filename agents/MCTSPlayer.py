@@ -138,16 +138,16 @@ class MCTS(BasePlayer):
 class MCTSTrainer(MCTS):
     data = {}
     file = './MCTSTrainer.pickle'
-    # exploration = 0  # use math.sqrt(2) for training, and 0 for playing
-    exploration = math.sqrt(2)  # use math.sqrt(2) for training, and 0 for playing
-
+    exploration = 0               # use math.sqrt(2) for training, and 0 for playing
+    # exploration = math.sqrt(2)  # use math.sqrt(2) for training, and 0 for playing
+    def choose( self, actions: List[Action], scores: List[int] ) -> Action:
+        return self.choose_with_probability(actions, scores)
 
 class MCTSPlayer(MCTS):
     data = {}
     file = './MCTSPlayer.pickle'
     # file = './MCTSTrainer.pickle'
-    exploration = 0  # use math.sqrt(2) for training, and 0 for playing
-    # exploration = math.sqrt(2)  # use math.sqrt(2) for training, and 0 for playing
+    exploration = math.sqrt(2)
 
     def choose( self, actions: List[Action], scores: List[int] ) -> Action:
         return self.choose_maximum(actions, scores)

@@ -6,6 +6,7 @@ import pickle
 import random
 import time
 from collections import defaultdict, namedtuple
+from functools import lru_cache
 from operator import itemgetter
 from typing import Dict, List, Tuple
 
@@ -170,6 +171,7 @@ def train_mcts(args):
     atexit.unregister(MCTSPlayer.save)
 
 
+Isolation.liberties = lru_cache(None, typed=True)(Isolation.liberties)  # 10x speedup for MinimaxPlayer
 TEST_AGENTS = {
     "RANDOM":    Agent(RandomPlayer,    "Random Agent"),
     "GREEDY":    Agent(GreedyPlayer,    "Greedy Agent"),

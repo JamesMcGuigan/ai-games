@@ -33,9 +33,9 @@ class AlphaBetaPlayer(BasePlayer):
     search_fn            = 'alphabeta'       # or 'minimax'
     search_max_depth     = 50
 
-    heuristic_fn         = 'heuristic_area'  # or 'heuristic_liberties'
-    heuristic_area_depth = 4                 # 4 seems to be the best number against LibertiesPlayer
-    heuristic_area_max   = len(Action) * 5   # 5 seems to be the best number against LibertiesPlayer
+    heuristic_fn         = 'heuristic_liberties'  # 'heuristic_liberties' | 'heuristic_area'
+    heuristic_area_depth = 4                      # 4 seems to be the best number against LibertiesPlayer
+    heuristic_area_max   = len(Action) * 5        # 5 seems to be the best number against LibertiesPlayer
 
 
     def __init__(self, *args, **kwargs):
@@ -77,11 +77,11 @@ class AlphaBetaPlayer(BasePlayer):
         self.queue.put( action )     # backup move incase of early timeout
 
         # The real trick with iterative deepening is caching, which allows us to out-depth the default minimax Agent
-        if self.verbose_depth: print('\n'+ self.__class__.__name__ +' | depth:', end=' ')
-        for depth in range(1,self.search_max_depth):
+        if self.verbose_depth: print('\n'+ self.__class__.__name__ +' | depth:', end=' ', flush=True)
+        for depth in range(1, self.search_max_depth):
             action = self.search(state, depth=depth)
             self.queue.put(action)
-            if self.verbose_depth: print(depth, end=' ')
+            if self.verbose_depth: print(depth, end=' ', flush=True)
         # if self.verbose_depth: print( depth, type(action), action, int((time.perf_counter() - time_start) * 1000), 'ms' )
 
 
@@ -195,10 +195,10 @@ class AlphaBetaPlayer(BasePlayer):
         if depth == 0:            return cls.heuristic(state, player_id)
         score = math.inf
         for action in state.actions():
-            result     = state.result(action)
-            score      = min(score, cls.alphabeta_max_value(result, player_id, depth-1, alpha, beta))
+            result    = state.result(action)
+            score     = min(score, cls.alphabeta_max_value(result, player_id, depth-1, alpha, beta))
             if score <= alpha: return score
-            beta       = min(beta,score)
+            beta      = min(beta,score)
         return score
 
     @classmethod
@@ -208,8 +208,13 @@ class AlphaBetaPlayer(BasePlayer):
         if depth == 0:            return cls.heuristic(state, player_id)
         score = -math.inf
         for action in state.actions():
-            result     = state.result(action)
-            score      = max(score, cls.alphabeta_min_value(result, player_id, depth-1, alpha, beta))
+            result    = state.result(action)
+            score     = max(score, cls.alphabeta_min_value(result, player_id, depth-1, alpha, beta))
             if score >= beta: return score
-            alpha      = max(alpha, score)
+            alpha     = max(alpha, score)
         return score
+
+
+
+class AlphaBetaAreaPlayer(AlphaBetaPlayer):
+    heuristic_fn = 'heuristic_area'  # or 'heuristic_liberties'

@@ -4,6 +4,7 @@ import signal
 import textwrap
 import time
 import traceback
+from copy import copy
 from queue import LifoQueue
 from typing import Callable, List, Tuple
 
@@ -14,6 +15,7 @@ from run_match import NUM_ROUNDS, TEST_AGENTS, TIME_LIMIT
 
 
 def argparser():
+    # noinspection PyTypeChecker
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description="Run matches to test the performance of your agent against sample opponents.",
@@ -97,6 +99,19 @@ def argparser():
     return args
 
 
+def call_with_timeout_ms( time_limit, function, *args, **kwargs ):
+    if time_limit:
+        def raise_timeout(signum, frame): raise TimeoutError
+        signal.signal(signal.SIGPROF, raise_timeout)           # Register function to raise a TimeoutError on signal
+        signal.setitimer(signal.ITIMER_PROF, time_limit/1000)  # Schedule the signal to be sent after time_limit in milliseconds
+
+    try:
+        output = function(*args, **kwargs)
+        return output
+    except TimeoutError as err:
+        return TimeoutError
+
+
 # Modified from Source: isolation/__init__.py:_play()
 def play_sync( agents: Tuple[Agent,Agent],
                game_state = None,   # defaults to Isolation()
@@ -104,7 +119,7 @@ def play_sync( agents: Tuple[Agent,Agent],
                match_id   = 0,
                debug      = False,  # disables the signal timeout
                verbose    = False,  # prints an ASCII copy of the board after each turn
-               callbacks: List[ Callable ] = [],  # WARNING: default argument is mutable
+               callbacks: List[ Callable ] = None,
                **kwargs ):
 
     agents        = tuple( Agent(agent, agent.__class__.name) if not isinstance(agent, Agent) else agent for agent in agents )
@@ -116,6 +131,7 @@ def play_sync( agents: Tuple[Agent,Agent],
     loser         = None
     status        = Status.NORMAL
     game_history  = []
+    callbacks     = copy(callbacks) or []
 
     logger.info(GAME_INFO.format(initial_state, *agents))
     while not game_state.terminal_test():
@@ -126,15 +142,19 @@ def play_sync( agents: Tuple[Agent,Agent],
         action = None
         active_player.queue = LifoQueue()  # we don't need a TimeoutQueue here
         try:
-            if time_limit and not debug:
-                def raise_timeout(signum, frame): raise TimeoutError
-                signal.signal(signal.SIGPROF, raise_timeout)           # Register function to raise a TimeoutError on signal
-                signal.setitimer(signal.ITIMER_PROF, time_limit/1000)  # Schedule the signal to be sent after time_limit in milliseconds
-
-            active_player.get_action(game_state)                   # This doesn't return an action, just adds it to player.queue
-            action = active_player.queue.get(block=False)          # raises Empty if agent did not respond
-        except TimeoutError as err:
-            action = active_player.queue.get(block=False)          # raises Empty if agent did not respond
+            if time_limit == 0 or debug:
+                active_player.get_action(game_state)
+                action = active_player.queue.get(block=False)  # raises Empty if agent did not respond
+            else:
+                # increment timeout 1x before throwing exception - MinimaxAgent occasionally takes longer than 150ms
+                for i in [1]:
+                    exception = call_with_timeout_ms(i * time_limit, active_player.get_action, game_state)
+                    if not active_player.queue.empty():
+                        action = active_player.queue.get(block=False)  # raises Empty if agent did not respond
+                        break                                          # accept answer generated after minimum timeout
+                if exception == TimeoutError:
+                    print(active_player)
+                    raise TimeoutError
         except Exception as err:
             status = Status.EXCEPTION
             logger.error(ERR_INFO.format( err, initial_state, agents[0], agents[1], game_state, game_history ))
@@ -146,6 +166,7 @@ def play_sync( agents: Tuple[Agent,Agent],
 
         if action not in game_state.actions():
             status = Status.INVALID_MOVE
+            print(ERR_INFO.format( 'INVALID_MOVE', initial_state, agents[0], agents[1], game_state, game_history ))
             logger.error(ERR_INFO.format( 'INVALID_MOVE', initial_state, agents[0], agents[1], game_state, game_history ))
             break
 
@@ -154,7 +175,7 @@ def play_sync( agents: Tuple[Agent,Agent],
 
         # Callbacks can be used to hook in additional functionality after each turn, such as verbose rendering
         callbacks = list(callbacks) if isinstance(callbacks, (tuple,list,set)) else [ callbacks ]
-        if verbose: callbacks = [ verbose_callback ] + callbacks  # default argument is mutable, avoid mutating
+        if verbose: callbacks = [ verbose_callback ] + callbacks
         for callback in callbacks:
             if not callable(callback): continue
             callback(

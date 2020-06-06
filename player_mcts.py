@@ -6,7 +6,6 @@ import pickle
 import random
 import time
 from collections import namedtuple
-from functools import lru_cache
 from typing import List
 
 from isolation import Agent, logger
@@ -168,7 +167,7 @@ def train_mcts(args):
 
         match_id += 1
         agent_order = ( agents[(match_id)%2], agents[(match_id+1)%2] )  # reverse player order between matches
-        winner, game_history, match_id = play_sync(agent_order, match_id=match_id, debug=True)
+        winner, game_history, match_id = play_sync(agent_order, match_id=match_id)
 
         winner_idx = agent_order.index(winner)
         loser      = agent_order[int(not winner_idx)]
@@ -199,9 +198,6 @@ def train_mcts(args):
         MCTS.save()
         atexit.unregister(MCTS.save)
 
-
-Isolation.liberties = lru_cache(None, typed=True)(Isolation.liberties)
-Isolation.result    = lru_cache(None, typed=True)(Isolation.result)
 
 TEST_AGENTS = {
     "RANDOM":    Agent(RandomPlayer,        "Random Agent"),

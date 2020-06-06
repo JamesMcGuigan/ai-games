@@ -82,9 +82,12 @@ class AlphaBetaPlayer(BasePlayer):
         # The real trick with iterative deepening is caching, which allows us to out-depth the default minimax Agent
         if self.verbose_depth: print('\n'+ self.__class__.__name__ +' | depth:', end=' ', flush=True)
         for depth in range(1, self.search_max_depth):
-            action = self.search(state, depth=depth)
+            action, score = self.search(state, depth=depth)
             self.queue.put(action)
             if self.verbose_depth: print(depth, end=' ', flush=True)
+            if abs(score) == math.inf:
+                if self.verbose_depth: print(score, end=' ', flush=True)
+                break  # terminate iterative deepening on inescapable victory condition
         # if self.verbose_depth: print( depth, type(action), action, int((time.perf_counter() - time_start) * 1000), 'ms' )
 
 
@@ -154,8 +157,13 @@ class AlphaBetaPlayer(BasePlayer):
     ### Search: Minmax
 
     def minimax( self, state, depth ):
-        return max(state.actions(),
-                   key=lambda action: self.minimax_min_value(state.result(action), self.player_id, depth - 1))
+        actions = state.actions()
+        scores  = [
+            self.minimax_min_value(state.result(action), player_id=self.player_id, depth=depth-1)
+            for action in actions
+        ]
+        action, score = max(zip(actions, scores), key=itemgetter(1))
+        return action, score
 
     @classmethod
     @lru_cache(None, typed=True)
@@ -188,8 +196,8 @@ class AlphaBetaPlayer(BasePlayer):
             self.alphabeta_min_value(state.result(action), player_id=self.player_id, depth=depth-1)
             for action in actions
         ]
-        score, action = max(zip(scores,actions), key=itemgetter(0))
-        return action
+        action, score = max(zip(actions, scores), key=itemgetter(1))
+        return action, score
 
     def alphabeta_min_value(self, state, player_id, depth, alpha=-math.inf, beta=math.inf):
         # Don't cache heuristic values, only terminal states

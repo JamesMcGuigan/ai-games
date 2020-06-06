@@ -5,12 +5,12 @@ from functools import lru_cache
 from itertools import chain
 from operator import itemgetter
 
+from agents.DataSavePlayer import DataSavePlayer
 from isolation.isolation import Action
-from sample_players import BasePlayer
 
 
 
-class AlphaBetaPlayer(BasePlayer):
+class AlphaBetaPlayer(DataSavePlayer):
     """ Implement your own agent to play knight's Isolation
 
     The get_action() method is the only required method for this project.
@@ -36,10 +36,6 @@ class AlphaBetaPlayer(BasePlayer):
     heuristic_fn         = 'heuristic_liberties'  # 'heuristic_liberties' | 'heuristic_area'
     heuristic_area_depth = 4                      # 4 seems to be the best number against LibertiesPlayer
     heuristic_area_max   = len(Action) * 5        # 5 seems to be the best number against LibertiesPlayer
-    cache = {
-        "alphabeta_min_value": {},
-        "alphabeta_max_value": {}
-    }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -80,7 +76,7 @@ class AlphaBetaPlayer(BasePlayer):
         self.queue.put( action )     # backup move incase of early timeout
 
         # The real trick with iterative deepening is caching, which allows us to out-depth the default minimax Agent
-        if self.verbose_depth: print('\n'+ self.__class__.__name__ +' | depth:', end=' ', flush=True)
+        if self.verbose_depth: print('\n'+ self.__class__.__name__.ljust(20) +' | depth:', end=' ', flush=True)
         for depth in range(1, self.search_max_depth):
             action, score = self.search(state, depth=depth)
             self.queue.put(action)
@@ -93,14 +89,12 @@ class AlphaBetaPlayer(BasePlayer):
 
     ### Heuristics
 
-    @classmethod
-    @lru_cache(None, typed=True)
-    def heuristic(cls, state, player_id):
-        if cls.heuristic_fn == 'heuristic_area':
-            return cls.heuristic_area(state, player_id)
-        if cls.heuristic_fn == 'heuristic_liberties':
-            return cls.heuristic_liberties(state, player_id)  # won 45%
-        raise NotImplementedError('cls.heuristic_fn must be in ["heuristic_area", "heuristic_liberties"] - got: ', cls.heuristic_fn)
+    def heuristic(self, state, player_id):
+        if self.heuristic_fn == 'heuristic_area':
+            return self.heuristic_area(state, player_id)
+        if self.heuristic_fn == 'heuristic_liberties':
+            return self.heuristic_liberties(state, player_id)  # won 45%
+        raise NotImplementedError('cls.heuristic_fn must be in ["heuristic_area", "heuristic_liberties"] - got: ', self.heuristic_fn)
 
     @classmethod
     @lru_cache(None, typed=True)
@@ -117,13 +111,16 @@ class AlphaBetaPlayer(BasePlayer):
         """add a @lru_cache around this function"""
         return state.liberties(cell)
 
+
     @classmethod
-    @lru_cache(None, typed=True)
-    def heuristic_area( cls, state, player_id):
-        own_loc = state.locs[player_id]
-        opp_loc = state.locs[1 - player_id]
-        own_area = cls.count_area_liberties(state, own_loc)
-        opp_area = cls.count_area_liberties(state, opp_loc)
+    def heuristic_area(cls, state, player_id):
+        return cls.cache(cls._heuristic_area, state, player_id)
+    @classmethod
+    def _heuristic_area(self, state, player_id):
+        own_loc  = state.locs[player_id]
+        opp_loc  = state.locs[1 - player_id]
+        own_area = self.count_area_liberties(state, own_loc)
+        opp_area = self.count_area_liberties(state, opp_loc)
         return own_area - opp_area
 
     @classmethod
@@ -154,6 +151,7 @@ class AlphaBetaPlayer(BasePlayer):
             return self.alphabeta(state, depth)
         raise NotImplementedError('cls.search_fn must be in ["minimax", "alphabeta"] - got: ', self.search_fn)
 
+
     ### Search: Minmax
 
     def minimax( self, state, depth ):
@@ -165,24 +163,24 @@ class AlphaBetaPlayer(BasePlayer):
         action, score = max(zip(actions, scores), key=itemgetter(1))
         return action, score
 
-    @classmethod
-    @lru_cache(None, typed=True)
-    def minimax_min_value( cls, state, player_id, depth ):
+    def minimax_min_value(self, state, player_id, depth):
+        return self.cache_infinite(self._minimax_min_value, state, player_id, depth)
+    def _minimax_min_value( self, state, player_id, depth ):
         if state.terminal_test(): return state.utility(player_id)
-        if depth == 0:            return cls.heuristic(state, player_id)
+        if depth == 0:            return self.heuristic(state, player_id)
         scores = [
-            cls.minimax_max_value(state.result(action), player_id, depth - 1)
+            self.minimax_max_value(state.result(action), player_id, depth - 1)
             for action in state.actions()
         ]
         return min(scores) if len(scores) else math.inf
 
-    @classmethod
-    @lru_cache(None, typed=True)
-    def minimax_max_value( cls, state, player_id, depth ):
+    def minimax_max_value(self, state, player_id, depth):
+        return self.cache_infinite(self._minimax_max_value, state, player_id, depth)
+    def _minimax_max_value( self, state, player_id, depth ):
         if state.terminal_test(): return state.utility(player_id)
-        if depth == 0:            return cls.heuristic(state, player_id)
+        if depth == 0:            return self.heuristic(state, player_id)
         scores = [
-            cls.minimax_min_value(state.result(action), player_id, depth - 1)
+            self.minimax_min_value(state.result(action), player_id, depth - 1)
             for action in state.actions()
         ]
         return max(scores) if len(scores) else -math.inf
@@ -200,23 +198,7 @@ class AlphaBetaPlayer(BasePlayer):
         return action, score
 
     def alphabeta_min_value(self, state, player_id, depth, alpha=-math.inf, beta=math.inf):
-        # Don't cache heuristic values, only terminal states
-        hash  = (player_id, state)
-        if hash in self.cache['alphabeta_min_value']:
-            return self.cache['alphabeta_min_value'][hash]
-        score = self._alphabeta_min_value(state, player_id, depth, alpha, beta)
-        if abs(score) == math.inf: self.cache['alphabeta_min_value'][hash] = score
-        return score
-
-    def alphabeta_max_value(self, state, player_id, depth, alpha=-math.inf, beta=math.inf):
-        # Don't cache heuristic values, only terminal states
-        hash  = (player_id, state)
-        if hash in self.cache['alphabeta_max_value']:
-            return self.cache['alphabeta_max_value'][hash]
-        score = self._alphabeta_max_value(state, player_id, depth, alpha, beta)
-        if abs(score) == math.inf: self.cache['alphabeta_max_value'][hash] = score
-        return score
-
+        return self.cache_infinite(self._alphabeta_min_value, state, player_id, depth, alpha, beta)
     def _alphabeta_min_value(self, state, player_id, depth, alpha=-math.inf, beta=math.inf):
         if state.terminal_test(): return state.utility(player_id)
         if depth == 0:            return self.heuristic(state, player_id)
@@ -228,13 +210,15 @@ class AlphaBetaPlayer(BasePlayer):
             beta      = min(beta,score)
         return score
 
-    def _alphabeta_max_value(cls, state, player_id, depth, alpha=-math.inf, beta=math.inf):
+    def alphabeta_max_value(self, state, player_id, depth, alpha=-math.inf, beta=math.inf):
+        return self.cache_infinite(self._alphabeta_max_value, state, player_id, depth, alpha, beta)
+    def _alphabeta_max_value(self, state, player_id, depth, alpha=-math.inf, beta=math.inf):
         if state.terminal_test(): return state.utility(player_id)
-        if depth == 0:            return cls.heuristic(state, player_id)
+        if depth == 0:            return self.heuristic(state, player_id)
         score = -math.inf
         for action in state.actions():
             result    = state.result(action)
-            score     = max(score, cls.alphabeta_min_value(result, player_id, depth-1, alpha, beta))
+            score     = max(score, self.alphabeta_min_value(result, player_id, depth-1, alpha, beta))
             if score >= beta: return score
             alpha     = max(alpha, score)
         return score

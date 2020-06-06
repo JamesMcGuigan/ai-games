@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import argparse
-import atexit
 import time
 
 from agents.AlphaBetaPlayer import AlphaBetaAreaPlayer, AlphaBetaPlayer
@@ -9,23 +8,6 @@ from isolation import Agent, logger
 from run_match_sync import play_sync
 from sample_players import GreedyPlayer, MinimaxPlayer, RandomPlayer
 
-
-
-def register_save_handlers(agents, args=None):
-    # Register save on exit handlers
-    if not args or args.get('save', 1):
-        for agent_idx, agent in enumerate(agents):
-            if callable(getattr(agent.agent_class, 'save', None)):
-                atexit.register(agent.agent_class.save)  # Autosave on Ctrl-C
-
-
-def save_and_unregister_handlers(agents, args=None):
-    # Save agents and unregister save handler
-    if not args or args.get('save', 1):
-        for agent_idx, agent in enumerate(agents):
-            if callable(getattr(agent.agent_class, 'save', None)):
-                agent.agent_class.save()
-                atexit.unregister(agent.agent_class.save)
 
 
 def log_results(agents, scores, match_id, winner):
@@ -55,8 +37,6 @@ def run_backpropagation(args):
         agent2 = Agent(agent2.agent_class, agent2.name+'2')
     agents = (agent1, agent2)
 
-    register_save_handlers(agents, args)
-
     scores = {
         agent: []
         for agent in agents
@@ -78,11 +58,9 @@ def run_backpropagation(args):
 
         for agent_idx, agent in enumerate(agent_order):
             if callable(getattr(agent.agent_class, 'backpropagate', None)):
-                agent.agent_class.backpropagate(agent_idx, winner_idx, game_history)
+                agent.agent_class.backpropagate(agent_idx=agent_idx, winner_idx=winner_idx, game_history=game_history)
 
         log_results(agents, scores, match_id, winner)
-
-    save_and_unregister_handlers(agents, args)
 
 
 

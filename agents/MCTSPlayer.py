@@ -1,66 +1,22 @@
 import math
-import os
-import pickle
 import random
-import time
 from collections import namedtuple
 from operator import itemgetter
 from typing import List
 
+from agents.DataSavePlayer import DataSavePlayer
 from isolation.isolation import Action, Isolation
-from sample_players import BasePlayer
 
 
 
 MCTSRecord = namedtuple("MCTSRecord", ("wins","count","score"), defaults=(0,0,0))
 
-class MCTS(BasePlayer):
+class MCTS(DataSavePlayer):
     exploration = math.sqrt(2)  # use math.sqrt(2) for training, and 0 for playing
-    game = Isolation
-    file = './data.pickle'
-    data = {}
+    game        = Isolation
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.load()
-
-    # def __del__(self):
-    #     self.save()
-
-    @classmethod
-    def load( cls ):
-        if cls.data: return  # skip loading if the file is already in class memory
-        try:
-            # class data may be more upto date than the pickle file, so avoid race conditions with multiple instances
-            start_time = time.perf_counter()
-            with open(cls.file, "rb") as file:
-                # print("loading: "+cls.file )
-                cls.data.update({ **pickle.load(file), **cls.data })
-                print("loaded: "+cls.file+" | {:.1f}MB in {:.1f}s".format(
-                    os.path.getsize(cls.file)/1024/1024,
-                    time.perf_counter() - start_time
-                ))
-        except (IOError, TypeError, EOFError) as exception:
-                pass
-
-    @classmethod
-    def save( cls ):
-        # cls.load()  # update any new information from the file
-        if cls.data:
-            # print("saving: " + cls.file )
-            with open(cls.file, "wb") as file:
-                start_time = time.perf_counter()
-                pickle.dump(cls.data, file)
-                print("wrote:  "+cls.file+" | {:.1f}MB in {:.1f}s".format(
-                    os.path.getsize(cls.file)/1024/1024,
-                    time.perf_counter() - start_time
-                ))
-
-    @classmethod
-    def reset( cls ):
-        cls.data = {}
-        cls.save()
-
 
     def get_action(self, state):
         actions  = state.actions()
@@ -136,17 +92,12 @@ class MCTS(BasePlayer):
 
 
 class MCTSTrainer(MCTS):
-    data = {}
-    file = './MCTSTrainer.pickle'
     exploration = 0               # use math.sqrt(2) for training, and 0 for playing
     # exploration = math.sqrt(2)  # use math.sqrt(2) for training, and 0 for playing
     def choose( self, actions: List[Action], scores: List[int] ) -> Action:
         return self.choose_with_probability(actions, scores)
 
 class MCTSPlayer(MCTS):
-    data = {}
-    file = './MCTSPlayer.pickle'
-    # file = './MCTSTrainer.pickle'
     exploration = math.sqrt(2)
 
     def choose( self, actions: List[Action], scores: List[int] ) -> Action:

@@ -17,7 +17,7 @@ class BasePlayer:
         self.data = None
 
     def get_action(self, state):
-        """ Implement a function that calls self.queue.put(ACTION) within the allowed time limit 
+        """ Implement a function that calls self.queue.put(ACTION) within the allowed time limit
 
         See RandomPlayer and GreedyPlayer for examples.
         """
@@ -92,7 +92,7 @@ class MinimaxPlayer(BasePlayer):
 
         This method must call self.queue.put(ACTION) at least once, and may
         call it as many times as you want; the caller is responsible for
-        cutting off the function after the search time limit has expired. 
+        cutting off the function after the search time limit has expired.
 
         **********************************************************************
         NOTE: since the caller is responsible for cutting off search, calling

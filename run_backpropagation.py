@@ -50,7 +50,7 @@ def run_backpropagation(args):
 
         frequency = args.get('frequency', 100)
         if (  frequency != 0 and match_id % frequency == 0
-                or match_id  != 0 and match_id == args.get('rounds')
+            or match_id != 0 and match_id == args.get('rounds')
         ):
             message = " match_id: {:4d} | last {} = {:3.0f}% | all = {:3.0f}% | {} vs {}" .format(
                 match_id, frequency,
@@ -82,7 +82,7 @@ def argparser():
     parser.add_argument('-t', '--time_limit', type=int, default=150)  # play_sync()  timeout per round
     parser.add_argument('-a', '--agent',      type=str, default='MCT')
     parser.add_argument('-o', '--opponent',   type=str, default='MCA')
-    parser.add_argument('-f', '--frequency',  type=int, default=1000)
+    parser.add_argument('-f', '--frequency',  type=int, default=100)
     parser.add_argument(      '--progress',   action='store_true')    # show progress bat
     parser.add_argument('-s', '--save',       type=int, default=1)
     return vars(parser.parse_args())

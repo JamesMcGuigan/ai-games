@@ -1,21 +1,15 @@
 import os
 from udacity_pa import udacity
+import glob
 
 nanodegree = 'nd898'
 projects = ['adversarial_search']
 filenames_all = [
-    'agents/DataSavePlayer.py',
-    'agents/MCTSPlayer.py',
-    'agents/AlphaBetaPlayer.py',
-    'data/MCTSPlayer.zip.pickle',
-    'data/MCTSTrainer.zip.pickle',
-    'data/AlphaBetaPlayer.zip.pickle',
-    'data/AlphaBetaAreaPlayer.zip.pickle',
     'run_backpropagation.py',
     'run_match_sync.py',
     'my_custom_player.py',
     'report.pdf',
-]
+] + glob.glob('agents/*.py') + glob.glob('data/*.pickle')
 
 def submit(args):
     filenames = []

@@ -11,7 +11,7 @@ from isolation.isolation import Action, Isolation
 
 MCTSRecord = namedtuple("MCTSRecord", ("wins","count","score"), defaults=(0,0,0))
 
-class MCTS(DataSavePlayer):
+class MCTSMaximum(DataSavePlayer):
     exploration = math.sqrt(2)  # use math.sqrt(2) for training, and 0 for playing
     game        = Isolation
 
@@ -20,22 +20,23 @@ class MCTS(DataSavePlayer):
 
     def get_action(self, state):
         actions  = state.actions()
+        self.queue.put(random.choice(actions))  # Avoid occasional TimeoutError
         children = [ state.result(action) for action in actions ]
         scores   = [ self.score(child, state) for child in children ]
         action   = self.choose(actions, scores)
         self.queue.put(action)
         return action
 
-    def choose( self, actions: List[Action], scores: List[int] ) -> Action:
-        return self.choose_with_probability(actions, scores)
+    def choose( self, actions: List[Action], scores: List[float] ) -> Action:
+        return self.choose_maximum(actions, scores)
 
     @staticmethod
-    def choose_maximum( actions: List[Action], scores: List[int] ) -> Action:
-        action, score = max(sorted(zip(actions, scores), key=itemgetter(1)))
+    def choose_maximum( actions: List[Action], scores: List[float] ) -> Action:
+        action, score = max(zip(actions, scores), key=itemgetter(1))
         return action
 
     @staticmethod
-    def choose_with_probability( actions: List[Action], scores: List[int] ) -> Action:
+    def choose_with_probability( actions: List[Action], scores: List[float] ) -> Action:
         # Efficient method to compute a weighted probability lookup without division
         # Source: https://www.kaggle.com/jamesmcguigan/ant-colony-optimization-algorithm
         total  = sum(scores)
@@ -64,7 +65,7 @@ class MCTS(DataSavePlayer):
         n = max(1, child_record.count)   # avoid divide by zero
         N = max(2, parent_record.count)  # encourage exploration of unexplored states | log(1) = 0
         score = w/n + cls.exploration * math.sqrt(math.log(N)/n)
-        return score
+        return max(0.01, score)          # score=0 means a node will never be selected with randomness
 
 
     # noinspection PyTypeChecker, PyArgumentList
@@ -78,7 +79,7 @@ class MCTS(DataSavePlayer):
             win   = int(idx == winner_idx)
             child = parent.result(action)
 
-            if agent_idx == idx:   # only learn from the agent's moves
+            if True or agent_idx == idx:   # only learn from the agent's moves | don't it slows down learning
                 # Avoid using defaultdict, as it creates too many lookup entries with zero score
                 child_record = cls.data[child] if child in cls.data else MCTSRecord()
                 record = MCTSRecord(
@@ -90,15 +91,9 @@ class MCTS(DataSavePlayer):
 
             parent = child
 
+# Randomness replaces exploration parameter - inspired by the Ant Colony Optimization Algorithm
+class MCTSRandom(MCTSMaximum):
+    exploration = 0  # randomness replaces exploration parameter
 
-class MCTSTrainer(MCTS):
-    exploration = 0               # use math.sqrt(2) for training, and 0 for playing
-    # exploration = math.sqrt(2)  # use math.sqrt(2) for training, and 0 for playing
-    def choose( self, actions: List[Action], scores: List[int] ) -> Action:
-        return self.choose_with_probability(actions, scores)
-
-class MCTSPlayer(MCTS):
-    exploration = math.sqrt(2)
-
-    def choose( self, actions: List[Action], scores: List[int] ) -> Action:
-        return self.choose_maximum(actions, scores)
+    def choose( self, actions: List[Action], scores: List[float] ) -> Action:
+        return self.choose_with_probability(actions, scores)  # 75% winrate vs choose_maximum()

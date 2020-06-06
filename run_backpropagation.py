@@ -3,7 +3,7 @@ import argparse
 import time
 
 from agents.AlphaBetaPlayer import AlphaBetaAreaPlayer, AlphaBetaPlayer
-from agents.MCTSPlayer import MCTSPlayer, MCTSTrainer
+from agents.MCTSMaximum import MCTSMaximum, MCTSRandom
 from isolation import Agent, logger
 from run_match_sync import play_sync
 from sample_players import GreedyPlayer, MinimaxPlayer, RandomPlayer
@@ -30,12 +30,19 @@ def log_results(agents, scores, match_id, winner):
 
 
 def run_backpropagation(args):
-    agent1 = TEST_AGENTS.get(args['agent'].upper(),    Agent(MCTSTrainer, "MCTSTrainer"))
-    agent2 = TEST_AGENTS.get(args['opponent'].upper(), Agent(MCTSTrainer, "MCTSTrainer"))
+    agent1 = TEST_AGENTS.get(args['agent'].upper())
+    agent2 = TEST_AGENTS.get(args['opponent'].upper())
     if agent1.name == agent2.name:
         agent1 = Agent(agent1.agent_class, agent1.name+'1')
         agent2 = Agent(agent2.agent_class, agent2.name+'2')
     agents = (agent1, agent2)
+
+    # Reset caches
+    if args.get('reset'):
+        for agent_idx, agent in enumerate(agents):
+            if callable(getattr(agent.agent_class, 'reset', None)):
+                agent.agent_class.reset()
+
 
     scores = {
         agent: []
@@ -65,24 +72,24 @@ def run_backpropagation(args):
 
 
 TEST_AGENTS = {
-    "RANDOM":    Agent(RandomPlayer,        "Random Agent"),
-    "GREEDY":    Agent(GreedyPlayer,        "Greedy Agent"),
-    "MINIMAX":   Agent(MinimaxPlayer,       "Minimax Agent"),
-    "ALPHABETA": Agent(AlphaBetaPlayer,     "AlphaBeta Agent"),
-    "AREA":      Agent(AlphaBetaAreaPlayer, "AlphaBeta Area Agent"),
-    "MCA":       Agent(MCTSPlayer,          "MCTS Agent"),
-    "MCT":       Agent(MCTSTrainer,         "MCTS Trainer"),
+    "RANDOM":    Agent(RandomPlayer,        "Random"),
+    "GREEDY":    Agent(GreedyPlayer,        "Greedy"),
+    "MINIMAX":   Agent(MinimaxPlayer,       "Minimax"),
+    "ALPHABETA": Agent(AlphaBetaPlayer,     "AlphaBeta"),
+    "AREA":      Agent(AlphaBetaAreaPlayer, "AlphaBeta Area"),
+    "MCM":       Agent(MCTSMaximum,         "MCTS Maximum"),
+    "MCR":       Agent(MCTSRandom,          "MCTS Random"),
 }
 def argparser():
     parser = argparse.ArgumentParser()
     parser.add_argument('-r', '--rounds',     type=int, default=0)
     parser.add_argument(      '--timeout',    type=int, default=0)    # train_mcts() timeout global for
     parser.add_argument('-t', '--time_limit', type=int, default=150)  # play_sync()  timeout per round
-    parser.add_argument('-a', '--agent',      type=str, default='MCT')
-    parser.add_argument('-o', '--opponent',   type=str, default='MCA')
+    parser.add_argument('-a', '--agent',      type=str, default='MCP')
+    parser.add_argument('-o', '--opponent',   type=str, default='MCR')
     parser.add_argument('-f', '--frequency',  type=int, default=100)
     parser.add_argument(      '--progress',   action='store_true')    # show progress bat
-    parser.add_argument('-s', '--save',       type=int, default=1)
+    parser.add_argument(      '--reset',      action='store_true')
     return vars(parser.parse_args())
 
 if __name__ == '__main__':

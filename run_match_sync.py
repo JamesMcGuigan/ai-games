@@ -146,8 +146,8 @@ def play_sync( agents: Tuple[Agent,Agent],
                 active_player.get_action(game_state)
                 action = active_player.queue.get(block=False)  # raises Empty if agent did not respond
             else:
-                # increment timeout 1x before throwing exception - MinimaxAgent occasionally takes longer than 150ms
-                for i in [1]:
+                # increment timeout 2x before throwing exception - MinimaxAgent occasionally takes longer than 150ms
+                for i in [1,2]:
                     exception = call_with_timeout_ms(i * time_limit, active_player.get_action, game_state)
                     if not active_player.queue.empty():
                         action = active_player.queue.get(block=False)  # raises Empty if agent did not respond

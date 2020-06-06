@@ -3,7 +3,15 @@ from udacity_pa import udacity
 
 nanodegree = 'nd898'
 projects = ['adversarial_search']
-filenames_all = ['run_match_sync.py', 'player_mcts.py', 'player_alphabeta.py', 'my_custom_player.py', 'report.pdf', 'data.pickle']
+filenames_all = [
+    'agents/MCTSPlayer.py',
+    'agents/AlphaBetaPlayer.py',
+    'my_custom_player.py',
+    'run_backpropagation.py',
+    'run_match_sync.py',
+    'report.pdf',
+    'data.pickle'
+]
 
 def submit(args):
     filenames = []

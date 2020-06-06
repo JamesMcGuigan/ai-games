@@ -1,4 +1,4 @@
-from player_alphabeta import AlphaBetaPlayer
+from agents.AlphaBetaPlayer import AlphaBetaPlayer
 
 
 # CustomPlayer is the agent exported to the submission

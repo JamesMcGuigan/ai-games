@@ -22,7 +22,7 @@ MCTSRecord = namedtuple("MCTSRecord", ("wins","count","score"), defaults=(0,0,0)
 class MCTS(BasePlayer):
     exploration = math.sqrt(2)  # use math.sqrt(2) for training, and 0 for playing
     game = Isolation
-    file = 'data.pickle'
+    file = './data.pickle'
     data = {}
 
     def __init__(self, *args, **kwargs):
@@ -37,21 +37,29 @@ class MCTS(BasePlayer):
         if cls.data: return  # skip loading if the file is already in class memory
         try:
             # class data may be more upto date than the pickle file, so avoid race conditions with multiple instances
+            start_time = time.perf_counter()
             with open(cls.file, "rb") as file:
+                # print("loading: "+cls.file )
                 cls.data.update({ **pickle.load(file), **cls.data })
-                print("loaded: './data.pickle' ({:.2f}) MB".format(os.path.getsize(cls.file)/1024/1024) )
+                print("loaded: "+cls.file+" | {:.1f}MB in {:.1f}s".format(
+                    os.path.getsize(cls.file)/1024/1024,
+                    time.perf_counter() - start_time
+                ))
+        except (IOError, TypeError, EOFError) as exception:
                 pass
-        except (IOError, TypeError) as exception: pass
 
     @classmethod
     def save( cls ):
         # cls.load()  # update any new information from the file
-        print("saving: " + cls.file )
-        with open(cls.file, "wb") as file:
-            pickle.dump(cls.data, file)
-        # for key, value in cls.data.items():
-        #     print(key, ':', value)
-        print("wrote:  "+cls.file+" ({:.2f}) MB)".format(os.path.getsize(cls.file)/1024/1024) )
+        if cls.data:
+            # print("saving: " + cls.file )
+            with open(cls.file, "wb") as file:
+                start_time = time.perf_counter()
+                pickle.dump(cls.data, file)
+                print("wrote:  "+cls.file+" | {:.1f}MB in {:.1f}s".format(
+                    os.path.getsize(cls.file)/1024/1024,
+                    time.perf_counter() - start_time
+                ))
 
     @classmethod
     def reset( cls ):

@@ -5,14 +5,13 @@ import os
 import pickle
 import random
 import time
-from collections import defaultdict, namedtuple
+from collections import namedtuple
 from functools import lru_cache
-from operator import itemgetter
-from typing import Dict, List, Tuple
+from typing import List
 
 from isolation import Agent, logger
 from isolation.isolation import Action, Isolation
-from player_alphabeta import AlphaBetaPlayer
+from player_alphabeta import AlphaBetaAreaPlayer, AlphaBetaPlayer
 from run_match_sync import play_sync
 from sample_players import BasePlayer, GreedyPlayer, MinimaxPlayer, RandomPlayer
 
@@ -20,8 +19,8 @@ from sample_players import BasePlayer, GreedyPlayer, MinimaxPlayer, RandomPlayer
 
 MCTSRecord = namedtuple("MCTSRecord", ("wins","count","score"), defaults=(0,0,0))
 
-class MCTSPlayer(BasePlayer):
-    exploration = 0   # use math.sqrt(2) for training, and 0 for playing
+class MCTS(BasePlayer):
+    exploration = math.sqrt(2)  # use math.sqrt(2) for training, and 0 for playing
     game = Isolation
     file = 'data.pickle'
     data = {}
@@ -56,7 +55,7 @@ class MCTSPlayer(BasePlayer):
 
     @classmethod
     def reset( cls ):
-        cls.data = defaultdict(MCTSRecord())
+        cls.data = {}
         cls.save()
 
 
@@ -74,14 +73,16 @@ class MCTSPlayer(BasePlayer):
     def choose_with_probability( actions: List[Action], scores: List[int] ) -> Action:
         # Efficient method to compute a weighted probability lookup without division
         # Source: https://www.kaggle.com/jamesmcguigan/ant-colony-optimization-algorithm
-        total = sum(scores)
-        rand  = random.random() * total
+        total  = sum(scores)
+        rand   = random.random() * total
+        action = None
         for (weight, action) in zip(scores, actions):
             if rand > weight: rand -= weight
             else:             break
         return action
 
 
+    # noinspection PyArgumentList,PyTypeChecker
     @classmethod
     def score( cls, child, parent ):
         # DOCS: https://en.wikipedia.org/wiki/Monte_Carlo_tree_search#Exploration_and_exploitation
@@ -101,6 +102,7 @@ class MCTSPlayer(BasePlayer):
         return score
 
 
+    # noinspection PyTypeChecker
     @classmethod
     def backpropagate( cls, winner_idx: int, game_history: List[Action] ):
         winner_idx = winner_idx % 2
@@ -112,32 +114,43 @@ class MCTSPlayer(BasePlayer):
             child = parent.result(action)
 
             # Avoid using defaultdict, as it creates too many lookup entries with zero score
+            # noinspection PyArgumentList
             child_record = cls.data[child] if child in cls.data else MCTSRecord()
             record = MCTSRecord(
                 wins  = child_record.wins  + win,
                 count = child_record.count + 1,
                 score = cls.score(child, parent)
-            )
+                )
             cls.data[child] = record
             parent = child
 
 
-class MCTSTrainer(MCTSPlayer):
+class MCTSTrainer(MCTS):
     exploration = math.sqrt(2)  # use math.sqrt(2) for training, and 0 for playing
 
+class MCTSPlayer(MCTS):
+    exploration = 0  # use math.sqrt(2) for training, and 0 for playing
+
+    @classmethod
+    def backpropagate( cls, winner_idx: int, game_history: List[Action] ):
+        return None
 
 
 def train_mcts(args):
-    atexit.register(MCTSPlayer.save)
+    if args.get('save', 1):
+        atexit.register(MCTS.save)  # Autosave on Ctrl-C
 
-    agent1 = Agent(MCTSTrainer, "MCTSTrainer")
-    agent2 = TEST_AGENTS.get(args['opponent'].upper(), Agent(MCTSPlayer, "MCTSPlayer"))
+    agent1 = TEST_AGENTS.get(args['agent'].upper(),    Agent(MCTSTrainer, "MCTSTrainer"))
+    agent2 = TEST_AGENTS.get(args['opponent'].upper(), Agent(MCTSTrainer, "MCTSTrainer"))
+    if agent1.name == agent2.name:
+        agent1 = Agent(agent1.agent_class, agent1.name+'1')
+        agent2 = Agent(agent2.agent_class, agent2.name+'2')
     agents = (agent1, agent2)
 
     scores = {
         agent: []
         for agent in agents
-    }
+        }
     start_time = time.perf_counter()
     match_id = 0
     while True:
@@ -153,39 +166,52 @@ def train_mcts(args):
         scores[winner] += [ 1 ]
         scores[loser]  += [ 0 ]
 
-        MCTSPlayer.backpropagate(winner_idx, game_history)
+        MCTS.backpropagate(winner_idx, game_history)
 
-        print('+' if winner == agents[0] else '-', end='', flush=True)
-        line = 100 # args['verbose']
-        if match_id and match_id % line == 0:
+        if args.get('progress'):
+            print('+' if winner == agents[0] else '-', end='', flush=True)
+
+        frequency = args.get('frequency', 100)
+        if (  match_id % frequency == 0
+           or match_id == args.get('rounds')
+        ) and match_id  != 0 \
+          and frequency != 0:
             message = " match_id: {:4d} | last {} = {:3.0f}% | all = {:3.0f}% | {} vs {}" .format(
-                match_id, line,
-                100 * sum(scores[agents[0]][-line:]) / line,
+                match_id, frequency,
+                100 * sum(scores[agents[0]][-frequency:]) / frequency,
                 100 * sum(scores[agents[0]]) / len(scores[agents[0]]),
-                agents[0].agent_class.__name__,
-                agents[1].agent_class.__name__,
-            )
+                agents[0].name,
+                agents[1].name,
+                )
             print(message); logger.info(message)
 
-    MCTSPlayer.save()
-    atexit.unregister(MCTSPlayer.save)
+    if args.get('save', 1):
+        MCTS.save()
+        atexit.unregister(MCTS.save)
 
 
-Isolation.liberties = lru_cache(None, typed=True)(Isolation.liberties)  # 10x speedup for MinimaxPlayer
+Isolation.liberties = lru_cache(None, typed=True)(Isolation.liberties)
+Isolation.result    = lru_cache(None, typed=True)(Isolation.result)
+
 TEST_AGENTS = {
-    "RANDOM":    Agent(RandomPlayer,    "Random Agent"),
-    "GREEDY":    Agent(GreedyPlayer,    "Greedy Agent"),
-    "MINIMAX":   Agent(MinimaxPlayer,   "Minimax Agent"),
-    "ALPHABETA": Agent(AlphaBetaPlayer, "AlphaBeta Agent"),
-    "MCTS":      Agent(MCTSPlayer,      "MCTS Agent"),
-    "MCTST":     Agent(MCTSTrainer,     "MCTS Trainer"),
+    "RANDOM":    Agent(RandomPlayer,        "Random Agent"),
+    "GREEDY":    Agent(GreedyPlayer,        "Greedy Agent"),
+    "MINIMAX":   Agent(MinimaxPlayer,       "Minimax Agent"),
+    "ALPHABETA": Agent(AlphaBetaPlayer,     "AlphaBeta Agent"),
+    "AREA":      Agent(AlphaBetaAreaPlayer, "AlphaBeta Area Agent"),
+    "MCA":       Agent(MCTSPlayer,          "MCTS Agent"),
+    "MCT":       Agent(MCTSTrainer,         "MCTS Trainer"),
 }
 def argparser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-r', '--rounds',   type=int, default=0)
-    parser.add_argument('-t', '--timeout',  type=int, default=0)
-    parser.add_argument('-a', '--agent',    type=str, default='MCTST')
-    parser.add_argument('-o', '--opponent', type=str, default='MCTST')
+    parser.add_argument('-r', '--rounds',     type=int, default=0)
+    parser.add_argument(      '--timeout',    type=int, default=0)    # train_mcts() timeout global for
+    parser.add_argument('-t', '--time_limit', type=int, default=150)  # play_sync()  timeout per round
+    parser.add_argument('-a', '--agent',      type=str, default='MCT')
+    parser.add_argument('-o', '--opponent',   type=str, default='MCA')
+    parser.add_argument('-f', '--frequency',  type=int, default=1000)
+    parser.add_argument(      '--progress',   action='store_true')    # show progress bat
+    parser.add_argument('-s', '--save',       type=int, default=1)
     return vars(parser.parse_args())
 
 if __name__ == '__main__':

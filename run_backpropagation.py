@@ -36,13 +36,14 @@ def log_results(agents, scores, match_id, winner):
     if (  frequency != 0 and match_id % frequency == 0
             or match_id != 0 and match_id == args.get('rounds')
     ):
-        message = " match_id: {:4d} | last {} = {:3.0f}% | all = {:3.0f}% | {} vs {}" .format(
-            match_id, frequency,
-            100 * sum(scores[agents[0]][-frequency:]) / frequency,
-            100 * sum(scores[agents[0]]) / len(scores[agents[0]]),
+        total_average   = 100 * sum(scores[agents[0]]) / len(scores[agents[0]])
+        running_average = 100 * sum( 2*i*score for i,score in enumerate(scores[agents[0]]) ) / len(scores[agents[0]])**2
+        message = " match_id: {:4d} | {:3.0f}% -> {:3.0f}% | {} vs {}" .format(
+            match_id,
+            total_average, running_average,
             agents[0].name,
             agents[1].name,
-            )
+        )
         print(message); logger.info(message)
 
 

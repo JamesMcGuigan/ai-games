@@ -16,7 +16,7 @@ MCTSRecord = namedtuple("MCTSRecord", ("wins","count","score"), defaults=(0,0,0)
 class MCTS(BasePlayer):
     exploration = math.sqrt(2)  # use math.sqrt(2) for training, and 0 for playing
     game = Isolation
-    file = '../data.pickle'
+    file = './data.pickle'
     data = {}
 
     def __init__(self, *args, **kwargs):

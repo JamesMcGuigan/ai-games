@@ -1,3 +1,4 @@
 adversarial_search-*.zip
 adversarial_search-*.json
 *.log
+*.zip.pickle

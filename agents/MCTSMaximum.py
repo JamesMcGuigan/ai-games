@@ -70,7 +70,7 @@ class MCTSMaximum(DataSavePlayer):
 
     # noinspection PyTypeChecker, PyArgumentList
     @classmethod
-    def backpropagate( cls, agent_idx, winner_idx: int, game_history: List[Action] ):
+    def backpropagate( cls, winner_idx: int, game_history: List[Action] ):
         winner_idx = winner_idx % 2
         parent = cls.game()
         idx    = -1
@@ -79,15 +79,14 @@ class MCTSMaximum(DataSavePlayer):
             win   = int(idx == winner_idx)
             child = parent.result(action)
 
-            if True or agent_idx == idx:   # only learn from the agent's moves | don't it slows down learning
-                # Avoid using defaultdict, as it creates too many lookup entries with zero score
-                child_record = cls.data[child] if child in cls.data else MCTSRecord()
-                record = MCTSRecord(
-                    wins  = child_record.wins  + win,
-                    count = child_record.count + 1,
-                    score = cls.score(child, parent)
-                )
-                cls.data[child] = record
+            # Avoid using defaultdict, as it creates too many lookup entries with zero score
+            child_record = cls.data[child] if child in cls.data else MCTSRecord()
+            record = MCTSRecord(
+                wins  = child_record.wins  + win,
+                count = child_record.count + 1,
+                score = cls.score(child, parent)
+            )
+            cls.data[child] = record
 
             parent = child
 

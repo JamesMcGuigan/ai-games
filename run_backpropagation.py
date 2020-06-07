@@ -5,6 +5,7 @@ import time
 from agents.AlphaBetaPlayer import AlphaBetaAreaPlayer, AlphaBetaPlayer
 from agents.DistancePlayer import DistancePlayer, GreedyDistancePlayer
 from agents.MCTSMaximum import MCTSMaximum, MCTSRandom
+from agents.UCTPlayer import UCTPlayer
 from isolation import Agent, logger
 from run_match_sync import play_sync
 from sample_players import GreedyPlayer, MinimaxPlayer, RandomPlayer
@@ -15,9 +16,9 @@ def log_results(agents, scores, match_id, winner):
     if args.get('progress'):
         print('+' if winner == agents[0] else '-', end='', flush=True)
 
-    frequency = args.get('frequency', 100)
-    if (  frequency != 0 and match_id % frequency == 0
-            or match_id != 0 and match_id == args.get('rounds')
+    frequency = args.get('frequency', 0)
+    if ( frequency != 0 and match_id % frequency == 0
+       or match_id != 0 and match_id == args.get('rounds')
     ):
         total_average   = 100 * sum(scores[agents[0]]) / len(scores[agents[0]])
         running_average = 100 * sum( 2*i*score for i,score in enumerate(scores[agents[0]]) ) / len(scores[agents[0]])**2
@@ -31,6 +32,8 @@ def log_results(agents, scores, match_id, winner):
 
 
 def run_backpropagation(args):
+    assert args['agent'].upper()    in TEST_AGENTS, '{} not in {}'.format(args['agent'],    TEST_AGENTS.keys())
+    assert args['opponent'].upper() in TEST_AGENTS, '{} not in {}'.format(args['opponent'], TEST_AGENTS.keys())
     agent1 = TEST_AGENTS.get(args['agent'].upper())
     agent2 = TEST_AGENTS.get(args['opponent'].upper())
     if agent1.name == agent2.name:
@@ -66,7 +69,7 @@ def run_backpropagation(args):
 
         for agent_idx, agent in enumerate(agent_order):
             if callable(getattr(agent.agent_class, 'backpropagate', None)):
-                agent.agent_class.backpropagate(agent_idx=agent_idx, winner_idx=winner_idx, game_history=game_history)
+                agent.agent_class.backpropagate(winner_idx=winner_idx, game_history=game_history)
 
         log_results(agents, scores, match_id, winner)
 
@@ -82,14 +85,15 @@ TEST_AGENTS = {
     "AREA":      Agent(AlphaBetaAreaPlayer,  "AlphaBeta Area"),
     "MCM":       Agent(MCTSMaximum,          "MCTS Maximum"),
     "MCR":       Agent(MCTSRandom,           "MCTS Random"),
+    "UCT":       Agent(UCTPlayer,            "UCT"),
 }
 def argparser():
     parser = argparse.ArgumentParser()
     parser.add_argument('-r', '--rounds',     type=int, default=0)
     parser.add_argument(      '--timeout',    type=int, default=0)    # train_mcts() timeout global for
     parser.add_argument('-t', '--time_limit', type=int, default=150)  # play_sync()  timeout per round
-    parser.add_argument('-a', '--agent',      type=str, default='MCP')
-    parser.add_argument('-o', '--opponent',   type=str, default='MCR')
+    parser.add_argument('-a', '--agent',      type=str, default='MCR')
+    parser.add_argument('-o', '--opponent',   type=str, default='MCM')
     parser.add_argument('-f', '--frequency',  type=int, default=100)
     parser.add_argument(      '--progress',   action='store_true')    # show progress bat
     parser.add_argument(      '--reset',      action='store_true')

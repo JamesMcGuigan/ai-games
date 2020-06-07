@@ -4,6 +4,7 @@ import math
 import os
 import pickle
 import time
+import zlib
 
 from sample_players import BasePlayer
 
@@ -13,6 +14,7 @@ class DataSavePlayer(BasePlayer):
     data = {}
 
     def __new__(cls, *args, **kwargs):
+        # noinspection PyUnresolvedReferences
         for parentclass in cls.__mro__:  # https://stackoverflow.com/questions/2611892/how-to-get-the-parents-of-a-python-class
             if cls is parentclass: continue
             if cls.data is getattr(parentclass,'data',None):
@@ -55,7 +57,7 @@ class DataSavePlayer(BasePlayer):
                     time.perf_counter() - start_time,
                     cls.size(cls.data),
                 ))
-        except (IOError, TypeError, EOFError) as exception:
+        except (IOError, TypeError, EOFError, zlib.error) as exception:
             pass
 
     @classmethod
@@ -95,7 +97,7 @@ class DataSavePlayer(BasePlayer):
         if hash in cls.data[function.__name__]: return cls.data[function.__name__][hash]
 
         score = function(state, player_id, *args, **kwargs)
-        if abs(score) == math.inf: cls.data[function.__name__][hash] = score
+        cls.data[function.__name__][hash] = score
         return score
 
     @classmethod
@@ -106,6 +108,5 @@ class DataSavePlayer(BasePlayer):
         if hash in cls.data[function.__name__]: return cls.data[function.__name__][hash]
 
         score = function(state, player_id, *args, **kwargs)
-        if abs(score) == math.inf:
-            cls.data[function.__name__][hash] = score
+        if abs(score) == math.inf: cls.data[function.__name__][hash] = score
         return score

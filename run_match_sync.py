@@ -1,4 +1,5 @@
 import argparse
+import gc
 import logging
 import signal
 import textwrap
@@ -100,13 +101,15 @@ def argparser():
 
 
 def call_with_timeout_ms( time_limit, function, *args, **kwargs ):
+    gc.collect(); time.sleep(0.001)  # Helps reduce TimeoutErrors from process scheduling
     if time_limit:
-        def raise_timeout(signum, frame): raise TimeoutError
-        signal.signal(signal.SIGPROF, raise_timeout)           # Register function to raise a TimeoutError on signal
-        signal.setitimer(signal.ITIMER_PROF, time_limit/1000)  # Schedule the signal to be sent after time_limit in milliseconds
+        def raise_timeout(signum, frame): raise TimeoutError    # DOC: https://docs.python.org/3.6/library/signal.html
+        signal.signal(signal.SIGPROF, raise_timeout)            # Register function to raise a TimeoutError on signal
+        signal.setitimer(signal.ITIMER_PROF, time_limit/1000)   # Schedule the signal to be sent after time_limit in milliseconds
 
     try:
         output = function(*args, **kwargs)
+        signal.setitimer(signal.ITIMER_PROF, 0)                 # Unregister signal
         return output
     except TimeoutError as err:
         return TimeoutError
@@ -118,6 +121,7 @@ def play_sync( agents: Tuple[Agent,Agent],
                time_limit = TIME_LIMIT,
                match_id   = 0,
                debug      = False,  # disables the signal timeout
+               logging    = True,
                verbose    = False,  # prints an ASCII copy of the board after each turn
                callbacks: List[ Callable ] = None,
                **kwargs ):
@@ -133,7 +137,7 @@ def play_sync( agents: Tuple[Agent,Agent],
     game_history  = []
     callbacks     = copy(callbacks) or []
 
-    logger.info(GAME_INFO.format(initial_state, *agents))
+    if logging: logger.info(GAME_INFO.format(initial_state, *agents))
     while not game_state.terminal_test():
         active_idx    = game_state.player()
         active_player = players[active_idx]
@@ -152,13 +156,16 @@ def play_sync( agents: Tuple[Agent,Agent],
                     if not active_player.queue.empty():
                         action = active_player.queue.get(block=False)  # raises Empty if agent did not respond
                         break                                          # accept answer generated after minimum timeout
-                if action is None and exception == TimeoutError:
+                if logging and action is None and exception == TimeoutError:
                     print(active_player)
                     raise TimeoutError
+        except KeyboardInterrupt:
+            raise KeyboardInterrupt
         except Exception as err:
             status = Status.EXCEPTION
-            logger.error(ERR_INFO.format( err, initial_state, agents[0], agents[1], game_state, game_history ))
-            traceback.print_exception(type(err), err, err.__traceback__)
+            if logging:
+                logger.error(ERR_INFO.format( err, initial_state, agents[0], agents[1], game_state, game_history ))
+                traceback.print_exception(type(err), err, err.__traceback__)
             break
         finally:
             if time_limit and not debug:
@@ -166,8 +173,9 @@ def play_sync( agents: Tuple[Agent,Agent],
 
         if action not in game_state.actions():
             status = Status.INVALID_MOVE
-            print(ERR_INFO.format( 'INVALID_MOVE', initial_state, agents[0], agents[1], game_state, game_history ))
-            logger.error(ERR_INFO.format( 'INVALID_MOVE', initial_state, agents[0], agents[1], game_state, game_history ))
+            if logging:
+                print(ERR_INFO.format( 'INVALID_MOVE', initial_state, agents[0], agents[1], game_state, game_history ))
+                logger.error(ERR_INFO.format( 'INVALID_MOVE', initial_state, agents[0], agents[1], game_state, game_history ))
             break
 
         game_state = game_state.result(action)
@@ -190,7 +198,7 @@ def play_sync( agents: Tuple[Agent,Agent],
         if game_state.utility(active_idx) > 0:
             winner, loser = loser, winner  # swap winner/loser if active player won
 
-    logger.info(RESULT_INFO.format(status, game_state, game_history, winner, loser))
+    if logging: logger.info(RESULT_INFO.format(status, game_state, game_history, winner, loser))
     return winner, game_history, match_id
 
 

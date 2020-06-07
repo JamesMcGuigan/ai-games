@@ -101,7 +101,7 @@ def argparser():
 
 
 def call_with_timeout_ms( time_limit, function, *args, **kwargs ):
-    gc.collect(); time.sleep(0.001)  # Helps reduce TimeoutErrors from process scheduling
+    time.sleep(0)   # If any other process wants to interrupt us, do it now
     if time_limit:
         def raise_timeout(signum, frame): raise TimeoutError    # DOC: https://docs.python.org/3.6/library/signal.html
         signal.signal(signal.SIGPROF, raise_timeout)            # Register function to raise a TimeoutError on signal
@@ -126,6 +126,7 @@ def play_sync( agents: Tuple[Agent,Agent],
                callbacks: List[ Callable ] = None,
                **kwargs ):
 
+    gc.collect(1)  # reduce chance of TimeoutError in call_with_timeout_ms() | gc.collect(2) is an expensive function
     agents        = tuple( Agent(agent, agent.__class__.name) if not isinstance(agent, Agent) else agent for agent in agents )
     players       = tuple( a.agent_class(player_id=i) for i, a in enumerate(agents) )
     game_state    = game_state or Isolation()

@@ -4,7 +4,7 @@ import time
 
 from agents.AlphaBetaPlayer import AlphaBetaAreaPlayer, AlphaBetaPlayer
 from agents.DistancePlayer import DistancePlayer, GreedyDistancePlayer
-from agents.MCTS import MCTSMaximum, MCTSRandom
+from agents.MCTS import MCTSMaximum, MCTSMaximumHeuristic, MCTSRandom, MCTSRandomHeuristic
 from agents.UCTPlayer import UCTPlayer
 from isolation import Agent, logger
 from run_match_sync import play_sync
@@ -85,6 +85,8 @@ TEST_AGENTS = {
     "AREA":      Agent(AlphaBetaAreaPlayer,  "AlphaBeta Area"),
     "MCM":       Agent(MCTSMaximum,          "MCTS Maximum"),
     "MCR":       Agent(MCTSRandom,           "MCTS Random"),
+    "MCMH":      Agent(MCTSMaximumHeuristic, "MCTS Maximum Heuristic"),
+    "MCRH":      Agent(MCTSRandomHeuristic,  "MCTS Random Heuristic"),
     "UCT":       Agent(UCTPlayer,            "UCT"),
 }
 def argparser():

@@ -47,6 +47,9 @@ class MCTSMaximum(DataSavePlayer):
             else:             break
         return action
 
+    @classmethod
+    def heuristic( cls, state, parent ):
+        return 0
 
     # noinspection PyArgumentList,PyTypeChecker
     @classmethod
@@ -64,7 +67,8 @@ class MCTSMaximum(DataSavePlayer):
         w = max(0, child_record.wins)
         n = max(1, child_record.count)   # avoid divide by zero
         N = max(2, parent_record.count)  # encourage exploration of unexplored states | log(1) = 0
-        score = w/n + cls.exploration * math.sqrt(math.log(N)/n)
+        score  = w/n + cls.exploration * math.sqrt(math.log(N)/n)
+        score += cls.heuristic(child, parent)
         return max(0.01, score)          # score=0 means a node will never be selected with randomness
 
 
@@ -96,3 +100,18 @@ class MCTSRandom(MCTSMaximum):
 
     def choose( self, actions: List[Action], scores: List[float] ) -> Action:
         return self.choose_with_probability(actions, scores)  # 75% winrate vs choose_maximum()
+
+
+class MCTSMaximumHeuristic(MCTSMaximum):
+    @classmethod
+    def heuristic( cls, state, parent ):
+        loc           = state.locs[state.player()]
+        own_liberties = len(state.liberties(loc))
+        return own_liberties
+
+class MCTSRandomHeuristic(MCTSRandom):
+    @classmethod
+    def heuristic( cls, state, parent ):
+        loc           = state.locs[state.player()]
+        own_liberties = len(state.liberties(loc))
+        return own_liberties

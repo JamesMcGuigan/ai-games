@@ -3,6 +3,7 @@ import argparse
 import time
 
 from agents.AlphaBetaPlayer import AlphaBetaAreaPlayer, AlphaBetaPlayer
+from agents.DistancePlayer import DistancePlayer, GreedyDistancePlayer
 from agents.MCTSMaximum import MCTSMaximum, MCTSRandom
 from isolation import Agent, logger
 from run_match_sync import play_sync
@@ -72,13 +73,15 @@ def run_backpropagation(args):
 
 
 TEST_AGENTS = {
-    "RANDOM":    Agent(RandomPlayer,        "Random"),
-    "GREEDY":    Agent(GreedyPlayer,        "Greedy"),
-    "MINIMAX":   Agent(MinimaxPlayer,       "Minimax"),
-    "ALPHABETA": Agent(AlphaBetaPlayer,     "AlphaBeta"),
-    "AREA":      Agent(AlphaBetaAreaPlayer, "AlphaBeta Area"),
-    "MCM":       Agent(MCTSMaximum,         "MCTS Maximum"),
-    "MCR":       Agent(MCTSRandom,          "MCTS Random"),
+    "RANDOM":    Agent(RandomPlayer,         "Random"),
+    "GREEDY":    Agent(GreedyPlayer,         "Greedy"),
+    "DISTANCE":  Agent(DistancePlayer,       "Distance"),
+    "GD":        Agent(GreedyDistancePlayer, "Greedy Distance"),
+    "MINIMAX":   Agent(MinimaxPlayer,        "Minimax"),
+    "ALPHABETA": Agent(AlphaBetaPlayer,      "AlphaBeta"),
+    "AREA":      Agent(AlphaBetaAreaPlayer,  "AlphaBeta Area"),
+    "MCM":       Agent(MCTSMaximum,          "MCTS Maximum"),
+    "MCR":       Agent(MCTSRandom,           "MCTS Random"),
 }
 def argparser():
     parser = argparse.ArgumentParser()

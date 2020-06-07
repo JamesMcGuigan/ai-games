@@ -30,17 +30,15 @@ class GreedyDistancePlayer(DistancePlayer):
     equivalent to a minimax search agent with a search depth of one.
     """
     def liberty_difference(self, state):
-        own_loc       = state.locs[self.player_id]
-        opp_loc       = state.locs[self.player_id]
-        own_liberties = len(state.liberties(own_loc))
-        opp_liberties = len(state.liberties(own_loc))
+        own_liberties = len(state.liberties(state.locs[self.player_id]))
+        opp_liberties = len(state.liberties(state.locs[1-self.player_id]))
         score = own_liberties - opp_liberties
         return score
 
     def score(self, state):
         distance  = self.distance(state)
         liberties = self.liberty_difference(state)
-        score     = distance + liberties
+        score     = distance + liberties*16  # Distance is just a deciding factor when liberties are equal
         # print('{:.2f} {:.2f} {:.2f}'.format(score, distance, liberties))
         return score
 

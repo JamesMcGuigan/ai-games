@@ -4,7 +4,7 @@ import time
 
 from agents.AlphaBetaPlayer import AlphaBetaAreaPlayer, AlphaBetaPlayer
 from agents.DistancePlayer import DistancePlayer, GreedyDistancePlayer
-from agents.MCTSMaximum import MCTSMaximum, MCTSRandom
+from agents.MCTS import MCTSMaximum, MCTSRandom
 from agents.UCTPlayer import UCTPlayer
 from isolation import Agent, logger
 from run_match_sync import play_sync

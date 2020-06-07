@@ -4,7 +4,7 @@ import sys
 import time
 from operator import itemgetter
 
-from agents.MCTSMaximum import MCTSMaximum, MCTSRandom
+from agents.MCTS import MCTSMaximum, MCTSRandom
 from isolation import Agent
 from run_match_sync import play_sync
 from sample_players import BasePlayer

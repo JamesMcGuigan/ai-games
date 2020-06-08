@@ -123,6 +123,7 @@ def play_sync( agents: Tuple[Agent,Agent],
                debug      = False,  # disables the signal timeout
                logging    = True,
                verbose    = False,  # prints an ASCII copy of the board after each turn
+               exceptions = False,
                max_moves  = 0,      # end the game early after a set number of turns
                callbacks: List[ Callable ] = None,
                **kwargs ):
@@ -160,14 +161,14 @@ def play_sync( agents: Tuple[Agent,Agent],
                     if not active_player.queue.empty():
                         action = active_player.queue.get(block=False)  # raises Empty if agent did not respond
                         break                                          # accept answer generated after minimum timeout
-                if logging and action is None and exception == TimeoutError:
+                if exceptions and action is None and exception == TimeoutError:
                     print(active_player)
                     raise TimeoutError
         except KeyboardInterrupt:
             raise KeyboardInterrupt
         except Exception as err:
             status = Status.EXCEPTION
-            if logging:
+            if exceptions:
                 logger.error(ERR_INFO.format( err, initial_state, agents[0], agents[1], game_state, game_history ))
                 traceback.print_exception(type(err), err, err.__traceback__)
             break
@@ -177,7 +178,7 @@ def play_sync( agents: Tuple[Agent,Agent],
 
         if action not in game_state.actions():
             status = Status.INVALID_MOVE
-            if logging:
+            if exceptions:
                 print(ERR_INFO.format( 'INVALID_MOVE', initial_state, agents[0], agents[1], game_state, game_history ))
                 logger.error(ERR_INFO.format( 'INVALID_MOVE', initial_state, agents[0], agents[1], game_state, game_history ))
             break
@@ -244,7 +245,7 @@ def main():
         custom_agent.name, results[custom_agent], match_count, percentage, test_agent.name, time_taken, time_taken/match_count
     )
     print()
-    print(message); logger.info(message)
+    print(message); _logger.info(message)
     print()
 
 if __name__ == '__main__':

@@ -4,7 +4,7 @@ import sys
 import time
 from operator import itemgetter
 
-from agents.MCTS import MCTSMaximum, MCTSRandom
+from agents.MCTS import MCTSMaximum
 from isolation import Agent
 from run_match_sync import play_sync
 from sample_players import BasePlayer
@@ -13,8 +13,8 @@ from sample_players import BasePlayer
 
 class UCTPlayer(BasePlayer):
     """ UCTPlayer """
-    # agent = MCTSMaximum
-    agent = MCTSRandom
+    agent = MCTSMaximum
+    # agent = MCTSRandom
     verbose_depth = False
 
     def __init__(self, time_limit=150, *args, **kwargs):

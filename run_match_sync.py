@@ -210,12 +210,13 @@ def play_sync( agents: Tuple[Agent,Agent],
 
 
 def verbose_callback(game_state, action, active_player, active_idx, match_id, time_taken):
-    summary = "\nmatch: {} | move: {} | {:.2f}s | {}({}) => {}".format(
-        match_id, game_state.ply_count, time_taken, active_player.__class__.__name__, active_idx, DebugState.ind2xy(action)
-    )
-    board = str(DebugState.from_state(game_state))
-    print(summary); logger.info(summary)
-    print(board);   logger.info(board)
+    if game_state.ply_count % 2 == 0 or game_state.terminal_test():  # print every other move, plus endgame
+        summary = "\nmatch: {} | move: {} | {:.2f}s | {}({}) => {}".format(
+            match_id, game_state.ply_count, time_taken, active_player.__class__.__name__, active_idx, DebugState.ind2xy(action)
+        )
+        board = str(DebugState.from_state(game_state))
+        print(summary); logger.info(summary)
+        print(board);   logger.info(board)
 
 
 def main():

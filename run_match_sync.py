@@ -141,7 +141,7 @@ def play_sync( agents: Tuple[Agent,Agent],
 
     if logging: logger.info(GAME_INFO.format(initial_state, *agents))
     while not game_state.terminal_test():
-        if max_moves and game_state.ply_count > max_moves: break
+        if max_moves and game_state.ply_count >= max_moves: break
         turn_start    = time.perf_counter()
         active_idx    = game_state.player()
         active_player = players[active_idx]

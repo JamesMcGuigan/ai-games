@@ -1,6 +1,7 @@
 import math
 import random
 from collections import namedtuple
+from functools import lru_cache
 from operator import itemgetter
 from typing import List
 
@@ -106,8 +107,14 @@ class MCTSMaximumHeuristic(MCTSMaximum):
     @classmethod
     def heuristic( cls, state, parent ):
         loc           = state.locs[state.player()]
-        own_liberties = len(state.liberties(loc))
+        own_liberties = len(cls.liberties(state,loc))
         return own_liberties
+
+    @staticmethod
+    @lru_cache(None, typed=True)
+    def liberties( state, cell ):
+        """add a @lru_cache around this function"""
+        return state.liberties(cell)
 
 class MCTSRandomHeuristic(MCTSRandom):
     @classmethod

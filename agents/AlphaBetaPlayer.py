@@ -28,7 +28,6 @@ class AlphaBetaPlayer(DataSavePlayer):
     **********************************************************************
     """
 
-    verbose              = False
     verbose_depth        = False
     search_fn            = 'alphabeta'       # or 'minimax'
     search_max_depth     = 50
@@ -96,9 +95,13 @@ class AlphaBetaPlayer(DataSavePlayer):
             return self.heuristic_liberties(state, player_id)  # won 45%
         raise NotImplementedError('cls.heuristic_fn must be in ["heuristic_area", "heuristic_liberties"] - got: ', self.heuristic_fn)
 
+
     @classmethod
-    @lru_cache(None, typed=True)
-    def heuristic_liberties( cls, state, player_id ):
+    def heuristic_liberties(cls, state, player_id):
+        """ Persistent caching to disk """
+        return cls.cache(cls._heuristic_liberties, state, player_id)
+    @classmethod
+    def _heuristic_liberties( cls, state, player_id ):
         own_loc = state.locs[player_id]
         opp_loc = state.locs[1 - player_id]
         own_liberties = cls.liberties(state, own_loc)
@@ -114,6 +117,7 @@ class AlphaBetaPlayer(DataSavePlayer):
 
     @classmethod
     def heuristic_area(cls, state, player_id):
+        """ Persistent caching to disk """
         return cls.cache(cls._heuristic_area, state, player_id)
     @classmethod
     def _heuristic_area(self, state, player_id):
@@ -227,3 +231,11 @@ class AlphaBetaPlayer(DataSavePlayer):
 
 class AlphaBetaAreaPlayer(AlphaBetaPlayer):
     heuristic_fn = 'heuristic_area'  # or 'heuristic_liberties'
+
+
+# This matches the specs of the course implemention - but this version is better performance optimized
+class MinimaxPlayer(AlphaBetaPlayer):
+    verbose          = False
+    search_fn        = 'minimax'              # or 'alphabeta'
+    heuristic_fn     = 'heuristic_liberties'  # 'heuristic_liberties' | 'heuristic_area'
+    search_max_depth = 3

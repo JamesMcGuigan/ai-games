@@ -1,6 +1,6 @@
-from agents.AlphaBetaPlayer import AlphaBetaPlayer
+from agents.AlphaBetaPlayer import AlphaBetaAreaPlayer
 
 
 # CustomPlayer is the agent exported to the submission
-class CustomPlayer(AlphaBetaPlayer):
+class CustomPlayer(AlphaBetaAreaPlayer):
     pass

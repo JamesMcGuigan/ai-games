@@ -11,7 +11,8 @@ from sample_players import BasePlayer
 
 
 class DataSavePlayer(BasePlayer):
-    data = {}
+    data    = {}
+    verbose = True
 
     def __new__(cls, *args, **kwargs):
         # noinspection PyUnresolvedReferences
@@ -51,12 +52,13 @@ class DataSavePlayer(BasePlayer):
                 # print("loading: "+cls.file )
                 data = pickle.load(file)
                 cls.data.update({ **data, **cls.data })
-                print("loaded: {:40s} | {:4.1f}MB in {:4.1f}s | entries: {}".format(
-                    filename,
-                    os.path.getsize(filename)/1024/1024,
-                    time.perf_counter() - start_time,
-                    cls.size(cls.data),
-                ))
+                if cls.verbose:
+                    print("loaded: {:40s} | {:4.1f}MB in {:4.1f}s | entries: {}".format(
+                        filename,
+                        os.path.getsize(filename)/1024/1024,
+                        time.perf_counter() - start_time,
+                        cls.size(cls.data),
+                    ))
         except (IOError, TypeError, EOFError, zlib.error) as exception:
             pass
 
@@ -66,15 +68,16 @@ class DataSavePlayer(BasePlayer):
         if cls.data:
             filename   = cls.filename()
             start_time = time.perf_counter()
-            print("saving: " + filename )
+            # print("saving: " + filename )
             with gzip.GzipFile(filename, 'wb') as file:  # reduce filesystem size
                 pickle.dump(cls.data, file)
-                print("wrote:  {:40s} | {:4.1f}MB in {:4.1f}s | entries: {}".format(
-                    filename,
-                    os.path.getsize(filename)/1024/1024,
-                    time.perf_counter() - start_time,
-                    cls.size(cls.data),
-                ))
+                if cls.verbose:
+                    print("wrote:  {:40s} | {:4.1f}MB in {:4.1f}s | entries: {}".format(
+                        filename,
+                        os.path.getsize(filename)/1024/1024,
+                        time.perf_counter() - start_time,
+                        cls.size(cls.data),
+                    ))
 
     @staticmethod
     def size( data ):

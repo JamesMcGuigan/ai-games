@@ -123,10 +123,11 @@ def play_sync( agents: Tuple[Agent,Agent],
                debug      = False,  # disables the signal timeout
                logging    = True,
                verbose    = False,  # prints an ASCII copy of the board after each turn
+               max_moves  = 0,      # end the game early after a set number of turns
                callbacks: List[ Callable ] = None,
                **kwargs ):
 
-    gc.collect(1)  # reduce chance of TimeoutError in call_with_timeout_ms() | gc.collect(2) is an expensive function
+    gc.collect(1) # reduce chance of TimeoutError in call_with_timeout_ms() | gc.collect(2) is an expensive function
     agents        = tuple( Agent(agent, agent.__class__.name) if not isinstance(agent, Agent) else agent for agent in agents )
     players       = tuple( a.agent_class(player_id=i) for i, a in enumerate(agents) )
     game_state    = game_state or Isolation()
@@ -140,6 +141,8 @@ def play_sync( agents: Tuple[Agent,Agent],
 
     if logging: logger.info(GAME_INFO.format(initial_state, *agents))
     while not game_state.terminal_test():
+        if max_moves and game_state.ply_count > max_moves: break
+        turn_start    = time.perf_counter()
         active_idx    = game_state.player()
         active_player = players[active_idx]
         winner, loser = agents[1 - active_idx], agents[active_idx]  # any problems during get_action means the active player loses
@@ -179,20 +182,23 @@ def play_sync( agents: Tuple[Agent,Agent],
                 logger.error(ERR_INFO.format( 'INVALID_MOVE', initial_state, agents[0], agents[1], game_state, game_history ))
             break
 
+        time_taken = time.perf_counter() - turn_start
         game_state = game_state.result(action)
         game_history.append(action)
 
         # Callbacks can be used to hook in additional functionality after each turn, such as verbose rendering
-        callbacks = list(callbacks) if isinstance(callbacks, (tuple,list,set)) else [ callbacks ]
-        if verbose: callbacks = [ verbose_callback ] + callbacks
-        for callback in callbacks:
+        # BUGFIX: don't modify callbacks, else the board position will be repeated multiple times per turn
+        turn_callbacks = list(callbacks) if isinstance(callbacks, (tuple,list,set)) else [ callbacks ]
+        if verbose: turn_callbacks = [ verbose_callback ] + callbacks
+        for callback in turn_callbacks:
             if not callable(callback): continue
             callback(
                 game_state=game_state,
                 action=action,
                 active_player=active_player,
                 active_idx=active_idx,
-                match_id=match_id
+                match_id=match_id,
+                time_taken=time_taken
             )
     else:
         status = Status.GAME_OVER
@@ -203,9 +209,9 @@ def play_sync( agents: Tuple[Agent,Agent],
     return winner, game_history, match_id
 
 
-def verbose_callback(game_state, action, active_player, active_idx, match_id):
-    summary = "match: {} | {}({}) => {}".format(
-        match_id,  active_player.__class__.__name__, active_idx, DebugState.ind2xy(action)
+def verbose_callback(game_state, action, active_player, active_idx, match_id, time_taken):
+    summary = "\nmatch: {} | move: {} | {:.2f}s | {}({}) => {}".format(
+        match_id, game_state.ply_count, time_taken, active_player.__class__.__name__, active_idx, DebugState.ind2xy(action)
     )
     board = str(DebugState.from_state(game_state))
     print(summary); logger.info(summary)

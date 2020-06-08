@@ -1,6 +1,9 @@
-import os
-from udacity_pa import udacity
 import glob
+import os
+
+from udacity_pa import udacity
+
+
 
 nanodegree = 'nd898'
 projects = ['adversarial_search']
@@ -9,6 +12,7 @@ filenames_all = [
     'run_match_sync.py',
     'my_custom_player.py',
     'report.pdf',
+    'report.ipynb',
 ] + glob.glob('agents/*.py') + glob.glob('data/*.pickle')
 
 def submit(args):

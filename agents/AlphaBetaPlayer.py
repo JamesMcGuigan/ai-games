@@ -76,7 +76,7 @@ class AlphaBetaPlayer(DataSavePlayer):
 
         # The real trick with iterative deepening is caching, which allows us to out-depth the default minimax Agent
         if self.verbose_depth: print('\n'+ self.__class__.__name__.ljust(20) +' | depth:', end=' ', flush=True)
-        for depth in range(1, self.search_max_depth):
+        for depth in range(1, self.search_max_depth+1):
             action, score = self.search(state, depth=depth)
             self.queue.put(action)
             if self.verbose_depth: print(depth, end=' ', flush=True)
@@ -96,12 +96,10 @@ class AlphaBetaPlayer(DataSavePlayer):
         raise NotImplementedError('cls.heuristic_fn must be in ["heuristic_area", "heuristic_liberties"] - got: ', self.heuristic_fn)
 
 
+    # Its not worth persisting this cache to disk, when too large (million+) its becomes quicker to compute than lookup
     @classmethod
+    @lru_cache(None, typed=True)
     def heuristic_liberties(cls, state, player_id):
-        """ Persistent caching to disk """
-        return cls.cache(cls._heuristic_liberties, state, player_id)
-    @classmethod
-    def _heuristic_liberties( cls, state, player_id ):
         own_loc = state.locs[player_id]
         opp_loc = state.locs[1 - player_id]
         own_liberties = cls.liberties(state, own_loc)

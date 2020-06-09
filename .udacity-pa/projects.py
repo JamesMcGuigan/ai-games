@@ -13,7 +13,7 @@ filenames_all = [
     'my_custom_player.py',
     'report.pdf',
     'report.ipynb',
-] + glob.glob('agents/*.py') + glob.glob('data/*.pickle')
+] + glob.glob('agents/*.py') # + glob.glob('data/*.pickle')
 
 def submit(args):
     filenames = []

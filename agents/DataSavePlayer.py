@@ -66,7 +66,9 @@ class DataSavePlayer(BasePlayer):
     def save( cls ):
         # cls.load()  # update any new information from the file
         if cls.data:
-            filename   = cls.filename()
+            filename = cls.filename()
+            dirname  = os.path.dirname(filename)
+            if not os.path.exists(dirname): os.mkdir(dirname)
             start_time = time.perf_counter()
             # print("saving: " + filename )
             with gzip.GzipFile(filename, 'wb') as file:  # reduce filesystem size

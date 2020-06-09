@@ -237,3 +237,9 @@ class MinimaxPlayer(AlphaBetaPlayer):
     search_fn        = 'minimax'              # or 'alphabeta'
     heuristic_fn     = 'heuristic_liberties'  # 'heuristic_liberties' | 'heuristic_area'
     search_max_depth = 3
+
+
+
+# CustomPlayer is the agent exported to the submission
+class CustomPlayer(AlphaBetaAreaPlayer):
+    pass

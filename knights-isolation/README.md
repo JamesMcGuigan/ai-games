@@ -1,3 +1,9 @@
+# Knights Isolation
+
+Inspired by the [Udacity AI Nanodegree](https://www.udacity.com/course/ai-artificial-intelligence-nanodegree--nd898)
+
+Project Writeup: [report.ipynb](report.ipynb)
+
 
 # Build an Adversarial Game Playing Agent
 

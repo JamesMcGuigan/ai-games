@@ -1,0 +1,10 @@
+.ipynb_checkpoints
+ARC
+*.pyc
+
+venv/
+venv_windows/
+
+wip/
+*.wip
+*.wip.*

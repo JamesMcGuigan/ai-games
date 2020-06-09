@@ -1,0 +1,44 @@
+{'score': 0, 'time': 19, 'booster': 'dart', 'eval_metric': 'rmse', 'grow_policy': 'lossguide', 'objective': 'survival:aft', 'sampling_method': 'uniform', 'tree_method': 'hist'}
+{'score': 0, 'time': 13, 'booster': 'dart', 'eval_metric': 'aft-nloglik', 'grow_policy': 'lossguide', 'objective': 'survival:aft', 'sampling_method': 'gradient_based', 'tree_method': 'approx'}
+{'score': 6, 'time': 149, 'booster': 'dart', 'eval_metric': 'logloss', 'grow_policy': 'depthwise', 'objective': 'reg:tweedie', 'sampling_method': 'gradient_based', 'tree_method': 'hist'}
+{'score': 0, 'time': 9, 'booster': 'gblinear', 'eval_metric': 'aucpr', 'grow_policy': 'depthwise', 'objective': 'survival:aft', 'sampling_method': 'gradient_based', 'tree_method': 'gpu_hist'}
+{'score': 1, 'time': 36, 'booster': 'gblinear', 'eval_metric': 'gamma-nloglik', 'grow_policy': 'depthwise', 'objective': 'reg:gamma', 'sampling_method': 'gradient_based', 'tree_method': 'approx'}
+{'score': 6, 'time': 70, 'booster': 'gbtree', 'eval_metric': 'aft-nloglik', 'grow_policy': 'depthwise', 'objective': 'survival:cox', 'sampling_method': 'gradient_based', 'tree_method': 'hist'}
+{'score': 1, 'time': 38, 'booster': 'gblinear', 'eval_metric': 'poisson-nloglik', 'grow_policy': 'lossguide', 'objective': 'reg:gamma', 'sampling_method': 'gradient_based', 'tree_method': 'exact'}
+{'score': 1, 'time': 17, 'booster': 'gblinear', 'eval_metric': 'ndcg', 'grow_policy': 'lossguide', 'objective': 'reg:logistic', 'sampling_method': 'gradient_based', 'tree_method': 'hist'}
+{'score': 0, 'time': 2, 'booster': 'gblinear', 'eval_metric': 'auc', 'grow_policy': 'depthwise', 'objective': 'survival:aft', 'sampling_method': 'gradient_based', 'tree_method': 'approx'}
+{'score': 0, 'time': 0, 'booster': 'gbtree', 'eval_metric': 'tweedie-nlogli', 'grow_policy': 'lossguide', 'objective': 'rank:map', 'sampling_method': 'gradient_based', 'tree_method': 'approx'}
+{'score': 5, 'time': 105, 'booster': 'gbtree', 'eval_metric': 'error', 'grow_policy': 'lossguide', 'objective': 'reg:gamma', 'sampling_method': 'uniform', 'tree_method': 'gpu_hist'}
+{'score': 0, 'time': 11, 'booster': 'dart', 'eval_metric': 'map', 'grow_policy': 'lossguide', 'objective': 'multi:softmax', 'sampling_method': 'uniform', 'tree_method': 'hist'}
+{'score': 0, 'time': 2, 'booster': 'gbtree', 'eval_metric': 'gamma-nloglik', 'grow_policy': 'lossguide', 'objective': 'survival:aft', 'sampling_method': 'gradient_based', 'tree_method': 'hist'}
+{'score': 0, 'time': 8, 'booster': 'gbtree', 'eval_metric': 'map', 'grow_policy': 'depthwise', 'objective': 'multi:softmax', 'sampling_method': 'uniform', 'tree_method': 'exact'}
+{'score': 7, 'time': 104, 'booster': 'dart', 'eval_metric': 'merror', 'grow_policy': 'lossguide', 'objective': 'reg:squarederror', 'sampling_method': 'uniform', 'tree_method': 'hist'}
+{'score': 1, 'time': 41, 'booster': 'gblinear', 'eval_metric': 'merror', 'grow_policy': 'lossguide', 'objective': 'reg:gamma', 'sampling_method': 'uniform', 'tree_method': 'gpu_hist'}
+{'score': 5, 'time': 131, 'booster': 'dart', 'eval_metric': 'logloss', 'grow_policy': 'lossguide', 'objective': 'rank:map', 'sampling_method': 'gradient_based', 'tree_method': 'gpu_hist'}
+{'score': 0, 'time': 0, 'booster': 'gbtree', 'eval_metric': 'tweedie-nlogli', 'grow_policy': 'depthwise', 'objective': 'rank:ndcg', 'sampling_method': 'gradient_based', 'tree_method': 'hist'}
+{'score': 5, 'time': 203, 'booster': 'gbtree', 'eval_metric': 'cox-nloglik', 'grow_policy': 'depthwise', 'objective': 'rank:map', 'sampling_method': 'uniform', 'tree_method': 'gpu_hist'}
+{'score': 1, 'time': 49, 'booster': 'gblinear', 'eval_metric': 'aucpr', 'grow_policy': 'depthwise', 'objective': 'survival:cox', 'sampling_method': 'gradient_based', 'tree_method': 'exact'}
+{'score': 6, 'time': 140, 'booster': 'dart', 'eval_metric': 'rmsle', 'grow_policy': 'depthwise', 'objective': 'rank:map', 'sampling_method': 'uniform', 'tree_method': 'exact'}
+{'score': 6, 'time': 119, 'booster': 'gbtree', 'eval_metric': 'aft-nloglik', 'grow_policy': 'lossguide', 'objective': 'reg:gamma', 'sampling_method': 'uniform', 'tree_method': 'hist'}
+{'score': 0, 'time': 8, 'booster': 'gblinear', 'eval_metric': 'mae', 'grow_policy': 'lossguide', 'objective': 'survival:aft', 'sampling_method': 'uniform', 'tree_method': 'gpu_hist'}
+{'score': 0, 'time': 0, 'booster': 'gbtree', 'eval_metric': 'tweedie-nlogli', 'grow_policy': 'depthwise', 'objective': 'reg:gamma', 'sampling_method': 'uniform', 'tree_method': 'approx'}
+{'score': 7, 'time': 105, 'booster': 'dart', 'eval_metric': 'gamma-deviance', 'grow_policy': 'lossguide', 'objective': 'reg:squarederror', 'sampling_method': 'uniform', 'tree_method': 'hist'}
+{'score': 6, 'time': 141, 'booster': 'dart', 'eval_metric': 'logloss', 'grow_policy': 'depthwise', 'objective': 'reg:tweedie', 'sampling_method': 'uniform', 'tree_method': 'hist'}
+{'score': 0, 'time': 1, 'booster': 'dart', 'eval_metric': 'mphe', 'grow_policy': 'lossguide', 'objective': 'reg:squarederror', 'sampling_method': 'uniform', 'tree_method': 'hist'}
+{'score': 7, 'time': 106, 'booster': 'gbtree', 'eval_metric': 'mlogloss', 'grow_policy': 'lossguide', 'objective': 'count:poisson', 'sampling_method': 'uniform', 'tree_method': 'hist'}
+{'score': 7, 'time': 110, 'booster': 'dart', 'eval_metric': 'merror', 'grow_policy': 'lossguide', 'objective': 'reg:squaredlogerror', 'sampling_method': 'uniform', 'tree_method': 'hist'}
+{'score': 6, 'time': 120, 'booster': 'dart', 'eval_metric': 'rmse', 'grow_policy': 'depthwise', 'objective': 'reg:tweedie', 'sampling_method': 'gradient_based', 'tree_method': 'hist'}
+--------------------------------------------------
+##### Results
+Time elapsed:  1874.7174911499023
+Parameter combinations evaluated:  30
+Score best parameters:  7.0
+--------------------
+Best parameters: 
+booster = gbtree str
+eval_metric = error str
+grow_policy = depthwise str
+objective = reg:squarederror str
+sampling_method = uniform str
+tree_method = approx str
+--------------------

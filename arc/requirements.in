@@ -1,0 +1,39 @@
+#
+# This file is input for pip-compile. Update this file, then run:
+#
+#    pip-compile
+#    pip-sync
+#
+# Or to check for version bump upgrades:
+#
+#    pip-review
+#
+# List of available libraries on Kaggle without internet access
+# - https://www.kaggle.com/jamesmcguigan/kaggle-pip-imports-without-internet-access/
+
+# Utils
+glob2
+tqdm
+simplejson
+
+# Data Science
+numpy
+pandas
+sklearn
+sympy
+xgboost
+hyperopt
+lightgbm
+
+# Image Manipulation
+opencv-python
+scikit-image
+
+# Visualisation
+matplotlib
+jupyter
+
+# Functional Programming
+cytoolz
+pydash
+fastcache

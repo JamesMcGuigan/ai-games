@@ -42,7 +42,7 @@ def get_tl_tr(color, cur_row, cur_col, nrows, ncols):
     return top_left, top_right
 
 
-def make_features(input_color, nfeat=13, local_neighb = 5):
+def make_features(input_color, nfeat=13, local_neighb=5):
     nrows, ncols = input_color.shape
     feat = np.zeros((nrows * ncols, nfeat))
     cur_idx = 0
@@ -65,11 +65,10 @@ def make_features(input_color, nfeat=13, local_neighb = 5):
     return feat
 
 
-def features(task, mode='train', nfeat=13):
+def features(task, mode='train', nfeat=13, local_neighb=5):
     num_train_pairs = len(task[mode])
     feat, target = [], []
 
-    global local_neighb
     for task_num in range(num_train_pairs):
         input_color = np.array(task[mode][task_num]['input'])
         # print(input_color)

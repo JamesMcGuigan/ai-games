@@ -5,6 +5,7 @@ from src.functions.queries.ratio import task_shape_ratios
 from src.solver_multimodel.core.Solver import Solver
 
 
+
 class ZoomSolver(Solver):
     verbose = False
 
@@ -12,7 +13,7 @@ class ZoomSolver(Solver):
         ratios = task_shape_ratios(task)
         ratio  = list(ratios)[0]
         detect = (
-                ratios != { (1,1) }   # not no scaling
+                ratios != { (1,1) }       # not no scaling
                 and len(ratios) == 1      # not multiple scalings
                 and ratio[0] == ratio[1]  # single consistent scaling
         )

@@ -1,13 +1,14 @@
+from itertools import chain
 from typing import List
 from typing import Tuple
 from typing import Union
 
 import numpy as np
-from fastcache._lrucache import clru_cache
-from itertools import chain
+from fastcache import clru_cache
 
 from src.datamodel.Task import Task
 from src.util.np_cache import np_cache
+
 
 
 @np_cache()

@@ -30,7 +30,9 @@ import heapq
 import inspect
 import random
 import sys
-from typing import Any, Callable, Union
+from typing import Any
+from typing import Callable
+from typing import Union
 
 
 
@@ -619,7 +621,7 @@ def pause():
 # code to handle timeouts
 #
 # FIXME
-# NOTE: TimeoutFuncton is NOT reentrant.  Later timeouts will silently
+# NOTE: TimeoutFunction is NOT reentrant.  Later timeouts will silently
 # disable earlier timeouts.  Could be solved by maintaining a global list
 # of active time outs.  Currently, questions which have test cases calling
 # this have all student code so wrapped.

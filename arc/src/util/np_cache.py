@@ -2,10 +2,12 @@
 from functools import wraps
 
 import numpy as np
-from fastcache._lrucache import clru_cache
+from fastcache import clru_cache
 
 ### Profiler: 2x speedup
 from src.settings import settings
+
+
 
 __np_cache = {}
 def np_cache(maxsize=1024, typed=True):

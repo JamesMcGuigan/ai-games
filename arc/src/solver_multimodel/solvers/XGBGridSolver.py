@@ -1,14 +1,14 @@
+from itertools import product
 from typing import List
 
 import pydash
-from fastcache._lrucache import clru_cache
-from itertools import product
-from src.ensemble.period import get_period_length0
-from src.ensemble.period import get_period_length1
+from fastcache import clru_cache
 from xgboost import XGBClassifier
 
 from src.datamodel.Competition import Competition
 from src.datamodel.Task import Task
+from src.ensemble.period import get_period_length0
+from src.ensemble.period import get_period_length1
 from src.functions.queries.grid import *
 from src.functions.queries.ratio import is_task_shape_ratio_unchanged
 from src.functions.queries.symmetry import is_grid_symmetry
@@ -16,6 +16,7 @@ from src.functions.transforms.singlecolor import np_bincount
 from src.settings import settings
 from src.solver_multimodel.core.Solver import Solver
 from src.util.np_cache import np_cache
+
 
 
 class XGBGridSolver(Solver):

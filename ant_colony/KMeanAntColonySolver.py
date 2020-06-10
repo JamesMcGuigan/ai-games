@@ -67,6 +67,10 @@ class KmeansAntColonySolver(AntColonySolver):
         }
         super().__init__(**self.kwargs)
 
+        ### Heuristic Exports
+        self.ants_used   = 0
+        self.epochs_used = 0
+        self.round_trips = 0
 
 
     @staticmethod

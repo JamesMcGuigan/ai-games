@@ -64,6 +64,16 @@ class AntColonySolver:
         if self.min_round_trips and self.max_round_trips: self.min_round_trips = min(self.min_round_trips, self.max_round_trips)
         if self.min_ants and self.max_ants:               self.min_ants        = min(self.min_ants, self.max_ants)
 
+        ### Internal Caches - see solve_initialize()
+        self.distances     = {}
+        self.distance_cost = {}
+        self.pheromones    = {}
+
+        ### Heuristic Exports
+        self.ants_used   = 0
+        self.epochs_used = 0
+        self.round_trips = 0
+
 
     @staticmethod
     def distance(xy1, xy2) -> float:

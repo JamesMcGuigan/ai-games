@@ -89,7 +89,7 @@ Select at least one of the following to implement and evaluate in your report. (
 - Research other games (chess, go, connect4, etc.) to get ideas for developing good heuristics
 - If the results of your tests are very close, try increasing the number of matches (e.g., >100) to increase your confidence in the results
 - Experiment with adding more search time--does adding time confer any advantage to your agent over the baseline?
-- Augment the code to count the nubmer of nodes your agent searches--is it better to search more or fewer nodes? How does your heuristic compare to the baseline heuristic you chose?
+- Augment the code to count the number of nodes your agent searches--is it better to search more or fewer nodes? How does your heuristic compare to the baseline heuristic you chose?
 
 
 ### Option 2: Develop an opening book (must span at least depth 4 of the search tree)

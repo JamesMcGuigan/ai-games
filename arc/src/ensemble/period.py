@@ -4,6 +4,7 @@ from src.ensemble.util import Defensive_Copy
 from src.util.np_cache import np_cache
 
 
+
 @np_cache()
 def get_period_length0(arr):
     H, W = arr.shape
@@ -40,7 +41,7 @@ def get_period(arr0):
 
 def same_ratio(basic_task):
     # returns -1 if no match is found
-    # returns Transformed_Test_Case  if the mathching rule is found
+    # returns Transformed_Test_Case if the matching rule is found
     # for this notebook we only look at mosaics
     Input  = [ Defensive_Copy(x) for x in basic_task[0] ]
     Output = [ Defensive_Copy(y) for y in basic_task[1] ]

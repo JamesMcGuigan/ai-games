@@ -6,7 +6,7 @@
 > 
 > https://en.wikipedia.org/wiki/Verbal_arithmetic
 
-This is a general purpose solver that can handle addition, subtraction, multiplication, integer division and rasing to powers.
+This is a general purpose solver that can handle addition, subtraction, multiplication, integer division and raising to powers.
 
 This implementation uses the z3 constraint satisfaction solver 
 - https://github.com/Z3Prover/z3/wiki

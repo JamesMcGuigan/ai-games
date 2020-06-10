@@ -3,6 +3,7 @@ import numpy as np
 from src.ensemble.util import Defensive_Copy
 
 
+
 def maxcolor(A):
     b = np.bincount(A.flatten(), minlength=10)
     b[0] = 500  # ???255
@@ -58,8 +59,8 @@ def getObjectHash(pixmap):
 # 經測試沒有overflow問題
 def groupByColor(pixmap):
     nb_colors = int(pixmap.max()) + 1
-    splited = [(pixmap == i) * i for i in range(1, nb_colors)]
-    return [x for x in splited if np.any(x)]
+    splitted  = [(pixmap == i) * i for i in range(1, nb_colors)]
+    return [x for x in splitted if np.any(x)]
 
 
 def checkColorMap(a0, b0):

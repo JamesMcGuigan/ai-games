@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
 
-##### 
+#####
 ##### ./submission/kaggle_compile.py ./src/main.py
-##### 
+#####
 ##### 2020-05-29 18:07:36+01:00
-##### 
+#####
 ##### archive	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### archive	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### origin	git@github.com:JamesMcGuigan/kaggle-arc.git (fetch)
 ##### origin	git@github.com:JamesMcGuigan/kaggle-arc.git (push)
-##### 
+#####
 ##### * master 39c4143 CSV | replace list(set()) with pydash.uniq() for deterministic sorting
-##### 
+#####
 ##### 39c414351778328f56038f537735d894ed4585a7
-##### 
+#####
 
 #####
 ##### START src/datamodel/Problem.py
@@ -501,7 +501,7 @@ class Dataset(UserList):
 # Source: https://www.kaggle.com/jamesmcguigan/arc-geometry-solvers/
 import matplotlib.pyplot as plt
 import numpy as np
-from fastcache._lrucache import clru_cache
+from fastcache import clru_cache
 from itertools import chain
 from matplotlib import colors
 
@@ -592,7 +592,7 @@ def plot_task(task: Task, scale=2):
 from functools import wraps
 
 import numpy as np
-from fastcache._lrucache import clru_cache
+from fastcache import clru_cache
 
 ### Profiler: 2x speedup
 # from src.settings import settings
@@ -671,7 +671,7 @@ from typing import Tuple
 from typing import Union
 
 import numpy as np
-from fastcache._lrucache import clru_cache
+from fastcache import clru_cache
 from itertools import chain
 
 # from src.datamodel.Task import Task
@@ -1527,7 +1527,7 @@ class Competition(UserDict):
 ##### START src/functions/queries/colors.py
 #####
 
-from fastcache._lrucache import clru_cache
+from fastcache import clru_cache
 
 # from src.functions.queries.grid import grid_unique_colors
 # from src.functions.queries.ratio import is_task_shape_ratio_consistent
@@ -2542,7 +2542,7 @@ if __name__ == '__main__' and not settings['production']:
 from typing import List
 
 import pydash
-from fastcache._lrucache import clru_cache
+from fastcache import clru_cache
 from itertools import product
 # from src.ensemble.period import get_period_length0
 # from src.ensemble.period import get_period_length1
@@ -3121,17 +3121,17 @@ if __name__ == '__main__':
 ##### END   ./src/main.py
 #####
 
-##### 
+#####
 ##### ./submission/kaggle_compile.py ./src/main.py
-##### 
+#####
 ##### 2020-05-29 18:07:36+01:00
-##### 
+#####
 ##### archive	git@github.com:seshurajup/kaggle-arc.git (fetch)
 ##### archive	git@github.com:seshurajup/kaggle-arc.git (push)
 ##### origin	git@github.com:JamesMcGuigan/kaggle-arc.git (fetch)
 ##### origin	git@github.com:JamesMcGuigan/kaggle-arc.git (push)
-##### 
+#####
 ##### * master 39c4143 CSV | replace list(set()) with pydash.uniq() for deterministic sorting
-##### 
+#####
 ##### 39c414351778328f56038f537735d894ed4585a7
-##### 
+#####

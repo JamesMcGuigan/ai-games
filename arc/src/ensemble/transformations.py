@@ -4,6 +4,7 @@ import numpy as np
 from src.ensemble.util import Defensive_Copy
 
 
+
 def Vert(M):
     n = len(M)
     k = len(M[0])
@@ -52,7 +53,9 @@ def Apply_geometric(S, x):
         x1 = Defensive_Copy(x)
         for t in S:
             x1 = t(x1)
-    return x1
+        return x1
+    else:
+        return x
 
 
 def Cut(M, r1, r2):  # Cut a region into tiles

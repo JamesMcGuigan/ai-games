@@ -1,12 +1,13 @@
 from typing import Tuple
 
 import numpy as np
-from fastcache._lrucache import clru_cache
+from fastcache import clru_cache
 
 from src.datamodel.Problem import Problem
 from src.datamodel.Task import Task
 from src.functions.transforms.singlecolor import np_resize
 from src.functions.transforms.singlecolor import np_shape
+
 
 
 @clru_cache(None)

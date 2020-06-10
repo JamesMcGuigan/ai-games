@@ -1,7 +1,8 @@
-from fastcache._lrucache import clru_cache
+from fastcache import clru_cache
 
 from src.functions.queries.grid import grid_unique_colors
 from src.functions.queries.ratio import is_task_shape_ratio_consistent
+
 
 
 @clru_cache()

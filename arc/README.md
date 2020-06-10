@@ -107,9 +107,9 @@ an integer multiple of each other
 - [src/solver_multimodel/solvers/TessellationSolver.py](src/solver_multimodel/solvers/TessellationSolver.py)
 - [notebooks_gallery/solved/TessellationSolver.ipynb](notebooks_gallery/solved/TessellationSolver.ipynb)
 
-**XGBGridSolver** generates a large multi-dimential featuremap to be solved by XGBoost. 
+**XGBGridSolver** generates a large multi-dimentional featuremap to be solved by XGBoost. 
 The featuremap includes each pixel's "view" of neighbouring pixels. This was able to autosolve a 
-suprising number of problem cases, but also produces a large number of incorrect or close guesess that 
+surprising number of problem cases, but also produces a large number of incorrect or close guesess that 
 managed to test correctly against the train side the task.
 
 Hyperopt Bayesian Hyperparameter Optimization was also performed on XGBoost.
@@ -137,5 +137,5 @@ A range of different numpy.array queries and transformations
 # Kaggle Compile
 - Source: [submission/kaggle_compile.py](submission/kaggle_compile.py)
 
-Kaggle Compile is a custom python concatenater that resolves local import statements and 
+Kaggle Compile is a custom python concatenator that resolves local import statements and 
 allows an IDE multi-file codebase to be compiled into a single-file Kaggle Kernel Script 

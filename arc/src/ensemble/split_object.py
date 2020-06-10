@@ -102,29 +102,29 @@ def _split_conn01(img0, neighbor=4):
 
 
 def split_conn(img):
-    ''' Split an image into a list of images each containing a single connected region'''
+    """ Split an image into a list of images each containing a single connected region"""
 
     return _split_conn(img, 4)
 
 
 def split_conn8(img):
-    ''' Split an image into a list of images each containing a single connected region.
+    """ Split an image into a list of images each containing a single connected region.
       Pixels of 8 neighbors are all considered "connected"
-    '''
+    """
 
     return _split_conn(img, 8)
 
 
 def split_conn01(img):
-    ''' Split an image into a list of images each containing a single connected region'''
+    """ Split an image into a list of images each containing a single connected region"""
 
     return _split_conn01(img, 4)
 
 
 def split_conn801(img):
-    ''' Split an image into a list of images each containing a single connected region.
+    """ Split an image into a list of images each containing a single connected region.
       Pixels of 8 neighbors are all considered "connected"
-    '''
+    """
 
     return _split_conn01(img, 8)
 

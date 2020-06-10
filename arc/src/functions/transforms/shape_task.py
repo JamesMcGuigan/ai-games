@@ -2,13 +2,14 @@ from typing import List
 from typing import Tuple
 
 import numpy as np
-from fastcache._lrucache import clru_cache
+from fastcache import clru_cache
 
 from src.datamodel.Task import Task
 from src.functions.transforms.shape_problem import problem_difference_input
 from src.functions.transforms.shape_problem import problem_difference_mask
 from src.functions.transforms.shape_problem import problem_difference_output
 from src.functions.transforms.shape_problem import problem_max_shape
+
 
 
 @clru_cache(None)

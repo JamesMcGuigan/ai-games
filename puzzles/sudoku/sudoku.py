@@ -6,7 +6,6 @@ from itertools import chain  # flatten nested lists; chain(*[[a, b], [c, d], ...
 from z3 import *
 
 
-
 rows = 'ABCDEFGHI'
 cols = '123456789'
 boxes = [[Int("{}{}".format(r, c)) for c in cols] for r in rows]  # declare variables for each box in the puzzle
@@ -39,7 +38,73 @@ def sudoku_solver(board):
     return s_solver
 
 
+import pandas as pd
+
+
+### Conversion Functions
+
+def format_time(seconds):
+    if seconds < 1:     return "{:.0f}ms".format(seconds*1000)
+    if seconds < 60:    return "{:.2f}s".format(seconds)
+    if seconds < 60*60: return "{:.0f}m {:.0f}s".format(seconds//60, seconds%60)
+    if seconds < 60*60: return "{:.0f}h {:.0f}m {:.0f}s".format(seconds//(60*60), (seconds//60)%60, seconds%60)
+
+
+def string_to_tuple(string):
+    if isinstance(string, Solver): string = solver_to_tuple(string)
+
+    string = string.replace('.','0')
+    output = tuple( tuple(map(int, string[n*9:n*9+9])) for n in range(0,9) )
+    return output
+
+
+def tuple_to_string(board, zeros='.'):
+    if isinstance(board, str):    board = string_to_tuple(board)
+    if isinstance(board, Solver): board = solver_to_tuple(board)
+
+    output = "".join([ "".join(map(str,row)) for row in board ])
+    output = output.replace('0', zeros)
+    return output
+
+
+def solver_to_tuple(s_solver):
+    output = tuple(
+        tuple(
+            int(s_solver.model()[box].as_string())
+            for col, box in enumerate(_boxes)
+        )
+        for row, _boxes in enumerate(boxes)
+    )
+    return output
+
+
+def solver_to_string(s_solver, zeros='.'):
+    output = "".join(
+        "".join(
+            s_solver.model()[box].as_string()
+            for col, box in enumerate(_boxes)
+        )
+        for row, _boxes in enumerate(boxes)
+    )
+    return output
+
+
+def series_to_inout_pair(series):
+    input  = ''
+    output = ''
+    for key, value in series.iteritems():
+        if isinstance(value, str) and len(value) == 9*9:
+            if not input: input  = value
+            else:         output = value
+    return (input, output)
+
+
+
+### Print Functions
+
 def print_board(board):
+    if isinstance(board, str):     board = string_to_tuple(board)
+    if isinstance(board, Solver):  board = solver_to_tuple(board)
     for row, _boxes in enumerate(boxes):
         if row and row % 3 == 0:
             print('-'*9+"|"+'-'*9+"|"+'-'*9)
@@ -51,21 +116,87 @@ def print_board(board):
     print()
 
 
-def print_sudoku_solution( board ):
-    time_start = time.perf_counter()
-    s_solver = sudoku_solver(board)
-    assert s_solver.check() == sat, "Uh oh. The solver didn't find a solution. Check your constraints."
-    for row, _boxes in enumerate(boxes):
-        if row and row % 3 == 0:
-            print('-'*9+"|"+'-'*9+"|"+'-'*9)
-        for col, box in enumerate(_boxes):
-            if col and col % 3 == 0:
-                print('|', end='')
-            print(' {} '.format(s_solver.model()[box]), end='')
-        print()
-    print()
-    print('solved in', round(time.perf_counter() - time_start,2), 's')
+def print_sudoku( board ):
+    if isinstance(board, str): board = string_to_tuple(board)
 
+    print_board(board)
+
+    time_start = time.perf_counter()
+    s_solver   = sudoku_solver(board)
+    time_end   = time.perf_counter()
+    if s_solver.check() != sat: print('Unsolvable'); return
+
+    time_end   = time.perf_counter()
+    print_board(s_solver)
+    print('solved in {:.2f}s'.format(time_end - time_start))
+
+
+
+### Solve Functions
+
+def solve_sudoku( board, format=str ):
+    """This is really just a wrapper function that deals with type conversion"""
+    if isinstance(board, str):     board = string_to_tuple(board)
+    if isinstance(board, Solver):  board = solver_to_tuple(board)
+
+    s_solver = sudoku_solver(board)
+
+    if s_solver.check() != sat:
+        return None
+    if format == str:
+        return solver_to_string(s_solver)
+    if format == tuple:
+        return solver_to_tuple(s_solver)
+    return s_solver
+
+
+def solve_dataframe(dataframe, count=0, timeout=8*60*60, verbose=0):
+    if isinstance(dataframe, str): dataframe = pd.read_csv(dataframe)
+
+    time_start = time.perf_counter()
+    total      = 0
+    solved     = 0
+    failed     = []
+    different  = []
+    for index, row in dataframe.iterrows():
+        if count and index >= count:                    break
+        if time.perf_counter() - time_start >= timeout: break
+
+        board, expected = series_to_inout_pair(row)
+        board  = board.replace('0', '.')
+        output = solve_sudoku(board, format=str)
+
+        if output is None:
+            failed.append([index, row])
+            if verbose:
+                print(f"Failed:    {board} -> {expected} != {output}")
+            if verbose >= 2:
+                print_board(board)
+                print_board('Unsolvable')
+        elif output != expected:
+            solved += 1
+            different.append([index, row])
+            if verbose:
+                print(f"Different: {board} -> {expected} != {output}")
+            if verbose >= 2:
+                print_board(board)
+                print_board(output)
+        else:
+            solved += 1
+            if verbose:
+                print(f"Solved:    {board} -> {output}")
+            if verbose >= 3:
+                print_board(board)
+                print_board(output)
+        total += 1
+    time_end   = time.perf_counter()
+    if verbose: print()
+    time_taken = time_end-time_start
+    print(f'Solved {solved}/{total} Sudoku ({len(different)} different / {len(failed)} failures) in {format_time(time_taken)} ({format_time(time_taken/total)} per sudoku)')
+
+
+test_board = "..149....642.31........8........67...54...9..9....5..8...6....5.......2...5.24.81"
+assert test_board == tuple_to_string(string_to_tuple(test_board))
 
 
 if __name__ == '__main__':
@@ -80,8 +211,7 @@ if __name__ == '__main__':
              (0, 0, 2, 6, 0, 9, 5, 0, 0),
              (8, 0, 0, 2, 0, 3, 0, 0, 9),
              (0, 0, 5, 0, 1, 0, 3, 0, 0))
-    print_board(board)
-    print_sudoku_solution(board)
+    print_sudoku(board)
 
     print()
     print()
@@ -98,5 +228,4 @@ if __name__ == '__main__':
         (0, 0, 8, 5, 0, 0, 0, 1, 0),
         (0, 9, 0, 0, 0, 0, 4, 0, 0)
     )
-    print_board(board_hardest_sudoku)
-    print_sudoku_solution(board_hardest_sudoku)
+    print_sudoku(board_hardest_sudoku)

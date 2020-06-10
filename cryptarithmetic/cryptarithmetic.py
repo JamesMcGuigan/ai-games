@@ -56,21 +56,26 @@ def cryptarithmetic(input: str, limit=None, unique=True):
 
 
 if __name__ == '__main__':
-    print('##### Cryptarithmetic Addition ##### ')
+    print('## Cryptarithmetic Addition and Subtraction')
     cryptarithmetic('XY - X == YX')
     cryptarithmetic('TWO + TWO == FOUR')
+    cryptarithmetic('EIGHT - FOUR == FOUR', limit=4)
+
+    print()
+    print('## Cryptarithmetic Multiplication and Division')
     cryptarithmetic('ONE * TWO == THREE', limit=1)
     cryptarithmetic('X / Y == 2')  # Division by 2 is rounded
     cryptarithmetic("Y == A * X + B")
-    cryptarithmetic('EIGHT - FOUR == FOUR', limit=4)
-    print()
-    print('##### Cryptarithmetic Multiplication ##### ')
     cryptarithmetic('( FOUR - TWO ) * ( NINE - ONE ) + TWO == EIGHTEEN', limit=3)
+
+    print()
+    print('## Cryptarithmetic Powers')
     cryptarithmetic("A**2 + B**2 == C**2",  unique=False)
     cryptarithmetic("A**2 + B**2 == CD**2", unique=False)
+
     print()
-    print('##### Cryptarithmetic Challenges #####')
-    print('##### https://www.reddit.com/r/dailyprogrammer/comments/7p5p2o/20180108_challenge_346_easy_cryptarithmetic_solver/')
+    print('## Cryptarithmetic Challenges ##')
+    print('- https://www.reddit.com/r/dailyprogrammer/comments/7p5p2o/20180108_challenge_346_easy_cryptarithmetic_solver/')
     challenges = [
         "WHAT + WAS + THY == CAUSE",
         "HIS + HORSE + IS == SLAIN",

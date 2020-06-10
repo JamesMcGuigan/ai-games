@@ -3,9 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/ai-games.iml" filepath="$PROJECT_DIR$/.idea/ai-games.iml" />
-      <module fileurl="file://$PROJECT_DIR$/arc/arc.iml" filepath="$PROJECT_DIR$/arc/arc.iml" />
-      <module fileurl="file://$PROJECT_DIR$/knights-isolation/knights-isolation.iml" filepath="$PROJECT_DIR$/knights-isolation/knights-isolation.iml" />
-      <module fileurl="file://$PROJECT_DIR$/pacman/pacman.iml" filepath="$PROJECT_DIR$/pacman/pacman.iml" />
+      <module fileurl="file://$PROJECT_DIR$/search/arc/arc.iml" filepath="$PROJECT_DIR$/search/arc/arc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/games/knights-isolation/knights-isolation.iml" filepath="$PROJECT_DIR$/games/knights-isolation/knights-isolation.iml" />
+      <module fileurl="file://$PROJECT_DIR$/search/pacman/pacman.iml" filepath="$PROJECT_DIR$/search/pacman/pacman.iml" />
     </modules>
   </component>
 </project>

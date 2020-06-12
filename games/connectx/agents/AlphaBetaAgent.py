@@ -1,7 +1,6 @@
-from __future__ import annotations
-
 import math
 import random
+import sys
 import time
 from operator import itemgetter
 from queue import LifoQueue
@@ -27,6 +26,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
         self.queue     = LifoQueue()
         self.verbose_depth    = self.kwargs.get('verbose_depth')
         self.search_max_depth = self.kwargs.get('search_max_depth')
+        if "pytest" in sys.modules: self.search_max_depth = 3
 
 
     ### Exported Interface
@@ -41,7 +41,12 @@ class AlphaBetaAgent(PersistentCacheAgent):
         game    = ConnectX(observation, configuration)
         agent   = AlphaBetaAgent(game, **kwargs)
         action  = agent.get_action(timeout - (time.perf_counter()-time_start))
-        return action
+        return int(action)
+
+    @staticmethod
+    def agent_test(observation, configuration, **kwargs) -> int:
+        kwargs = { "search_max_depth": 3, **kwargs }
+        return AlphaBetaAgent.agent(observation, configuration, **kwargs)
 
 
 

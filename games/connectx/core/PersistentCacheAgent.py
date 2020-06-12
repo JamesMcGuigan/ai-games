@@ -7,8 +7,9 @@ import time
 import zlib
 
 
+
 class PersistentCacheAgent:
-    debug   = True
+    debug   = not os.environ.get('KAGGLE_KERNEL_RUN_TYPE',None)
     cache   = {}
     verbose = True
 

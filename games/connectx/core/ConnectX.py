@@ -50,9 +50,9 @@ class Line:
         mark = game.board[coord]
         if mark == 0: return None
 
-        cells = set()
+        cells = { coord }
         for sign in [1, -1]:
-            next = coord
+            next = cls.next_coord(coord, direction, sign)
             while cls._is_valid_coord(next, game) and game.board[next] == mark:
                 cells.add(next)
                 next = cls.next_coord(next, direction, sign)
@@ -84,7 +84,7 @@ class Line:
         return len(self.cells)
 
     def __hash__(self):
-        return hash((self.direction, self.cells, self.game))
+        return hash((self.direction, self.cells))
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__): return False
@@ -108,16 +108,18 @@ class Line:
 
     def is_valid_coord( self, coord: Tuple[int,int] ) -> bool:
         # Profiler: 7.7% -> 6.2% runtime | avoid an extra function call within this tight loop
-        if coord[0] < 0 or self.game.rows    <= coord[0]: return False
-        if coord[1] < 0 or self.game.columns <= coord[1]: return False
+        game = self.game
+        x,y  = coord
+        if x < 0 or game.rows    <= x: return False
+        if y < 0 or game.columns <= y: return False
         return True
 
     @staticmethod
     def _is_valid_coord( coord: Tuple[int,int], game: ConnectX ) -> bool:
-        if coord[0] < 0 or game.rows    <= coord[0]: return False
-        if coord[1] < 0 or game.columns <= coord[1]: return False
+        x,y  = coord
+        if x < 0 or game.rows    <= x: return False
+        if y < 0 or game.columns <= y: return False
         return True
-
 
 
     ### Heuristic Methods
@@ -166,7 +168,7 @@ class Line:
     def extensions( self ) -> List[FrozenSet[Tuple[int,int]]]:
         extensions = []
         for next in self.liberties:
-            extension = set([ next ])
+            extension = { next }
             for sign in [1,-1]:
                 count = 0
                 while True:
@@ -199,7 +201,7 @@ class ConnectX(KaggleGame):
         self.timeout:   int = configuration.timeout
         self.player_id: int = observation.mark
 
-        self.board = observation.board = self.cast_board(observation.board)
+        self.board = self.cast_board(observation.board)  # Don't modify observation.board
         self.lines = Line.from_game(self)
 
 
@@ -267,11 +269,10 @@ class ConnectX(KaggleGame):
         actions = np.nonzero(self.board[0,:] == 0)[0]  # rows are counted from sky = 0; if the top row is empty we can play
         return actions
 
-    @cached_property
-    def score( self ) -> float:
+    def score( self, player_id: int ) -> float:
         """Heuristic score"""
-        hero_score    = sum( line.score for line in self.lines if line.mark == self.player_id )
-        villain_score = sum( line.score for line in self.lines if line.mark != self.player_id )
+        hero_score    = sum( line.score for line in self.lines if line.mark == player_id )
+        villain_score = sum( line.score for line in self.lines if line.mark != player_id )
         return hero_score - villain_score
 
     def utility(self, player_id: int) -> float:

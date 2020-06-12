@@ -87,7 +87,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
 
     def _alphabeta_min_value( self, game: KaggleGame, player_id, depth: int, alpha=-math.inf, beta=math.inf ):
         if game.gameover: return game.utility(player_id)
-        if depth == 0:    return self.heuristic(game, player_id)
+        if depth == 0:    return game.score(player_id)
         score = math.inf
         for action in game.actions:
             result    = game.result(action)
@@ -101,7 +101,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
 
     def _alphabeta_max_value( self, game: KaggleGame, player_id: int, depth, alpha=-math.inf, beta=math.inf ):
         if game.gameover:  return game.utility(player_id)
-        if depth == 0:     return self.heuristic(game, player_id)
+        if depth == 0:     return game.score(player_id)
         score = -math.inf
         for action in game.actions:
             result    = game.result(action)
@@ -109,14 +109,6 @@ class AlphaBetaAgent(PersistentCacheAgent):
             if score >= beta: return score
             alpha     = max(alpha, score)
         return score
-
-
-    ### Heuristic Functions
-
-    def heuristic( self, game: ConnectX, player_id: int ):
-        hero_score    = sum( line.score for line in game.lines if line.mark == player_id )
-        villain_score = sum( line.score for line in game.lines if line.mark != player_id )
-        return hero_score - villain_score
 
 
 

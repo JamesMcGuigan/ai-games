@@ -56,8 +56,7 @@ class KaggleGame:
         """Has the game reached a terminal game?"""
         raise NotImplementedError
 
-    @cached_property
-    def score( self ) -> bool:
+    def score( self, player_id: int ) -> bool:
         raise NotImplementedError
 
     def utility( self, player_id: int ) -> bool:

@@ -16,7 +16,7 @@ from util.call_with_timeout_ms import call_with_timeout
 class AlphaBetaAgent(PersistentCacheAgent):
     defaults = {
         "verbose_depth":    True,
-        "search_max_depth": 5,
+        "search_max_depth": 100,
     }
 
     def __init__( self, game: ConnectX, *args, **kwargs ):
@@ -34,12 +34,12 @@ class AlphaBetaAgent(PersistentCacheAgent):
     # observation   = {'mark': 1, 'board': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
     # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 2}
     @staticmethod
-    def agent(observation, configuration) -> int:
+    def agent(observation, configuration, **kwargs) -> int:
         time_start = time.perf_counter()
         timeout    = configuration.timeout * 0.8  # 400ms spare to return answers - 0.9 is too small
 
         game    = ConnectX(observation, configuration)
-        agent   = AlphaBetaAgent(game)
+        agent   = AlphaBetaAgent(game, **kwargs)
         action  = agent.get_action(timeout - (time.perf_counter()-time_start))
         return action
 

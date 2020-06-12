@@ -23,7 +23,7 @@ class PersistentCacheAgent:
         return instance
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__()
         if self.debug: return
         self.load()
         self.autosave()

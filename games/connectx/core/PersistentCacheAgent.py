@@ -9,7 +9,7 @@ import zlib
 
 
 class PersistentCacheAgent:
-    debug   = not os.environ.get('KAGGLE_KERNEL_RUN_TYPE',None)
+    persist = False
     cache   = {}
     verbose = True
 
@@ -25,7 +25,7 @@ class PersistentCacheAgent:
 
     def __init__(self, *args, **kwargs):
         super().__init__()
-        if self.debug: return
+        if not self.persist: return  # disable persistent caching
         self.load()
         self.autosave()
 
@@ -43,8 +43,8 @@ class PersistentCacheAgent:
 
     @classmethod
     def load( cls ):
-        if cls.debug: return  # remove caching on debug
-        if cls.cache: return  # skip loading if the file is already in class memory
+        if not cls.persist: return  # disable persistent caching
+        if cls.cache:       return  # skip loading if the file is already in class memory
         try:
             # class cache may be more upto date than the pickle file, so avoid race conditions with multiple instances
             filename   = cls.filename()
@@ -65,8 +65,8 @@ class PersistentCacheAgent:
 
     @classmethod
     def save( cls ):
-        if cls.debug: return  # remove caching on debug
-        # cls.load()          # update any new information from the file
+        if not cls.persist: return  # disable persistent caching
+        # cls.load()                # update any new information from the file
         if cls.cache:
             filename = cls.filename()
             dirname  = os.path.dirname(filename)
@@ -101,7 +101,7 @@ class PersistentCacheAgent:
     def cache_function( cls, function, game, *args, **kwargs ):
         hash = game
         if function.__name__ not in cls.cache:   cls.cache[function.__name__] = {}
-        if not cls.debug and hash in cls.cache[function.__name__]: return cls.cache[function.__name__][hash]
+        if hash in cls.cache[function.__name__]: return cls.cache[function.__name__][hash]
 
         score = function(game, *args, **kwargs)
         cls.cache[function.__name__][hash] = score
@@ -112,7 +112,7 @@ class PersistentCacheAgent:
         # Don't cache heuristic values, only terminal states
         hash = game  # QUESTION: is player_id required for correct caching between games?
         if function.__name__ not in cls.cache:   cls.cache[function.__name__] = {}
-        if not cls.debug and hash in cls.cache[function.__name__]: return cls.cache[function.__name__][hash]
+        if hash in cls.cache[function.__name__]: return cls.cache[function.__name__][hash]
 
         score = function(game, *args, **kwargs)
         if abs(score) == math.inf: cls.cache[function.__name__][hash] = score

@@ -1,4 +1,4 @@
-def rules_agent(observation, configuration, verbose=True):
+def RulesAgent( observation, configuration, verbose=True ):
     verbose = True
     try:
         from functools import lru_cache

@@ -36,7 +36,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
     @staticmethod
     def agent(observation, configuration) -> int:
         time_start = time.perf_counter()
-        timeout    = configuration.timeout * 0.9  # 200ms spare to return answers
+        timeout    = configuration.timeout * 0.8  # 400ms spare to return answers - 0.9 is too small
 
         game    = ConnectX(observation, configuration)
         agent   = AlphaBetaAgent(game)
@@ -47,14 +47,13 @@ class AlphaBetaAgent(PersistentCacheAgent):
 
     ### Public Interface
 
-    def get_action( self, timeout: float ):
-        print(f'get_action({timeout})')
+    def get_action( self, timeout: float ) -> int:
         call_with_timeout(timeout, self.iterative_deepening_search)
         if self.queue.empty():
             action = random.choice(self.game.actions)  # backup move incase of early timeout
         else:
             action = self.queue.get()
-        return action
+        return int(action)
 
 
 

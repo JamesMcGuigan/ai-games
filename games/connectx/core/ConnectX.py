@@ -91,8 +91,9 @@ class ConnectX(KaggleGame):
 
     @cached_property
     def actions(self) -> List[int]:
-        actions = np.nonzero(self.board[0,:] == 0)[0]  # rows are counted from sky = 0; if the top row is empty we can play
-        return actions
+        # rows are counted from sky = 0; if the top row is empty we can play
+        actions = np.nonzero(self.board[0,:] == 0)[0].tolist()   # BUGFIX: Kaggle wants List[int] not np.ndarray(int64)
+        return list(actions)
 
     def score( self, player_id: int ) -> float:
         """Heuristic score"""

@@ -60,15 +60,18 @@ class AlphaBetaAgent(PersistentCacheAgent):
     def iterative_deepening_search( self, endtime: float = 0 ) -> int:
         # The real trick with iterative deepening is caching, which allows us to out-depth the default minimax Agent
         if self.verbose_depth: print('\n'+ self.__class__.__name__.ljust(20) +' | depth:', end=' ', flush=True)
-        action = random.choice(self.game.actions)
+        best_action = random.choice(self.game.actions)
         for depth in range(1, self.search_max_depth+1):
             action, score = self.alphabeta(self.game, depth=depth, endtime=endtime)
+            if endtime and time.perf_counter() >= endtime: break  # ignore results on timeout
+
+            best_action = action
             if self.verbose_depth: print(depth, end=' ', flush=True)
             if abs(score) == math.inf:
                 if self.verbose_depth: print(score, end=' ', flush=True)
                 break  # terminate iterative deepening on inescapable victory condition
-            if endtime and time.perf_counter() >= endtime: break
-        return action
+
+        return best_action
         # if self.verbose_depth: print( depth, type(action), action, int((time.perf_counter() - time_start) * 1000), 'ms' )
 
 
@@ -96,7 +99,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
         return score
 
     def alphabeta_max_value( self, game: KaggleGame, player_id: int, depth, alpha=-math.inf, beta=math.inf, endtime: float = 0  ):
-        return self.cache_infinite(self._alphabeta_max_value, game, player_id, depth, alpha, beta, endtime)    #
+        return self.cache_infinite(self._alphabeta_max_value, game, player_id, depth, alpha, beta, endtime)
     def _alphabeta_max_value( self, game: KaggleGame, player_id: int, depth, alpha=-math.inf, beta=math.inf, endtime: float = 0  ):
         if game.gameover:  return game.utility(player_id)
         if depth == 0:     return game.score(player_id)

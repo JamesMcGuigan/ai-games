@@ -8,6 +8,7 @@ env = make("connectx", debug=True)
 env.render()
 env.reset()
 
-env.run([AlphaBetaAgent.agent, "random"])
-# # env.render(mode="ipython", width=500, height=450)
+# env.run([AlphaBetaAgent.agent, "random"])
+env.run([AlphaBetaAgent.agent, AlphaBetaAgent.agent])
+# noinspection PyTypeChecker
 env.render(mode="human")

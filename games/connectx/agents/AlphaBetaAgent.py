@@ -8,7 +8,6 @@ from queue import LifoQueue
 from games.connectx.core.ConnectX import ConnectX
 from games.connectx.core.KaggleGame import KaggleGame
 from games.connectx.core.PersistentCacheAgent import PersistentCacheAgent
-from util.call_with_timeout_ms import call_with_timeout
 
 
 
@@ -53,61 +52,59 @@ class AlphaBetaAgent(PersistentCacheAgent):
     ### Public Interface
 
     def get_action( self, timeout: float ) -> int:
-        call_with_timeout(timeout, self.iterative_deepening_search)
-        if self.queue.empty():
-            action = random.choice(self.game.actions)  # backup move incase of early timeout
-        else:
-            action = self.queue.get()
+        action = self.iterative_deepening_search(endtime=time.perf_counter()+timeout)
         return int(action)
 
 
 
     ### Search Functions
 
-    def iterative_deepening_search( self ):
+    def iterative_deepening_search( self, endtime: float = 0 ) -> int:
         # The real trick with iterative deepening is caching, which allows us to out-depth the default minimax Agent
         if self.verbose_depth: print('\n'+ self.__class__.__name__.ljust(20) +' | depth:', end=' ', flush=True)
+        action = random.choice(self.game.actions)
         for depth in range(1, self.search_max_depth+1):
-            action, score = self.alphabeta(self.game, depth=depth)
-            self.queue.put(action)
+            action, score = self.alphabeta(self.game, depth=depth, endtime=endtime)
             if self.verbose_depth: print(depth, end=' ', flush=True)
             if abs(score) == math.inf:
                 if self.verbose_depth: print(score, end=' ', flush=True)
                 break  # terminate iterative deepening on inescapable victory condition
+            if endtime and time.perf_counter() >= endtime: break
+        return action
         # if self.verbose_depth: print( depth, type(action), action, int((time.perf_counter() - time_start) * 1000), 'ms' )
 
 
-    def alphabeta( self, game, depth ):
-        actions = game.actions
-        scores  = [
-            self.alphabeta_min_value(game.result(action), player_id=self.player_id, depth=depth - 1)
-            for action in actions
-        ]
-        action, score = max(zip(actions, scores), key=itemgetter(1))
+    def alphabeta( self, game, depth, endtime: float = 0 ):
+        scores = []
+        for action in game.actions:
+            if endtime and time.perf_counter() >= endtime: break
+            score = self.alphabeta_min_value(game.result(action), player_id=self.player_id, depth=depth - 1)
+            scores.append(score)
+        action, score = max(zip(game.actions, scores), key=itemgetter(1))
         return action, score
 
-    def alphabeta_min_value( self, game: KaggleGame, player_id: int, depth: int, alpha=-math.inf, beta=math.inf ):
-        return self.cache_infinite(self._alphabeta_min_value, game, player_id, depth, alpha, beta)
-
-    def _alphabeta_min_value( self, game: KaggleGame, player_id, depth: int, alpha=-math.inf, beta=math.inf ):
+    def alphabeta_min_value( self, game: KaggleGame, player_id: int, depth: int, alpha=-math.inf, beta=math.inf, endtime: float = 0):
+        return self.cache_infinite(self._alphabeta_min_value, game, player_id, depth, alpha, beta, endtime)
+    def _alphabeta_min_value( self, game: KaggleGame, player_id, depth: int, alpha=-math.inf, beta=math.inf, endtime: float = 0 ):
         if game.gameover: return game.utility(player_id)
         if depth == 0:    return game.score(player_id)
         score = math.inf
         for action in game.actions:
+            if endtime and time.perf_counter() >= endtime: return score
             result    = game.result(action)
             score     = min(score, self.alphabeta_max_value(result, player_id, depth-1, alpha, beta))
             if score <= alpha: return score
             beta      = min(beta,score)
         return score
 
-    def alphabeta_max_value( self, game: KaggleGame, player_id: int, depth, alpha=-math.inf, beta=math.inf ):
-        return self.cache_infinite(self._alphabeta_max_value, game, player_id, depth, alpha, beta)
-
-    def _alphabeta_max_value( self, game: KaggleGame, player_id: int, depth, alpha=-math.inf, beta=math.inf ):
+    def alphabeta_max_value( self, game: KaggleGame, player_id: int, depth, alpha=-math.inf, beta=math.inf, endtime: float = 0  ):
+        return self.cache_infinite(self._alphabeta_max_value, game, player_id, depth, alpha, beta, endtime)    #
+    def _alphabeta_max_value( self, game: KaggleGame, player_id: int, depth, alpha=-math.inf, beta=math.inf, endtime: float = 0  ):
         if game.gameover:  return game.utility(player_id)
         if depth == 0:     return game.score(player_id)
         score = -math.inf
         for action in game.actions:
+            if endtime and time.perf_counter() >= endtime: return score
             result    = game.result(action)
             score     = max(score, self.alphabeta_min_value(result, player_id, depth-1, alpha, beta))
             if score >= beta: return score

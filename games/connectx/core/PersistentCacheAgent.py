@@ -98,8 +98,8 @@ class PersistentCacheAgent:
 
     ### Caching
     @classmethod
-    def cache_function( cls, function, game, *args, **kwargs ):
-        hash = game
+    def cache_function( cls, function, game, player_id, *args, **kwargs ):
+        hash = (player_id, game)  # QUESTION: is player_id required for correct caching between games?
         if function.__name__ not in cls.cache:   cls.cache[function.__name__] = {}
         if hash in cls.cache[function.__name__]: return cls.cache[function.__name__][hash]
 
@@ -108,12 +108,12 @@ class PersistentCacheAgent:
         return score
 
     @classmethod
-    def cache_infinite( cls, function, game, *args, **kwargs ):
+    def cache_infinite( cls, function, game, player_id, *args, **kwargs ):
         # Don't cache heuristic values, only terminal states
-        hash = game  # QUESTION: is player_id required for correct caching between games?
+        hash = (player_id, game)  # QUESTION: is player_id required for correct caching between games?
         if function.__name__ not in cls.cache:   cls.cache[function.__name__] = {}
         if hash in cls.cache[function.__name__]: return cls.cache[function.__name__][hash]
 
-        score = function(game, *args, **kwargs)
+        score = function(game, player_id, *args, **kwargs)
         if abs(score) == math.inf: cls.cache[function.__name__][hash] = score
         return score

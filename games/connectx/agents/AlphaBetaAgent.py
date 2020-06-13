@@ -34,7 +34,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
     # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 2}
     @staticmethod
     def agent(observation, configuration, **kwargs) -> int:
-        endtime = time.perf_counter() + configuration.timeout * 0.5
+        endtime = time.perf_counter() + configuration.timeout - 0.7  # https://www.kaggle.com/zanedurante/intelligent-monte-carlo#kln-17
         game    = ConnectX(observation, configuration)
         agent   = AlphaBetaAgent(game, **kwargs)
         action  = agent.get_action(endtime)

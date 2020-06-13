@@ -133,10 +133,12 @@ class Line:
         # A line with zero liberties is dead
         # A line with two liberties is a potential double attack
         # A line of 2 with 2 liberties is worth more than a line of 3 with one liberty
-        if self.gameover:            return math.inf
-        if len(self.liberties) == 0: return 0
+        if len(self) == self.game.inarow: return math.inf
+        if len(self.liberties) == 0:      return 0                                  # line can't connect 4
         if len(self) + sum(map(len, self.extensions)) < self.game.inarow: return 0  # line can't connect 4
-        return ( len(self) + self.extension_score ) * len(self.liberties)
+        score = ( len(self) + self.extension_score ) * len(self.liberties)
+        if len(self) == 1: score /= len(Directions)                                 # Discount duplicates
+        return score
 
     @cached_property
     def extension_score( self ):

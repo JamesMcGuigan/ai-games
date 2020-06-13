@@ -14,7 +14,7 @@ from games.connectx.core.PersistentCacheAgent import PersistentCacheAgent
 class AlphaBetaAgent(PersistentCacheAgent):
     defaults = {
         "verbose_depth":    True,
-        "search_max_depth": 3,
+        "search_max_depth": 100,
     }
 
     def __init__( self, game: ConnectX, *args, **kwargs ):
@@ -34,12 +34,10 @@ class AlphaBetaAgent(PersistentCacheAgent):
     # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 2}
     @staticmethod
     def agent(observation, configuration, **kwargs) -> int:
-        time_start = time.perf_counter()
-        timeout    = configuration.timeout * 0.8  # 400ms spare to return answers - 0.9 is too small
-
+        endtime = time.perf_counter() + configuration.timeout * 0.5
         game    = ConnectX(observation, configuration)
         agent   = AlphaBetaAgent(game, **kwargs)
-        action  = agent.get_action(timeout - (time.perf_counter()-time_start))
+        action  = agent.get_action(endtime)
         return int(action)
 
     @staticmethod
@@ -51,8 +49,8 @@ class AlphaBetaAgent(PersistentCacheAgent):
 
     ### Public Interface
 
-    def get_action( self, timeout: float ) -> int:
-        action = self.iterative_deepening_search(endtime=time.perf_counter()+timeout)
+    def get_action( self, endtime: float ) -> int:
+        action = self.iterative_deepening_search(endtime=endtime)
         return int(action)
 
 

@@ -14,7 +14,7 @@ from games.connectx.core.PersistentCacheAgent import PersistentCacheAgent
 class AlphaBetaAgent(PersistentCacheAgent):
     defaults = {
         "verbose_depth":    True,
-        "search_max_depth": 100,
+        "search_max_depth": 3,
     }
 
     def __init__( self, game: ConnectX, *args, **kwargs ):

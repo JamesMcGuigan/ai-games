@@ -39,7 +39,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
 
     ### Search Functions
 
-    def iterative_deepening_search( self, endtime: float = 0 ) -> int:
+    def iterative_deepening_search( self, endtime=0.0 ) -> int:
         # The real trick with iterative deepening is caching, which allows us to out-depth the default minimax Agent
         if self.verbose_depth: print('\n'+ self.__class__.__name__.ljust(20) +' | depth:', end=' ', flush=True)
         best_action = random.choice(self.game.actions)
@@ -57,39 +57,39 @@ class AlphaBetaAgent(PersistentCacheAgent):
         # if self.verbose_depth: print( depth, type(action), action, int((time.perf_counter() - time_start) * 1000), 'ms' )
 
 
-    def alphabeta( self, game, depth, endtime: float = 0 ):
+    def alphabeta( self, game, depth, endtime=0.0 ):
         scores = []
         for action in game.actions:
             if endtime and time.perf_counter() >= endtime: break
-            score = self.alphabeta_min_value(game.result(action), player_id=self.player_id, depth=depth - 1, endtime=endtime)
+            score = self.alphabeta_min_value(game.result(action), player_id=self.player_id, depth=depth-1, endtime=endtime)
             scores.append(score)
         action, score = max(zip(game.actions, scores), key=itemgetter(1))
         return action, score
 
-    def alphabeta_min_value( self, game: KaggleGame, player_id: int, depth: int, alpha=-math.inf, beta=math.inf, endtime: float = 0):
+    def alphabeta_min_value( self, game: KaggleGame, player_id: int, depth: int, alpha=-math.inf, beta=math.inf, endtime=0.0):
         return self.cache_infinite(self._alphabeta_min_value, game, player_id, depth, alpha, beta, endtime)
-    def _alphabeta_min_value( self, game: KaggleGame, player_id, depth: int, alpha=-math.inf, beta=math.inf, endtime: float = 0 ):
+    def _alphabeta_min_value( self, game: KaggleGame, player_id, depth: int, alpha=-math.inf, beta=math.inf, endtime=0.0 ):
         if game.gameover: return game.utility(player_id)
         if depth == 0:    return game.score(player_id)
         score = math.inf
         for action in game.actions:
             if endtime and time.perf_counter() >= endtime: return score
             result    = game.result(action)
-            score     = min(score, self.alphabeta_max_value(result, player_id, depth-1, alpha, beta))
+            score     = min(score, self.alphabeta_max_value(result, player_id, depth-1, alpha, beta, endtime))
             if score <= alpha: return score
             beta      = min(beta,score)
         return score
 
-    def alphabeta_max_value( self, game: KaggleGame, player_id: int, depth, alpha=-math.inf, beta=math.inf, endtime: float = 0  ):
+    def alphabeta_max_value( self, game: KaggleGame, player_id: int, depth, alpha=-math.inf, beta=math.inf, endtime=0.0  ):
         return self.cache_infinite(self._alphabeta_max_value, game, player_id, depth, alpha, beta, endtime)
-    def _alphabeta_max_value( self, game: KaggleGame, player_id: int, depth, alpha=-math.inf, beta=math.inf, endtime: float = 0  ):
+    def _alphabeta_max_value( self, game: KaggleGame, player_id: int, depth, alpha=-math.inf, beta=math.inf, endtime=0.0  ):
         if game.gameover:  return game.utility(player_id)
         if depth == 0:     return game.score(player_id)
         score = -math.inf
         for action in game.actions:
             if endtime and time.perf_counter() >= endtime: return score
             result    = game.result(action)
-            score     = max(score, self.alphabeta_min_value(result, player_id, depth-1, alpha, beta))
+            score     = max(score, self.alphabeta_min_value(result, player_id, depth-1, alpha, beta, endtime))
             if score >= beta: return score
             alpha     = max(alpha, score)
         return score
@@ -102,7 +102,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
     # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 2}
     @staticmethod
     def agent(observation, configuration, **kwargs) -> int:
-        endtime = time.perf_counter() + configuration.timeout # - 0.5
+        endtime = time.perf_counter() + configuration.timeout - 0.1  # Leave a small amount of time to return an answer
         game    = ConnectX(observation, configuration)
         agent   = AlphaBetaAgent(game, **kwargs)
         action  = agent.get_action(endtime)

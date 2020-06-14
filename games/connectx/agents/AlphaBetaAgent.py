@@ -60,8 +60,8 @@ class AlphaBetaAgent(PersistentCacheAgent):
     def alphabeta( self, game, depth, endtime=0.0 ):
         scores = []
         for action in game.actions:
-            if endtime and time.perf_counter() >= endtime: break
             score = self.alphabeta_min_value(game.result(action), player_id=self.player_id, depth=depth-1, endtime=endtime)
+            if endtime and time.perf_counter() >= endtime: break
             scores.append(score)
         action, score = max(zip(game.actions, scores), key=itemgetter(1))
         return action, score
@@ -73,9 +73,9 @@ class AlphaBetaAgent(PersistentCacheAgent):
         if depth == 0:    return game.score(player_id)
         score = math.inf
         for action in game.actions:
-            if endtime and time.perf_counter() >= endtime: return score
             result    = game.result(action)
             score     = min(score, self.alphabeta_max_value(result, player_id, depth-1, alpha, beta, endtime))
+            if endtime and time.perf_counter() >= endtime: return score
             if score <= alpha: return score
             beta      = min(beta,score)
         return score
@@ -87,9 +87,9 @@ class AlphaBetaAgent(PersistentCacheAgent):
         if depth == 0:     return game.score(player_id)
         score = -math.inf
         for action in game.actions:
-            if endtime and time.perf_counter() >= endtime: return score
             result    = game.result(action)
             score     = max(score, self.alphabeta_min_value(result, player_id, depth-1, alpha, beta, endtime))
+            if endtime and time.perf_counter() >= endtime: return score
             if score >= beta: return score
             alpha     = max(alpha, score)
         return score
@@ -102,7 +102,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
     # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 2}
     @staticmethod
     def agent(observation, configuration, **kwargs) -> int:
-        endtime = time.perf_counter() + configuration.timeout - 0.25  # Leave a small amount of time to return an answer
+        endtime = time.perf_counter() + configuration.timeout - 0.75  # Leave a small amount of time to return an answer
         game    = ConnectX(observation, configuration)
         agent   = AlphaBetaAgent(game, **kwargs)
         action  = agent.get_action(endtime)

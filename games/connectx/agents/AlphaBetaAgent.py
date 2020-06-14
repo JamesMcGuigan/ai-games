@@ -28,24 +28,6 @@ class AlphaBetaAgent(PersistentCacheAgent):
         if "pytest" in sys.modules: self.search_max_depth = 3
 
 
-    ### Exported Interface
-
-    # observation   = {'mark': 1, 'board': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
-    # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 2}
-    @staticmethod
-    def agent(observation, configuration, **kwargs) -> int:
-        endtime = time.perf_counter() + configuration.timeout # - 0.5
-        game    = ConnectX(observation, configuration)
-        agent   = AlphaBetaAgent(game, **kwargs)
-        action  = agent.get_action(endtime)
-        return int(action)
-
-    @staticmethod
-    def agent_test(observation, configuration, **kwargs) -> int:
-        kwargs = { "search_max_depth": 3, **kwargs }
-        return AlphaBetaAgent.agent(observation, configuration, **kwargs)
-
-
 
     ### Public Interface
 
@@ -111,6 +93,25 @@ class AlphaBetaAgent(PersistentCacheAgent):
             if score >= beta: return score
             alpha     = max(alpha, score)
         return score
+
+
+
+    ### Exported Interface
+
+    # observation   = {'mark': 1, 'board': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
+    # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 2}
+    @staticmethod
+    def agent(observation, configuration, **kwargs) -> int:
+        endtime = time.perf_counter() + configuration.timeout # - 0.5
+        game    = ConnectX(observation, configuration)
+        agent   = AlphaBetaAgent(game, **kwargs)
+        action  = agent.get_action(endtime)
+        return int(action)
+
+    @staticmethod
+    def agent_test(observation, configuration, **kwargs) -> int:
+        kwargs = { "search_max_depth": 3, **kwargs }
+        return AlphaBetaAgent.agent(observation, configuration, **kwargs)
 
 
 

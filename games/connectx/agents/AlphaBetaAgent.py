@@ -102,7 +102,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
     # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 2}
     @staticmethod
     def agent(observation, configuration, **kwargs) -> int:
-        endtime = time.perf_counter() + configuration.timeout - 0.1  # Leave a small amount of time to return an answer
+        endtime = time.perf_counter() + configuration.timeout - 0.25  # Leave a small amount of time to return an answer
         game    = ConnectX(observation, configuration)
         agent   = AlphaBetaAgent(game, **kwargs)
         action  = agent.get_action(endtime)

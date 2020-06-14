@@ -2,7 +2,6 @@ import math
 import random
 import sys
 import time
-from operator import itemgetter
 from queue import LifoQueue
 
 from games.connectx.core.ConnectX import ConnectX
@@ -59,12 +58,19 @@ class AlphaBetaAgent(PersistentCacheAgent):
 
     def alphabeta( self, game, depth, endtime=0.0 ):
         scores = []
+        best_action = random.choice(game.actions)
+        best_score  = -math.inf
         for action in game.actions:
             score = self.alphabeta_min_value(game.result(action), player_id=self.player_id, depth=depth-1, endtime=endtime)
             if endtime and time.perf_counter() >= endtime: break
+            if score > best_score:
+                best_score  = score
+                best_action = action
             scores.append(score)
-        action, score = max(zip(game.actions, scores), key=itemgetter(1))
-        return action, score
+
+        # action, score = max(zip(game.actions, scores), key=itemgetter(1))
+        return best_action, best_score  # This is slightly quicker for timeout purposes
+
 
     def alphabeta_min_value( self, game: KaggleGame, player_id: int, depth: int, alpha=-math.inf, beta=math.inf, endtime=0.0):
         return self.cache_infinite(self._alphabeta_min_value, game, player_id, depth, alpha, beta, endtime)

@@ -34,7 +34,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
     # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 2}
     @staticmethod
     def agent(observation, configuration, **kwargs) -> int:
-        endtime = time.perf_counter() + configuration.timeout - 0.7  # https://www.kaggle.com/zanedurante/intelligent-monte-carlo#kln-17
+        endtime = time.perf_counter() + configuration.timeout # - 0.5
         game    = ConnectX(observation, configuration)
         agent   = AlphaBetaAgent(game, **kwargs)
         action  = agent.get_action(endtime)
@@ -79,7 +79,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
         scores = []
         for action in game.actions:
             if endtime and time.perf_counter() >= endtime: break
-            score = self.alphabeta_min_value(game.result(action), player_id=self.player_id, depth=depth - 1)
+            score = self.alphabeta_min_value(game.result(action), player_id=self.player_id, depth=depth - 1, endtime=endtime)
             scores.append(score)
         action, score = max(zip(game.actions, scores), key=itemgetter(1))
         return action, score

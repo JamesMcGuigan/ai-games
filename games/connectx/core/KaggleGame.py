@@ -18,16 +18,21 @@ class KaggleGame:
         return random.choice(game.actions())
     """
 
-    def __init__(self, observation, configuration, verbose=True):
+    def __init__(self, observation, configuration, heuristic_class, verbose=True):
         self.time_start    = time.perf_counter()
         self.observation   = observation
         self.configuration = configuration
         self.verbose       = verbose
+        self.player_id     = None
+        self._hash         = None
+        self.heuristic_class = heuristic_class
+
 
     def __hash__(self):
         """Return an id for caching purposes """
-        return hash(tuplize((self.observation, self.configuration)))
-        # return self.board.tobytes()
+        self._hash = self._hash or hash(tuplize((self.observation, self.configuration)))
+        # self._hash = self._hash or self.board.tobytes()
+        return self._hash
 
 
     ### Result Methods
@@ -52,12 +57,20 @@ class KaggleGame:
     ### Heuristic Methods
 
     @cached_property
+    def heuristic(self):
+        """Delay resolution until after parentclass constructor has finished"""
+        return self.heuristic_class(self)
+
+    @cached_property
     def gameover( self ) -> bool:
         """Has the game reached a terminal game?"""
-        raise NotImplementedError
+        if len( self.actions ) == 0:  return True
+        if self.heuristic.gameover:   return True
 
-    def score( self, player_id: int ) -> bool:
-        raise NotImplementedError
-
-    def utility( self, player_id: int ) -> bool:
-        raise NotImplementedError
+    # def score( self, player_id: int=None ) -> float:
+    #     sign = 1 if self.player_id == player_id or None in (self.player_id, player_id) else -1
+    #     return sign * self.heuristic.score
+    #
+    # def utility( self, player_id: int ) -> float:
+    #     sign = 1 if self.player_id == player_id or None in (self.player_id, player_id) else -1
+    #     return sign * self.heuristic.utility

@@ -7,6 +7,7 @@ from queue import LifoQueue
 from games.connectx.core.ConnectX import ConnectX
 from games.connectx.core.KaggleGame import KaggleGame
 from games.connectx.core.PersistentCacheAgent import PersistentCacheAgent
+from games.connectx.heuristics.LinesHeuristic import LinesHeuristic
 
 
 
@@ -75,8 +76,8 @@ class AlphaBetaAgent(PersistentCacheAgent):
     def alphabeta_min_value( self, game: KaggleGame, player_id: int, depth: int, alpha=-math.inf, beta=math.inf, endtime=0.0):
         return self.cache_infinite(self._alphabeta_min_value, game, player_id, depth, alpha, beta, endtime)
     def _alphabeta_min_value( self, game: KaggleGame, player_id, depth: int, alpha=-math.inf, beta=math.inf, endtime=0.0 ):
-        if game.gameover: return game.utility(player_id)
-        if depth == 0:    return game.score(player_id)
+        if game.gameover: return game.heuristic.utility  # score relative to player with current turn
+        if depth == 0:    return game.heuristic.score
         score = math.inf
         for action in game.actions:
             result    = game.result(action)
@@ -89,8 +90,8 @@ class AlphaBetaAgent(PersistentCacheAgent):
     def alphabeta_max_value( self, game: KaggleGame, player_id: int, depth, alpha=-math.inf, beta=math.inf, endtime=0.0  ):
         return self.cache_infinite(self._alphabeta_max_value, game, player_id, depth, alpha, beta, endtime)
     def _alphabeta_max_value( self, game: KaggleGame, player_id: int, depth, alpha=-math.inf, beta=math.inf, endtime=0.0  ):
-        if game.gameover:  return game.utility(player_id)
-        if depth == 0:     return game.score(player_id)
+        if game.gameover:  return game.heuristic.utility  # score relative to player with current turn
+        if depth == 0:     return game.heuristic.score
         score = -math.inf
         for action in game.actions:
             result    = game.result(action)
@@ -108,10 +109,11 @@ class AlphaBetaAgent(PersistentCacheAgent):
     # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 2}
     @staticmethod
     def agent(observation, configuration, **kwargs) -> int:
-        endtime = time.perf_counter() + configuration.timeout - 1.0  # Leave a small amount of time to return an answer
-        game    = ConnectX(observation, configuration)
+        endtime = time.perf_counter() + configuration.timeout - 1.1  # Leave a small amount of time to return an answer
+        game    = ConnectX(observation, configuration, LinesHeuristic)
         agent   = AlphaBetaAgent(game, **kwargs)
         action  = agent.get_action(endtime)
+        # print(endtime - time.perf_counter(), 's')  # min -0.001315439000000751 s
         return int(action)
 
     @staticmethod

@@ -9,7 +9,10 @@ from typing import Tuple
 from typing import Union
 
 import numpy as np
+from fastcache import clru_cache
 
+from games.connectx.core.ConnectX import ConnectX
+from games.connectx.core.Heuristic import Heuristic
 from util.vendor.cached_property import cached_property
 
 
@@ -40,7 +43,8 @@ class Line:
     ### Factory Methods
 
     @classmethod
-    def from_position( cls, game: 'ConnectX', coord: Tuple[int, int], direction: Direction ) -> Union['Line',None]:
+    @clru_cache(None)
+    def line_from_position( cls, game: 'ConnectX', coord: Tuple[int, int], direction: Direction ) -> Union['Line', None]:
         mark = game.board[coord]
         if mark == 0: return None
 
@@ -57,19 +61,6 @@ class Line:
             mark      = mark,
             direction = direction,
         )
-
-    @classmethod
-    def from_game( cls, game: 'ConnectX' ) -> List['Line']:
-        lines = set()
-        for (row,col) in zip(*np.where(game.board != 0)):
-            if game.board[row,col] == 0: continue
-            lines |= {
-                cls.from_position(game, (row,col), direction)
-                for direction in Directions
-            }
-        lines = { line for line in lines if line.score != 0 }
-        return sorted(lines, reverse=True, key=len)
-
 
 
     ### Magic Methods
@@ -136,7 +127,7 @@ class Line:
         if len(self) == self.game.inarow: return math.inf
         if len(self.liberties) == 0:      return 0                                  # line can't connect 4
         if len(self) + sum(map(len, self.extensions)) < self.game.inarow: return 0  # line can't connect 4
-        score = ( len(self) + self.extension_score ) * len(self.liberties)
+        score = ( len(self)**2 + self.extension_score ) * len(self.liberties)
         if len(self) == 1: score /= len(Directions)                                 # Discount duplicates
         return score
 
@@ -179,3 +170,59 @@ class Line:
             if len(extension):
                 extensions.append(frozenset(extension))
         return extensions
+
+
+
+class LinesHeuristic(Heuristic):
+    ### Heuristic Methods - relative to the current self.player_id
+    ## Heuristic Methods
+
+    cache = {}
+    def __new__(cls, game: ConnectX, *args, **kwargs):
+        hash = frozenset(( game.board.tobytes(), np.fliplr(game.board).tobytes() ))
+        if hash not in cls.cache:
+            cls.cache[hash] = object.__new__(cls)
+        return cls.cache[hash]
+
+    def __init__(self, game: ConnectX):
+        super().__init__(game)
+        self.game      = game
+        self.board     = game.board
+        self.player_id = game.player_id
+
+    @cached_property
+    def lines(self) -> List['Line']:
+        lines = set()
+        for (row,col) in zip(*np.where(self.board != 0)):
+            if self.board[row,col] == 0: continue
+            lines |= {
+                Line.line_from_position(self.game, (row, col), direction)
+                for direction in Directions
+            }
+        lines = { line for line in lines if line.score != 0 }
+        return sorted(lines, reverse=True, key=len)
+
+    @cached_property
+    def gameover( self ) -> bool:
+        """Has the game reached a terminal game?"""
+        if len( self.game.actions ) == 0:               return True
+        if any( line.gameover for line in self.lines ): return True
+        return False
+
+
+    @cached_property
+    def score( self ) -> float:
+        """Heuristic score"""
+        hero_score    = sum( line.score for line in self.lines if line.mark == self.player_id )
+        villain_score = sum( line.score for line in self.lines if line.mark != self.player_id )
+        return hero_score - villain_score
+
+    @cached_property
+    def utility(self) -> float:
+        """ +inf for victory or -inf for loss else 0 """
+        for line in self.lines:
+            if len(line) == 4:
+                return math.inf if line.mark == self.player_id else -math.inf
+            else:
+                break  # self.lines is sorted by length
+        return 0

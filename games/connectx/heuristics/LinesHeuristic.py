@@ -134,7 +134,7 @@ class Line:
     @cached_property
     def extension_score( self ):
         # less than 1 - ensure center col is played first
-        return sum( len(cell)**1.25 for cell in self.extensions ) / ( self.game.inarow**2 )
+        return sum( len(extension)**1.25 for extension in self.extensions ) / ( self.game.inarow**2 )
 
     @cached_property
     def liberties( self ) -> FrozenSet[Tuple[int,int]]:
@@ -157,16 +157,12 @@ class Line:
         for next in self.liberties:
             extension = { next }
             for sign in [1,-1]:
-                count = 0
-                while True:
+                while len(extension) + len(self) < self.game.inarow:
                     next = self.next_coord(next, self.direction, sign)
                     if next in self.cells:            break
                     if not self.is_valid_coord(next): break
-                    if self.game.board[next] not in [0, self.mark]: break
+                    if self.game.board[next] not in (0, self.mark): break
                     extension.add(next)
-
-                    count += 1
-                    if count >= self.game.inarow - len(self): break
             if len(extension):
                 extensions.append(frozenset(extension))
         return extensions
@@ -213,16 +209,18 @@ class LinesHeuristic(Heuristic):
     @cached_property
     def score( self ) -> float:
         """Heuristic score"""
-        hero_score    = sum( line.score for line in self.lines if line.mark == self.player_id )
-        villain_score = sum( line.score for line in self.lines if line.mark != self.player_id )
+        # mark is the next player to move - calculate score from perspective of player who just moved
+        hero_score    = sum( line.score for line in self.lines if line.mark != self.player_id )
+        villain_score = sum( line.score for line in self.lines if line.mark == self.player_id )
         return hero_score - villain_score
 
     @cached_property
     def utility(self) -> float:
-        """ +inf for victory or -inf for loss else 0 """
+        """ +inf for victory or -inf for loss else 0 - calculated from the perspective of the player who made the previous move"""
         for line in self.lines:
             if len(line) == 4:
-                return math.inf if line.mark == self.player_id else -math.inf
+                # mark is the next player to move - calculate score from perspective of player who just moved
+                return math.inf if line.mark != self.player_id else -math.inf
             else:
                 break  # self.lines is sorted by length
         return 0

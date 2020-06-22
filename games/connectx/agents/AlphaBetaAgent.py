@@ -1,6 +1,5 @@
 import math
 import random
-import sys
 import time
 from queue import LifoQueue
 
@@ -12,9 +11,10 @@ from games.connectx.heuristics.LinesHeuristic import LinesHeuristic
 
 
 class AlphaBetaAgent(PersistentCacheAgent):
+    heuristic_class = LinesHeuristic
     defaults = {
         "verbose_depth":    True,
-        "search_max_depth": 100,
+        "search_max_depth": 100 # if "pytest" not in sys.modules else 3,
     }
 
     def __init__( self, game: ConnectX, *args, **kwargs ):
@@ -25,8 +25,6 @@ class AlphaBetaAgent(PersistentCacheAgent):
         self.queue     = LifoQueue()
         self.verbose_depth    = self.kwargs.get('verbose_depth')
         self.search_max_depth = self.kwargs.get('search_max_depth')
-        if "pytest" in sys.modules: self.search_max_depth = 3
-
 
 
     ### Public Interface
@@ -43,7 +41,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
         # The real trick with iterative deepening is caching, which allows us to out-depth the default minimax Agent
         if self.verbose_depth: print('\n'+ self.__class__.__name__.ljust(20) +' | depth:', end=' ', flush=True)
         best_action = random.choice(self.game.actions)
-        for depth in range(1, self.search_max_depth+1):
+        for depth in range(1, self.search_max_depth+1, 1):
             action, score = self.alphabeta(self.game, depth=depth, endtime=endtime)
             if endtime and time.perf_counter() >= endtime: break  # ignore results on timeout
 
@@ -62,12 +60,13 @@ class AlphaBetaAgent(PersistentCacheAgent):
         best_action = random.choice(game.actions)
         best_score  = -math.inf
         for action in game.actions:
-            score = self.alphabeta_min_value(game.result(action), player_id=self.player_id, depth=depth-1, endtime=endtime)
+            result = game.result(action)
+            score  = self.alphabeta_min_value(result, player_id=self.player_id, depth=depth-1, endtime=endtime)
             if endtime and time.perf_counter() >= endtime: break
             if score > best_score:
                 best_score  = score
                 best_action = action
-            scores.append(score)
+            scores.append(score)  # for debugging
 
         # action, score = max(zip(game.actions, scores), key=itemgetter(1))
         return best_action, best_score  # This is slightly quicker for timeout purposes
@@ -76,29 +75,33 @@ class AlphaBetaAgent(PersistentCacheAgent):
     def alphabeta_min_value( self, game: KaggleGame, player_id: int, depth: int, alpha=-math.inf, beta=math.inf, endtime=0.0):
         return self.cache_infinite(self._alphabeta_min_value, game, player_id, depth, alpha, beta, endtime)
     def _alphabeta_min_value( self, game: KaggleGame, player_id, depth: int, alpha=-math.inf, beta=math.inf, endtime=0.0 ):
-        if game.gameover: return game.heuristic.utility  # score relative to player with current turn
-        if depth == 0:    return game.heuristic.score
-        score = math.inf
+        if game.gameover:  return game.heuristic.utility  # score relative to previous player who made the move
+        if depth == 0:     return game.heuristic.score
+        scores = []
+        score  = math.inf
         for action in game.actions:
             result    = game.result(action)
             score     = min(score, self.alphabeta_max_value(result, player_id, depth-1, alpha, beta, endtime))
             if endtime and time.perf_counter() >= endtime: return score
             if score <= alpha: return score
             beta      = min(beta,score)
+            scores.append(score)  # for debugging
         return score
 
     def alphabeta_max_value( self, game: KaggleGame, player_id: int, depth, alpha=-math.inf, beta=math.inf, endtime=0.0  ):
         return self.cache_infinite(self._alphabeta_max_value, game, player_id, depth, alpha, beta, endtime)
     def _alphabeta_max_value( self, game: KaggleGame, player_id: int, depth, alpha=-math.inf, beta=math.inf, endtime=0.0  ):
-        if game.gameover:  return game.heuristic.utility  # score relative to player with current turn
+        if game.gameover:  return game.heuristic.utility  # score relative to previous player who made the move
         if depth == 0:     return game.heuristic.score
-        score = -math.inf
+        scores = []
+        score  = -math.inf
         for action in game.actions:
             result    = game.result(action)
             score     = max(score, self.alphabeta_min_value(result, player_id, depth-1, alpha, beta, endtime))
             if endtime and time.perf_counter() >= endtime: return score
             if score >= beta: return score
             alpha     = max(alpha, score)
+            scores.append(score)  # for debugging
         return score
 
 
@@ -109,9 +112,10 @@ class AlphaBetaAgent(PersistentCacheAgent):
     # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 2}
     @staticmethod
     def agent(observation, configuration, **kwargs) -> int:
+        cls     = AlphaBetaAgent
         endtime = time.perf_counter() + configuration.timeout - 1.1  # Leave a small amount of time to return an answer
-        game    = ConnectX(observation, configuration, LinesHeuristic)
-        agent   = AlphaBetaAgent(game, **kwargs)
+        game    = ConnectX(observation, configuration, cls.heuristic_class)
+        agent   = cls(game, **kwargs)
         action  = agent.get_action(endtime)
         # print(endtime - time.perf_counter(), 's')  # min -0.001315439000000751 s
         return int(action)
@@ -120,7 +124,6 @@ class AlphaBetaAgent(PersistentCacheAgent):
     def agent_test(observation, configuration, **kwargs) -> int:
         kwargs = { "search_max_depth": 3, **kwargs }
         return AlphaBetaAgent.agent(observation, configuration, **kwargs)
-
 
 
 # The last function defined in the file run by Kaggle in submission.csv

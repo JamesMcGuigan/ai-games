@@ -17,7 +17,7 @@ class ConnectX(KaggleGame):
 
     # observation   = {'mark': 1, 'board': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
     # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 2}
-    def __init__( self, observation, configuration, heuristic_class: Callable, verbose=True ):
+    def __init__( self, observation, configuration, heuristic_class: Callable=None, verbose=True ):
         super().__init__(observation, configuration, heuristic_class, verbose)
         self.rows:      int = configuration.rows
         self.columns:   int = configuration.columns
@@ -42,7 +42,8 @@ class ConnectX(KaggleGame):
 
     def cast_board( self, board: Union[np.ndarray,List[int]], copy=False ) -> np.ndarray:
         if isinstance(board, np.ndarray):
-            return board if not copy else board.copy()
+            if copy: return board.copy()
+            else:    return board
         else:
             board = np.array(board, dtype=np.int8).reshape(self.rows, self.columns)
             return board
@@ -60,7 +61,7 @@ class ConnectX(KaggleGame):
     def result_observation( self, observation: Struct, action: int ) -> Struct:
         output = copy(observation)
         output.board = self.result_board(observation.board, action, observation.mark)
-        output.mark  = (observation.mark + 1) % self.players
+        output.mark  = 2 if observation.mark == 1 else 1
         return output
 
     def result_board( self, board: np.ndarray, action: int, mark: int ) -> np.ndarray:

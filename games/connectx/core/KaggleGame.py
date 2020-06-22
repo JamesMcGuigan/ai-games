@@ -64,13 +64,15 @@ class KaggleGame:
     @cached_property
     def gameover( self ) -> bool:
         """Has the game reached a terminal game?"""
-        if len( self.actions ) == 0:  return True
-        if self.heuristic.gameover:   return True
+        if self.heuristic:
+            return self.heuristic.gameover
+        else:
+            return len( self.actions ) == 0
 
-    # def score( self, player_id: int=None ) -> float:
-    #     sign = 1 if self.player_id == player_id or None in (self.player_id, player_id) else -1
-    #     return sign * self.heuristic.score
-    #
-    # def utility( self, player_id: int ) -> float:
-    #     sign = 1 if self.player_id == player_id or None in (self.player_id, player_id) else -1
-    #     return sign * self.heuristic.utility
+    @cached_property
+    def score( self ) -> float:
+        return self.heuristic.score
+
+    @cached_property
+    def utility( self ) -> float:
+        return self.heuristic.utility

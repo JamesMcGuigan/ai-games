@@ -5,7 +5,10 @@ import os
 import re
 import subprocess
 import sys
+from subprocess import PIPE
 from typing import List
+
+
 
 parser = argparse.ArgumentParser(
     description='Compile a list of python files into a Kaggle compatable script: \n' +
@@ -93,10 +96,10 @@ def compile_script(filelist: List[str]) -> str:
     shebang = "#!/usr/bin/env python3"
     header = [
         ("\n" + (" ".join(sys.argv)) + "\n"),
-        subprocess.check_output('date --rfc-3339 seconds',     shell=True).decode("utf-8"),
-        subprocess.check_output('git remote -v',               shell=True).decode("utf-8"),
-        subprocess.check_output('git branch -v ',              shell=True).decode("utf-8"),
-        subprocess.check_output('git rev-parse --verify HEAD', shell=True).decode("utf-8"),
+        subprocess.run('date --rfc-3339 seconds',     shell=True, stdout=PIPE).stdout.decode("utf-8"),
+        subprocess.run('git remote -v',               shell=True, stdout=PIPE).stdout.decode("utf-8"),
+        subprocess.run('git branch -v ',              shell=True, stdout=PIPE).stdout.decode("utf-8"),
+        subprocess.run('git rev-parse --verify HEAD', shell=True, stdout=PIPE).stdout.decode("utf-8"),
     ]
     if args.save: header += [ f'Wrote: {savefile()}' ]
 

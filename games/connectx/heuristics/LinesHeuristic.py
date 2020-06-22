@@ -1,5 +1,6 @@
 import functools
 import math
+from collections import defaultdict
 from dataclasses import dataclass
 from enum import Enum
 from enum import unique
@@ -173,18 +174,19 @@ class LinesHeuristic(Heuristic):
     ### Heuristic Methods - relative to the current self.player_id
     ## Heuristic Methods
 
-    cache = {}
+    instances = {}
     def __new__(cls, game: ConnectX, *args, **kwargs):
         hash = frozenset(( game.board.tobytes(), np.fliplr(game.board).tobytes() ))
-        if hash not in cls.cache:
-            cls.cache[hash] = object.__new__(cls)
-        return cls.cache[hash]
+        if hash not in cls.instances:
+            cls.instances[hash] = object.__new__(cls)
+        return cls.instances[hash]
 
     def __init__(self, game: ConnectX):
         super().__init__(game)
         self.game      = game
         self.board     = game.board
         self.player_id = game.player_id
+        self.cache     = defaultdict(dict)
 
     @cached_property
     def lines(self) -> List['Line']:
@@ -206,21 +208,25 @@ class LinesHeuristic(Heuristic):
         return False
 
 
-    @cached_property
-    def score( self ) -> float:
+    def score( self, player_id: int ) -> float:
         """Heuristic score"""
-        # mark is the next player to move - calculate score from perspective of player who just moved
-        hero_score    = sum( line.score for line in self.lines if line.mark != self.player_id )
-        villain_score = sum( line.score for line in self.lines if line.mark == self.player_id )
-        return hero_score - villain_score
+        # mark is the next player to move
+        if player_id not in self.cache['score']:
+            hero_score    = sum( line.score for line in self.lines if line.mark == player_id )
+            villain_score = sum( line.score for line in self.lines if line.mark != player_id )
+            score         = hero_score - villain_score
+            self.cache['score'][player_id] = score
+        return self.cache['score'][player_id]
 
-    @cached_property
-    def utility(self) -> float:
-        """ +inf for victory or -inf for loss else 0 - calculated from the perspective of the player who made the previous move"""
-        for line in self.lines:
-            if len(line) == 4:
-                # mark is the next player to move - calculate score from perspective of player who just moved
-                return math.inf if line.mark != self.player_id else -math.inf
-            else:
+
+    def utility( self, player_id: int ) -> float:
+        """ +inf for victory or -inf for loss else 0 """
+        if player_id not in self.cache['utility']:
+            utility = 0
+            for line in self.lines:
+                if len(line) == 4:
+                    # mark is the next player to move
+                    utility = math.inf if line.mark == player_id else -math.inf
                 break  # self.lines is sorted by length
-        return 0
+            self.cache['utility'][player_id] = utility
+        return self.cache['utility'][player_id]

@@ -75,8 +75,8 @@ class AlphaBetaAgent(PersistentCacheAgent):
     def alphabeta_min_value( self, game: KaggleGame, player_id: int, depth: int, alpha=-math.inf, beta=math.inf, endtime=0.0):
         return self.cache_infinite(self._alphabeta_min_value, game, player_id, depth, alpha, beta, endtime)
     def _alphabeta_min_value( self, game: KaggleGame, player_id, depth: int, alpha=-math.inf, beta=math.inf, endtime=0.0 ):
-        if game.gameover:  return game.heuristic.utility  # score relative to previous player who made the move
-        if depth == 0:     return game.heuristic.score
+        if game.gameover:  return game.heuristic.utility(player_id)  # score relative to previous player who made the move
+        if depth == 0:     return game.heuristic.score(player_id)
         scores = []
         score  = math.inf
         for action in game.actions:
@@ -91,8 +91,8 @@ class AlphaBetaAgent(PersistentCacheAgent):
     def alphabeta_max_value( self, game: KaggleGame, player_id: int, depth, alpha=-math.inf, beta=math.inf, endtime=0.0  ):
         return self.cache_infinite(self._alphabeta_max_value, game, player_id, depth, alpha, beta, endtime)
     def _alphabeta_max_value( self, game: KaggleGame, player_id: int, depth, alpha=-math.inf, beta=math.inf, endtime=0.0  ):
-        if game.gameover:  return game.heuristic.utility  # score relative to previous player who made the move
-        if depth == 0:     return game.heuristic.score
+        if game.gameover:  return game.heuristic.utility(player_id)  # score relative to previous player who made the move
+        if depth == 0:     return game.heuristic.score(player_id)
         scores = []
         score  = -math.inf
         for action in game.actions:
@@ -113,7 +113,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
     @staticmethod
     def agent(observation, configuration, **kwargs) -> int:
         cls     = AlphaBetaAgent
-        endtime = time.perf_counter() + configuration.timeout - 1.1  # Leave a small amount of time to return an answer
+        endtime = time.perf_counter() + configuration.timeout - 1.15  # Leave a small amount of time to return an answer
         game    = ConnectX(observation, configuration, cls.heuristic_class)
         agent   = cls(game, **kwargs)
         action  = agent.get_action(endtime)

@@ -106,12 +106,12 @@ class Line:
 
     ### Heuristic Methods
 
-    @property
-    @njit(cached=True)
+    @cached_property
+    # @njit(cache=False) ### throws exceptions
     def gameover( self ) -> bool:
         return len(self) == self.game.inarow
 
-    @njit(cached=True)
+    @njit(cache=False)
     def utility( self, player_id: int ) -> float:
         if len(self) == self.game.inarow:
             if player_id == self.mark: return  math.inf
@@ -132,12 +132,12 @@ class Line:
 
 
     @cached_property
-    @njit(cached=True)
+    @njit(cache=True, parallel=True)
     def extension_length( self ):
         return np.sum(map(len, self.extensions))
 
     @cached_property
-    @njit(cached=True)
+    @njit(cache=True, parallel=True)
     def extension_score( self ):
         # less than 1 - ensure center col is played first
         return np.sum([ len(extension)**1.25 for extension in self.extensions ]) / ( self.game.inarow**2 )
@@ -155,7 +155,7 @@ class Line:
             next_coord=self.next_coord
         )
     @staticmethod
-    @njit()
+    @njit(cache=False)
     def _liberties( direction, cells, board: np.ndarray, rows: int, columns: int, is_valid_coord, next_coord ) -> Set[Tuple[int,int]]:
         output = set()
         for sign in [1, -1]:
@@ -182,7 +182,7 @@ class Line:
             is_valid_coord=self.is_valid_coord
         )
     @staticmethod
-    @njit(parallel=True, cache=True)
+    @njit(cache=True, parallel=True)
     def _extensions( length_self, liberties, cells, mark, direction, board, inarow, rows, columns, next_coord, is_valid_coord ) -> List[Set[Tuple[int,int]]]:
         extensions = []
         for next in liberties:

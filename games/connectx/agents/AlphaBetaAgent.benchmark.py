@@ -36,8 +36,9 @@ for search_max_depth in [1,2,3,4,5,6]:
 
 
 # 1=0.00s 2=0.02s 3=0.15s 4=0.62s 5=4.50s 6=10.05s - baseline python
-# 1=0.75s 2=0.07s 3=0.36s 4=1.31s 5=7.67s 6=12.91s - @njit() next_coord
-# 1=0.21s 2=0.02s 3=0.15s 4=0.64s 5=4.59s 6=8.23s  - @njit() next_coord + is_valid_coord
+# 1=0.75s 2=0.07s 3=0.36s 4=1.31s 5=7.67s 6=12.91s - @njit() + next_coord()
+# 1=0.21s 2=0.02s 3=0.15s 4=0.64s 5=4.59s 6=8.23s  - @njit() + is_valid_coord()
+# 1=1.18s 2=0.02s 3=0.46s 4=0.35s 5=1.13s 6=2.55s  - @njit() + extensions() + liberties()
 
 
 

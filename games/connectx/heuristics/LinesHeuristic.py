@@ -10,6 +10,7 @@ from typing import Union
 
 import numpy as np
 from fastcache import clru_cache
+from numba import njit
 
 from games.connectx.core.ConnectX import ConnectX
 from games.connectx.core.Heuristic import Heuristic
@@ -51,7 +52,7 @@ class Line:
         cells = { coord }
         for sign in [1, -1]:
             next = cls.next_coord(coord, direction, sign)
-            while cls._is_valid_coord(next, game) and game.board[next] == mark:
+            while cls.is_valid_coord(next, game.rows, game.columns) and game.board[next] == mark:
                 cells.add(next)
                 next = cls.next_coord(next, direction, sign)
 
@@ -87,23 +88,17 @@ class Line:
     ### Navigation Methods
 
     @staticmethod
+    @njit(cache=True)
     def next_coord( coord: Tuple[int, int], direction: Direction, sign=1 ) -> Tuple[int,int]:
         """Use is_valid_coord to verify the coord is valid """
         return ( coord[0]+(direction[0]*sign), coord[1]+(direction[1]*sign) )
 
-    def is_valid_coord( self, coord: Tuple[int,int] ) -> bool:
-        # Profiler: 7.7% -> 6.2% runtime | avoid an extra function call within this tight loop
-        game = self.game
-        x,y  = coord
-        if x < 0 or game.rows    <= x: return False
-        if y < 0 or game.columns <= y: return False
-        return True
-
     @staticmethod
-    def _is_valid_coord( coord: Tuple[int,int], game: 'ConnectX' ) -> bool:
+    @njit(cache=True)
+    def is_valid_coord( coord: Tuple[int, int], rows: int, columns: int ) -> bool:
         x,y  = coord
-        if x < 0 or game.rows    <= x: return False
-        if y < 0 or game.columns <= y: return False
+        if x < 0 or rows    <= x: return False
+        if y < 0 or columns <= y: return False
         return True
 
 
@@ -146,7 +141,7 @@ class Line:
         cells = {
             coord
             for coord in cells
-            if  self.is_valid_coord(coord)
+            if  self.is_valid_coord(coord, self.game.rows, self.game.columns)
                 and self.game.board[coord] == 0
         }
         return frozenset(cells)
@@ -160,7 +155,7 @@ class Line:
                 while len(extension) + len(self) < self.game.inarow:
                     next = self.next_coord(next, self.direction, sign)
                     if next in self.cells:            break
-                    if not self.is_valid_coord(next): break
+                    if not self.is_valid_coord(next, self.game.rows, self.game.columns): break
                     if self.game.board[next] not in (0, self.mark): break
                     extension.add(next)
             if len(extension):

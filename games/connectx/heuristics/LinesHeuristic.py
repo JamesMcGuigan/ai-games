@@ -90,13 +90,13 @@ class Line:
     ### Navigation Methods
 
     @staticmethod
-    @njit(cache=True)
+    @njit()
     def next_coord( coord: Tuple[int, int], direction: Direction, sign=1 ) -> Tuple[int,int]:
         """Use is_valid_coord to verify the coord is valid """
         return ( coord[0]+(direction[0]*sign), coord[1]+(direction[1]*sign) )
 
     @staticmethod
-    @njit(cache=True)
+    @njit()
     def is_valid_coord( coord: Tuple[int, int], rows: int, columns: int ) -> bool:
         x,y  = coord
         if x < 0 or rows    <= x: return False
@@ -107,11 +107,11 @@ class Line:
     ### Heuristic Methods
 
     @cached_property
-    # @njit(cache=False) ### throws exceptions
+    # @njit() ### throws exceptions
     def gameover( self ) -> bool:
         return len(self) == self.game.inarow
 
-    @njit(cache=False)
+    @njit()
     def utility( self, player_id: int ) -> float:
         if len(self) == self.game.inarow:
             if player_id == self.mark: return  math.inf
@@ -132,12 +132,12 @@ class Line:
 
 
     @cached_property
-    @njit(cache=True, parallel=True)
+    @njit(parallel=True)
     def extension_length( self ):
         return np.sum(map(len, self.extensions))
 
     @cached_property
-    @njit(cache=True, parallel=True)
+    @njit(parallel=True)
     def extension_score( self ):
         # less than 1 - ensure center col is played first
         return np.sum([ len(extension)**1.25 for extension in self.extensions ]) / ( self.game.inarow**2 )
@@ -152,10 +152,10 @@ class Line:
             rows=self.game.rows,
             columns=self.game.columns,
             is_valid_coord=self.is_valid_coord,
-            next_coord=self.next_coord
+            next_coord=self.next_coord,
         )
     @staticmethod
-    @njit(cache=False)
+    @njit(parallel=False)
     def _liberties( direction, cells, board: np.ndarray, rows: int, columns: int, is_valid_coord, next_coord ) -> Set[Tuple[int,int]]:
         output = set()
         for sign in [1, -1]:
@@ -182,7 +182,7 @@ class Line:
             is_valid_coord=self.is_valid_coord
         )
     @staticmethod
-    @njit(cache=True, parallel=True)
+    @njit(parallel=True)
     def _extensions( length_self, liberties, cells, mark, direction, board, inarow, rows, columns, next_coord, is_valid_coord ) -> List[Set[Tuple[int,int]]]:
         extensions = []
         for next in liberties:

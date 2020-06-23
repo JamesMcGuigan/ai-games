@@ -18,7 +18,7 @@ class PersistentCacheAgent:
         for parentclass in cls.__mro__:  # https://stackoverflow.com/questions/2611892/how-to-get-the-parents-of-a-python-class
             if cls is parentclass: continue
             if cls.cache is getattr(parentclass, 'cache', None):
-                cls.cache = {}  # create a new cls.instances for each class
+                cls.cache = {}  # create a new cls.cache for each class
                 break
         instance = object.__new__(cls)
         return instance

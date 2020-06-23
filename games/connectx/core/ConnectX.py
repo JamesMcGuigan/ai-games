@@ -55,8 +55,12 @@ class ConnectX(KaggleGame):
 
     def result( self, action ) -> 'ConnectX':
         """This returns the next KaggleGame after applying action"""
-        observation = self.result_observation(self.observation, action)
-        return self.__class__(observation, self.configuration, self.heuristic_class, self.verbose)
+        if not hasattr(self, '_results_cache'): self._results_cache = {}
+        if action not in self._results_cache:
+            observation = self.result_observation(self.observation, action)
+            result      = self.__class__(observation, self.configuration, self.heuristic_class, self.verbose)
+            self._results_cache[action] = result
+        return self._results_cache[action]
 
     def result_observation( self, observation: Struct, action: int ) -> Struct:
         output = copy(observation)

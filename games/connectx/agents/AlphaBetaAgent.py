@@ -43,17 +43,19 @@ class AlphaBetaAgent(PersistentCacheAgent):
         # The real trick with iterative deepening is caching, which allows us to out-depth the default minimax Agent
         if self.verbose_depth: print('\n'+ self.__class__.__name__.ljust(20) +' | depth:', end=' ', flush=True)
         best_action = random.choice(self.game.actions)
-        for depth in range(1, self.search_max_depth+1):
-            action, score = self.alphabeta(self.game, depth=depth, endtime=endtime)
-            if endtime and time.perf_counter() >= endtime: break  # ignore results on timeout
+        try:
+            for depth in range(1, self.search_max_depth+1):
+                action, score = self.alphabeta(self.game, depth=depth, endtime=endtime)
+                if endtime and time.perf_counter() >= endtime: break  # ignore results on timeout
 
-            best_action = action
-            if self.verbose_depth: print(depth, end=' ', flush=True)
-            if abs(score) == math.inf:
-                if self.verbose_depth: print(score, end=' ', flush=True)
-                break  # terminate iterative deepening on inescapable victory condition
-
-        return best_action
+                best_action = action
+                if self.verbose_depth: print(depth, end=' ', flush=True)
+                if abs(score) == math.inf:
+                    if self.verbose_depth: print(score, end=' ', flush=True)
+                    break  # terminate iterative deepening on inescapable victory condition
+        except TimeoutError:
+            pass  # This is the fastest way to exit a loop: https://www.kaggle.com/c/connectx/discussion/158190
+        return int(best_action)
         # if self.verbose_depth: print( depth, type(action), action, int((time.perf_counter() - time_start) * 1000), 'ms' )
 
 
@@ -64,7 +66,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
         for action in game.actions:
             result = game.result(action)
             score  = self.alphabeta_min_value(result, player_id=self.player_id, depth=depth-1, endtime=endtime)
-            if endtime and time.perf_counter() >= endtime: break
+            if endtime and time.perf_counter() >= endtime: raise TimeoutError
             if score > best_score:
                 best_score  = score
                 best_action = action
@@ -85,7 +87,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
         for action in game.actions:
             result    = game.result(action)
             score     = min(score, self.alphabeta_max_value(result, player_id, depth-1, alpha, beta, endtime))
-            if endtime and time.perf_counter() >= endtime: return score
+            if endtime and time.perf_counter() >= endtime: raise TimeoutError
             if score <= alpha: return score
             beta      = min(beta,score)
             scores.append(score)  # for debugging
@@ -102,7 +104,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
         for action in game.actions:
             result    = game.result(action)
             score     = max(score, self.alphabeta_min_value(result, player_id, depth-1, alpha, beta, endtime))
-            if endtime and time.perf_counter() >= endtime: return score
+            if endtime and time.perf_counter() >= endtime: raise TimeoutError
             if score >= beta: return score
             alpha     = max(alpha, score)
             scores.append(score)  # for debugging
@@ -119,7 +121,8 @@ class AlphaBetaAgent(PersistentCacheAgent):
         heuristic_class = kwargs.get('heuristic_class', cls.heuristic_class)
 
         def kaggle_agent(observation: Struct, configuration: Struct):
-            endtime = time.perf_counter() + configuration.timeout - 1.1  # Leave a small amount of time to return an answer
+            # Leave a small amount of time to return an answer - was 1.1, but try 0.25 now we exiting loop via exception
+            endtime = time.perf_counter() + configuration.timeout - 0.25
             game    = ConnectX(observation, configuration, heuristic_class, **kwargs)
             agent   = cls(game, **kwargs)
             action  = agent.get_action(endtime)

@@ -9,6 +9,8 @@ env.render()
 env.reset()
 
 # env.run([AlphaBetaAgent.agent, "random"])
-env.run([AlphaBetaAgent.agent, AlphaBetaAgent.agent])
+env.run([ AlphaBetaAgent.agent(search_max_depth=3), AlphaBetaAgent.agent(search_max_depth=3) ])
 # noinspection PyTypeChecker
 env.render(mode="human")
+
+# Timings

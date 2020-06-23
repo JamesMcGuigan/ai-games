@@ -2,6 +2,8 @@ import math
 import random
 import time
 from queue import LifoQueue
+from struct import Struct
+from typing import Callable
 
 from games.connectx.core.ConnectX import ConnectX
 from games.connectx.core.KaggleGame import KaggleGame
@@ -41,7 +43,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
         # The real trick with iterative deepening is caching, which allows us to out-depth the default minimax Agent
         if self.verbose_depth: print('\n'+ self.__class__.__name__.ljust(20) +' | depth:', end=' ', flush=True)
         best_action = random.choice(self.game.actions)
-        for depth in range(1, self.search_max_depth+1, 1):
+        for depth in range(1, self.search_max_depth+1):
             action, score = self.alphabeta(self.game, depth=depth, endtime=endtime)
             if endtime and time.perf_counter() >= endtime: break  # ignore results on timeout
 
@@ -110,22 +112,21 @@ class AlphaBetaAgent(PersistentCacheAgent):
 
     # observation   = {'mark': 1, 'board': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
     # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 2}
-    @staticmethod
-    def agent(observation, configuration, **kwargs) -> int:
-        cls     = AlphaBetaAgent
-        endtime = time.perf_counter() + configuration.timeout - 1.1  # Leave a small amount of time to return an answer
-        game    = ConnectX(observation, configuration, cls.heuristic_class)
-        agent   = cls(game, **kwargs)
-        action  = agent.get_action(endtime)
-        # print(endtime - time.perf_counter(), 's')  # min -0.001315439000000751 s
-        return int(action)
+    @classmethod
+    def agent(cls, **kwargs) -> Callable[[Struct, Struct],int]:
+        heuristic_class = kwargs.get('heuristic_class', cls.heuristic_class)
 
-    @staticmethod
-    def agent_test(observation, configuration, **kwargs) -> int:
-        kwargs = { "search_max_depth": 3, **kwargs }
-        return AlphaBetaAgent.agent(observation, configuration, **kwargs)
+        def kaggle_agent(observation: Struct, configuration: Struct):
+            endtime = time.perf_counter() + configuration.timeout - 1.1  # Leave a small amount of time to return an answer
+            game    = ConnectX(observation, configuration, heuristic_class, **kwargs)
+            agent   = cls(game, **kwargs)
+            action  = agent.get_action(endtime)
+            # print(endtime - time.perf_counter(), 's')  # min -0.001315439000000751 s
+            return int(action)
+        return kaggle_agent
+
 
 
 # The last function defined in the file run by Kaggle in submission.csv
 def agent(observation, configuration) -> int:
-    return AlphaBetaAgent.agent(observation, configuration)
+    return AlphaBetaAgent.agent()(observation, configuration)

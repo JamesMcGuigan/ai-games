@@ -21,7 +21,7 @@ def configuration(env):
 
 @pytest.mark.parametrize("search_max_depth", [1,2,3,4,5])
 def test_first_move_is_center_depth(observation, configuration, search_max_depth):
-    action = AlphaBetaAgent.agent(observation, configuration, search_max_depth=search_max_depth)
+    action = AlphaBetaAgent.agent(search_max_depth=search_max_depth)(observation, configuration)
     assert action == 3  # always play the middle square first
     assert type(action) == int, f'search_max_depth = {search_max_depth}'
 
@@ -29,7 +29,7 @@ def test_first_move_is_center_depth(observation, configuration, search_max_depth
 def test_can_play_game_against_self():
     env = make("connectx", debug=True)
     env.configuration.timeout = 4
-    env.run([AlphaBetaAgent.agent, AlphaBetaAgent.agent])
+    env.run([ AlphaBetaAgent.agent(), AlphaBetaAgent.agent() ])
 
 @pytest.mark.parametrize("position", ["player1","player2"])
 @pytest.mark.parametrize("opponent", ["random", "negamax"])

@@ -17,7 +17,7 @@ class ConnectX(KaggleGame):
 
     # observation   = {'mark': 1, 'board': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
     # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 2}
-    def __init__( self, observation, configuration, heuristic_class: Callable=None, verbose=True ):
+    def __init__( self, observation, configuration, heuristic_class: Callable=None, verbose=True, **kwargs ):
         super().__init__(observation, configuration, heuristic_class, verbose)
         self.rows:      int = configuration.rows
         self.columns:   int = configuration.columns

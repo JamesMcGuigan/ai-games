@@ -124,7 +124,7 @@ class Line:
         # A line with two liberties is a potential double attack
         # A line of 2 with 2 liberties is worth more than a line of 3 with one liberty
         if len(self) == self.game.inarow: return math.inf
-        if len(self.liberties) == 0:      return 0                                     # line can't connect 4
+        if len(self.liberties) == 0:      return 0                         # line can't connect 4
         if len(self) + self.extension_length < self.game.inarow: return 0  # line can't connect 4
         score = ( len(self)**2 + self.extension_score ) * len(self.liberties)
         if len(self) == 1: score /= len(Directions)                                    # Discount duplicates
@@ -132,12 +132,10 @@ class Line:
 
 
     @cached_property
-    @njit(parallel=True)
     def extension_length( self ):
-        return np.sum(map(len, self.extensions))
+        return np.sum(list(map(len, self.extensions)))
 
     @cached_property
-    @njit(parallel=True)
     def extension_score( self ):
         # less than 1 - ensure center col is played first
         return np.sum([ len(extension)**1.25 for extension in self.extensions ]) / ( self.game.inarow**2 )
@@ -145,58 +143,95 @@ class Line:
 
     @cached_property
     def liberties( self ) -> Set[Tuple[int,int]]:
-        return self._liberties(
-            direction=self.direction,
-            cells=tuple(self.cells),
-            board=self.game.board,
-            rows=self.game.rows,
-            columns=self.game.columns,
-            is_valid_coord=self.is_valid_coord,
-            next_coord=self.next_coord,
-        )
-    @staticmethod
-    @njit(parallel=False)
-    def _liberties( direction, cells, board: np.ndarray, rows: int, columns: int, is_valid_coord, next_coord ) -> Set[Tuple[int,int]]:
-        output = set()
-        for sign in [1, -1]:
-            for coord in cells:
-                if (is_valid_coord(coord, rows, columns)
-                and board[coord] == 0):
-                    output.add( next_coord(coord, direction, sign) )
-        return output
+        ### Numba doesn't like this syntax
+        cells = {
+            self.next_coord(coord, self.direction, sign)
+            for coord in self.cells
+            for sign in [1, -1]
+        }
+        cells = {
+            coord
+            for coord in cells
+            if  self.is_valid_coord(coord, self.game.rows, self.game.columns)
+                and self.game.board[coord] == 0
+        }
+        return cells
+
+    ### BUG: Numba optimized code returns zero scores
+    # @cached_property
+    # def liberties( self ) -> Set[Tuple[int,int]]:
+    #     return self._liberties(
+    #         direction=self.direction,
+    #         cells=tuple(self.cells),
+    #         board=self.game.board,
+    #         rows=self.game.rows,
+    #         columns=self.game.columns,
+    #         is_valid_coord=self.is_valid_coord,
+    #         next_coord=self.next_coord,
+    #     )
+    # @staticmethod
+    # @njit(parallel=True)
+    # def _liberties( direction, cells, board: np.ndarray, rows: int, columns: int, is_valid_coord, next_coord ) -> Set[Tuple[int,int]]:
+    #     coords = set()
+    #     for sign in [1, -1]:
+    #         for coord in cells:
+    #             next = next_coord(coord, direction, sign)
+    #             coords.add(next)
+    #     output = set()
+    #     for coord in coords:
+    #         if is_valid_coord(coord, rows, columns) and board[coord] == 0:
+    #             output.add(coord)
+    #     return output
 
 
     @cached_property
-    def extensions( self ) -> List[Set[Tuple[int,int]]]:
-        return self._extensions(
-            length_self=len(self),
-            liberties=self.liberties,
-            cells=self.cells,
-            mark=self.mark,
-            direction=self.direction,
-            board=self.game.board,
-            inarow=self.game.inarow,
-            rows=self.game.rows,
-            columns=self.game.columns,
-            next_coord=self.next_coord,
-            is_valid_coord=self.is_valid_coord
-        )
-    @staticmethod
-    @njit(parallel=True)
-    def _extensions( length_self, liberties, cells, mark, direction, board, inarow, rows, columns, next_coord, is_valid_coord ) -> List[Set[Tuple[int,int]]]:
+    def extensions( self ) -> List[FrozenSet[Tuple[int,int]]]:
         extensions = []
-        for next in liberties:
+        for next in self.liberties:
             extension = { next }
             for sign in [1,-1]:
-                while len(extension) + length_self < inarow:
-                    next = next_coord(next, direction, sign)
-                    if next in cells:                           break
-                    if not is_valid_coord(next, rows, columns): break
-                    if board[next] not in (0, mark):            break
+                while len(extension) + len(self) < self.game.inarow:
+                    next = self.next_coord(next, self.direction, sign)
+                    if next in self.cells:                                               break
+                    if not self.is_valid_coord(next, self.game.rows, self.game.columns): break
+                    if self.game.board[next] not in (0, self.mark):                      break
                     extension.add(next)
             if len(extension):
-                extensions.append(set(extension))
+                extensions.append(frozenset(extension))
         return extensions
+
+    ### BUG: Numba optimized code returns zero scores
+    # @cached_property
+    # def extensions( self ) -> List[Set[Tuple[int,int]]]:
+    #     return self._extensions(
+    #         length_self=len(self),
+    #         liberties=self.liberties,
+    #         cells=self.cells,
+    #         mark=self.mark,
+    #         direction=self.direction,
+    #         board=self.game.board,
+    #         inarow=self.game.inarow,
+    #         rows=self.game.rows,
+    #         columns=self.game.columns,
+    #         next_coord=self.next_coord,
+    #         is_valid_coord=self.is_valid_coord
+    #     )
+    # @staticmethod
+    # @njit(parallel=True)
+    # def _extensions( length_self, liberties, cells, mark, direction, board, inarow, rows, columns, next_coord, is_valid_coord ) -> List[Set[Tuple[int,int]]]:
+    #     extensions = []
+    #     for next in liberties:
+    #         extension = { next }
+    #         for sign in [1,-1]:
+    #             while len(extension) + length_self < inarow:
+    #                 next = next_coord(next, direction, sign)
+    #                 if next in cells:                           break
+    #                 if not is_valid_coord(next, rows, columns): break
+    #                 if board[next] not in (0, mark):            break
+    #                 extension.add(next)
+    #         if len(extension):
+    #             extensions.append(set(extension))
+    #     return extensions
 
 
 

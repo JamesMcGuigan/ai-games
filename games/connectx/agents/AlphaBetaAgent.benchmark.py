@@ -39,7 +39,7 @@ for search_max_depth in [1,2,3,4,5,6]:
 # 1=0.75s 2=0.07s 3=0.36s 4=1.31s 5=7.67s 6=12.91s - @njit() + next_coord()
 # 1=0.21s 2=0.02s 3=0.15s 4=0.64s 5=4.59s 6=8.23s  - @njit() + is_valid_coord()
 # 1=1.18s 2=0.02s 3=0.46s 4=0.35s 5=1.13s 6=2.55s  - @njit() + extensions() + liberties()
-
+# 1=0.97s 2=0.02s 3=0.36s 4=0.40s 5=0.98s 6=2.45s  - np.sum() + @njit gameover + utility + extension_score
 
 
 

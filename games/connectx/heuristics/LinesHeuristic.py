@@ -47,6 +47,7 @@ class Line:
     @classmethod
     @clru_cache(None)
     def line_from_position( cls, game: 'ConnectX', coord: Tuple[int, int], direction: Direction ) -> Union['Line', None]:
+        # NOTE: This function doesn't improve with @jit
         mark = game.board[coord]
         if mark == 0: return None
 
@@ -78,7 +79,7 @@ class Line:
         return self.cells == other.cells and self.direction == other.direction
 
     def __lt__(self, other):
-        return self.score() < other.score()
+        return self.score < other.score
 
     def __repr__(self):
         args = {"mark": self.mark, "direction": self.direction, "cells": self.cells }
@@ -105,10 +106,12 @@ class Line:
 
     ### Heuristic Methods
 
-    @cached_property
+    @property
+    @njit(cached=True)
     def gameover( self ) -> bool:
         return len(self) == self.game.inarow
 
+    @njit(cached=True)
     def utility( self, player_id: int ) -> float:
         if len(self) == self.game.inarow:
             if player_id == self.mark: return  math.inf
@@ -121,13 +124,20 @@ class Line:
         # A line with two liberties is a potential double attack
         # A line of 2 with 2 liberties is worth more than a line of 3 with one liberty
         if len(self) == self.game.inarow: return math.inf
-        if len(self.liberties) == 0:      return 0                                  # line can't connect 4
-        if len(self) + sum(map(len, self.extensions)) < self.game.inarow: return 0  # line can't connect 4
+        if len(self.liberties) == 0:      return 0                                     # line can't connect 4
+        if len(self) + self.extension_length < self.game.inarow: return 0  # line can't connect 4
         score = ( len(self)**2 + self.extension_score ) * len(self.liberties)
-        if len(self) == 1: score /= len(Directions)                                 # Discount duplicates
+        if len(self) == 1: score /= len(Directions)                                    # Discount duplicates
         return score
 
+
     @cached_property
+    @njit(cached=True)
+    def extension_length( self ):
+        return np.sum(map(len, self.extensions))
+
+    @cached_property
+    @njit(cached=True)
     def extension_score( self ):
         # less than 1 - ensure center col is played first
         return np.sum([ len(extension)**1.25 for extension in self.extensions ]) / ( self.game.inarow**2 )
@@ -222,8 +232,8 @@ class LinesHeuristic(Heuristic):
     @cached_property
     def gameover( self ) -> bool:
         """Has the game reached a terminal game?"""
-        if len( self.game.actions ) == 0:               return True
-        if any( line.gameover for line in self.lines ): return True
+        if len( self.game.actions ) == 0:                    return True
+        if np.any([ line.gameover for line in self.lines ]): return True
         return False
 
 
@@ -231,8 +241,8 @@ class LinesHeuristic(Heuristic):
     def score( self ) -> float:
         """Heuristic score"""
         # mark is the next player to move - calculate score from perspective of player who just moved
-        hero_score    = sum( line.score for line in self.lines if line.mark != self.player_id )
-        villain_score = sum( line.score for line in self.lines if line.mark == self.player_id )
+        hero_score    = np.sum([ line.score for line in self.lines if line.mark != self.player_id ])
+        villain_score = np.sum([ line.score for line in self.lines if line.mark == self.player_id ])
         return hero_score - villain_score
 
     @cached_property

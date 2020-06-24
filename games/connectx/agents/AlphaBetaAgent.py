@@ -122,7 +122,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
 
         def kaggle_agent(observation: Struct, configuration: Struct):
             # Leave a small amount of time to return an answer - was 1.1, but try 0.25 now we exiting loop via exception
-            endtime = time.perf_counter() + configuration.timeout - 0.25
+            endtime = time.perf_counter() + configuration.timeout - 0.75
             game    = ConnectX(observation, configuration, heuristic_class, **kwargs)
             agent   = cls(game, **kwargs)
             action  = agent.get_action(endtime)

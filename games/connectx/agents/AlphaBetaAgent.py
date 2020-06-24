@@ -16,7 +16,8 @@ class AlphaBetaAgent(PersistentCacheAgent):
     heuristic_class = LinesHeuristic
     defaults = {
         "verbose_depth":    True,
-        "search_max_depth": 100 # if "pytest" not in sys.modules else 3,
+        "search_max_depth": 100,  # if "pytest" not in sys.modules else 3,
+        "search_step":      1     # 2 to only evaluate odd numbers of depths
     }
 
     def __init__( self, game: ConnectX, *args, **kwargs ):
@@ -27,6 +28,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
         self.queue     = LifoQueue()
         self.verbose_depth    = self.kwargs.get('verbose_depth')
         self.search_max_depth = self.kwargs.get('search_max_depth')
+        self.search_step      = self.kwargs.get('search_step', 1)
 
 
     ### Public Interface
@@ -44,7 +46,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
         if self.verbose_depth: print('\n'+ self.__class__.__name__.ljust(20) +' | depth:', end=' ', flush=True)
         best_action = random.choice(self.game.actions)
         try:
-            for depth in range(1, self.search_max_depth+1):
+            for depth in range(1, self.search_max_depth+1, self.search_step):
                 action, score = self.alphabeta(self.game, depth=depth, endtime=endtime)
                 if endtime and time.perf_counter() >= endtime: break  # ignore results on timeout
 
@@ -129,7 +131,6 @@ class AlphaBetaAgent(PersistentCacheAgent):
             # print(endtime - time.perf_counter(), 's')  # min -0.001315439000000751 s
             return int(action)
         return kaggle_agent
-
 
 
 # The last function defined in the file run by Kaggle in submission.csv

@@ -142,105 +142,105 @@ class Line:
 
 
     ### Orginal non-numba code
-    # @cached_property
-    # def liberties( self ) -> Set[Tuple[int,int]]:
-    #     ### Numba doesn't like this syntax
-    #     cells = {
-    #         self.next_coord(coord, self.direction, sign)
-    #         for coord in self.cells
-    #         for sign in [1, -1]
-    #     }
-    #     cells = {
-    #         coord
-    #         for coord in cells
-    #         if  self.is_valid_coord(coord, self.game.rows, self.game.columns)
-    #             and self.game.board[coord] == 0
-    #     }
-    #     return cells
-
-    ## BUG: Numba optimized code returns zero scores
     @cached_property
     def liberties( self ) -> Set[Tuple[int,int]]:
-        return self._liberties(
-            direction=self.direction,
-            cells=tuple(self.cells),
-            board=self.game.board,
-            rows=self.game.rows,
-            columns=self.game.columns,
-            is_valid_coord=self.is_valid_coord,
-            next_coord=self.next_coord,
-        )
-    @staticmethod
-    @njit()
-    def _liberties( direction, cells, board: np.ndarray, rows: int, columns: int, is_valid_coord, next_coord ) -> Set[Tuple[int,int]]:
-        coords = set()
-        for sign in [1, -1]:
-            for coord in cells:
-                next = next_coord(coord, direction, sign)
-                coords.add(next)
-        output = set()
-        for coord in coords:
-            if is_valid_coord(coord, rows, columns) and board[coord] == 0:
-                output.add(coord)
-        return output
+        ### Numba doesn't like this syntax
+        cells = {
+            self.next_coord(coord, self.direction, sign)
+            for coord in self.cells
+            for sign in [1, -1]
+        }
+        cells = {
+            coord
+            for coord in cells
+            if  self.is_valid_coord(coord, self.game.rows, self.game.columns)
+                and self.game.board[coord] == 0
+        }
+        return cells
+
+    # ### BUG: Numba optimized code returns zero scores
+    # @cached_property
+    # def liberties( self ) -> Set[Tuple[int,int]]:
+    #     return self._liberties(
+    #         direction=self.direction,
+    #         cells=tuple(self.cells),
+    #         board=self.game.board,
+    #         rows=self.game.rows,
+    #         columns=self.game.columns,
+    #         is_valid_coord=self.is_valid_coord,
+    #         next_coord=self.next_coord,
+    #     )
+    # @staticmethod
+    # @njit()
+    # def _liberties( direction, cells, board: np.ndarray, rows: int, columns: int, is_valid_coord, next_coord ) -> Set[Tuple[int,int]]:
+    #     coords = set()
+    #     for sign in [1, -1]:
+    #         for coord in cells:
+    #             next = next_coord(coord, direction, sign)
+    #             coords.add(next)
+    #     output = set()
+    #     for coord in coords:
+    #         if is_valid_coord(coord, rows, columns) and board[coord] == 0:
+    #             output.add(coord)
+    #     return output
 
 
 
     ### Orginal non-numba code
-    # @cached_property
-    # # @njit()
-    # def extensions( self ) -> List[FrozenSet[Tuple[int,int]]]:
-    #     extensions = []
-    #     for next in self.liberties:
-    #         extension = { next }
-    #         for sign in [1,-1]:
-    #             while len(extension) + len(self) < self.game.inarow:
-    #                 next = self.next_coord(next, self.direction, sign)
-    #                 if next in self.cells:                                               break
-    #                 if not self.is_valid_coord(next, self.game.rows, self.game.columns): break
-    #                 if self.game.board[next] not in (0, self.mark):                      break
-    #                 extension.add(next)
-    #         if len(extension):
-    #             extensions.append(frozenset(extension))
-    #     return extensions
-
-    ## BUG: Numba optimized code returns zero scores
     @cached_property
-    def extensions( self ) -> List[Set[Tuple[int,int]]]:
-        ### tuple() seems quicker than numba.typed.List()
-        # liberties = numba.typed.List(); [ liberties.append(l) for l    in self.liberties ]
-        # cells     = numba.typed.List(); [ cells.append(cell)  for cell in self.cells ]
-        return self._extensions(
-            length_self=len(self),
-            liberties=tuple(self.liberties),
-            cells=tuple(self.cells),
-            mark=self.mark,
-            direction=self.direction,
-            board=self.game.board,
-            inarow=self.game.inarow,
-            rows=self.game.rows,
-            columns=self.game.columns,
-            next_coord=self.next_coord,
-            is_valid_coord=self.is_valid_coord
-        )
-    # noinspection PySetFunctionToLiteral
-    @staticmethod
-    @njit()
-    def _extensions(length_self, liberties, cells, mark, direction, board, inarow, rows, columns, next_coord, is_valid_coord) -> List[Set[Tuple[int,int]]]:
-        extensions = [ set([ (0,0) ]) for _ in range(0) ]  # http://numba.pydata.org/numba-doc/latest/user/troubleshoot.html#my-code-has-an-untyped-list-problem
-        cells      = set(cells)
-        for next in liberties:
-            extension = set([ next ])
+    # @njit()
+    def extensions( self ) -> List[FrozenSet[Tuple[int,int]]]:
+        extensions = []
+        for next in self.liberties:
+            extension = { next }
             for sign in [1,-1]:
-                while len(extension) + length_self < inarow:
-                    next = next_coord(next, direction, sign)
-                    if next in cells:                            break
-                    if not is_valid_coord(next, rows, columns):  break
-                    if board[next] != 0 and board[next] == mark: break
+                while len(extension) + len(self) < self.game.inarow:
+                    next = self.next_coord(next, self.direction, sign)
+                    if next in self.cells:                                               break
+                    if not self.is_valid_coord(next, self.game.rows, self.game.columns): break
+                    if self.game.board[next] not in (0, self.mark):                      break
                     extension.add(next)
             if len(extension):
-                extensions.append(set(extension))
+                extensions.append(frozenset(extension))
         return extensions
+
+    # ## BUG: Numba optimized code returns zero scores
+    # @cached_property
+    # def extensions( self ) -> List[Set[Tuple[int,int]]]:
+    #     ### tuple() seems quicker than numba.typed.List()
+    #     # liberties = numba.typed.List(); [ liberties.append(l) for l    in self.liberties ]
+    #     # cells     = numba.typed.List(); [ cells.append(cell)  for cell in self.cells ]
+    #     return self._extensions(
+    #         length_self=len(self),
+    #         liberties=tuple(self.liberties),
+    #         cells=tuple(self.cells),
+    #         mark=self.mark,
+    #         direction=self.direction,
+    #         board=self.game.board,
+    #         inarow=self.game.inarow,
+    #         rows=self.game.rows,
+    #         columns=self.game.columns,
+    #         next_coord=self.next_coord,
+    #         is_valid_coord=self.is_valid_coord
+    #     )
+    # # noinspection PySetFunctionToLiteral
+    # @staticmethod
+    # @njit()
+    # def _extensions(length_self, liberties, cells, mark, direction, board, inarow, rows, columns, next_coord, is_valid_coord) -> List[Set[Tuple[int,int]]]:
+    #     extensions = [ set([ (0,0) ]) for _ in range(0) ]  # http://numba.pydata.org/numba-doc/latest/user/troubleshoot.html#my-code-has-an-untyped-list-problem
+    #     cells      = set(cells)
+    #     for next in liberties:
+    #         extension = set([ next ])
+    #         for sign in [1,-1]:
+    #             while len(extension) + length_self < inarow:
+    #                 next = next_coord(next, direction, sign)
+    #                 if next in cells:                            break
+    #                 if not is_valid_coord(next, rows, columns):  break
+    #                 if board[next] != 0 and board[next] == mark: break
+    #                 extension.add(next)
+    #         if len(extension):
+    #             extensions.append(set(extension))
+    #     return extensions
 
 
 

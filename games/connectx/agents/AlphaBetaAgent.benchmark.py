@@ -42,4 +42,5 @@ for search_max_depth in [1,2,3,4,5,6]:
 # 1=0.97s 2=0.02s 3=0.36s 4=0.40s 5=0.98s 6=2.45s   - np.sum() + @njit gameover + utility + extension_score
 # 1=1.21s 2=0.03s 3=0.54s 4=0.59s 5=1.43s 6=3.70s   - after bugfixing (without @njit liberties() + extensions()
 # 1=4.11s 2=0.06s 3=3.27s 4=1.96s 5=12.18s 6=33.83s - @njit liberties() + extensions() - why so slow???
+# 1=0.39s 2=0.03s 3=0.22s 4=1.23s 5=5.93s 6=24.28s  - revert: @njit liberties() + extensions() - why so slow???
 

@@ -36,10 +36,10 @@ def test_can_play_game_against_self():
 def test_can_win_against(position, opponent):
     env = make("connectx", debug=True)
     if position == "player1":
-        env.run([AlphaBetaAgent.agent, opponent])
+        env.run([AlphaBetaAgent.agent(), opponent])
         assert env.state[0].reward == 1
         assert env.state[1].reward == -1
     else:
-        env.run([opponent, AlphaBetaAgent.agent])
+        env.run([opponent, AlphaBetaAgent.agent()])
         assert env.state[1].reward == 1
         assert env.state[0].reward == -1

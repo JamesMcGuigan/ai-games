@@ -9,7 +9,6 @@ from typing import Set
 from typing import Tuple
 from typing import Union
 
-import numba
 import numpy as np
 from fastcache import clru_cache
 from numba import njit
@@ -208,12 +207,13 @@ class Line:
     ## BUG: Numba optimized code returns zero scores
     @cached_property
     def extensions( self ) -> List[Set[Tuple[int,int]]]:
-        liberties = numba.typed.List(); [ liberties.append(l) for l    in self.liberties ]
-        cells     = numba.typed.List(); [ cells.append(cell)  for cell in self.cells ]
+        ### tuple() seems quicker than numba.typed.List()
+        # liberties = numba.typed.List(); [ liberties.append(l) for l    in self.liberties ]
+        # cells     = numba.typed.List(); [ cells.append(cell)  for cell in self.cells ]
         return self._extensions(
             length_self=len(self),
-            liberties=liberties,
-            cells=cells,
+            liberties=tuple(self.liberties),
+            cells=tuple(self.cells),
             mark=self.mark,
             direction=self.direction,
             board=self.game.board,
@@ -223,14 +223,14 @@ class Line:
             next_coord=self.next_coord,
             is_valid_coord=self.is_valid_coord
         )
+    # noinspection PySetFunctionToLiteral
     @staticmethod
     @njit()
     def _extensions(length_self, liberties, cells, mark, direction, board, inarow, rows, columns, next_coord, is_valid_coord) -> List[Set[Tuple[int,int]]]:
-        # noinspection PySetFunctionToLiteral
         extensions = [ set([ (0,0) ]) for _ in range(0) ]  # http://numba.pydata.org/numba-doc/latest/user/troubleshoot.html#my-code-has-an-untyped-list-problem
         cells      = set(cells)
         for next in liberties:
-            extension = set([ (0,0) for _ in range(0) ])
+            extension = set([ next ])
             for sign in [1,-1]:
                 while len(extension) + length_self < inarow:
                     next = next_coord(next, direction, sign)

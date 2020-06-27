@@ -87,9 +87,11 @@ class AlphaBetaAgent(PersistentCacheAgent):
         scores = []
         score  = math.inf
         for action in game.actions:
-            result    = game.result(action)
-            score     = min(score, self.alphabeta_max_value(result, player_id, depth-1, alpha, beta, endtime))
-            if endtime and time.perf_counter() >= endtime: raise TimeoutError
+            time_start = time.perf_counter()
+            result     = game.result(action)
+            score      = min(score, self.alphabeta_max_value(result, player_id, depth-1, alpha, beta, endtime))
+            time_taken = time.perf_counter() - time_start
+            if endtime and time.perf_counter() >= endtime - time_taken: raise TimeoutError
             if score <= alpha: return score
             beta      = min(beta,score)
             scores.append(score)  # for debugging
@@ -104,9 +106,11 @@ class AlphaBetaAgent(PersistentCacheAgent):
         scores = []
         score  = -math.inf
         for action in game.actions:
-            result    = game.result(action)
-            score     = max(score, self.alphabeta_min_value(result, player_id, depth-1, alpha, beta, endtime))
-            if endtime and time.perf_counter() >= endtime: raise TimeoutError
+            time_start = time.perf_counter()
+            result     = game.result(action)
+            score      = max(score, self.alphabeta_min_value(result, player_id, depth-1, alpha, beta, endtime))
+            time_taken = time.perf_counter() - time_start
+            if endtime and time.perf_counter() >= endtime - time_taken: raise TimeoutError
             if score >= beta: return score
             alpha     = max(alpha, score)
             scores.append(score)  # for debugging

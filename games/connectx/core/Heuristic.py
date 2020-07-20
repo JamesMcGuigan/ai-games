@@ -1,7 +1,7 @@
 import math
 
-from games.connectx.core.KaggleGame import KaggleGame
-from games.connectx.core.PersistentCacheAgent import PersistentCacheAgent
+from core.KaggleGame import KaggleGame
+from core.PersistentCacheAgent import PersistentCacheAgent
 from util.vendor.cached_property import cached_property
 
 

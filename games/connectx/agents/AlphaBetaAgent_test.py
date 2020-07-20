@@ -1,7 +1,7 @@
 import pytest
 from kaggle_environments import make
 
-from games.connectx.agents.AlphaBetaAgent import AlphaBetaAgent
+from agents.AlphaBetaAgent import AlphaBetaAgent
 
 
 
@@ -35,6 +35,7 @@ def test_can_play_game_against_self():
 @pytest.mark.parametrize("opponent", ["random", "negamax"])
 def test_can_win_against(position, opponent):
     env = make("connectx", debug=True)
+    env.configuration.timeout = 8
     if position == "player1":
         env.run([AlphaBetaAgent.agent, opponent])
         assert env.state[0].reward == 1

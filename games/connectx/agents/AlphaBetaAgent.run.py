@@ -1,6 +1,6 @@
 from kaggle_environments import make
 
-from games.connectx.agents.AlphaBetaAgent import AlphaBetaAgent
+from agents.AlphaBetaAgent import AlphaBetaAgent
 
 
 

@@ -1,4 +1,4 @@
-from __future__ import annotations
+# from __future__ import annotations
 
 import time
 from struct import Struct
@@ -42,7 +42,7 @@ class KaggleGame:
         """Return a list of valid actions"""
         raise NotImplementedError
 
-    def result( self, action ) -> KaggleGame:
+    def result( self, action ) -> 'KaggleGame':
         """This returns the next KaggleGame after applying action"""
         observation = self.result_observation(self.observation, action)
         return self.__class__(observation, self.configuration, self.verbose)

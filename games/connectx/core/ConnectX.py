@@ -7,7 +7,7 @@ from typing import Union
 
 import numpy as np
 
-from games.connectx.core.KaggleGame import KaggleGame
+from core.KaggleGame import KaggleGame
 from util.vendor.cached_property import cached_property
 
 

@@ -3,9 +3,9 @@ from typing import Type
 import pytest
 from kaggle_environments import make
 
-from games.connectx.core.ConnectX import ConnectX
-from games.connectx.core.Heuristic import Heuristic
-from games.connectx.heuristics.LinesHeuristic import LinesHeuristic
+from core.ConnectX import ConnectX
+from core.Heuristic import Heuristic
+from heuristics.LinesHeuristic import LinesHeuristic
 
 
 

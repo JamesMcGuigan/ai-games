@@ -5,10 +5,10 @@ from queue import LifoQueue
 from struct import Struct
 from typing import Callable
 
-from games.connectx.core.ConnectX import ConnectX
-from games.connectx.core.KaggleGame import KaggleGame
-from games.connectx.core.PersistentCacheAgent import PersistentCacheAgent
-from games.connectx.heuristics.LinesHeuristic import LinesHeuristic
+from core.ConnectX import ConnectX
+from core.KaggleGame import KaggleGame
+from core.PersistentCacheAgent import PersistentCacheAgent
+from heuristics.LinesHeuristic import LinesHeuristic
 
 
 

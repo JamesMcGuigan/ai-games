@@ -1,4 +1,4 @@
-from games.connectx.agents.AlphaBetaAgent import AlphaBetaAgent
+from agents.AlphaBetaAgent import AlphaBetaAgent
 
 
 

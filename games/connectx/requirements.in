@@ -1,0 +1,7 @@
+dataclasses
+fastcache
+kaggle_environments
+numba
+numpy
+pytest
+jupyter

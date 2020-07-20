@@ -1,6 +1,6 @@
 from kaggle_environments import make
 
-from games.connectx.agents.old.RulesAgent import RulesAgent
+from agents.old.RulesAgent import RulesAgent
 
 
 #

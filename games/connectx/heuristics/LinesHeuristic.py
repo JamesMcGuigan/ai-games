@@ -13,8 +13,8 @@ import numpy as np
 from fastcache import clru_cache
 from numba import njit
 
-from games.connectx.core.ConnectX import ConnectX
-from games.connectx.core.Heuristic import Heuristic
+from core.ConnectX import ConnectX
+from core.Heuristic import Heuristic
 from util.vendor.cached_property import cached_property
 
 

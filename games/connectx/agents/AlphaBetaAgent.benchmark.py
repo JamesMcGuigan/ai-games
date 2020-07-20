@@ -3,9 +3,9 @@ import time
 
 from kaggle_environments import make
 
-from games.connectx.agents.AlphaBetaAgent import AlphaBetaAgent
-from games.connectx.core.ConnectX import ConnectX
-from games.connectx.heuristics.LinesHeuristic import LinesHeuristic
+from agents.AlphaBetaAgent import AlphaBetaAgent
+from core.ConnectX import ConnectX
+from heuristics.LinesHeuristic import LinesHeuristic
 
 
 

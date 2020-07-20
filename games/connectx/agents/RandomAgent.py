@@ -2,7 +2,7 @@ import random
 import time
 from queue import LifoQueue
 
-from games.connectx.core.ConnectX import ConnectX
+from core.ConnectX import ConnectX
 from util.call_with_timeout_ms import call_with_timeout
 
 

@@ -1,7 +1,7 @@
 import pytest
 from kaggle_environments import make
 
-from agents.AlphaBetaAgent import AlphaBetaAgent
+from agents.AlphaBetaAgent.AlphaBetaAgent import AlphaBetaAgent
 
 
 

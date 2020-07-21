@@ -1,6 +1,6 @@
 from kaggle_environments import make
 
-from agents.old.RulesAgent import RulesAgent
+from agents.RulesAgent.RulesAgent import RulesAgent
 
 
 #

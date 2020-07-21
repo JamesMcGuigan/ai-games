@@ -34,8 +34,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
     ### Public Interface
 
     def get_action( self, endtime: float ) -> int:
-        action = self.iterative_deepening_search(endtime=endtime)
-        return int(action)
+        return self.iterative_deepening_search(endtime=endtime)
 
 
 

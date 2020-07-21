@@ -1,4 +1,4 @@
-from agents.AlphaBetaAgent import AlphaBetaAgent
+from agents.AlphaBetaAgent.AlphaBetaAgent import AlphaBetaAgent
 
 
 

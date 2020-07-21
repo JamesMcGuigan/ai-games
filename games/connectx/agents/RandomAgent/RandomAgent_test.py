@@ -1,7 +1,7 @@
 import pytest
 from kaggle_environments import make
 
-from agents.RandomAgent import RandomAgent
+from agents.RandomAgent.RandomAgent import RandomAgent
 
 
 

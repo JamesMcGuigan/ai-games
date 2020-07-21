@@ -3,7 +3,7 @@ import time
 
 from kaggle_environments import make
 
-from agents.AlphaBetaAgent import AlphaBetaAgent
+from agents.AlphaBetaAgent.AlphaBetaAgent import AlphaBetaAgent
 from core.ConnectX import ConnectX
 from heuristics.LinesHeuristic import LinesHeuristic
 

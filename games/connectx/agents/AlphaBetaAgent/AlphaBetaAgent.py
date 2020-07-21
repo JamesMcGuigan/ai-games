@@ -126,11 +126,12 @@ class AlphaBetaAgent(PersistentCacheAgent):
     def agent(cls, **kwargs) -> Callable[[Struct, Struct],int]:
         heuristic_class = kwargs.get('heuristic_class', cls.heuristic_class)
         def kaggle_agent(observation: Struct, configuration: Struct):
+            # Disabling the garbage collector prevents spikes in loop exit times on localhost but doesn't affect Kaggle
             # Kaggle Leaderboard results for the effect of `safety_time` values without disabling gc:
             # - 0.75s = kaggle error rate of 26/154 = 15%
             # - 1.15s = kaggle error rate of 16/360 = 4.5%
-            gc.disable()        # Disable the garbage collected to prevent spikes in loop exit times
-            safety_time = 0.01  # 10ms is 3x sufficient with the gc disabled
+            gc.disable()
+            safety_time = 1.5    # 250ms fails on Kaggle Submit
             endtime = time.perf_counter() + configuration.timeout - safety_time
 
             game    = ConnectX(observation, configuration, heuristic_class, **kwargs)

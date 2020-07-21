@@ -70,7 +70,10 @@ Empirical observation of the Kaggle Leaderboard results for the effect of `safet
 
 The root cause of these random timeouts was discovered as the garbage collector. This can be solved
 by running `gc.disable()` as the first action of the agent, then `gc.enable()` to schedule garbage collection
-during our opponents turn (or the inter-turn period). With the gc disabled, a 10ms `safety_time` is now reliable. 
+during our opponents turn (or the inter-turn period). 
+
+With the gc disabled, `safety_time=10ms` is reliable on localhost but fails on Kaggle Submit, 
+so currently playing safe with `safety_time=1500ms`.
 
 
 ## Numba 

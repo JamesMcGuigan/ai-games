@@ -65,9 +65,9 @@ class AlphaBetaAgent(PersistentCacheAgent):
         best_action = random.choice(game.actions)
         best_score  = -math.inf
         for action in game.actions:
+            if endtime and time.perf_counter() >= endtime: raise TimeoutError
             result = game.result(action)
             score  = self.alphabeta_min_value(result, player_id=self.player_id, depth=depth-1, endtime=endtime)
-            if endtime and time.perf_counter() >= endtime: raise TimeoutError
             if score > best_score:
                 best_score  = score
                 best_action = action
@@ -86,11 +86,9 @@ class AlphaBetaAgent(PersistentCacheAgent):
         scores = []
         score  = math.inf
         for action in game.actions:
-            time_start = time.perf_counter()
+            if endtime and time.perf_counter() >= endtime: raise TimeoutError
             result     = game.result(action)
             score      = min(score, self.alphabeta_max_value(result, player_id, depth-1, alpha, beta, endtime))
-            time_taken = time.perf_counter() - time_start
-            if endtime and time.perf_counter() >= endtime - time_taken: raise TimeoutError
             if score <= alpha: return score
             beta      = min(beta,score)
             scores.append(score)  # for debugging
@@ -105,11 +103,9 @@ class AlphaBetaAgent(PersistentCacheAgent):
         scores = []
         score  = -math.inf
         for action in game.actions:
-            time_start = time.perf_counter()
+            if endtime and time.perf_counter() >= endtime: raise TimeoutError
             result     = game.result(action)
             score      = max(score, self.alphabeta_min_value(result, player_id, depth-1, alpha, beta, endtime))
-            time_taken = time.perf_counter() - time_start
-            if endtime and time.perf_counter() >= endtime - time_taken: raise TimeoutError
             if score >= beta: return score
             alpha     = max(alpha, score)
             scores.append(score)  # for debugging
@@ -126,12 +122,13 @@ class AlphaBetaAgent(PersistentCacheAgent):
         heuristic_class = kwargs.get('heuristic_class', cls.heuristic_class)
 
         def kaggle_agent(observation: Struct, configuration: Struct):
-            # Leave a small amount of time to return an answer - was 1.1, but try 0.25 now we exiting loop via exception
-            endtime = time.perf_counter() + configuration.timeout - 0.75
+            # Leave a small amount of time to return an answer
+            safety_time = 1.5
+            endtime = time.perf_counter() + configuration.timeout - safety_time
             game    = ConnectX(observation, configuration, heuristic_class, **kwargs)
             agent   = cls(game, **kwargs)
             action  = agent.get_action(endtime)
-            # print(endtime - time.perf_counter(), 's')  # min -0.001315439000000751 s
+            print(endtime - time.perf_counter(), 's')  # min -0.001315439000000751 s
             return int(action)
         return kaggle_agent
 

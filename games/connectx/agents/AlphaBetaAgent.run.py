@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from kaggle_environments import make
 
-from games.connectx.agents.AlphaBetaAgent import AlphaBetaAgent
-from games.connectx.agents.AlphaBetaAgentOdd import AlphaBetaAgentOdd
+from agents.AlphaBetaAgent import AlphaBetaAgent
+from agents.AlphaBetaAgentOdd import AlphaBetaAgentOdd
 
 
 

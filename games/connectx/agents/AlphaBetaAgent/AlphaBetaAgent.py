@@ -132,7 +132,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
             game    = ConnectX(observation, configuration, heuristic_class, **kwargs)
             agent   = cls(game, **kwargs)
             action  = agent.get_action(endtime)
-            print(endtime - time.perf_counter(), 's')  # min -0.001315439000000751 s
+            # print(endtime - time.perf_counter(), 's')  # min -0.001315439000000751 s
             return int(action)
         return kaggle_agent
 

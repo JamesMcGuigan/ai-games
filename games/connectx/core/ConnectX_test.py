@@ -5,7 +5,7 @@ from kaggle_environments import make
 
 from core.ConnectX import ConnectX
 from core.Heuristic import Heuristic
-from heuristics.LinesHeuristic import LinesHeuristic
+from heuristics.LibertiesHeuristic import LibertiesHeuristic
 
 
 
@@ -25,7 +25,7 @@ def configuration(env):
 
 @pytest.fixture
 def heuristic_class() -> Type[Heuristic]:
-    return LinesHeuristic
+    return LibertiesHeuristic
 
 @pytest.fixture
 def game(observation, configuration, heuristic_class) -> ConnectX:

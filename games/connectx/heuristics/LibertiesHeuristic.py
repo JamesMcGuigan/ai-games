@@ -247,7 +247,7 @@ class Line:
 
 
 
-class LinesHeuristic(Heuristic):
+class LibertiesHeuristic(Heuristic):
     ### Heuristic Methods - relative to the current self.player_id
     ## Heuristic Methods
 

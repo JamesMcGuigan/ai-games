@@ -5,7 +5,7 @@ from kaggle_environments import make
 
 from agents.AlphaBetaAgent.AlphaBetaAgent import AlphaBetaAgent
 from core.ConnectX import ConnectX
-from heuristics.LinesHeuristic import LinesHeuristic
+from heuristics.LibertiesHeuristic import LibertiesHeuristic
 
 
 
@@ -13,7 +13,7 @@ env = make("connectx", debug=True)
 env.configuration.timeout = 24*60*60
 observation   = env.state[0].observation
 configuration = env.configuration
-game          = ConnectX(observation, configuration, LinesHeuristic)
+game          = ConnectX(observation, configuration, LibertiesHeuristic)
 
 for search_max_depth in [1,2,3,4,5,6]:
     start_time = time.perf_counter()
@@ -44,3 +44,6 @@ for search_max_depth in [1,2,3,4,5,6]:
 # 1=4.11s 2=0.06s 3=3.27s 4=1.96s 5=12.18s 6=33.83s - @njit liberties() + extensions() - why so slow???
 # 1=0.39s 2=0.03s 3=0.22s 4=1.23s 5=5.93s 6=24.28s  - revert: @njit liberties() + extensions() - why so slow???
 
+### Timings - 2019 Razer Pro
+# 1=0.00s 2=0.01s 3=0.10s 4=0.59s 5=2.48s 6=10.42s - pure python
+# 1=0.22s 2=0.01s 3=0.12s 4=0.51s 5=2.28s 6=9.25s  - @njit()

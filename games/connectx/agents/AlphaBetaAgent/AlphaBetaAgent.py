@@ -8,12 +8,12 @@ from typing import Callable
 from core.ConnectX import ConnectX
 from core.KaggleGame import KaggleGame
 from core.PersistentCacheAgent import PersistentCacheAgent
-from heuristics.LinesHeuristic import LinesHeuristic
+from heuristics.LibertiesHeuristic import LibertiesHeuristic
 
 
 
 class AlphaBetaAgent(PersistentCacheAgent):
-    heuristic_class = LinesHeuristic
+    heuristic_class = LibertiesHeuristic
     defaults = {
         "verbose_depth":    True,
         "search_max_depth": 100,  # if "pytest" not in sys.modules else 3,

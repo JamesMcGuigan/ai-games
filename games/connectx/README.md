@@ -61,17 +61,17 @@ to throw an exception on timeout didn't seem to work when run inside Kaggle subm
 
 The fastest way to exit a recursive loop is by throwing an exception. 
 
-Usually this can be done in under 3ms, but on rare occasions the code will take longer than 1000ms+.
-There can be upto 49 turns in a game, and a Timeout on any of them will result in total game loss with an Err score.
+Loop exit times are usually in the 0.1-3ms range, but on rare occasions the code will take longer than 1000ms+.
+There can be upto 49 turns in a game, so a Timeout on any of these will result in total game loss with an Err score.
 
 Empirical observation of the Kaggle Leaderboard results for the effect of `safety_time` values:
 - 0.75s = kaggle error rate of 26/154 = 15% 
 - 1.15s = kaggle error rate of 16/360 = 4.5% 
 
-Given the high observed error rate, and exponential time complexity of iterative deepening, 
-overall score is probably improved more with a generous `safety_time`. 
-On an empty board, depth 5 is reached in `2.28s` and depth 6 in `9.25s` with a default timeout of 8 seconds. 
-This squeezing in an extra second of compute will generally not result in an extra level of depth being returned.
+The root cause of these random timeouts was discovered as the garbage collector. This can be solved
+by running `gc.disable()` as the first action of the agent, then `gc.enable()` to schedule garbage collection
+during our opponents turn (or the inter-turn period). With the gc disabled, a 10ms `safety_time` is now reliable. 
+
 
 ## Numba 
 

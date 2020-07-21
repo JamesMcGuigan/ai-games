@@ -1,3 +1,4 @@
+import gc
 import math
 import random
 import time
@@ -124,21 +125,22 @@ class AlphaBetaAgent(PersistentCacheAgent):
     @classmethod
     def agent(cls, **kwargs) -> Callable[[Struct, Struct],int]:
         heuristic_class = kwargs.get('heuristic_class', cls.heuristic_class)
-
         def kaggle_agent(observation: Struct, configuration: Struct):
-            # Leave a generous amount of safety_time to prevent Err results
-            # Empirical observation of the Kaggle Leaderboard results for the effect of `safety_time` values:
+            # Kaggle Leaderboard results for the effect of `safety_time` values without disabling gc:
             # - 0.75s = kaggle error rate of 26/154 = 15%
             # - 1.15s = kaggle error rate of 16/360 = 4.5%
-            safety_time = 1.5
+            gc.disable()        # Disable the garbage collected to prevent spikes in loop exit times
+            safety_time = 0.01  # 10ms is 3x sufficient with the gc disabled
             endtime = time.perf_counter() + configuration.timeout - safety_time
+
             game    = ConnectX(observation, configuration, heuristic_class, **kwargs)
             agent   = cls(game, **kwargs)
             action  = agent.get_action(endtime)
-            # print(endtime - time.perf_counter(), 's')  # usually under 3ms but occasionally has huge timeouts 1000ms+
+
+            gc.enable()  # re-enable the gc to run during our opponents turn!
+            # print( f'T{-(endtime - time.perf_counter()):+.5f}s')  # range 0.1-3ms but gc triggers huge timeouts 1000ms+
             return int(action)
         return kaggle_agent
-
 
 # The last function defined in the file run by Kaggle in submission.csv
 def agent(observation, configuration) -> int:

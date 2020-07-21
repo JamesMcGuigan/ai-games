@@ -80,6 +80,8 @@ class AlphaBetaAgent(PersistentCacheAgent):
     def alphabeta_min_value( self, game: KaggleGame, player_id: int, depth: int, alpha=-math.inf, beta=math.inf, endtime=0.0):
         return self.cache_infinite(self._alphabeta_min_value, game, player_id, depth, alpha, beta, endtime)
     def _alphabeta_min_value( self, game: KaggleGame, player_id, depth: int, alpha=-math.inf, beta=math.inf, endtime=0.0 ):
+        if endtime and time.perf_counter() >= endtime: raise TimeoutError
+
         sign = 1 if player_id != game.player_id else -1
         if game.gameover:  return sign * game.heuristic.utility  # score relative to previous player who made the move
         if depth == 0:     return sign * game.heuristic.score
@@ -97,6 +99,8 @@ class AlphaBetaAgent(PersistentCacheAgent):
     def alphabeta_max_value( self, game: KaggleGame, player_id: int, depth, alpha=-math.inf, beta=math.inf, endtime=0.0  ):
         return self.cache_infinite(self._alphabeta_max_value, game, player_id, depth, alpha, beta, endtime)
     def _alphabeta_max_value( self, game: KaggleGame, player_id: int, depth, alpha=-math.inf, beta=math.inf, endtime=0.0  ):
+        if endtime and time.perf_counter() >= endtime: raise TimeoutError
+
         sign = 1 if player_id != game.player_id else -1
         if game.gameover:  return sign * game.heuristic.utility  # score relative to previous player who made the move
         if depth == 0:     return sign * game.heuristic.score

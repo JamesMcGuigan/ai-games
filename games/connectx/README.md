@@ -47,7 +47,8 @@ Leaderboard Score: **1033.0 (top 8%)** with Liberties Heuristic
 - [agents/AlphaBetaAgent/AlphaBetaAgent.py](agents/AlphaBetaAgent/AlphaBetaAgent.py)
 - [kaggle:connectx-alphabeta-minimax-with-numba](https://www.kaggle.com/jamesmcguigan/connectx-alphabeta-minimax-with-numba)
 
-This is an object oriented implementation of the AlphaBeta algorithm with iterative deepening using a custom heuristic.
+This is an object oriented implementation of the MiniMax with AlphaBeta pruning algorithm and iterative deepening 
+using a custom heuristic.
 
 This implementation converts the board into a numpy array. 
 Whilst convenient for programming, this might be slower (due to object copying) than performing operations 

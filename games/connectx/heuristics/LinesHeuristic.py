@@ -1,5 +1,8 @@
 import functools
 import math
+
+
+import numba
 from dataclasses import dataclass
 from enum import Enum
 from enum import unique
@@ -111,7 +114,7 @@ class Line:
     def gameover( self ) -> bool:
         return len(self) == self.game.inarow
 
-    @njit()
+    @numba.generated_jit(nopython=True, nogil=True, cache=False, forceobj=False, parallel=False)
     def utility( self, player_id: int ) -> float:
         if len(self) == self.game.inarow:
             if player_id == self.mark: return  math.inf

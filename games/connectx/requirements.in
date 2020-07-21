@@ -1,7 +1,8 @@
 dataclasses
 fastcache
+jupyter
+kaggle
 kaggle_environments
 numba
 numpy
 pytest
-jupyter

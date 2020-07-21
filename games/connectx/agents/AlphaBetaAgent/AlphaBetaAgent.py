@@ -126,13 +126,16 @@ class AlphaBetaAgent(PersistentCacheAgent):
         heuristic_class = kwargs.get('heuristic_class', cls.heuristic_class)
 
         def kaggle_agent(observation: Struct, configuration: Struct):
-            # Leave a small amount of time to return an answer
+            # Leave a generous amount of safety_time to prevent Err results
+            # Empirical observation of the Kaggle Leaderboard results for the effect of `safety_time` values:
+            # - 0.75s = kaggle error rate of 26/154 = 15%
+            # - 1.15s = kaggle error rate of 16/360 = 4.5%
             safety_time = 1.5
             endtime = time.perf_counter() + configuration.timeout - safety_time
             game    = ConnectX(observation, configuration, heuristic_class, **kwargs)
             agent   = cls(game, **kwargs)
             action  = agent.get_action(endtime)
-            # print(endtime - time.perf_counter(), 's')  # min -0.001315439000000751 s
+            # print(endtime - time.perf_counter(), 's')  # usually under 3ms but occasionally has huge timeouts 1000ms+
             return int(action)
         return kaggle_agent
 

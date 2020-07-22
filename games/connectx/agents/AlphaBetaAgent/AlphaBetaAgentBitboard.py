@@ -1,5 +1,5 @@
 from agents.AlphaBetaAgent.AlphaBetaAgent import AlphaBetaAgent
-from core.ConnextXbitboard import ConnectXbitboard
+from core.ConnextXBitboard import ConnectXbitboard
 
 
 class AlphaBetaAgentBitboard(AlphaBetaAgent):

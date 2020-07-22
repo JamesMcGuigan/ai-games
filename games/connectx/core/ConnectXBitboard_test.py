@@ -8,7 +8,7 @@ import pytest
 from kaggle_environments import make
 
 from core.ConnectX import ConnectX
-from core.ConnextXbitboard import ConnectXbitboard
+from core.ConnextXBitboard import ConnectXbitboard
 from core.Heuristic import Heuristic
 
 

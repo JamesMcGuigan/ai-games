@@ -8,7 +8,7 @@ from kaggle_environments import make
 from agents.AlphaBetaAgent.AlphaBetaAgent import AlphaBetaAgent
 from agents.AlphaBetaAgent.AlphaBetaAgentBitboard import AlphaBetaAgentBitboard
 from core.ConnectX import ConnectX
-from core.ConnextXbitboard import ConnectXbitboard
+from core.ConnextXBitboard import ConnectXbitboard
 from heuristics.LibertiesHeuristic import LibertiesHeuristic
 
 env = make("connectx", debug=True)

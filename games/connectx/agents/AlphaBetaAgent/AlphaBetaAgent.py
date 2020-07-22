@@ -84,8 +84,8 @@ class AlphaBetaAgent(PersistentCacheAgent):
         if endtime and time.perf_counter() >= endtime: raise TimeoutError
 
         sign = 1 if player_id != game.player_id else -1
-        if game.gameover:  return sign * game.utility  # score relative to previous player who made the move
-        if depth == 0:     return sign * game.score
+        if game.gameover():  return sign * game.utility()  # score relative to previous player who made the move
+        if depth == 0:       return sign * game.score()
         scores = []
         score  = math.inf
         for action in game.actions:
@@ -103,8 +103,8 @@ class AlphaBetaAgent(PersistentCacheAgent):
         if endtime and time.perf_counter() >= endtime: raise TimeoutError
 
         sign = 1 if player_id != game.player_id else -1
-        if game.gameover:  return sign * game.utility  # score relative to previous player who made the move
-        if depth == 0:     return sign * game.score
+        if game.gameover():  return sign * game.utility()  # score relative to previous player who made the move
+        if depth == 0:       return sign * game.score()
         scores = []
         score  = -math.inf
         for action in game.actions:

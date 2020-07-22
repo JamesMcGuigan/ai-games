@@ -5,8 +5,9 @@ from struct import Struct
 from typing import Dict
 from typing import List
 
+from fastcache import clru_cache
+
 from util.tuplize import tuplize
-from util.vendor.cached_property import cached_property
 
 
 class KaggleGame:
@@ -54,23 +55,23 @@ class KaggleGame:
 
     ### Heuristic Methods
 
-    @cached_property
+    @clru_cache(maxsize=None)
     def heuristic(self):
         """Delay resolution until after parentclass constructor has finished"""
         return self.heuristic_class(self) if self.heuristic_class else None
 
-    @cached_property
+    @clru_cache(maxsize=None)
     def gameover( self ) -> bool:
         """Has the game reached a terminal game?"""
-        if self.heuristic:
-            return self.heuristic.gameover
+        if self.heuristic():
+            return self.heuristic().gameover
         else:
             return len( self.actions ) == 0
 
-    @cached_property
+    @clru_cache(maxsize=None)
     def score( self ) -> float:
-        return self.heuristic.score
+        return self.heuristic().score
 
-    @cached_property
+    @clru_cache(maxsize=None)
     def utility( self ) -> float:
-        return self.heuristic.utility
+        return self.heuristic().utility

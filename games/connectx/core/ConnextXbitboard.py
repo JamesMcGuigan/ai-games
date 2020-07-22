@@ -9,7 +9,6 @@ import numpy as np
 from fastcache import clru_cache
 
 from core.ConnectX import ConnectX
-from util.vendor.cached_property import cached_property
 
 
 class ConnectXbitboard(ConnectX):
@@ -23,7 +22,7 @@ class ConnectXbitboard(ConnectX):
     ### Magic Methods
 
     def __hash__(self):
-        return self.board
+        return self.board  # used by @clru_cache for self
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__): return False
@@ -31,6 +30,7 @@ class ConnectXbitboard(ConnectX):
 
     def __str__(self):
         return str(self.cast_numpy(self.board))
+
 
     ### Utility Methods
 
@@ -131,19 +131,19 @@ class ConnectXbitboard(ConnectX):
 
     ### Heuristic Methods
 
-    @cached_property
+    @clru_cache(maxsize=None)
     def heuristic(self):
         """Delay resolution until after parentclass constructor has finished"""
         return self.heuristic_class(self) if self.heuristic_class else None
 
-    @cached_property
+    @clru_cache(maxsize=None)
     def gameover( self ) -> bool:
         """Has the game reached a terminal game?"""
-        if len( self.actions ) == 0:        return True
-        if abs( self.utility ) == math.inf: return True
+        if len( self.actions   ) == 0:        return True
+        if abs( self.utility() ) == math.inf: return True
         return False
 
-    @cached_property
+    @clru_cache(maxsize=None)
     def utility( self ) -> float:
         """ +inf for victory or -inf for loss else 0 - from the perspective of the player who made the previous move"""
         bitboard_size = self.columns * self.rows
@@ -159,7 +159,7 @@ class ConnectXbitboard(ConnectX):
         return 0.0  # nothing found, neither side wins
 
 
-    @cached_property
+    @clru_cache(maxsize=None)
     def score( self ) -> float:
         """ For all possible connect4 gameover positions,
             check if a player has at least one token in position and that the opponent is not blocking
@@ -175,7 +175,7 @@ class ConnectXbitboard(ConnectX):
              80% vs AlphaBetaAgent - + double_attack_score=8   with math.log2() (mostly wins)
             100% vs AlphaBetaAgent - + double_attack_score=0.5 with math.log2() (mostly wins)
         """
-        if self.heuristic_class: return self.heuristic.score
+        if self.heuristic_class: return self.heuristic().score()
 
         gameovers      = self.get_gameovers(rows=self.rows, columns=self.columns, inarow=self.inarow)
         bitboard_size  = self.columns * self.rows

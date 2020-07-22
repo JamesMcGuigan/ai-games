@@ -3,7 +3,6 @@ from struct import Struct
 import numpy as np
 
 
-
 # noinspection PyTypeChecker
 def tuplize(value):
     """
@@ -32,7 +31,7 @@ def tuplize(value):
     return value
 
 
-if __name__ == '__main__':
-    # python3 -m doctest -v util/tuplize.py
-    import doctest
-    doctest.testmod()
+# if __name__ == '__main__':
+#     # python3 -m doctest -v util/tuplize.py
+#     import doctest
+#     doctest.testmod()

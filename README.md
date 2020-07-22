@@ -1,26 +1,33 @@
 # Artificial Intelligence Games
 
-## Puzzles
-### Sudoku
-- Source: [puzzles/sudoku](puzzles/sudoku)
-- Kaggle: https://www.kaggle.com/jamesmcguigan/z3-sudoku-solver/
+## Games
 
-Sudoku Solver that can solve the World's Hardest Sudoku
+### ConnectX 
+- Source: [games/connectx](games/connectx)
+- Kaggle: https://www.kaggle.com/jamesmcguigan/connectx-manually-coded-strategies
+- Kaggle: https://www.kaggle.com/jamesmcguigan/connectx-alphabeta-minimax-with-numba
 
-### N Queens
-- Source: [puzzles/n_queens](puzzles/n_queens)
-- Kaggle: https://www.kaggle.com/jamesmcguigan/n-queens-92-solutions-in-prolog
-
-This code solves the N-Queens problem in Prolog using the CLP(FD): Constraint Logic Programming over Finite Domain Library
-
-### Cryptarithmetic
-- Source: [puzzles/cryptarithmetic](puzzles/cryptarithmetic)
-- Kaggle: https://www.kaggle.com/jamesmcguigan/cryptarithmetic-solver
-
-This is a general purpose solver that can handle addition, subtraction, multiplication, integer division and raising to powers.
+Writeup on a variety of approaches to competitive AI agent design, exploring classic game: Connect 4
+ 
+- Random Agent
+- Simple Rules Agent
+- Minimax with AlphaBeta Pruning, Iterative Deepening and custom heuristic
+    - Object Oriented / Numpy implementation (slow)
+    - Bitboard Implementions  implementation (fast)
+    
+### Knights Isolation
+- Source: [games/knights-isolation](games/knights-isolation)
+- Report: [games/knights-isolation/report.ipynb](games/knights-isolation/report.ipynb)
+ 
+ 
+Minimax adversarial search with alphaBeta pruning, iterative deepening, area heuristic, and persistant caching.
+ 
+Monty Carlo Tree Search reinforcement learning 
+ 
 
 
 ## Search
+
 ### Ant Colony Optimization Algorithm with Kmeans
 - Source: [search/ant_colony](search/ant_colony)
 - Kaggle: https://www.kaggle.com/jamesmcguigan/ant-colony-optimization-algorithm
@@ -45,33 +52,29 @@ XGBoost with a large multidimentional feature map was able to autosolve a wide r
 
 AbstractSolver - Proof of Concept code using inspect.signiture() to figure out all possible permutations of `f(g(h(x)))` implementing a IoC dependency injection solver.
 
+
 ### Pacman - A* Search
 - Source: [search/pacman](search/pacman)
 
 A* Search Algorithms to navigate Pacman round a maze 
 
 
-## Games
+## Puzzles
 
-### ConnectX 
-- Source: [games/connectx](games/connectx)
-- Kaggle: https://www.kaggle.com/jamesmcguigan/connectx-manually-coded-strategies
-- Kaggle: https://www.kaggle.com/jamesmcguigan/connectx-alphabeta-minimax-with-numba
+### Sudoku
+- Source: [puzzles/sudoku](puzzles/sudoku)
+- Kaggle: https://www.kaggle.com/jamesmcguigan/z3-sudoku-solver/
 
-Writeup on a variety of approaches to competitive AI agent design, exploring classic game: Connect 4
- 
-- Random Agent
-- Simple Rules Agent
-- Minimax with AlphaBeta Pruning, Iterative Deepening and custom heuristic
-    - Object Oriented / Numpy implementation (slow)
-    - Bitboard Implementions  implementation (fast)
-    
- ### Knights Isolation
- - Source: [games/knights-isolation](games/knights-isolation)
- - Report: [games/knights-isolation/report.ipynb](games/knights-isolation/report.ipynb)
- 
- 
- Minimax adversarial search with alphaBeta pruning, iterative deepening, area heuristic, and persistant caching.
- 
- Monty Carlo Tree Search reinforcement learning 
- 
+Sudoku Solver that can solve the World's Hardest Sudoku
+
+### N Queens
+- Source: [puzzles/n_queens](puzzles/n_queens)
+- Kaggle: https://www.kaggle.com/jamesmcguigan/n-queens-92-solutions-in-prolog
+
+This code solves the N-Queens problem in Prolog using the CLP(FD): Constraint Logic Programming over Finite Domain Library
+
+### Cryptarithmetic
+- Source: [puzzles/cryptarithmetic](puzzles/cryptarithmetic)
+- Kaggle: https://www.kaggle.com/jamesmcguigan/cryptarithmetic-solver
+
+This is a general purpose solver that can handle addition, subtraction, multiplication, integer division and raising to powers.

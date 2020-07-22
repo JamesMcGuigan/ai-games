@@ -7,8 +7,10 @@ from kaggle_environments import make
 
 from agents.AlphaBetaAgent.AlphaBetaAgent import AlphaBetaAgent
 from agents.AlphaBetaAgent.AlphaBetaBitboard import AlphaBetaBitboard
+from agents.AlphaBetaAgent.AlphaBetaBitboardNumba import AlphaBetaBitboardNumba
 from core.ConnectX import ConnectX
 from core.ConnextXBitboard import ConnectXBitboard
+from core.ConnextXBitboardNumba import ConnectXBitboardNumba
 from heuristics.LibertiesHeuristic import LibertiesHeuristic
 
 env = make("connectx", debug=True)
@@ -18,7 +20,8 @@ configuration = env.configuration
 
 tests = [
     (list(range(1, 6+1)), ConnectX(observation, configuration, LibertiesHeuristic), AlphaBetaAgent,    ),
-    (list(range(1, 9+1)), ConnectXBitboard(observation, configuration, None),       AlphaBetaBitboard, ),
+    (list(range(1, 8+1)), ConnectXBitboard(observation, configuration, None),       AlphaBetaBitboard, ),
+    (list(range(1, 8+1)), ConnectXBitboardNumba(observation, configuration, None),  AlphaBetaBitboardNumba, ),
 ]
 for depth_range, game, agent_class in tests:
     game = deepcopy(game)
@@ -54,10 +57,13 @@ for depth_range, game, agent_class in tests:
 ### Timings - 2019 Razer Pro
 # AlphaBetaAgent     | 1=0.00s 2=0.01s 3=0.10s 4=0.59s 5=2.48s 6=10.42s - pure python
 # AlphaBetaAgent     | 1=0.22s 2=0.01s 3=0.12s 4=0.51s 5=2.28s 6=9.25s  - @njit()
+
 # AlphaBetaBitboard  | 1=0.00s 2=0.00s 3=0.01s 4=0.03s 5=0.15s 6=0.67s 7=2.10s 8= 8.88s 9=25.61s  - pure python + original heuristic
+# AlphaBetaBitboard  | 1=0.00s 2=0.00s 3=0.02s 4=0.09s 5=0.43s 6=1.79s 7=7.82s 8=28.63s 9=114.14s - without caching
+# AlphaBetaBitboard  | 1=0.01s 2=0.00s 3=0.02s 4=0.04s 5=0.17s 6=0.62s 7=3.30s 8=10.20s 9=44.47s  - @clru_cache(2**16) + double_attack_score heuristic
 # AlphaBetaBitboard  | 1=0.00s 2=0.00s 3=0.01s 4=0.04s 5=0.21s 6=0.91s 7=3.90s 8=15.06s 9=62.96s  - @cached_property   + double_attack_score heuristic
 # AlphaBetaBitboard  | 1=0.00s 2=0.00s 3=0.01s 4=0.04s 5=0.16s 6=0.60s 7=2.76s 8= 8.76s 9=34.58s  - @clru_cache(None)  + double_attack_score heuristic
-# AlphaBetaBitboard  | 1=0.01s 2=0.00s 3=0.02s 4=0.04s 5=0.17s 6=0.62s 7=3.30s 8=10.20s 9=44.47s  - @clru_cache(2**16) + double_attack_score heuristic
-# AlphaBetaBitboard  | 1=0.00s 2=0.00s 3=0.02s 4=0.09s 5=0.43s 6=1.79s 7=7.82s 8=28.63s 9=114.14s - without caching
-# AlphaBetaBitboard  | 1=2.34s 2=0.01s 3=0.04s 4=0.18s 5=0.68s 6=2.21s 7=8.38s 8=22.84s           - @njit(nogil=True, parallel=True)
-# AlphaBetaBitboard  | 1=0.82s 2=0.00s 3=0.01s 4=0.04s 5=0.19s 6=0.67s 7=3.06s 8=9.48s 9=35.27s   - @njit(nogil=True, parallel=False)
+
+# AlphaBetaBitboard       | 1=0.00s 2=0.00s 3=0.02s 4=0.04s 5=0.16s 6=0.63s 7=3.07s 8=9.29s
+# AlphaBetaBitboardNumba  | 1=1.45s 2=0.00s 3=0.01s 4=0.05s 5=0.21s 6=0.70s 7=3.05s 8=10.40s      - @njit(nogil=True, parallel=False)
+# AlphaBetaBitboardNumba  | 1=2.34s 2=0.01s 3=0.04s 4=0.18s 5=0.68s 6=2.21s 7=8.38s 8=22.84s      - @njit(nogil=True, parallel=True)

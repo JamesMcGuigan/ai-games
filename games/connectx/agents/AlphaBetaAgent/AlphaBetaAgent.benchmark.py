@@ -18,7 +18,7 @@ configuration = env.configuration
 
 tests = [
     (list(range(1, 6+1)), ConnectX(observation, configuration, LibertiesHeuristic), AlphaBetaAgent,         ),
-    (list(range(1,10+1)), ConnectXbitboard(observation, configuration, None),       AlphaBetaAgentBitboard, ),
+    (list(range(1, 9+1)), ConnectXbitboard(observation, configuration, None),       AlphaBetaAgentBitboard, ),
 ]
 for depth_range, game, agent_class in tests:
     game = deepcopy(game)
@@ -54,4 +54,8 @@ for depth_range, game, agent_class in tests:
 ### Timings - 2019 Razer Pro
 # AlphaBetaAgent          | 1=0.00s 2=0.01s 3=0.10s 4=0.59s 5=2.48s 6=10.42s - pure python
 # AlphaBetaAgent          | 1=0.22s 2=0.01s 3=0.12s 4=0.51s 5=2.28s 6=9.25s  - @njit()
-# AlphaBetaAgentBitboard  | 1=0.00s 2=0.00s 3=0.01s 4=0.03s 5=0.15s 6=0.67s 7=2.10s 8=8.88s 9=25.61s 10=98.92s - pure python
+# AlphaBetaAgentBitboard  | 1=0.00s 2=0.00s 3=0.01s 4=0.03s 5=0.15s 6=0.67s 7=2.10s 8= 8.88s 9=25.61s - pure python + original heuristic
+# AlphaBetaAgentBitboard  | 1=0.00s 2=0.00s 3=0.01s 4=0.04s 5=0.21s 6=0.91s 7=3.90s 8=15.06s 9=62.96s - @cached_property   + double_attack_score heuristic
+# AlphaBetaAgentBitboard  | 1=0.00s 2=0.00s 3=0.01s 4=0.04s 5=0.16s 6=0.60s 7=2.76s 8= 8.76s 9=34.58s - @clru_cache(None)  + double_attack_score heuristic
+# AlphaBetaAgentBitboard  | 1=0.01s 2=0.00s 3=0.02s 4=0.04s 5=0.17s 6=0.62s 7=3.30s 8=10.20s 9=44.47s - @clru_cache(2**16) + double_attack_score heuristic
+# AlphaBetaAgentBitboard  | 1=0.00s 2=0.00s 3=0.02s 4=0.09s 5=0.43s 6=1.79s 7=7.82s 8=28.63s 9=114.14s - without caching

@@ -52,18 +52,26 @@ A* Search Algorithms to navigate Pacman round a maze
 
 
 ## Games
-### Knights Isolation
-- Source: [games/knights-isolation](games/knights-isolation)
-- Report: [games/knights-isolation/report.ipynb](games/knights-isolation/report.ipynb)
-
-
-Minimax adversarial search with alphaBeta pruning, iterative deepening, area heuristic, and persistant caching.
-
-Monty Carlo Tree Search reinforcement learning 
-
 
 ### ConnectX 
 - Source: [games/connectx](games/connectx)
 - Kaggle: https://www.kaggle.com/jamesmcguigan/connectx-manually-coded-strategies
+- Kaggle: https://www.kaggle.com/jamesmcguigan/connectx-alphabeta-minimax-with-numba
 
-Agent for playing the classic children's game: Connect 4
+Writeup on a variety of approaches to competitive AI agent design, exploring classic game: Connect 4
+ 
+- Random Agent
+- Simple Rules Agent
+- Minimax with AlphaBeta Pruning, Iterative Deepening and custom heuristic
+    - Object Oriented / Numpy implementation (slow)
+    - Bitboard Implementions  implementation (fast)
+    
+ ### Knights Isolation
+ - Source: [games/knights-isolation](games/knights-isolation)
+ - Report: [games/knights-isolation/report.ipynb](games/knights-isolation/report.ipynb)
+ 
+ 
+ Minimax adversarial search with alphaBeta pruning, iterative deepening, area heuristic, and persistant caching.
+ 
+ Monty Carlo Tree Search reinforcement learning 
+ 

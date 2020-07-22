@@ -1,9 +1,9 @@
 from agents.AlphaBetaAgent.AlphaBetaAgent import AlphaBetaAgent
-from core.ConnextXBitboard import ConnectXbitboard
+from core.ConnextXBitboard import ConnectXBitboard
 
 
 class AlphaBetaAgentBitboard(AlphaBetaAgent):
-    game_class      = ConnectXbitboard
+    game_class      = ConnectXBitboard
     heuristic_class = None
 
 

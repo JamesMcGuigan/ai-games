@@ -8,7 +8,7 @@ from kaggle_environments import make
 from agents.AlphaBetaAgent.AlphaBetaAgent import AlphaBetaAgent
 from agents.AlphaBetaAgent.AlphaBetaAgentBitboard import AlphaBetaAgentBitboard
 from core.ConnectX import ConnectX
-from core.ConnextXBitboard import ConnectXbitboard
+from core.ConnextXBitboard import ConnectXBitboard
 from heuristics.LibertiesHeuristic import LibertiesHeuristic
 
 env = make("connectx", debug=True)
@@ -18,7 +18,7 @@ configuration = env.configuration
 
 tests = [
     (list(range(1, 6+1)), ConnectX(observation, configuration, LibertiesHeuristic), AlphaBetaAgent,         ),
-    (list(range(1, 9+1)), ConnectXbitboard(observation, configuration, None),       AlphaBetaAgentBitboard, ),
+    (list(range(1, 9+1)), ConnectXBitboard(observation, configuration, None),       AlphaBetaAgentBitboard, ),
 ]
 for depth_range, game, agent_class in tests:
     game = deepcopy(game)

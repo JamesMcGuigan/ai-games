@@ -11,7 +11,7 @@ from fastcache import clru_cache
 from core.ConnectX import ConnectX
 
 
-class ConnectXbitboard(ConnectX):
+class ConnectXBitboard(ConnectX):
     # observation   = {'mark': 1, 'board': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
     # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 2}
 

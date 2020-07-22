@@ -8,7 +8,7 @@ import pytest
 from kaggle_environments import make
 
 from core.ConnectX import ConnectX
-from core.ConnextXBitboard import ConnectXbitboard
+from core.ConnextXBitboard import ConnectXBitboard
 from core.Heuristic import Heuristic
 
 
@@ -32,7 +32,7 @@ def heuristic_class() -> Union[None,Type[Heuristic]]:
 
 @pytest.fixture
 def game(observation, configuration, heuristic_class) -> ConnectX:
-    return ConnectXbitboard(observation, configuration, heuristic_class)
+    return ConnectXBitboard(observation, configuration, heuristic_class)
 
 
 def test_cast_numpy(game):
@@ -60,7 +60,7 @@ def test_get_actions(observation, configuration):
             board[i] = 0
             board[j] = 0
             observation.board = board
-            game     = ConnectXbitboard(observation, configuration, None)
+            game     = ConnectXBitboard(observation, configuration, None)
             expected = list({ i,j })
             actual   = game.get_actions()
             assert actual == expected, f'input = {input}'

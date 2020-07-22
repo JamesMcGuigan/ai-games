@@ -73,9 +73,9 @@ class ConnectXBitboardNumba(ConnectX):
 
     @staticmethod
     @clru_cache(maxsize=None)
-    def get_gameovers(rows: int, columns: int, inarow: int) -> List[int]:
+    def get_gameovers(rows: int, columns: int, inarow: int) -> typed.List:
         """Creates a list of all winning board positions, over 4 directions: horizontal, vertical and 2 diagonals"""
-        gameovers = []
+        gameovers = typed.List()
 
         mask_horizontal  = 0
         mask_vertical    = 0
@@ -161,7 +161,6 @@ class ConnectXBitboardNumba(ConnectX):
         # bitboard_size = self.columns * self.rows
         board     = ( int64(self.board[0]), int64(self.board[1]) )
         gameovers = self.get_gameovers(rows=self.rows, columns=self.columns, inarow=self.inarow)
-        gameovers = typed.List(gameovers)
         return self._utility(board, int8(self.player_id), gameovers)
 
     @staticmethod
@@ -190,7 +189,6 @@ class ConnectXBitboardNumba(ConnectX):
         board         = ( int64(self.board[0]), int64(self.board[1]) )
         bitboard_size = self.columns * self.rows
         gameovers     = self.get_gameovers(rows=self.rows, columns=self.columns, inarow=self.inarow)
-        gameovers     = typed.List(gameovers)
         score         = self._score(board, gameovers, self.player_id, bitboard_size)
         return score
 

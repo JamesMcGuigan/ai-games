@@ -1,3 +1,4 @@
+import itertools
 import math
 from typing import Callable
 from typing import List
@@ -163,6 +164,16 @@ class ConnectXbitboard(ConnectX):
         """ For all possible connect4 gameover positions,
             check if a player has at least one token in position and that the opponent is not blocking
             return difference in score
+
+            Winrates:
+             55% vs AlphaBetaAgent - original heuristic
+             70% vs AlphaBetaAgent - + math.log2(p1_can_play) % 1 == 0
+             60% vs AlphaBetaAgent - + double_attack_score=1   without math.log2() (mostly draws)
+             80% vs AlphaBetaAgent - + double_attack_score=1   with math.log2() (mostly wins)
+             80% vs AlphaBetaAgent - + double_attack_score=2   with math.log2() (mostly wins)
+             70% vs AlphaBetaAgent - + double_attack_score=4   with math.log2() (mostly wins)
+             80% vs AlphaBetaAgent - + double_attack_score=8   with math.log2() (mostly wins)
+            100% vs AlphaBetaAgent - + double_attack_score=0.5 with math.log2() (mostly wins)
         """
         if self.heuristic_class: return self.heuristic.score
 
@@ -173,19 +184,35 @@ class ConnectXbitboard(ConnectX):
         p1_tokens      = self.board & (player_board ^ invert_mask)
         p2_tokens      = self.board & player_board
 
-        p1_score = 0
-        p2_score = 0
-        # p1_gameovers = []
-        # p2_gameovers = []
+        p1_score = 0.0
+        p2_score = 0.0
+        p1_gameovers = []
+        p2_gameovers = []
         for gameover in gameovers:
             p1_can_play = p1_tokens & gameover
             p2_can_play = p2_tokens & gameover
             if p1_can_play and not p2_can_play:
-                p1_score += 1 if not p1_can_play == gameover else math.inf
-                # p1_gameovers.append(gameover)
+                if   p1_can_play == gameover:         p1_score += math.inf   # Connect 4
+                elif math.log2(p1_can_play) % 1 == 0: p1_score += 0.1        # Mostly ignore single square lines
+                else:                                 p1_score += 1; p1_gameovers.append(gameover);
             elif p2_can_play and not p1_can_play:
-                p2_score += 1 if not p2_can_play == gameover else math.inf
-                # p2_gameovers.append(gameover)
+                if   p2_can_play == gameover:         p2_score += math.inf   # Connect 4
+                elif math.log2(p2_can_play) % 1 == 0: p2_score += 0.1        # Mostly ignore single square lines
+                else:                                 p2_score += 1; p2_gameovers.append(gameover);
+
+        double_attack_score = 0.5  # 0.5 == 100% winrate vs AlphaBetaAgent
+        for gameover1, gameover2 in itertools.product(p1_gameovers, p1_gameovers):
+            overlap = gameover1 & gameover2
+            if gameover1 == gameover2:      continue  # Ignore self
+            if overlap == 0:                continue  # Ignore no overlap
+            if math.log2(overlap) % 1 != 0: continue  # Only count double_attacks with a single overlap square
+            p1_score += double_attack_score
+        for gameover1, gameover2 in itertools.product(p2_gameovers, p2_gameovers):
+            overlap = gameover1 & gameover2
+            if gameover1 == gameover2:      continue  # Ignore self
+            if overlap == 0:                continue  # Ignore no overlap
+            if math.log2(overlap) % 1 != 0: continue  # Only count double_attacks with a single overlap square
+            p2_score += double_attack_score
 
         if self.player_id != 1:  # perspective of the previous move
             return p1_score - p2_score

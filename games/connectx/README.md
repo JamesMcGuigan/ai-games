@@ -136,14 +136,17 @@ but also matched on empty squares, signifying the number of potential connect4 l
 
 The pure python implementation (without numba) was able to get to depth=7 on the first move, 
 climbing to depth=12 during the midgame, compared with depth=5-7 for the object oriented 
-AlphaBetaAgent. This translates to a depth advantage of 2-5.
+AlphaBetaAgent. This translates to a depth advantage of 2-5. 
 
 AlphaBetaAgentBitboard is able to beat the depth=4 Kaggle Negamax agent quite easily. 
 
-Despite its depth advantage, it only manages ~50% winrate against AlphaBetaAgent with its stronger (but slower) 
-LibertiesHeuristic. Bitboard performance might be still be improved upon as it may be more suited to numba optimization,
-and a better bitboard heuristic may still be possible.
-
+AlphaBetaAgentBitboard with the original first-pass bitboard heuristic scored a 55% winrate against 
+object-oriented AlphaBetaAgent with its slower (but stronger) LibertiesHeuristic. 
+A small improvement using  `math.log2() % 1 == 0` to heavily discount single square lines improved the winrate to 70%.
+Adding in a bonus double_attack_score for overlapping connect4 lines reduced the score at first to 55% 
+with a large percentage of draws. This was tweaked to only include connect4s that overlaped via a single square 
+(mostly those pointing in different directions) which boosted the winrate to 80%.
+Hyperparemeter optimization resulting in `double_attack_score=0.5` finally achieved a 100% winrate.
 
 # Future Ideas
 - Create an opening book

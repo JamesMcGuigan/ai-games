@@ -144,5 +144,6 @@ class AlphaBetaAgent(PersistentCacheAgent):
         return kaggle_agent
 
 # The last function defined in the file run by Kaggle in submission.csv
-def agent(observation, configuration) -> int:
+# BUGFIX: duplicate top-level function names in submission.py can cause a Kaggle Submission Error
+def agent_AlphaBetaAgent(observation, configuration) -> int:
     return AlphaBetaAgent.agent()(observation, configuration)

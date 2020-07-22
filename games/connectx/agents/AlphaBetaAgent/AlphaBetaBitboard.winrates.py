@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# seq 5 | parallel --ungroup --jobs 2 agents/AlphaBetaAgent/AlphaBetaAgentBitboard.winrates.py -r 2 -t 5
+# seq 5 | parallel --ungroup --jobs 2 agents/AlphaBetaAgent/AlphaBetaBitboard.winrates.py -r 2 -t 5
 import argparse
 import gc
 import time
@@ -7,7 +7,7 @@ import time
 from kaggle_environments import make
 
 from agents.AlphaBetaAgent.AlphaBetaAgent import AlphaBetaAgent
-from agents.AlphaBetaAgent.AlphaBetaAgentBitboard import AlphaBetaAgentBitboard
+from agents.AlphaBetaAgent.AlphaBetaBitboard import AlphaBetaBitboard
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-r', '--rounds',  type=int, default=10)
@@ -22,7 +22,7 @@ observation   = env.state[0].observation
 configuration = env.configuration
 
 rounds   = argv.rounds
-agent    = AlphaBetaAgentBitboard
+agent    = AlphaBetaBitboard
 opponent = AlphaBetaAgent
 kwargs = {
     "verbose_depth":    False,
@@ -52,11 +52,11 @@ winrate = 100 * wins / rounds
 print(f'{wins:.1f}/{rounds:.0f} = {winrate:3.0f}% winrate {agent.__name__} vs {opponent.__name__}')
 
 ### Winrates @ timeout=5
-#  55% winrate AlphaBetaAgentBitboard vs AlphaBetaAgent | original heuristic
-#  70% winrate AlphaBetaAgentBitboard vs AlphaBetaAgent | + log2() % 1 == 0
-#  60% winrate AlphaBetaAgentBitboard vs AlphaBetaAgent | + double_attack_score=1   without math.log2() (mostly draws)
-#  80% winrate AlphaBetaAgentBitboard vs AlphaBetaAgent | + double_attack_score=1   with math.log2() (all wins/losses)
-#  80% winrate AlphaBetaAgentBitboard vs AlphaBetaAgent | + double_attack_score=2   with math.log2() (all wins/losses)
-#  70% winrate AlphaBetaAgentBitboard vs AlphaBetaAgent | + double_attack_score=4   with math.log2() (all wins/losses)
-#  80% winrate AlphaBetaAgentBitboard vs AlphaBetaAgent | + double_attack_score=8   with math.log2() (all wins/losses)
-# 100% winrate AlphaBetaAgentBitboard vs AlphaBetaAgent | + double_attack_score=0.5 with math.log2() (all wins/losses)
+#  55% winrate AlphaBetaBitboard vs AlphaBetaAgent | original heuristic
+#  70% winrate AlphaBetaBitboard vs AlphaBetaAgent | + log2() % 1 == 0
+#  60% winrate AlphaBetaBitboard vs AlphaBetaAgent | + double_attack_score=1   without math.log2() (mostly draws)
+#  80% winrate AlphaBetaBitboard vs AlphaBetaAgent | + double_attack_score=1   with math.log2() (all wins/losses)
+#  80% winrate AlphaBetaBitboard vs AlphaBetaAgent | + double_attack_score=2   with math.log2() (all wins/losses)
+#  70% winrate AlphaBetaBitboard vs AlphaBetaAgent | + double_attack_score=4   with math.log2() (all wins/losses)
+#  80% winrate AlphaBetaBitboard vs AlphaBetaAgent | + double_attack_score=8   with math.log2() (all wins/losses)
+# 100% winrate AlphaBetaBitboard vs AlphaBetaAgent | + double_attack_score=0.5 with math.log2() (all wins/losses)

@@ -3,10 +3,10 @@ import gc
 import time
 from copy import deepcopy
 
-from agents.AlphaBetaAgent.AlphaBetaAgentBitboard import AlphaBetaAgentBitboard
 from kaggle_environments import make
 
 from agents.AlphaBetaAgent.AlphaBetaAgent import AlphaBetaAgent
+from agents.AlphaBetaAgent.AlphaBetaBitboard import AlphaBetaBitboard
 from core.ConnectX import ConnectX
 from core.ConnextXBitboard import ConnectXBitboard
 from heuristics.LibertiesHeuristic import LibertiesHeuristic
@@ -17,8 +17,8 @@ observation   = env.state[0].observation
 configuration = env.configuration
 
 tests = [
-    (list(range(1, 6+1)), ConnectX(observation, configuration, LibertiesHeuristic), AlphaBetaAgent,         ),
-    (list(range(1, 9+1)), ConnectXBitboard(observation, configuration, None),       AlphaBetaAgentBitboard, ),
+    (list(range(1, 6+1)), ConnectX(observation, configuration, LibertiesHeuristic), AlphaBetaAgent,    ),
+    (list(range(1, 9+1)), ConnectXBitboard(observation, configuration, None),       AlphaBetaBitboard, ),
 ]
 for depth_range, game, agent_class in tests:
     game = deepcopy(game)

@@ -121,7 +121,7 @@ Even still AlphaBeta + LibertiesHeuristic does score in the top 8% Kaggle Leader
 
 ## AlphaBeta Agent Bitboard
 
-- [agents/AlphaBetaAgent/AlphaBetaAgentBitboard.py](agents/AlphaBetaAgent/AlphaBetaAgentBitboard.py)
+- [agents/AlphaBetaAgent/AlphaBetaBitboard.py](agents/AlphaBetaAgent/AlphaBetaBitboard.py)
 
 Focusing attention back on raw performance resulted in a bitboard implementation. 
 A 84 bit number was used, divided into 2 x 42 bit subsections. 
@@ -138,9 +138,9 @@ The pure python implementation (without numba) was able to get to depth=7 on the
 climbing to depth=12 during the midgame, compared with depth=5-7 for the object oriented 
 AlphaBetaAgent. This translates to a depth advantage of 2-5. 
 
-AlphaBetaAgentBitboard is able to beat the depth=4 Kaggle Negamax agent quite easily. 
+AlphaBetaBitboard is able to beat the depth=4 Kaggle Negamax agent quite easily. 
 
-AlphaBetaAgentBitboard with the original first-pass bitboard heuristic scored a 55% winrate against 
+AlphaBetaBitboard with the original first-pass bitboard heuristic scored a 55% winrate against 
 object-oriented AlphaBetaAgent with its slower (but stronger) LibertiesHeuristic. 
 A small improvement using  `math.log2() % 1 == 0` to heavily discount single square lines improved the winrate to 70%.
 Adding in a bonus double_attack_score for overlapping connect4 lines reduced the score at first to 55% 

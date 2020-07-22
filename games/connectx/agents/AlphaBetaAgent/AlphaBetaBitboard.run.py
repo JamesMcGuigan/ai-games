@@ -3,7 +3,7 @@ import argparse
 
 from kaggle_environments import make
 
-from agents.AlphaBetaAgent.AlphaBetaAgentBitboard import AlphaBetaAgentBitboard
+from agents.AlphaBetaAgent.AlphaBetaBitboard import AlphaBetaBitboard
 
 env = make("connectx", debug=True)
 env.render()
@@ -24,7 +24,7 @@ if argv.debug:
 
 # env.run([AlphaBetaAgent.agent, "random"])
 # env.run([ AlphaBetaAgent.agent(search_max_depth=5), AlphaBetaAgentOdd.agent(search_max_depth=5) ])
-env.run([AlphaBetaAgentBitboard.agent(**agent_args), AlphaBetaAgentBitboard.agent(**agent_args)])
+env.run([AlphaBetaBitboard.agent(**agent_args), AlphaBetaBitboard.agent(**agent_args)])
 # noinspection PyTypeChecker
 env.render(mode="human")
 

@@ -4,7 +4,6 @@ from kaggle_environments import make
 from agents.AlphaBetaAgent.AlphaBetaAgent import AlphaBetaAgent
 
 
-
 @pytest.fixture
 def env():
     env = make("connectx", debug=True)
@@ -35,7 +34,7 @@ def test_can_play_game_against_self():
 @pytest.mark.parametrize("opponent", ["random", "negamax"])
 def test_can_win_against(position, opponent):
     env = make("connectx", debug=True)
-    env.configuration.timeout = 8
+    env.configuration.timeout = 4  # Half normal timer for quicker tests
     if position == "player1":
         env.run([AlphaBetaAgent.agent(), opponent])
         assert env.state[0].reward == 1

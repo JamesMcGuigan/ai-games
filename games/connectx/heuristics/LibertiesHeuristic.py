@@ -1,9 +1,5 @@
 import functools
 import math
-
-
-import numba
-from dataclasses import dataclass
 from enum import Enum
 from enum import unique
 from typing import FrozenSet
@@ -12,14 +8,15 @@ from typing import Set
 from typing import Tuple
 from typing import Union
 
+import numba
 import numpy as np
+from dataclasses import dataclass
 from fastcache import clru_cache
 from numba import njit
 
 from core.ConnectX import ConnectX
 from core.Heuristic import Heuristic
 from util.vendor.cached_property import cached_property
-
 
 
 # (1,0)  -> (-1,0)  = down -> up
@@ -230,7 +227,7 @@ class Line:
     # @staticmethod
     # @njit()
     # def _extensions(length_self, liberties, cells, mark, direction, board, inarow, rows, columns, next_coord, is_valid_coord) -> List[Set[Tuple[int,int]]]:
-    #     extensions = [ set([ (0,0) ]) for _ in range(0) ]  # http://numba.pydata.org/numba-doc/latest/user/troubleshoot.html#my-code-has-an-untyped-list-problem
+    #     extensions = [ set([ (0,0) ]) for _ in depth_range(0) ]  # http://numba.pydata.org/numba-doc/latest/user/troubleshoot.html#my-code-has-an-untyped-list-problem
     #     cells      = set(cells)
     #     for next in liberties:
     #         extension = set([ next ])

@@ -9,7 +9,6 @@ from util.tuplize import tuplize
 from util.vendor.cached_property import cached_property
 
 
-
 class KaggleGame:
     """
     This is a generic baseclass wrapper around kaggle_environments
@@ -19,14 +18,14 @@ class KaggleGame:
     """
 
     def __init__(self, observation, configuration, heuristic_class, verbose=True):
-        self.time_start    = time.perf_counter()
-        self.observation   = observation
-        self.configuration = configuration
-        self.verbose       = verbose
-        self.player_id     = None
-        self._hash         = None
-        self.heuristic_class = heuristic_class
-
+        self.time_start         = time.perf_counter()
+        self.observation        = observation
+        self.configuration      = configuration
+        self.verbose            = verbose
+        self.player_id          = None
+        self._hash              = None
+        self.heuristic_class    = heuristic_class
+        self.actions: List[int] = []  # self.get_actions()
 
     def __hash__(self):
         """Return an id for caching purposes """
@@ -37,8 +36,7 @@ class KaggleGame:
 
     ### Result Methods
 
-    @cached_property
-    def actions( self ) -> List:
+    def get_actions( self ) -> List:
         """Return a list of valid actions"""
         raise NotImplementedError
 
@@ -59,7 +57,7 @@ class KaggleGame:
     @cached_property
     def heuristic(self):
         """Delay resolution until after parentclass constructor has finished"""
-        return self.heuristic_class(self)
+        return self.heuristic_class(self) if self.heuristic_class else None
 
     @cached_property
     def gameover( self ) -> bool:

@@ -12,8 +12,8 @@ from core.PersistentCacheAgent import PersistentCacheAgent
 from heuristics.LibertiesHeuristic import LibertiesHeuristic
 
 
-
 class AlphaBetaAgent(PersistentCacheAgent):
+    game_class      = ConnectX
     heuristic_class = LibertiesHeuristic
     defaults = {
         "verbose_depth":    True,
@@ -43,7 +43,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
 
     def iterative_deepening_search( self, endtime=0.0 ) -> int:
         # The real trick with iterative deepening is caching, which allows us to out-depth the default minimax Agent
-        if self.verbose_depth: print('\n'+ self.__class__.__name__.ljust(20) +' | depth:', end=' ', flush=True)
+        if self.verbose_depth: print('\n'+ self.__class__.__name__.ljust(23) +' | depth:', end=' ', flush=True)
         best_action = random.choice(self.game.actions)
         try:
             for depth in range(1, self.search_max_depth+1, self.search_step):
@@ -65,7 +65,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
         scores = []
         best_action = random.choice(game.actions)
         best_score  = -math.inf
-        for action in game.actions:
+        for action in random.sample(game.actions, len(game.actions)):
             if endtime and time.perf_counter() >= endtime: raise TimeoutError
             result = game.result(action)
             score  = self.alphabeta_min_value(result, player_id=self.player_id, depth=depth-1, endtime=endtime)
@@ -84,8 +84,8 @@ class AlphaBetaAgent(PersistentCacheAgent):
         if endtime and time.perf_counter() >= endtime: raise TimeoutError
 
         sign = 1 if player_id != game.player_id else -1
-        if game.gameover:  return sign * game.heuristic.utility  # score relative to previous player who made the move
-        if depth == 0:     return sign * game.heuristic.score
+        if game.gameover:  return sign * game.utility  # score relative to previous player who made the move
+        if depth == 0:     return sign * game.score
         scores = []
         score  = math.inf
         for action in game.actions:
@@ -103,8 +103,8 @@ class AlphaBetaAgent(PersistentCacheAgent):
         if endtime and time.perf_counter() >= endtime: raise TimeoutError
 
         sign = 1 if player_id != game.player_id else -1
-        if game.gameover:  return sign * game.heuristic.utility  # score relative to previous player who made the move
-        if depth == 0:     return sign * game.heuristic.score
+        if game.gameover:  return sign * game.utility  # score relative to previous player who made the move
+        if depth == 0:     return sign * game.score
         scores = []
         score  = -math.inf
         for action in game.actions:
@@ -134,12 +134,12 @@ class AlphaBetaAgent(PersistentCacheAgent):
             safety_time = 1.5    # 250ms fails on Kaggle Submit
             endtime = time.perf_counter() + configuration.timeout - safety_time
 
-            game    = ConnectX(observation, configuration, heuristic_class, **kwargs)
+            game    = cls.game_class(observation, configuration, heuristic_class, **kwargs)
             agent   = cls(game, **kwargs)
             action  = agent.get_action(endtime)
 
             gc.enable()  # re-enable the gc to run during our opponents turn!
-            # print( f'T{-(endtime - time.perf_counter()):+.5f}s')  # range 0.1-3ms but gc triggers huge timeouts 1000ms+
+            # print( f'T{-(endtime - time.perf_counter()):+.5f}s')  # depth_range 0.1-3ms but gc triggers huge timeouts 1000ms+
             return int(action)
         return kaggle_agent
 

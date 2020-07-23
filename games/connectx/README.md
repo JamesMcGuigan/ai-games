@@ -148,6 +148,9 @@ with a large percentage of draws. This was tweaked to only include connect4s tha
 (mostly those pointing in different directions) which boosted the winrate to 80%.
 Hyperparemeter optimization resulting in `double_attack_score=0.5` finally achieved a 100% winrate.
 
+Attempting to optimise AlphaBetaBitboard with numba did not result in any significant performance increase.
+
+
 # Future Ideas
 - Create an opening book
 - Create an endgames table

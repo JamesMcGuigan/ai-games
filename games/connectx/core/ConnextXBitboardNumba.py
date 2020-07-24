@@ -1,3 +1,5 @@
+### This is a port/refactor of ConnectXBitboard to work with Numba - it doesn't improve performance significantly
+
 import math
 from typing import Callable
 from typing import List

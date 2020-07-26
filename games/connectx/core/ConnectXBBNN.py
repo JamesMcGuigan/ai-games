@@ -5,9 +5,12 @@ from typing import Tuple
 
 import numba
 import numpy as np
+from numba import int64
 from numba import int8
+from numba import njit
 from numba import prange
 from numba import typed
+from numba import typeof
 
 from util.reverse_bit import reverse_bits
 
@@ -39,7 +42,7 @@ def cast_configuration(configuration):
         inarow  = configuration.inarow
     )
 
-#@njit # (int64[::1](int64[:]))
+@njit(int64[:](typeof(typed.List([0]))))
 def list_to_bitboard(listboard: typed.List) -> np.ndarray:
     # bitboard[0] = played, is a square filled             | 0 = empty, 1 = filled
     # bitboard[1] = player, who's token is this, if filled | 0 = empty, 1 = filled
@@ -53,7 +56,7 @@ def list_to_bitboard(listboard: typed.List) -> np.ndarray:
     bitboard = np.array([bitboard_played, bitboard_player], dtype=np.int64)
     return bitboard
 
-#@njit # (int64[:,:](int64[:]))
+@njit(int8[:,:](int64[:]))
 def bitboard_to_numpy2d(bitboard: np.ndarray) -> np.ndarray:
     global configuration
     rows    = configuration.rows
@@ -68,34 +71,36 @@ def bitboard_to_numpy2d(bitboard: np.ndarray) -> np.ndarray:
     return output.reshape((rows, columns))
 
 
-
 ### Bitboard Operations
 
-#@njit
+@njit
 def empty_bitboard() -> np.ndarray:
     return np.array([0, 0], dtype=np.int64)
 
-#@njit
+@njit
 def hash_bitboard( bitboard: np.ndarray ) -> Tuple[int,int]:
     """ Create a tupleised mirror hash, the minimum value of the bitboard and its mirrored reverse """
     global configuration
-    bitsize  = configuration.rows * configuration.columns
-    reversed = np.fromiter((reverse_bits(bitstring, bitsize) for bitstring in bitboard), dtype=bitboard.dtype)
-    if ( bitboard[0] <  reversed[0]
-      or bitboard[0] == reversed[0] and bitboard[1] <= reversed[1] ):
-        minimum = bitboard
+    bitsize = configuration.rows * configuration.columns
+
+    reversed_0 = reverse_bits(bitboard[0], bitsize)
+    if bitboard[0] < reversed_0:
+        return ( bitboard[0], bitboard[1] )
     else:
-        minimum = reversed
-    return (minimum[0], minimum[1])
+        reversed_1 = reverse_bits(bitboard[1], bitsize)
+        if bitboard[0] == reversed_0 and bitboard[1] <= reversed_1:
+            return ( bitboard[0], bitboard[1] )
+        else:
+            return ( reversed_0, reversed_1 )
 
 
-
-
+@njit
 def current_player_id( bitboard: np.ndarray ) -> int:
     move_number = get_move_number(bitboard)
     next_player = 1 if move_number % 2 == 0 else 2  # player 1 has the first move on an empty board
     return next_player
 
+@njit(int8(int8))
 def next_player_id(player_id: int) -> int:
     return 3 - player_id  # 1 if player_id is 2 else 2
 
@@ -105,14 +110,14 @@ def next_player_id(player_id: int) -> int:
 
 ### Coordinates
 
-#@njit
+@njit
 def index_to_coords(index: int) -> Tuple[int,int]:
     global configuration
     row    = index // configuration.columns
     column = index - row * configuration.columns
     return (row, column)
 
-#@njit
+@njit
 def coords_to_index(row: int, column: int) -> int:
     global configuration
     return column + row * configuration.columns
@@ -121,12 +126,12 @@ def coords_to_index(row: int, column: int) -> int:
 
 ### Moves
 
-#@njit(int64[:](int8))
+@njit(int64[:](int8))
 def get_bitcount_mask(size: int) -> np.ndarray:
     global configuration
     return np.array([ 1 << index for index in range(size) ], dtype=np.int64)
 
-#@njit(int8(int64[:]))
+@njit(int8(int64[:]))
 def get_move_number(bitboard: np.ndarray) -> int:
     global configuration
     if bitboard[0] == 0: return 0
@@ -135,25 +140,25 @@ def get_move_number(bitboard: np.ndarray) -> int:
     move_number   = np.sum( bitboard[0] & bitcount_mask == bitcount_mask )
     return int(move_number)
 
-#@njit(int8(int64[:], int8))
+@njit(int8(int64[:], int8))
 def is_legal_move(bitboard: np.ndarray, action: int) -> int8:
     # First 7 bytes represent the top row. Moves are legal if the sky is unplayed
     return int( bitboard[0] >> action & 1 == 0 )
 
-#@njit
+@njit
 def get_legal_moves(bitboard: np.ndarray) -> np.ndarray:
     # First 7 bytes represent the top row. Moves are legal if the sky is unplayed
     global configuration
     return np.array([ action for action in range(configuration.columns) if is_legal_move(bitboard, action) ])
 
 # @clru_cache(1)
-#@njit
+@njit
 def get_all_moves() -> np.ndarray:
     # First 7 bytes represent the top row. Moves are legal if the sky is unplayed
     global configuration
     return np.array([ action for action in range(configuration.columns) ])
 
-#@njit
+@njit
 def get_random_move(bitboard: np.ndarray) -> int:
     """ This is slightly quicker than random.choice(get_all_moves())"""
     assert not has_no_more_moves(bitboard)
@@ -165,7 +170,7 @@ def get_random_move(bitboard: np.ndarray) -> int:
             return action
 
 
-#@njit
+@njit
 def get_next_row(bitboard: np.ndarray, action: int) -> int:
     global configuration
     # Start at the ground, and return first row that contains a 0
@@ -176,7 +181,7 @@ def get_next_row(bitboard: np.ndarray, action: int) -> int:
             return row  # first playable row
     return 0            # implies not is_legal_move(bitboard, action) - this should never happen
 
-#@njit
+@njit
 def result_action(bitboard: np.ndarray, action: int, player_id: int) -> np.ndarray:
     if not is_legal_move(bitboard, action): return bitboard
     column   = action
@@ -194,13 +199,10 @@ def result_action(bitboard: np.ndarray, action: int, player_id: int) -> np.ndarr
 ### Endgame Utility
 ### Gameovers
 
-_get_gameovers_cache = None
-#@njit(int64[:]())
+@njit(int64[:]())
 def get_gameovers() -> np.ndarray:
     """Creates a list of all winning board positions, over 4 directions: horizontal, vertical and 2 diagonals"""
     global configuration
-    global _get_gameovers_cache
-    if _get_gameovers_cache is not None: return _get_gameovers_cache
 
     rows    = configuration.rows
     columns = configuration.columns
@@ -235,20 +237,20 @@ def get_gameovers() -> np.ndarray:
     return _get_gameovers_cache
 
 
-#@njit
+@njit
 def is_gameover(bitboard: np.ndarray) -> bool:
     if has_no_more_moves(bitboard):  return True
     if get_winner(bitboard) != 0:    return True
     return False
 
-#@njit
+@njit
 def has_no_more_moves(bitboard: np.ndarray) -> bool:
     """If all the squares on the top row have been played, then there are no more moves"""
     global configuration
     mask = (2 ** configuration.columns) - 1
     return bitboard[0] & mask == mask
 
-#@njit
+@njit
 def get_winner(bitboard: np.ndarray) -> int:
     """ Endgammer get_winner: 0 for no get_winner, 1 = player 1, 2 = player 2"""
     gameovers        = get_gameovers()
@@ -261,21 +263,21 @@ def get_winner(bitboard: np.ndarray) -> int:
     return 0
 
 
-#@njit
+@njit
 def get_utility_one(bitboard: np.ndarray, player_id: int) -> int:
     """ Like get_utility_inf but returns: 1 for victory, -1 for loss, 0 for draw """
     winning_player = get_winner(bitboard)
     if winning_player == 0: return 0
     return 1 if winning_player == player_id else -1
 
-#@njit
+@njit
 def get_utility_zero_one(bitboard: np.ndarray, player_id: int) -> float:
     """ Like get_utility_one but returns: 1 for victory, 0 for loss, 0.5 for draw """
     winning_player = get_winner(bitboard)
     if winning_player == 0: return 0.5
     return 1.0 if winning_player == player_id else 0.0
 
-#@njit
+@njit
 def get_utility_inf(bitboard: np.ndarray, player_id: int) -> float:
     """ Like get_utility_one but returns: +inf for victory, -inf for loss, 0 for draw """
     winning_player = get_winner(bitboard)

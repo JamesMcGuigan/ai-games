@@ -5,6 +5,12 @@ import numpy as np
 
 # Create masks and reverse bitstring lookup tables for 15 bit segments = 32kb memory
 # Configuration options: 42 = 14 x 3 | 60 = 15 x 4 | 63 = 9 x 7 | more loops = slower
+from numba import int64
+from numba import int8
+from numba import njit
+
+
+
 blocksize   = 14                            # BUGFIX: OverflowError: Python int too large to convert to C long
 max_int     = 42  # blocksize * (63 // blocksize) # sys.maxsize == 2**63-1 | python requires sign bit which is unusable
 max_bit     = (1 << blocksize) - 1          # == 0xFFFF
@@ -12,8 +18,8 @@ inset_start = max_int - blocksize
 masks_bits  = np.array([ max_bit << offset for offset in range(0, max_int, blocksize) ], dtype=np.int64)
 reverse_bit = np.array([ max_bit - n       for n      in range(max_bit)               ], dtype=np.int16)
 
-# @njit
-def reverse_bits( bitstring: int, bitsize: int = blocksize ) -> int:
+@njit(int64(int64, int8))
+def reverse_bits( bitstring: int, bitsize: int ) -> int:
     # BUG: reverse_bit[bits] out of range
     try:
         if bitstring == 0: return (1 << bitsize) - 1               # short-circuit simplest edgecase

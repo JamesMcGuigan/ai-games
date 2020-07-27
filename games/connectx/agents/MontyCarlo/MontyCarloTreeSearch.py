@@ -11,7 +11,6 @@
 #       choose random child with probability: wins/total + exploration * sqrt( ln(simulation_count)/total )
 #   Expansion: run one end-to-end simulation for each child node
 #   Update:    for each parent node, update win/total statistics
-import sys
 import time
 from struct import Struct
 from typing import Union
@@ -165,6 +164,7 @@ def run_simulation( bitboard: np.ndarray, player_id: int ) -> float:
     return get_utility_zero_one(bitboard, player_id)
 
 
+
 ### Backpropergate
 
 @njit
@@ -180,47 +180,55 @@ def backpropergate_scores(state: typed.Dict, path: typed.List, player_id: int, s
     return None
 
 
+#### Selection
+
 # cannot @jit nopython=True required to access time.perf_counter()
-def run_search(state: typed.Dict, bitboard: np.ndarray, player_id: int, endtime: float, iterations=sys.maxsize) -> Tuple[int,int]:
+def run_search(state: typed.Dict, bitboard: np.ndarray, player_id: int, endtime: float, iterations=0) -> Tuple[int,int]:
 
     init_state(state, bitboard)
     path_to_root_node = typed.List([ PathEdge(bitboard, -1) ])  # BUGFIX: numba typed.List([]) needs a dummy value for typing
     expand_node(state, path_to_root_node, bitboard, player_id)  # Ensure root node is always expanded
 
     actions = get_all_moves()
-    count   = 0
-    while time.perf_counter() < endtime and count < iterations:
-        count += 1
-        run_search_once(state, bitboard, player_id, count, actions)
+
+    count = 0
+    if iterations:
+        count = run_search_loop(state, bitboard, player_id, count, actions, iterations)
+    else:
+        # This is the main loop and time.perf_counter() is slow compared to numba, so run tight loop in @njit
+        while time.perf_counter() < endtime:
+            count = run_search_loop(state, bitboard, player_id, count, actions, 100)
 
     final_weights = get_child_probabilities(state, bitboard, count)
     action        = actions[ np.argmax(final_weights) ]
     return action, count
 
 @njit
-def run_search_once(state: typed.Dict, bitboard: np.ndarray, player_id: int, count: int = 1, actions=get_all_moves()) -> None:
-    path              = path_selection(state, bitboard, count)
-    leaf_node, action = path[-1]
+def run_search_loop( state: typed.Dict, bitboard: np.ndarray, player_id: int, count: int = 1, actions=get_all_moves(), iterations: int = 1 ) -> int:
+    for count in range(count+1, count+iterations+1):
+        path              = path_selection(state, bitboard, count)
+        leaf_node, action = path[-1]
 
-    expand_node(state, path, leaf_node, player_id)
+        expand_node(state, path, leaf_node, player_id)
 
-    weights       = get_child_probabilities(state, leaf_node, count)
-    action        = weighted_choice(actions, weights)
-    next_bitboard = result_action(bitboard, action, player_id)
-    score         = run_simulation(next_bitboard, player_id)
+        weights       = get_child_probabilities(state, leaf_node, count)
+        action        = weighted_choice(actions, weights)
+        next_bitboard = result_action(bitboard, action, player_id)
+        score         = run_simulation(next_bitboard, player_id)
 
-    backpropergate_scores(state, path, player_id, score)
+        backpropergate_scores(state, path, player_id, score)
+    return count
 
-
-def precompile_numba(state):
-    run_search(state, empty_bitboard(), player_id=1, endtime=sys.maxsize, iterations=1)
 
 
 
 ### Main
 
-state = new_state()
-precompile_numba(state)
+# def precompile_numba(state):
+#     run_search(state, empty_bitboard(), player_id=1, endtime=sys.maxsize, iterations=1)
+#
+# state = new_state()
+# precompile_numba(state)
 
 # The last function defined in the file run by Kaggle in submission.csv
 # BUGFIX: duplicate top-level function names in submission.py can cause a Kaggle Submission Error
@@ -228,16 +236,16 @@ def MontyCarloTreeSearch(observation: Struct, _configuration_: Struct) -> int:
     # observation   = {'mark': 1, 'board': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
     # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 8}
 
-    first_move_time = 0    # Numba is now precompiled
-    safety_time     = 0.1  # == 100ms
+    first_move_time = 0     # Numba is now precompiled
+    safety_time     = 0.25  # Only gets checked once every hundred loops
     start_time      = time.perf_counter()
 
 
     global configuration
     configuration = cast_configuration(_configuration_)
 
-    global state  # Share state between runs
-    # state = new_state()
+    # global state  # Share state between runs
+    state = new_state()
 
     player_id     = observation.mark
     listboard     = typed.List(); [ listboard.append(cell) for cell in observation.board ]  # BUGFIX: constructor fails to load data

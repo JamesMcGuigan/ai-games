@@ -6,9 +6,11 @@ from kaggle_environments import make
 from agents.AlphaBetaAgent.AlphaBetaAgent import AlphaBetaAgent
 from agents.AlphaBetaAgent.AlphaBetaBitboard import AlphaBetaBitboard
 from agents.MontyCarlo.MontyCarloTreeSearch import MontyCarloTreeSearch
+from agents.MontyCarlo.MontyCarloTreeSearch import precompile_numba
 
 
 
+precompile_numba()
 env = make("connectx", debug=True)
 env.render()
 env.reset()

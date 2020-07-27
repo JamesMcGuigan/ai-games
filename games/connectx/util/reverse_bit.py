@@ -1,5 +1,5 @@
-
 # Source: https://stackoverflow.com/questions/12681945/reversing-bits-of-python-integer
+# Vectorized Bitshifting Implemention: ConnectXBBNN.mirror_bitstring()
 
 import numpy as np
 
@@ -16,24 +16,21 @@ max_int     = 42  # blocksize * (63 // blocksize) # sys.maxsize == 2**63-1 | pyt
 max_bit     = (1 << blocksize) - 1          # == 0xFFFF
 inset_start = max_int - blocksize
 masks_bits  = np.array([ max_bit << offset for offset in range(0, max_int, blocksize) ], dtype=np.int64)
-reverse_bit = np.array([ max_bit - n       for n      in range(max_bit)               ], dtype=np.int16)
+reverse_bit = np.array([ max_bit - n       for n      in range(max_bit+1)             ], dtype=np.int16)
 
 @njit(int64(int64, int8))
 def reverse_bits( bitstring: int, bitsize: int ) -> int:
     # BUG: reverse_bit[bits] out of range
-    try:
-        if bitstring == 0: return (1 << bitsize) - 1               # short-circuit simplest edgecase
-        output = 0                                                 # blank slate
-        for n, offset in enumerate(range(0, bitsize, blocksize)):  # look over 60 bit in 4 x 15 bit loops
-            mask   = masks_bits[n]                                 # create bit mask of bits we wish to extract
-            bits   = (bitstring & mask) >> offset                  # extract values as short int | ignoring sign bit
-            stib   = reverse_bit[bits]                             # perform reverse via lookup then cast back to int64
-            inset  = inset_start - offset                          # calculate start position of replacement
-            output = output | (stib << inset)                      # replace lookup on other end of bitstring
-        # output = output & (sys.maxsize >> blocksize << blocksize)  # mask out any excess bits | BUG: numba casting error
-        return output
-    except:
-        return bitstring
+    if bitstring == 0: return (1 << bitsize) - 1               # short-circuit simplest edgecase
+    output = 0                                                 # blank slate
+    for n, offset in enumerate(range(0, bitsize, blocksize)):  # look over 60 bit in 4 x 15 bit loops
+        mask   = masks_bits[n]                                 # create bit mask of bits we wish to extract
+        bits   = (bitstring & mask) >> offset                  # extract values as short int | ignoring sign bit
+        stib   = reverse_bit[bits]                             # perform reverse via lookup then cast back to int64
+        inset  = inset_start - offset                          # calculate start position of replacement
+        output = output | (stib << inset)                      # replace lookup on other end of bitstring
+    # output = output & (sys.maxsize >> blocksize << blocksize)  # mask out any excess bits | BUG: numba casting error
+    return output
 
 #
 # reverse_64bit_mask_front = np.array([ 1 << n for n in range(0, 63)    ], dtype=np.int64)

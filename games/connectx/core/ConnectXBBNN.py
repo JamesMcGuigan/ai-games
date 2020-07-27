@@ -10,7 +10,6 @@ from numba import int8
 from numba import njit
 from numba import prange
 from numba import typed
-from numba import typeof
 
 from util.reverse_bit import reverse_bits
 
@@ -42,7 +41,7 @@ def cast_configuration(configuration):
         inarow  = configuration.inarow
     )
 
-@njit(int64[:](typeof(typed.List([0]))))
+@njit
 def list_to_bitboard(listboard: typed.List) -> np.ndarray:
     # bitboard[0] = played, is a square filled             | 0 = empty, 1 = filled
     # bitboard[1] = player, who's token is this, if filled | 0 = empty, 1 = filled

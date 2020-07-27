@@ -173,7 +173,7 @@ def backpropergate_scores(state: typed.Dict, path: typed.List, player_id: int, s
     assert len(path) != 0
     current_player = current_player_id(path[0][0])
     for node, action in path:
-        if action <= -1: continue  # BUGFIX: numba typed.List([]) needs a dummy value for typing
+        if action <= -1: continue  # BUGFIX: numba typed.List([]) needs runtime type hint
         player_score = score if current_player == player_id else 1 - score  # +1 = victory | 0.5 = draw | 0 = loss
         update_state( state, node, action, player_score )
         player_id = next_player_id(player_id)
@@ -186,7 +186,8 @@ def backpropergate_scores(state: typed.Dict, path: typed.List, player_id: int, s
 def run_search(state: typed.Dict, bitboard: np.ndarray, player_id: int, endtime: float, iterations=0) -> Tuple[int,int]:
 
     init_state(state, bitboard)
-    path_to_root_node = typed.List([ PathEdge(bitboard, -1) ])  # BUGFIX: numba typed.List([]) needs a dummy value for typing
+    path_to_root_node = typed.List()
+    path_to_root_node.append( PathEdge(bitboard, -1) )          # BUGFIX: numba typed.List([]) needs runtime type hint
     expand_node(state, path_to_root_node, bitboard, player_id)  # Ensure root node is always expanded
 
     actions = get_all_moves()

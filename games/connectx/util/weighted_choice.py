@@ -12,12 +12,10 @@ def weighted_choice(options: np.ndarray, weights: np.ndarray) -> Union[int,float
     total = np.sum(weights)
     rand  = np.random.rand() * total
 
-    option = options[0]
     for i in range(len(options)):
-        option = options[i]
         weight = weights[i]
         if weight < rand:
             rand -= weight
         else:
-            break
-    return option
+            return options[i]
+    return np.random.choice(options)  # backup incase all weights are zero

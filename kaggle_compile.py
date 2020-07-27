@@ -27,12 +27,14 @@ module_names = [ name for name in os.listdir(args.python_path)
                  if os.path.isdir(os.path.join(args.python_path, name))
                  and not name.startswith('.') ]
 module_regex = '(?:' + "|".join(map(re.escape, module_names)) + ')'
-import_regex = re.compile(f'^from\s+({module_regex}.*?)\s+import', re.MULTILINE)
+import_regex = re.compile(fr'^from\s+({module_regex}.*?)\s+import', re.MULTILINE)
+assert_regex = re.compile(fr'\bassert\s', re.MULTILINE)
 
 
 def read_and_comment_file(filename: str) -> str:
     code = open(filename, 'r').read()
-    code = re.sub(import_regex, r'# \g<0>', code)
+    code = re.sub(import_regex, r'# \g<0>', code)  # comment out from * import statements
+    code = re.sub(assert_regex, r'# \g<0>', code)  # comment out asserts for production
     return code
 
 

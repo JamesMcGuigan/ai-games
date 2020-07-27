@@ -79,9 +79,11 @@ def empty_bitboard() -> np.ndarray:
 @njit
 def hash_bitboard( bitboard: np.ndarray ) -> Tuple[int,int]:
     """ Create a tupleised mirror hash, the minimum value of the bitboard and its mirrored reverse """
-    global configuration
-    bitsize = configuration.rows * configuration.columns
+    if bitboard[0] == 0:
+        return ( bitboard[0], bitboard[1] )
 
+    global configuration
+    bitsize    = configuration.rows * configuration.columns
     reversed_0 = reverse_bits(bitboard[0], bitsize)
     if bitboard[0] < reversed_0:
         return ( bitboard[0], bitboard[1] )

@@ -196,8 +196,8 @@ def result_action(bitboard: np.ndarray, action: int, player_id: int) -> np.ndarr
 
 
 
-### Endgame Utility
 ### Gameovers
+
 
 @njit(int64[:]())
 def get_gameovers() -> np.ndarray:
@@ -236,6 +236,11 @@ def get_gameovers() -> np.ndarray:
     _get_gameovers_cache = np.array(gameovers, dtype=np.int64)
     return _get_gameovers_cache
 
+gameovers = get_gameovers()
+
+
+
+### Endgame Utility
 
 @njit
 def is_gameover(bitboard: np.ndarray) -> bool:
@@ -253,7 +258,8 @@ def has_no_more_moves(bitboard: np.ndarray) -> bool:
 @njit
 def get_winner(bitboard: np.ndarray) -> int:
     """ Endgammer get_winner: 0 for no get_winner, 1 = player 1, 2 = player 2"""
-    gameovers        = get_gameovers()
+    global gameovers
+    # gameovers        = get_gameovers()
     gameovers_played = gameovers[ gameovers & bitboard[0] == gameovers ]  # exclude any unplayed squares
     if np.any(gameovers_played):                                          # have 4 tokens been played in a row yet
         p1_wins = gameovers_played & ~bitboard[1] == gameovers_played

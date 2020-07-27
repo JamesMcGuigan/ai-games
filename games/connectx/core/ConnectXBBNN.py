@@ -191,8 +191,8 @@ def get_move_number(bitboard: np.ndarray) -> int:
     if bitboard[0] == 0: return 0
     size          = configuration.columns * configuration.rows
     mask_bitcount = get_bitcount_mask(size)
-    move_number   = np.sum(bitboard[0] & mask_bitcount == mask_bitcount)
-    return int(move_number)
+    move_number   = np.count_nonzero(bitboard[0] & mask_bitcount)
+    return move_number
 
 
 mask_legal_moves = (1 << configuration.columns) - 1
@@ -213,7 +213,7 @@ def has_no_more_moves(bitboard: np.ndarray) -> bool:
 @njit
 def is_legal_move(bitboard: np.ndarray, action: int) -> int:
     # First 7 bytes represent the top row. Moves are legal if the sky is unplayed
-    return int( bitboard[0] >> action & 1 == 0 )
+    return int( (bitboard[0] >> action) & 1 == 0 )
 
 
 @njit
@@ -341,8 +341,9 @@ def get_winner(bitboard: np.ndarray) -> int:
     gameovers_played = gameovers[ gameovers & bitboard[0] == gameovers ]  # exclude any unplayed squares
     if np.any(gameovers_played):                                          # have 4 tokens been played in a row yet
         p1_wins = gameovers_played & ~bitboard[1] == gameovers_played
-        p2_wins = gameovers_played &  bitboard[1] == gameovers_played
         if np.any(p1_wins): return 1
+
+        p2_wins = gameovers_played &  bitboard[1] == gameovers_played
         if np.any(p2_wins): return 2
     return 0
 

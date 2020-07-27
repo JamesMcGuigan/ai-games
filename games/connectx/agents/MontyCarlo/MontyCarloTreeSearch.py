@@ -60,7 +60,7 @@ def init_state( state: typed.Dict, bitboard: np.ndarray ) -> None:
     return None
 
 @njit
-def update_state( state: typed.Dict, bitboard: np.ndarray, action: int, wins: Union[int, float], totals: Union[int, float]=1.0 ):
+def update_state( state: typed.Dict, bitboard: np.ndarray, action: int, wins: Union[int, float], totals: Union[int, float] ):
     hash = hash_bitboard(bitboard)
     if hash not in state:
         init_state(state, bitboard)
@@ -105,12 +105,12 @@ def path_selection( state: typed.Dict, bitboard: np.ndarray, player_id: int, sim
         path.append( PathEdge(bitboard, -1) )  # Add unexpanded leaf node to end of path
 
     assert len(path) > 0
-    assert player_id == current_player_id(path[-1][0])
+    # assert player_id == current_player_id(path[-1][0])
     return path
 
 
 @njit
-def get_child_probabilities( state: typed.Dict, bitboard: np.ndarray, simulation_count: int, normalize=False ):
+def get_child_probabilities( state: typed.Dict, bitboard: np.ndarray, simulation_count: int, normalize=True ):
     global hyperparameters
 
     hash       = hash_bitboard(bitboard)
@@ -160,7 +160,9 @@ def is_expanded( state: typed.Dict, bitboard: np.ndarray ):
 def expand_node(state: typed.Dict, path: typed.List, bitboard: np.ndarray, player_id: int) -> int:
     """ Look for any child nodes that have not yet been expanded, and run one random simulation for each """
     # path: typed.List[Tuple[np.ndarray, int]]
-    hash       = hash_bitboard(bitboard)
+    hash = hash_bitboard(bitboard)
+    if hash not in state:
+        init_state(state, bitboard)
     win_totals = state[hash]
     unexpanded = np.where(win_totals[:,1] == 0)[0]
 
@@ -170,10 +172,10 @@ def expand_node(state: typed.Dict, path: typed.List, bitboard: np.ndarray, playe
         action = unexpanded[n]
         if not is_legal_move(bitboard, action): continue
 
-        result    = result_action(bitboard, action, player_id)
-        score     = run_simulation(result, player_id)
-        wins     += score
-        totals   += 1
+        result  = result_action(bitboard, action, player_id)
+        score   = run_simulation(result, player_id)
+        wins   += score
+        totals += 1
         backpropergate_scores(state, [ PathEdge(bitboard, action) ], player_id, score)
 
     # Backpropergate combined wins/totals through parent path
@@ -203,17 +205,19 @@ def run_simulation( bitboard: np.ndarray, player_id: int ) -> float:
 ### Backpropergate
 
 @njit
-def backpropergate_scores(state: typed.Dict, path: typed.List, player_id: int, score: Union[int,float], total: int=1) -> None:
+def backpropergate_scores(state: typed.Dict, path: typed.List, player_id: int, score: Union[int,float], total: int = 1) -> None:
     # path: typed.List[Tuple[np.ndarray, int]]
     assert len(path) != 0
+    assert score <= total
+
     current_player = 0
     for n in range(len(path)):     # numba prefers explict for loops
         node, action = path[n]
         if action <= -1: continue  # ignore unexpanded and leaf nodes | BUGFIX: numba typed.List([]) needs runtime type hint
 
-        current_player = current_player or current_player_id(path[0][0])      # defer lookup until after action <= -1
-        player_score   = score if current_player == player_id else 1 - score  # +1 = victory | 0.5 = draw | 0 = loss
-        update_state( state, node, action, player_score )
+        current_player = current_player or current_player_id(path[0][0])              # defer lookup until after action <= -1
+        player_score   = score if (current_player == player_id) else (total - score)  # +1 = victory | 0.5 = draw | 0 = loss
+        update_state( state, node, action, player_score, total )
 
         # Update variables for next loop
         player_id      = next_player_id(player_id)
@@ -223,13 +227,15 @@ def backpropergate_scores(state: typed.Dict, path: typed.List, player_id: int, s
 #### Selection
 
 # cannot @jit nopython=True required to access time.perf_counter()
-def run_search(state: typed.Dict, bitboard: np.ndarray, player_id: int, endtime: float, iterations=0) -> Tuple[int,int]:
+def run_search(state: typed.Dict, bitboard: np.ndarray, player_id: int, endtime: float = 0, iterations = 0) -> Tuple[int,int]:
     """
     This is the main loop
     - Ensure root node is initialized and expanded
     - Repeat Monty Carlo TreeSearch until endtime
     - Return best action and simulation count
     """
+    assert endtime or iterations
+
     init_state(state, bitboard)
 
     path_to_root_node = typed.List()
@@ -258,16 +264,18 @@ def run_search_loop( state: typed.Dict, bitboard: np.ndarray, player_id: int, si
     - Backpropergate Scores
     """
     actions = get_all_moves()
-    for n in range(iterations):
+    iterations_end = simulation_count + iterations
+    while simulation_count <= iterations_end:
         simulation_count += 1
         path              = path_selection(state, bitboard, player_id, simulation_count)
         leaf_bitboard, _  = path[-1]
+        simulation_count += expand_node(state, path, leaf_bitboard, player_id)
 
         if not is_gameover(leaf_bitboard):
-            simulation_count += expand_node(state, path, leaf_bitboard, player_id)
             weights           = get_child_probabilities(state, leaf_bitboard, simulation_count)
             action            = weighted_choice(actions, weights)
             leaf_bitboard     = result_action(leaf_bitboard, action, player_id)
+            simulation_count += expand_node(state, path, leaf_bitboard, player_id)
 
         score = run_simulation(leaf_bitboard, player_id)
         backpropergate_scores(state, path, player_id, score)
@@ -299,8 +307,8 @@ def MontyCarloTreeSearch(observation: Struct, _configuration_: Struct) -> int:
     global configuration
     configuration = cast_configuration(_configuration_)
 
-    # global state  # Share state between runs
-    state = new_state()
+    global state  # Share state between runs
+    # state = new_state()
 
     player_id     = observation.mark
     listboard     = typed.List(); [ listboard.append(cell) for cell in observation.board ]  # BUGFIX: constructor fails to load data

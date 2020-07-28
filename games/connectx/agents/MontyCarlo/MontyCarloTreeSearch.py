@@ -317,8 +317,8 @@ def MontyCarloTreeSearch(observation: Struct, _configuration_: Struct) -> int:
     # observation   = {'mark': 1, 'board': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
     # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 8}
 
-    first_move_time = 1
-    safety_time     = 0.25    # Only gets checked once every hundred simulations
+    first_move_time = 0
+    safety_time     = 1    # Only gets checked once every hundred simulations
     start_time      = time.perf_counter()
 
     global configuration

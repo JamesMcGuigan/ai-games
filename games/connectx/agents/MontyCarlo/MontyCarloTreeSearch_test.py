@@ -1,4 +1,5 @@
 import pytest
+from numba import typed
 
 from agents.MontyCarlo.MontyCarloTreeSearch import new_state
 from agents.MontyCarlo.MontyCarloTreeSearch import run_search

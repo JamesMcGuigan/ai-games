@@ -247,7 +247,7 @@ def run_search(state: typed.Dict, bitboard: np.ndarray, player_id: int, endtime:
     if iterations:
         count = run_search_loop(state, bitboard, player_id, count, iterations)
     else:
-        # NOTE: time.perf_counter() and raw python loops are slow compared to numba, so run most of loop inside @njit
+        # NOTE: time.perf_counter() and raw python loops are slow compared to numba, so run most of loop inside #@njit
         while time.perf_counter() < endtime:
             count = run_search_loop(state, bitboard, player_id, count, 100)
 
@@ -284,8 +284,17 @@ def run_search_loop( state: typed.Dict, bitboard: np.ndarray, player_id: int, si
 
 
 
+### recompile Numba
+### TODO: This needs to happen within 16 of first turn and 8s of second turn
 
-### Main
+def precompile_numba_lite(move_number: int):
+    """ Only @jit compile a subset of functions on first turn = wait until turn 2+ to compile the rest"""
+    if move_number // 2 == 1:
+        state    = new_state()
+        bitboard = result_action(empty_bitboard(), 3, 1)
+        hash     = hash_bitboard(bitboard)
+        winner   = get_winner(bitboard)
+
 
 def precompile_numba():
     time_start = time.perf_counter()
@@ -294,8 +303,12 @@ def precompile_numba():
     time_taken = time.perf_counter() - time_start
     print(f'precompile_numba() in {time_taken:0.2f}s')
 
-state = new_state()
-precompile_numba()
+
+### Main
+
+state = new_state()  # Shared State
+
+# precompile_numba()  # kaggle offers 16s to make the first move - but we don't get extra time by running this outside the agent
 
 # The last function defined in the file run by Kaggle in submission.csv
 # BUGFIX: duplicate top-level function names in submission.py can cause a Kaggle Submission Error
@@ -303,10 +316,9 @@ def MontyCarloTreeSearch(observation: Struct, _configuration_: Struct) -> int:
     # observation   = {'mark': 1, 'board': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
     # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 8}
 
-    first_move_time = _configuration_.timeout - 1  # Numba is not precompiled
-    safety_time     = 0.25                         # Only gets checked once every hundred simulations
+    first_move_time = 1
+    safety_time     = 0.25    # Only gets checked once every hundred simulations
     start_time      = time.perf_counter()
-
 
     global configuration
     configuration = cast_configuration(_configuration_)
@@ -321,10 +333,16 @@ def MontyCarloTreeSearch(observation: Struct, _configuration_: Struct) -> int:
     is_first_move = int(move_number < 2)
     endtime       = start_time + _configuration_.timeout - safety_time - (first_move_time * is_first_move)
 
+    if move_number <= 2:
+        # Kaggle gives us a 16s window on first move to @jit compile, so only compile core functions on first move
+        precompile_numba_lite(move_number)
+        action = 3
+        count  = 10  # MontyCarloTreeSearch.py knows this aftr 1000+ simulations
+    else:
+        action, count = run_search(state, bitboard, player_id, endtime)
 
-    action, count = run_search(state, bitboard, player_id, endtime)
-
-    # if is_first_move: action = 3  # hardcode first move, but use time available to @njit compile and simulate state
+    # if is_first_move: action = 3  # hardcode first move, but use time available to #@njit compile and simulate state
     time_taken = time.perf_counter() - start_time
     print(f'MontyCarloTreeSearch: p{player_id} action = {action} after {count} simulations in {time_taken:.3f}s')
-    return int(action)  # kaggle_environments requires a python int, not np.int32
+
+    return int(action)          # kaggle_environments requires a python int, not np.int32

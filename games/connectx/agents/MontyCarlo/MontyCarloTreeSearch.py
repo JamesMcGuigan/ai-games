@@ -327,7 +327,7 @@ def MontyCarloTreeSearch(observation: Struct, _configuration_: Struct) -> int:
     # state = new_state()
 
     player_id     = observation.mark
-    listboard     = typed.List(); [ listboard.append(cell) for cell in observation.board ]  # BUGFIX: constructor fails to load data
+    listboard     = np.array(observation.board, dtype=np.int8)
     bitboard      = list_to_bitboard(listboard)
     move_number   = get_move_number(bitboard)
     is_first_move = int(move_number < 2)

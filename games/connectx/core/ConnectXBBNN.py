@@ -9,7 +9,6 @@ from numba import int64
 from numba import int8
 from numba import njit
 from numba import prange
-from numba import typed
 
 
 
@@ -41,7 +40,7 @@ def cast_configuration(configuration):
 
 
 @njit
-def list_to_bitboard(listboard: typed.List) -> np.ndarray:
+def list_to_bitboard(listboard: np.ndarray) -> np.ndarray:
     # bitboard[0] = played, is a square filled             | 0 = empty, 1 = filled
     # bitboard[1] = player, who's token is this, if filled | 0 = empty, 1 = filled
     bitboard_played = 0  # 42 bit number for if board square has been played

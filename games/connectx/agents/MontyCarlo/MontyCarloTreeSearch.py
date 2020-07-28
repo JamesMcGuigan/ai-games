@@ -334,13 +334,12 @@ def MontyCarloTreeSearch(observation: Struct, _configuration_: Struct) -> int:
     is_first_move = int(move_number < 2)
     endtime       = start_time + _configuration_.timeout - safety_time - (first_move_time * is_first_move)
 
-    if move_number <= 2:
-        # Kaggle gives us a 16s window on first move to @jit compile, so only compile core functions on first move
-        precompile_numba_lite(move_number)
-        action = 3
-        count  = 10  # MontyCarloTreeSearch.py knows this aftr 1000+ simulations
-    else:
-        action, count = run_search(state, bitboard, player_id, endtime)
+    # if move_number <= 2:
+    #     # Kaggle gives us a 16s window on first move to @jit compile, so only compile core functions on first move
+    #     precompile_numba_lite(move_number)
+    #     return 3
+
+    action, count = run_search(state, bitboard, player_id, endtime)
 
     # if is_first_move: action = 3  # hardcode first move, but use time available to #@njit compile and simulate state
     time_taken = time.perf_counter() - start_time

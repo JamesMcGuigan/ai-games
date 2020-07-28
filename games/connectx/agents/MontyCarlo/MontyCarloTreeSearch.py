@@ -18,15 +18,15 @@ from typing import Union
 
 from numba import float32
 
-import core.ConnectXBBNN
 from core.ConnectXBBNN import *
+from core.ConnectXBBNN import configuration
 from util.weighted_choice import weighted_choice
 
 
 
 ### Configuration
 
-configuration = core.ConnectXBBNN.configuration
+configuration = configuration  # prevent removal from imports
 
 class Hyperparameters(namedtuple('hyperparameters', ['exploration'])):
     exploration: float = np.sqrt(2)
@@ -36,9 +36,10 @@ hyperparameters = Hyperparameters(exploration=np.sqrt(2))
 
 ### State
 
-class PathEdge(namedtuple('PathEdge', ['bitboard', 'action'])):
-    bitboard: np.ndarray
-    action:   int
+# BUGFIX: Using an @njit function as a wrapper rather tha a namedtuple() fixes casting issues on Kaggle
+@njit
+def PathEdge(bitboard: np.ndarray, action: int) -> Tuple[np.ndarray, int]:
+    return (bitboard, action)
 
 
 # NOTE: @njit here causes Unknown attribute: numba.types.containers.UniTuple
@@ -287,11 +288,14 @@ def run_search_loop( state: typed.Dict, bitboard: np.ndarray, player_id: int, si
 ### Main
 
 def precompile_numba():
+    time_start = time.perf_counter()
     state = new_state()
     run_search(state, empty_bitboard(), player_id=1, endtime=sys.maxsize, iterations=1)
+    time_taken = time.perf_counter() - time_start
+    print(f'precompile_numba() in {time_taken:0.2f}s')
 
 state = new_state()
-# precompile_numba()  # UNTESTED on kaggle
+precompile_numba()
 
 # The last function defined in the file run by Kaggle in submission.csv
 # BUGFIX: duplicate top-level function names in submission.py can cause a Kaggle Submission Error
@@ -299,8 +303,8 @@ def MontyCarloTreeSearch(observation: Struct, _configuration_: Struct) -> int:
     # observation   = {'mark': 1, 'board': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
     # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 8}
 
-    first_move_time = 1     # Numba is not precompiled
-    safety_time     = 0.25  # Only gets checked once every hundred loops
+    first_move_time = _configuration_.timeout - 1  # Numba is not precompiled
+    safety_time     = 0.25                         # Only gets checked once every hundred simulations
     start_time      = time.perf_counter()
 
 

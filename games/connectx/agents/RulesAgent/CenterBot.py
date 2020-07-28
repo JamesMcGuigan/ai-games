@@ -35,5 +35,7 @@ def CenterBot(observation: Struct, _configuration_: Struct) -> int:
 
     for action in [3,2,4,1,5,0,6]:
         if is_legal_move(bitboard, action):
+            time_taken = time.perf_counter() - start_time
+            print(f'CenterBot() = {action} in {time_taken:0.3}s')
             return action
     return int(action)          # kaggle_environments requires a python int, not np.int32

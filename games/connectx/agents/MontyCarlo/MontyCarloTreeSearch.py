@@ -17,6 +17,7 @@ from struct import Struct
 from typing import Union
 
 from numba import float32
+from numba import typed
 
 from core.ConnectXBBNN import *
 from core.ConnectXBBNN import configuration

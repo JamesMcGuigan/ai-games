@@ -125,7 +125,7 @@ def test_utility(game):
         for actions_order in [ actions, actions_reversed, actions_offset, actions_reversed_offset ]:
             actual = game
             for action in actions_order: actual = actual.result(action)
-            assert actual.utility == expected, f"{actions} -> {actual}"
+            assert actual.utility() == expected, f"{actions} -> {actual}"
 
 
 def test_score(game):
@@ -142,4 +142,4 @@ def test_score(game):
         for actions_order in [ actions, actions_reversed ]:
             actual = game
             for action in actions_order: actual = actual.result(action)
-            assert actual.score == expected, f"{actions} -> {actual}"
+            assert actual.score() == expected, f"{actions} -> {actual}"

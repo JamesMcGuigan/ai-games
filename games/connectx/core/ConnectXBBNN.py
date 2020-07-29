@@ -17,10 +17,7 @@ from numba import prange
 # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 8}
 
 bitboard_type = numba.typeof(np.ndarray((2,), dtype=np.int64))
-class Configuration(namedtuple('configuration', ['rows', 'columns', 'inarow'])):
-    rows:    int
-    columns: int
-    inarow:  int
+Configuration = namedtuple('configuration', ['rows', 'columns', 'inarow'])
 configuration = Configuration(
     rows=6,
     columns=7,

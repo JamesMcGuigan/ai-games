@@ -17,9 +17,6 @@
       <option name="FROM_IMPORT_TRAILING_COMMA_IF_MULTILINE" value="true" />
       <option name="HANG_CLOSING_BRACKETS" value="true" />
     </Python>
-    <ScalaCodeStyleSettings>
-      <option name="MULTILINE_STRING_CLOSING_QUOTES_ON_NEW_LINE" value="true" />
-    </ScalaCodeStyleSettings>
     <TypeScriptCodeStyleSettings version="0">
       <option name="JSDOC_INCLUDE_TYPES" value="true" />
       <option name="SPACE_BEFORE_GENERATOR_MULT" value="true" />

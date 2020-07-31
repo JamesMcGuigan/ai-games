@@ -69,7 +69,7 @@ class ConnectXBitboard(ConnectX):
 
     @staticmethod
     @clru_cache(maxsize=None)
-    def get_gameovers(rows: int, columns: int, inarow: int) -> List[int]:
+    def get_gameovers(rows: int, columns: int, inarow: int) -> np.array:
         """Creates a list of all winning board positions, over 4 directions: horizontal, vertical and 2 diagonals"""
         gameovers = []
 
@@ -95,7 +95,7 @@ class ConnectXBitboard(ConnectX):
                 if col <= col_inner and row <= row_inner:
                     gameovers.append( mask_diagonal_dl << offset )
                     gameovers.append( mask_diagonal_ul << offset )
-        return gameovers
+        return np.array(gameovers, dtype=np.int64)
 
 
     ### Result Methods

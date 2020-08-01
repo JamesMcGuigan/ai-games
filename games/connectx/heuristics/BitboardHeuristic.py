@@ -1,12 +1,12 @@
 import sys
 
 import numpy as np
-from numba import njit
 
 from core.ConnectXBBNN import get_gameovers
 
 
-@njit
+
+# @njit
 def bitboard_gameovers_heuristic( bitboard: np.ndarray, player_id: int, gameovers: np.ndarray = get_gameovers() ) -> float:
     """ For all possible connect4 gameover positions,
         check if a player has at least one token in position and that the opponent is not blocking

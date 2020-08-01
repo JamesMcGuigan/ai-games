@@ -11,12 +11,16 @@
 #       choose random child with probability: wins/total + exploration * sqrt( ln(simulation_count)/total )
 #   Expansion: run one end-to-end simulation for each child node
 #   Update:    for each parent node, update win/total statistics
+
 import sys
 import time
 from struct import Struct
+from typing import Dict
+from typing import List
 from typing import Union
 
 from numba import float32
+from numba import int64
 from numba import typed
 
 from core.ConnectXBBNN import *
@@ -29,31 +33,39 @@ from util.weighted_choice import weighted_choice
 
 configuration = configuration  # prevent removal from imports
 
-class Hyperparameters(namedtuple('hyperparameters', ['exploration'])):
-    exploration: float = np.sqrt(2)
-hyperparameters = Hyperparameters(exploration=np.sqrt(2))
+Hyperparameters = namedtuple('hyperparameters', ['exploration', 'numba'])
+# noinspection PyArgumentList
+hyperparameters = Hyperparameters(
+    exploration = np.sqrt(2),
+    numba       = False
+)
 
 
 
 ### State
 
 # BUGFIX: Using an @njit function as a wrapper rather tha a namedtuple() fixes casting issues on Kaggle
-@njit
+#@njit
 def PathEdge(bitboard: np.ndarray, action: int) -> Tuple[np.ndarray, int]:
     return (bitboard, action)
 
 
 # NOTE: @njit here causes Unknown attribute: numba.types.containers.UniTuple
-def new_state()-> numba.typed.Dict:
+def new_state() -> Dict:
     global configuration
-    state = numba.typed.Dict.empty(
-        key_type   = numba.types.containers.UniTuple(int64, 2),  # tuple(min(bitboard, reverse_bits))
-        value_type = float32[:,:]                                # state[hash][action] = [wins, total]
-    )
+    global hyperparameters
+    if hyperparameters.numba:
+        state = numba.typed.Dict.empty(
+            key_type   = numba.types.containers.UniTuple(int64, 2),  # tuple(min(bitboard, reverse_bits))
+            value_type = float32[:,:]                                # state[hash][action] = [wins, total]
+        )
+    else:
+        state = {}
     return state
 
-@njit
-def init_state( state: typed.Dict, bitboard: np.ndarray ) -> None:
+
+#@njit
+def init_state( state: Dict, bitboard: np.ndarray ) -> None:
     global hyperparameters
     global configuration
     hash = hash_bitboard(bitboard)
@@ -61,8 +73,8 @@ def init_state( state: typed.Dict, bitboard: np.ndarray ) -> None:
         state[hash] = np.zeros((configuration.columns, 2), dtype=np.float32)  # state[hash][action] = [wins, total]
     return None
 
-@njit
-def update_state( state: typed.Dict, bitboard: np.ndarray, action: int, wins: Union[int, float], totals: Union[int, float] ):
+#@njit
+def update_state( state: Dict, bitboard: np.ndarray, action: int, wins: Union[int, float], totals: Union[int, float] ):
     hash = hash_bitboard(bitboard)
     if hash not in state:
         init_state(state, bitboard)
@@ -72,8 +84,8 @@ def update_state( state: typed.Dict, bitboard: np.ndarray, action: int, wins: Un
 
 ### Selection
 
-@njit
-def path_selection( state: typed.Dict, bitboard: np.ndarray, player_id: int, simulation_count: int ) -> typed.List:  # List[Tuple[np.ndarray, int]]
+#@njit
+def path_selection( state: Dict, bitboard: np.ndarray, player_id: int, simulation_count: int ) -> List:  # List[Tuple[np.ndarray, int]]
     """
     Selection:
       leaf_node = root_node
@@ -82,7 +94,8 @@ def path_selection( state: typed.Dict, bitboard: np.ndarray, player_id: int, sim
         choose random lead_node with probability: wins/total + exploration * sqrt( ln(simulation_count)/total )
       return path (ending in player_id move)
     """
-    path        = typed.List()
+    global hyperparameters
+    path        = typed.List() if hyperparameters.numba else []
     actions     = get_all_moves()
     last_player = next_player = current_player_id(bitboard)
 
@@ -111,8 +124,8 @@ def path_selection( state: typed.Dict, bitboard: np.ndarray, player_id: int, sim
     return path
 
 
-@njit
-def get_child_probabilities( state: typed.Dict, bitboard: np.ndarray, simulation_count: int, normalize=True ):
+#@njit
+def get_child_probabilities( state: Dict, bitboard: np.ndarray, simulation_count: int, normalize=True ):
     global hyperparameters
 
     hash       = hash_bitboard(bitboard)
@@ -144,8 +157,8 @@ def get_child_probabilities( state: typed.Dict, bitboard: np.ndarray, simulation
 
 ### Expansion
 
-@njit
-def is_expanded( state: typed.Dict, bitboard: np.ndarray ):
+#@njit
+def is_expanded( state: Dict, bitboard: np.ndarray ):
     hash = hash_bitboard(bitboard)
     if hash not in state:
         return False
@@ -158,8 +171,8 @@ def is_expanded( state: typed.Dict, bitboard: np.ndarray ):
                 return False
     return True
 
-@njit
-def expand_node(state: typed.Dict, path: typed.List, bitboard: np.ndarray, player_id: int) -> int:
+#@njit
+def expand_node(state: Dict, path: List, bitboard: np.ndarray, player_id: int) -> int:
     """ Look for any child nodes that have not yet been expanded, and run one random simulation for each """
     # path: typed.List[Tuple[np.ndarray, int]]
     hash = hash_bitboard(bitboard)
@@ -189,7 +202,7 @@ def expand_node(state: typed.Dict, path: typed.List, bitboard: np.ndarray, playe
 
 ### Simulate
 
-@njit
+#@njit
 def run_simulation( bitboard: np.ndarray, player_id: int ) -> float:
     """ Returns +1 = victory | 0.5 = draw | 0 = loss """
     move_number = get_move_number(bitboard)
@@ -206,8 +219,8 @@ def run_simulation( bitboard: np.ndarray, player_id: int ) -> float:
 
 ### Backpropergate
 
-@njit
-def backpropergate_scores(state: typed.Dict, path: typed.List, player_id: int, score: Union[int,float], total: int = 1) -> None:
+#@njit
+def backpropergate_scores(state: Dict, path: List, player_id: int, score: Union[int,float], total: int = 1) -> None:
     # path: typed.List[Tuple[np.ndarray, int]]
     assert len(path) != 0
     assert score <= total
@@ -229,7 +242,7 @@ def backpropergate_scores(state: typed.Dict, path: typed.List, player_id: int, s
 #### Selection
 
 # cannot @jit nopython=True required to access time.perf_counter()
-def run_search(state: typed.Dict, bitboard: np.ndarray, player_id: int, endtime: float = 0, iterations = 0) -> Tuple[int,int]:
+def run_search(state: Dict, bitboard: np.ndarray, player_id: int, endtime: float = 0, iterations = 0) -> Tuple[int,int]:
     """
     This is the main loop
     - Ensure root node is initialized and expanded
@@ -240,7 +253,7 @@ def run_search(state: typed.Dict, bitboard: np.ndarray, player_id: int, endtime:
 
     init_state(state, bitboard)
 
-    path_to_root_node = typed.List()
+    path_to_root_node = typed.List() if hyperparameters.numba else []
     path_to_root_node.append( PathEdge(bitboard, -1) )          # BUGFIX: numba typed.List([]) needs runtime type hint
     expand_node(state, path_to_root_node, bitboard, player_id)  # Ensure root node is always expanded
 
@@ -256,8 +269,9 @@ def run_search(state: typed.Dict, bitboard: np.ndarray, player_id: int, endtime:
     action        = int(np.argmax(final_weights))  # actions are defined by index
     return action, count
 
-@njit
-def run_search_loop( state: typed.Dict, bitboard: np.ndarray, player_id: int, simulation_count: int = 1, iterations: int = 1 ) -> int:
+
+#@njit
+def run_search_loop( state: Dict, bitboard: np.ndarray, player_id: int, simulation_count: int = 1, iterations: int = 1 ) -> int:
     """
     Run N Monty Carlo Tree Search simulations
     - Start at the Root node

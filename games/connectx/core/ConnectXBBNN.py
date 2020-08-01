@@ -202,10 +202,18 @@ def has_no_more_moves(bitboard: np.ndarray) -> bool:
     return bitboard[0] & mask_legal_moves == mask_legal_moves
 
 
+_legal_moves_mask  = ((1 << configuration.columns) - 1)
+_legal_moves_cache = np.array([
+    [
+        int( (bits >> action) & 1 == 0 )
+        for action in range(configuration.columns)
+    ]
+    for bits in range(2**configuration.columns)
+], dtype=np.int8)
 #@njit
 def is_legal_move(bitboard: np.ndarray, action: int) -> int:
-    # First 7 bytes represent the top row. Moves are legal if the sky is unplayed
-    return int( (bitboard[0] >> action) & 1 == 0 )
+    bits = bitboard[0] & _legal_moves_mask  # faster than: int( (bitboard[0] >> action) & 1 == 0 )
+    return _legal_moves_cache[bits,action]  # NOTE: [bits,action] is faster than
 
 
 #@njit

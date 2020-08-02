@@ -12,6 +12,7 @@ from core.ConnextXBitboard import ConnectXBitboard
 from core.Heuristic import Heuristic
 
 
+
 @pytest.fixture
 def env():
     env = make("connectx", debug=True)
@@ -130,12 +131,14 @@ def test_utility(game):
 
 def test_score(game):
     test_actions_score = {
-        (0,):   3,  # 3 possible lines (up, right, diagonal)
-        (0,0):  1,  # 3 possible lines (up, right, diagonal) - 2 opponent (right, diagonal)
-        (1,):   4,  # 4 possible lines (up, left/right*2, diagonal)
-        (1,1):  2,  # 5 possible lines (up, left/right*2, diagonal*2) - 3 opponent (left/right*2, diagonal)
-        (3,):   7,  # 7 possible lines (up, left/right*4, diagonal*2)
-        (3,3):  3,  # 9 possible lines (up, left/right*3, diagonal*4) - 6 opponent (left/right*3, diagonal*2)
+        (0,):        0.3,  # 3 possible single lines (up, right, diagonal)
+        (0,0):       0.1,  # 3 possible single lines (up, right, diagonal) - 2 opponent singles (right, diagonal)
+        (1,):        0.4,  # 4 possible single lines (up, left/right*2, diagonal)
+        (1,1):       0.2,  # 5 possible single lines (up, left/right*2, diagonal*2) - 3 opponent singles (left/right*2, diagonal)
+        (3,):        0.7,  # 7 possible single lines (up, left/right*4, diagonal*2)
+        (3,3):       0.3,  # 9 possible single lines (up, left/right*3, diagonal*4) - 6 opponent singles (left/right*3, diagonal*2)
+        (0,0,1,1):   0.3,  # p2 = 1 multi + 4 singles | p1 = 1 multi + 1 single
+        (0,0,1,1,2): 0.9,  # p1 = 2 multi + 3 singles | p2 = 1 multi + 4 singles
     }
     for actions, expected in test_actions_score.items():
         actions_reversed = tuple( game.columns-1 - action for action in actions )

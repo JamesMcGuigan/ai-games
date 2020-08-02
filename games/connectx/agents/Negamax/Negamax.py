@@ -29,16 +29,18 @@ def negamax( bitboard: np.ndarray, player_id: int, depth: int, max_count=0, alph
                 break (* cut-off *)
         return value
     """
+    best_action = action  # default action incase of gameover, depth=0 or all scores = -inf
+
     if is_gameover(bitboard):
         best_score  = get_utility_inf(bitboard, player_id)
-        best_action = action
     elif depth == 0:
         best_score  = bitboard_gameovers_heuristic(bitboard, player_id)
-        best_action = action
     else:
         next_player  = 3 - player_id  # 1 if player_id == 2 else 2
         actions      = get_legal_moves(bitboard)
-        best_action  = np.random.choice(actions)
+        if best_action not in actions:
+            best_action = np.random.choice(actions)
+
         best_score   = -np.inf
         scores       = []  # for debugging
         for n in range(len(actions)):
@@ -138,9 +140,9 @@ def Negamax():
         action = negamax_deepening(
             bitboard   = bitboard,
             player_id  = player_id,
-            min_depth  = 3,
+            min_depth  = 5,
             max_depth  = 100,
-            depth_step = 1,
+            depth_step = 2,
             timeout    = timeout,
             verbose_depth = True
         )

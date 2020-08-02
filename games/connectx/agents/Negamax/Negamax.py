@@ -4,13 +4,14 @@
 import time
 from struct import Struct
 
-from core.ConnectXBBNN import *
-from heuristics.BitboardHeuristic import bitboard_gameovers_heuristic
+from heuristics.BitboardHeuristic import *
+
+
 
 actions = get_all_moves()
 
 
-@njit
+# @njit
 def negamax( bitboard: np.ndarray, player_id: int, depth: int, max_count=0, alpha=-np.inf, beta=np.inf, action=0, count=0) -> Tuple[int,float,int]:
     """
     DOCS: https://en.wikipedia.org/wiki/Negamax
@@ -107,7 +108,7 @@ def negamax_deepening( bitboard: np.ndarray, player_id: int, min_depth=1, max_de
 
     time_taken = time.perf_counter() - time_start
     if verbose_depth:
-        print(f' = {best_action} ({best_score:.2f}) | {count} iterations in {time_taken:4.2f}s ', end=' ', flush=True)
+        print(f' = {best_action} ({best_score:.2f}) | {count} iterations in {time_taken:4.2f}s ', flush=True)
     # print(f'Negamax: p{player_id} depth {depth} = action {action} (score {score:.2f}) | {count} iterations in {time_taken:.3f}s')
     return int(best_action)
 
@@ -122,7 +123,7 @@ def Negamax():
         # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 8}
 
         first_move_time = 0
-        safety_time     = 1    # Only gets checked once every hundred simulations
+        safety_time     = 2    # Only gets checked once every hundred simulations
         start_time      = time.perf_counter()
 
         global configuration
@@ -137,9 +138,9 @@ def Negamax():
         action = negamax_deepening(
             bitboard   = bitboard,
             player_id  = player_id,
-            min_depth  = 5,
+            min_depth  = 3,
             max_depth  = 100,
-            depth_step = 1,
+            depth_step = 2,
             timeout    = timeout,
             verbose_depth = True
         )

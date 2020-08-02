@@ -130,11 +130,11 @@ def test_utility(game):
 
 def test_score(game):
     test_actions_score = {
-        # (0,):   3,  # 3 possible lines (up, right, diagonal)
-        # (0,0):  1,  # 3 possible lines (up, right, diagonal) - 2 opponent (right, diagonal)
-        # (1,):   4,  # 4 possible lines (up, left/right*2, diagonal)
-        # (1,1):  2,  # 5 possible lines (up, left/right*2, diagonal*2) - 3 opponent (left/right*2, diagonal)
-        # (3,):   7,  # 7 possible lines (up, left/right*4, diagonal*2)
+        (0,):   3,  # 3 possible lines (up, right, diagonal)
+        (0,0):  1,  # 3 possible lines (up, right, diagonal) - 2 opponent (right, diagonal)
+        (1,):   4,  # 4 possible lines (up, left/right*2, diagonal)
+        (1,1):  2,  # 5 possible lines (up, left/right*2, diagonal*2) - 3 opponent (left/right*2, diagonal)
+        (3,):   7,  # 7 possible lines (up, left/right*4, diagonal*2)
         (3,3):  3,  # 9 possible lines (up, left/right*3, diagonal*4) - 6 opponent (left/right*3, diagonal*2)
     }
     for actions, expected in test_actions_score.items():
@@ -142,4 +142,4 @@ def test_score(game):
         for actions_order in [ actions, actions_reversed ]:
             actual = game
             for action in actions_order: actual = actual.result(action)
-            assert actual.score() == expected, f"{actions} -> {actual}"
+            assert np.math.isclose(actual.score(), expected, abs_tol=0.01), f"{actions} -> {actual} | {actual.score()} != {expected}"

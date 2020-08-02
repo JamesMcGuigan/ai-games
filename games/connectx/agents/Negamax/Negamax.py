@@ -36,10 +36,10 @@ def negamax( bitboard: np.ndarray, player_id: int, depth: int, max_count=0, alph
         best_score  = bitboard_gameovers_heuristic(bitboard, player_id)
         best_action = action
     else:
-        best_score   = -np.inf
-        best_action  = 3
         next_player  = 3 - player_id  # 1 if player_id == 2 else 2
         actions      = get_legal_moves(bitboard)
+        best_action  = np.random.choice(actions)
+        best_score   = -np.inf
         scores       = []  # for debugging
         for n in range(len(actions)):
             action      = actions[n]
@@ -54,16 +54,16 @@ def negamax( bitboard: np.ndarray, player_id: int, depth: int, max_count=0, alph
                 action    = action,
                 count     = count+1
             )
-            child_score = -child_score
+            child_score = -child_score  # Negamax
             scores.append(child_score)  # for debugging
 
             if child_score > best_score:
                 best_action = action
                 best_score  = child_score
-            # if child_score > alpha:
-            #     alpha       = child_score
-            # if alpha >= beta:
-            #     break
+            if child_score > alpha:
+                alpha       = child_score
+            if alpha >= beta:
+                break
             if max_count and count >= max_count:
                 break
 
@@ -76,7 +76,7 @@ def negamax_deepening( bitboard: np.ndarray, player_id: int, min_depth=1, max_de
     if verbose_depth: print('\n'+ 'Negamax'.ljust(23) +' | depth:', end=' ', flush=True)
 
     time_start  = time.perf_counter()
-    best_action = np.random.choice(actions)
+    best_action = np.random.choice(get_legal_moves(bitboard))
     best_score  = -np.inf
     max_count   = 0
     count       = 0
@@ -133,14 +133,14 @@ def Negamax():
         bitboard      = list_to_bitboard(listboard)
         move_number   = get_move_number(bitboard)
         is_first_move = int(move_number < 2)
-        timeout       = _configuration_.timeout - safety_time - (first_move_time * is_first_move)
-
+        timeout       = _configuration_.timeout - safety_time - (first_move_time * is_first_move) - (time.perf_counter() - start_time)
+        print(time.perf_counter() - start_time)
         action = negamax_deepening(
             bitboard   = bitboard,
             player_id  = player_id,
             min_depth  = 3,
             max_depth  = 100,
-            depth_step = 2,
+            depth_step = 1,
             timeout    = timeout,
             verbose_depth = True
         )

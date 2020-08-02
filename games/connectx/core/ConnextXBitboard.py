@@ -37,7 +37,7 @@ class ConnectXBitboard(ConnectX):
     # noinspection PyMethodOverriding
     def cast_board(self, board: Union[int,List[int]]) -> int:
         """Create a bitboard representation of observation.board List[int]"""
-        if isinstance(board, int): return board
+        if isinstance(board, (int,np.int64)): return int(board)
 
         bitboard_size   = self.columns * self.rows
         bitboard_played = 0  # 42 bit number for if board square has been played

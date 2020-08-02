@@ -36,14 +36,14 @@ def game(observation, configuration, heuristic_class) -> ConnectX:
 
 def test_first_move(game):
     results = [ game.result(action) for action in game.actions ]
-    scores  = [ result.heuristic.score for result in results ]
+    scores  = [ result.heuristic().score for result in results ]
     best_score, best_action = max(zip(scores, game.actions))
     assert best_action == 3
 
 def test_second_move(game):
     game    = game.result(3)
     results = [ game.result(action) for action in game.actions ]
-    scores  = [ result.heuristic.score for result in results ]
+    scores  = [ result.heuristic().score for result in results ]
     best_score, best_action = max(zip(scores, game.actions))
     assert best_action == 3
 
@@ -51,9 +51,9 @@ def test_second_move(game):
 def test_gameover(game):
     for i in range(3):
         game = game.result(3).result(0)
-        assert game.gameover == False
+        assert game.gameover() == False
 
     game = game.result(3)
-    assert game.gameover == True
-    assert game.score    == math.inf
-    assert game.utility  == math.inf
+    assert game.gameover() == True
+    assert game.score()    == math.inf
+    assert game.utility()  == math.inf

@@ -131,9 +131,16 @@ def negamax_deepening(
             count       = count,
             sort_scores = scores
         )
-        time_taken     = time.perf_counter() - time_start
-        time_per_count = time_taken / (count + 1)           # BUGFIX: avoid divide by zero
-        max_count      = timeout    / time_per_count // 1
+        if max_count and count >= max_count and count > 1000:
+            break  # if we didn't complete a full depth search (after warmup) then ignore the results
+        else:
+            time_taken     = time.perf_counter() - time_start
+            time_per_count = time_taken / (count + 1)           # BUGFIX: avoid divide by zero
+            max_count      = timeout    / time_per_count // 1
+
+        # Search results are valid now, so persist as candidate return values
+        best_action    = action
+        best_score     = score
 
         if verbose:
             print(depth, end=' ', flush=True)
@@ -141,11 +148,6 @@ def negamax_deepening(
             print(f'Negamax: p{player_id} depth {depth} = action {best_action} (score {best_score:.2f}) | {count} iterations in {time_taken:.3f}s')
             print('scores', scores.round(2).tolist(),'\n')
 
-        if max_count and count >= max_count:
-            break  # if we didn't complete a full depth search, then ignore the results
-        else:
-            best_action = action
-            best_score  = score
         if abs(best_score) == np.inf:
             if verbose: print(best_score, end=' ', flush=True)
             break  # terminate iterative deepening on inescapable victory condition

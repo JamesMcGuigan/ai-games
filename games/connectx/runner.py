@@ -9,16 +9,18 @@ from agents.AlphaBetaAgent.AlphaBetaBitboard import AlphaBetaBitboard
 from agents.MontyCarlo.MontyCarloTreeSearch import MontyCarloTreeSearch
 from agents.Negamax.Negamax import Negamax
 
+
+
 env = make("connectx", debug=True)
 env.render()
 env.reset()
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--debug',    action="store_true")
-parser.add_argument('--inline',   action="store_true")
-parser.add_argument('--rounds',   type=int, default=1)
-parser.add_argument('-1', '--p1', type=str, required=True)
-parser.add_argument('-2', '--p2', type=str, default='negamax')
+parser.add_argument('--debug',        action="store_true")
+parser.add_argument('--inline',       action="store_true")
+parser.add_argument('-r', '--rounds', type=int, default=1)
+parser.add_argument('-1', '--p1',     type=str, required=True)
+parser.add_argument('-2', '--p2',     type=str, default='negamax')
 argv = parser.parse_args()
 
 

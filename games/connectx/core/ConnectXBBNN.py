@@ -335,18 +335,23 @@ def is_gameover(bitboard: np.ndarray) -> bool:
 
 #@njit
 def get_winner(bitboard: np.ndarray) -> int:
-    """ Endgammer get_winner: 0 for no get_winner, 1 = player 1, 2 = player 2"""
+    """ Endgamme get_winner: 0 for no get_winner, 1 = player 1, 2 = player 2"""
     global gameovers
-    # gameovers        = get_gameovers()
-    gameovers_played = gameovers[ gameovers & bitboard[0] == gameovers ]  # exclude any unplayed squares
-    if np.any(gameovers_played):                                          # have 4 tokens been played in a row yet
-        p1_wins = gameovers_played & ~bitboard[1] == gameovers_played
-        if np.any(p1_wins): return 1
-
-        p2_wins = gameovers_played &  bitboard[1] == gameovers_played
-        if np.any(p2_wins): return 2
+    # gameovers = get_gameovers()
+    p2_wins = (bitboard[0] &  bitboard[1]) & gameovers == gameovers
+    if np.any(p2_wins): return 2
+    p1_wins = (bitboard[0] & ~bitboard[1]) & gameovers == gameovers
+    if np.any(p1_wins): return 1
     return 0
 
+    # NOTE: above implementation is 2x faster than this original attempt
+    # gameovers_played = gameovers[ gameovers & bitboard[0] == gameovers ]  # exclude any unplayed squares
+    # if np.any(gameovers_played):                                          # have 4 tokens been played in a row yet
+    #     p1_wins = gameovers_played & ~bitboard[1] == gameovers_played
+    #     if np.any(p1_wins): return 1
+    #     p2_wins = gameovers_played &  bitboard[1] == gameovers_played
+    #     if np.any(p2_wins): return 2
+    # return 0
 
 
 ### Utility Scores

@@ -60,7 +60,8 @@ else:
         for round in range(argv.rounds):
             rounds    += 1
             env.reset()
-            env.run([agent_1, agent_2])
+            agent_order = [agent_1, agent_2] if round % 2 == 0 else [agent_2, agent_1]
+            env.run(agent_order)
             # noinspection PyTypeChecker
             env.render(mode="human")
             scores[0] += ((env.state[0].reward or 0) + 1)/2

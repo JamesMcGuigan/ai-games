@@ -321,42 +321,57 @@ def precompile_numba():
 
 ### Main
 
-state = new_state()  # Shared State
+# Shared State
+global_state_p1 = new_state()  # Player 1
+global_state_p2 = new_state()  # Player 2
 
 # precompile_numba()  # kaggle offers 16s to make the first move - but we don't get extra time by running this outside the agent
 
 # The last function defined in the file run by Kaggle in submission.csv
 # BUGFIX: duplicate top-level function names in submission.py can cause a Kaggle Submission Error
-def MontyCarloTreeSearch(observation: Struct, _configuration_: Struct) -> int:
+def MontyCarloTreeSearch( exploration: float = None, numba: bool = None, persist_state: bool = True ):
     # observation   = {'mark': 1, 'board': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
     # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 8}
+    def _MontyCarloTreeSearch_(observation: Struct, _configuration_: Struct) -> int:
+        global hyperparameters
+        hyperparameters = Hyperparameters(
+            exploration = exploration if exploration is not None else hyperparameters.exploration,
+            numba       = numba       if numba       is not None else hyperparameters.numba,
+        )
+        first_move_time = 0
+        safety_time     = 2    # Only gets checked once every hundred simulations
+        start_time      = time.perf_counter()
 
-    first_move_time = 0
-    safety_time     = 2    # Only gets checked once every hundred simulations
-    start_time      = time.perf_counter()
+        global configuration
+        configuration = cast_configuration(_configuration_)
 
-    global configuration
-    configuration = cast_configuration(_configuration_)
+        if persist_state:
+            state = global_state_p1 if observation.mark == 1 else global_state_p2
+        else:
+            state = new_state()
 
-    global state  # Share state between runs
-    # state = new_state()
+        player_id     = observation.mark
+        listboard     = np.array(observation.board, dtype=np.int8)
+        bitboard      = list_to_bitboard(listboard)
+        move_number   = get_move_number(bitboard)
+        is_first_move = int(move_number < 2)
+        endtime       = start_time + _configuration_.timeout - safety_time - (first_move_time * is_first_move)
 
-    player_id     = observation.mark
-    listboard     = np.array(observation.board, dtype=np.int8)
-    bitboard      = list_to_bitboard(listboard)
-    move_number   = get_move_number(bitboard)
-    is_first_move = int(move_number < 2)
-    endtime       = start_time + _configuration_.timeout - safety_time - (first_move_time * is_first_move)
+        # if move_number <= 2:
+        #     # Kaggle gives us a 16s window on first move to @jit compile, so only compile core functions on first move
+        #     precompile_numba_lite(move_number)
+        #     return 3
 
-    # if move_number <= 2:
-    #     # Kaggle gives us a 16s window on first move to @jit compile, so only compile core functions on first move
-    #     precompile_numba_lite(move_number)
-    #     return 3
+        action, count = run_search(state, bitboard, player_id, endtime)
 
-    action, count = run_search(state, bitboard, player_id, endtime)
+        # if is_first_move: action = 3  # hardcode first move, but use time available to #@njit compile and simulate state
+        time_taken = time.perf_counter() - start_time
+        print(f'MontyCarloTreeSearch: p{player_id} action = {action} after {count} simulations in {time_taken:.3f}s')
 
-    # if is_first_move: action = 3  # hardcode first move, but use time available to #@njit compile and simulate state
-    time_taken = time.perf_counter() - start_time
-    print(f'MontyCarloTreeSearch: p{player_id} action = {action} after {count} simulations in {time_taken:.3f}s')
+        return int(action)          # kaggle_environments requires a python int, not np.int32
+    return _MontyCarloTreeSearch_
 
-    return int(action)          # kaggle_environments requires a python int, not np.int32
+def MontyCarloTreeSearchKaggle(observation: Struct, _configuration_: Struct):
+    return MontyCarloTreeSearch()(observation, _configuration_)
+
+

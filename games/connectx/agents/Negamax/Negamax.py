@@ -48,9 +48,10 @@ def negamax(
         best_score = bitboard_gameovers_heuristic(bitboard, player_id)
     else:
         actions = get_legal_moves(bitboard)
-        actions = sorted(actions, key=lambda action: sort_scores[action], reverse=True) # try the best parent moves first
+        actions = sorted(actions, key=lambda action: sort_scores[action], reverse=True)   # try the best parent moves first
         if not recursing:
-            actions = [ action for action in actions if sort_scores[action] != -np.inf ]    # auto-exclude losing moves from negamax_deepening()
+            actions = [ action for action in actions if sort_scores[action] != -np.inf ]  # auto-exclude losing moves from negamax_deepening()
+            scores[ sort_scores == -np.inf ] = -np.inf                                    # persist -np.inf scores
             if len(actions) == 0:
                 # All moves are losing, pick the best one by heuristic
                 return negamax(bitboard, player_id, depth=1)

@@ -111,6 +111,22 @@ def test_foil_double_attack(observation, configuration, agent_name, agent):
         assert action == 0
 
 
+# Source: https://www.kaggle.com/c/connectx/submissions?dialog=episodes-episode-2045690
+# This test actually passes, but somehow Negamax played 0 when on the leaderboard
+@pytest.mark.parametrize("agent_name, agent", agents)
+def test_foil_double_attack_2(observation, configuration, agent_name, agent):
+    observation.mark  = 2
+    observation.board = [
+        0,0,0,0,0,0,0,
+        0,0,0,1,0,0,0,
+        0,0,0,2,0,0,0,
+        0,0,0,1,0,0,0,
+        0,0,0,2,0,0,0,
+        2,0,0,1,1,0,0,
+    ]
+    action = agent(observation, configuration)
+    assert action in [2, 5]
+
 
 @pytest.mark.parametrize("agent_name, agent", agents)
 def test_single_column(observation, configuration, agent_name, agent):

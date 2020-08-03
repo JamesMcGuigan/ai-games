@@ -1,3 +1,4 @@
+import math
 import sys
 
 from core.ConnectXBBNN import *
@@ -8,6 +9,8 @@ from core.ConnectXBBNN import *
 single_square_score = 0.1  # Mostly ignore single squares, that can make lines in 8 directions
 double_attack_score = 0.5  # 0.5 == 100% winrate vs AlphaBetaAgent
 
+min_score =  math.inf  # min_score: -32.3
+max_score = -math.inf  # max_score:  26.4
 
 # Profiler (Macbook Pro 2011): This vectorized implementation is actually slower than unvectorized
 # bitboard_gameovers_heuristic	                call_count=9469	    time=1558	own_time=1141
@@ -88,6 +91,10 @@ def bitboard_gameovers_heuristic( bitboard: np.ndarray, player_id: int, gameover
 
     score = (p1_score - p2_score) if player_id == 1 else (p2_score - p1_score)
     # assert np.math.isclose( score, bitboard_gameovers_heuristic_unvectorized(bitboard, player_id, gameovers), abs_tol=0.01), f'{score} != {bitboard_gameovers_heuristic_unvectorized(bitboard, player_id, gameovers)}'
+
+    # global min_score, max_score
+    # if score < min_score: min_score = score; print(f'min_score: {min_score}')  # min_score: -32.3
+    # if score > max_score: max_score = score; print(f'max_score: {max_score}')  # max_score:  26.4
     return score
 
 

@@ -6,12 +6,14 @@ from typing import Union
 
 from numba import int32
 
-import core.ConnectXBBNN
 from core.ConnectXBBNN import *
+from core.ConnectXBBNN import configuration
+
+
+
+configuration = configuration  # prevent optimize imports from removing configuration import
 
 ### Configuration
-
-configuration = core.ConnectXBBNN.configuration
 
 Hyperparameters = namedtuple('hyperparameters', ['pheromones_power', 'initial_pheromones'])
 hyperparameters = Hyperparameters(

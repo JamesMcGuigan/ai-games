@@ -4,12 +4,11 @@
 import time
 from struct import Struct
 
-import core.ConnectXBBNN
 from heuristics.BitboardHeuristic import *
 
 
 
-configuration = core.ConnectXBBNN.configuration
+configuration = configuration  # prevent optimize imports from removing configuration import
 
 # @njit
 def negamax(

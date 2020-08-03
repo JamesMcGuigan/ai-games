@@ -120,7 +120,7 @@ def precompile_numba():
 precompile_numba()
 
 def Negamax():
-    def _Negamax(observation: Struct, _configuration_: Struct) -> int:
+    def _Negamax_(observation: Struct, _configuration_: Struct) -> int:
         # observation   = {'mark': 1, 'board': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
         # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 8}
 
@@ -136,7 +136,6 @@ def Negamax():
         move_number   = get_move_number(bitboard)
         is_first_move = int(move_number < 2)
         timeout       = _configuration_.timeout - safety_time - (first_move_time * is_first_move) - (time.perf_counter() - start_time)
-        print(time.perf_counter() - start_time)
         action = negamax_deepening(
             bitboard   = bitboard,
             player_id  = player_id,
@@ -147,4 +146,7 @@ def Negamax():
             verbose_depth = True
         )
         return int(action)  # kaggle_environments requires a python int, not np.int32
-    return _Negamax
+    return _Negamax_
+
+def NegamaxKaggle(observation: Struct, _configuration_: Struct) -> int:
+    return Negamax()(observation, _configuration_)

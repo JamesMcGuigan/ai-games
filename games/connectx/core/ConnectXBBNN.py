@@ -1,7 +1,9 @@
 # This is a functional implementation of ConnectX that has been optimized using both numpy and numba
 
 from collections import namedtuple
+from typing import List
 from typing import Tuple
+from typing import Union
 
 import numba
 import numpy as np
@@ -33,7 +35,7 @@ def cast_configuration(configuration):
 
 
 #@njit
-def list_to_bitboard(listboard: np.ndarray) -> np.ndarray:
+def list_to_bitboard(listboard: Union[np.ndarray,List[int]]) -> np.ndarray:
     # bitboard[0] = played, is a square filled             | 0 = empty, 1 = filled
     # bitboard[1] = player, who's token is this, if filled | 0 = empty, 1 = filled
     bitboard_played = 0  # 42 bit number for if board square has been played

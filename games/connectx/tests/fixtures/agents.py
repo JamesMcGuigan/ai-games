@@ -8,6 +8,8 @@ from agents.Negamax.Negamax import Negamax
 
 
 agents = [
+    ('MontyCarloLinkedList', MontyCarloLinkedList()),
+    ('MontyCarloTreeSearch', MontyCarloTreeSearch),
     ('Negamax',              Negamax()),
     ('AlphaBetaAgent',       AlphaBetaAgent.agent()),
     ('AlphaBetaBitboard',    AlphaBetaBitboard.agent()),

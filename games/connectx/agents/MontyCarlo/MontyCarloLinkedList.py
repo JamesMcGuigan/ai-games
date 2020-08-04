@@ -43,29 +43,34 @@ class MCNode:
         self.is_expanded   = False
 
 
+    def __hash__(self):
+        return self.mirror_hash
+
     ### Constructors and Lookups
 
     def create_child( self, action: int ) -> 'MCNode':
         result = result_action(self.bitboard, action, self.player_id)
-        child  = MCNode(
-            bitboard      = result,
-            player_id     = next_player_id(self.player_id),
-            parent        = self,
-            parent_action = action,
-            config        = self.config,
-            exploration   = self.exploration
-        )
+        child  = self.find_child(result)
+        if child is None:
+            child = MCNode(
+                bitboard      = result,
+                player_id     = next_player_id(self.player_id),
+                parent        = self,
+                parent_action = action,
+                config        = self.config,
+                exploration   = self.exploration
+            )
         self.children[action] = child
         self.is_expanded      = self._is_expanded()
         return child
 
-
     def find_child( self, bitboard: np.array ) -> Union['MCNode', None]:
-        if np.all( self.bitboard == bitboard ):
+        mirror_hash = hash_bitboard(bitboard)
+        if self.mirror_hash == mirror_hash:
             return self
         for child in self.children:
             if child is None: continue
-            if np.all( child.bitboard == bitboard ):
+            if child.mirror_hash == mirror_hash:
                 return child
         return None
 
@@ -140,7 +145,7 @@ class MCNode:
             self.backpropagate(self.utility)
         elif not self.is_expanded:
             child = self.expand()
-            score = child.simulate()
+            score = child.simulate()    # score from the perspective of the other player
             child.backpropagate(score)
         else:
             # Recurse down tree, until a gameover or not expanded node is found
@@ -162,17 +167,20 @@ class MCNode:
 
 
     def simulate(self) -> float:
+        # score from perspective of player who made last move
         return run_random_simulation(self.bitboard, self.player_id)
 
 
     def backpropagate(self, score: float):
+        # child.simulate()  returns score for the player 2
+        # child.total_score is accessed via the parent node, so score on this node is from the perspective of player 1
         node = self
         while 1:
+            score = self.opponents_score(score)
             node.total_score  += score
             node.total_visits += 1
             if node.parent is not None:
                 node  = node.parent
-                score = self.opponents_score(score)
             else:
                 break  # Reached the root node, so terminate
 

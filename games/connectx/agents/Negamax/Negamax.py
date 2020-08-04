@@ -10,7 +10,7 @@ from heuristics.BitboardHeuristic import *
 
 configuration = configuration  # prevent optimize imports from removing configuration import
 
-#@njit
+# @njit
 def negamax(
         bitboard: np.ndarray,
         player_id:  int,
@@ -171,7 +171,7 @@ def Negamax(**kwargs):
         # observation   = {'mark': 1, 'board': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
         # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 8}
 
-        first_move_time = 1
+        first_move_time = 0
         safety_time     = 2    # Only gets checked once every hundred simulations
         start_time      = time.perf_counter()
 

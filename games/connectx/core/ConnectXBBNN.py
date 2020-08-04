@@ -5,12 +5,12 @@ from typing import Tuple
 
 import numba
 import numpy as np
+
+
+
 # Hardcode for simplicity
 # observation   = {'mark': 1, 'board': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
 # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 8}
-from numba import njit
-
-
 
 bitboard_type = numba.typeof(np.ndarray((2,), dtype=np.int64))
 Configuration = namedtuple('configuration', ['rows', 'columns', 'inarow'])
@@ -255,10 +255,10 @@ def get_random_move(bitboard: np.ndarray) -> int:
 
 # Actions + Results
 
-@njit
+#@njit
 def get_next_index(bitboard: np.ndarray, action: int) -> int:
     global configuration
-    # assert is_legal_move(bitboard, action)
+    assert is_legal_move(bitboard, action)
 
     # Start at the ground, and return first row that contains a 0
     for row in range(configuration.rows-1, -1, -1):
@@ -276,9 +276,9 @@ def get_next_row(bitboard: np.ndarray, action: int) -> int:
     return row
 
 
-@njit
+#@njit
 def result_action(bitboard: np.ndarray, action: int, player_id: int) -> np.ndarray:
-    # assert is_legal_move(bitboard, action)
+    assert is_legal_move(bitboard, action)
     index    = get_next_index(bitboard, action)
     mark     = 0 if player_id == 1 else 1
     output = np.array([
@@ -354,7 +354,7 @@ def is_gameover(bitboard: np.ndarray) -> bool:
     return False
 
 
-@njit
+#@njit
 def get_winner(bitboard: np.ndarray) -> int:
     """ Endgamme get_winner: 0 for no get_winner, 1 = player 1, 2 = player 2"""
     global gameovers

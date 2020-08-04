@@ -16,7 +16,6 @@ max_score = -math.inf  # max_score:  26.4
 # bitboard_gameovers_heuristic	                call_count=9469	    time=1558	own_time=1141
 # bitboard_gameovers_heuristic_unvectorized	    call_count=9469	    time=1879	own_time=1862  ( 20% slower)
 # bitboard_gameovers_heuristic_slow	            call_count=9469	    time=3419	own_time=1893  (220% slower)
-@njit
 def bitboard_gameovers_heuristic( bitboard: np.ndarray, player_id: int, gameovers: np.ndarray = get_gameovers() ) -> float:
     """ For all possible connect4 gameover positions,
         check if a player has at least one token in position and that the opponent is not blocking
@@ -60,8 +59,8 @@ def bitboard_gameovers_heuristic( bitboard: np.ndarray, player_id: int, gameover
         overlaps            = (p1_bitmasks != 0) & (p2_bitmasks != 0)
         p1_is_valid         = (p1_bitmasks != 0) & ~overlaps
         p2_is_valid         = (p2_bitmasks != 0) & ~overlaps
-        p1_is_single_square = p1_is_valid & ( np.log2(p1_bitmasks) % 1 == 0 )
-        p2_is_single_square = p2_is_valid & ( np.log2(p2_bitmasks) % 1 == 0 )
+        p1_is_single_square = p1_is_valid & ( np.log2(p1_bitmasks, where=p1_is_valid ) % 1 == 0 )
+        p2_is_single_square = p2_is_valid & ( np.log2(p2_bitmasks, where=p2_is_valid ) % 1 == 0 )
 
         p1_lines            = gameovers[ p1_is_valid & ~p1_is_single_square ]
         p2_lines            = gameovers[ p2_is_valid & ~p2_is_single_square ]

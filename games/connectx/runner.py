@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 import argparse
-import json
 import traceback
 
+import json5
 from kaggle_environments import make
 
 from agents.AlphaBetaAgent.AlphaBetaAgent import AlphaBetaAgent
 from agents.AlphaBetaAgent.AlphaBetaBitboard import AlphaBetaBitboard
+from agents.MontyCarlo.MontyCarloHeuristic import MontyCarloHeuristic
 from agents.MontyCarlo.MontyCarloLinkedList import MontyCarloLinkedList
 from agents.MontyCarlo.MontyCarloTreeSearch import MontyCarloTreeSearch
 from agents.Negamax.Negamax import Negamax
@@ -24,8 +25,8 @@ parser.add_argument('-t', '--timeout', type=int)
 parser.add_argument('-r', '--rounds',  type=int, default=1)
 parser.add_argument('-1', '--p1',      type=str, required=True)
 parser.add_argument('-2', '--p2',      type=str, default='negamax')
-parser.add_argument('--arg1',          type=json.loads)  # eg: '{ "exploration": 1 }'
-parser.add_argument('--arg2',          type=json.loads)
+parser.add_argument('--arg1',          type=json5.loads)  # eg: '{ "exploration": 1 }'
+parser.add_argument('--arg2',          type=json5.loads)
 
 argv = parser.parse_args()
 print(argv)
@@ -47,6 +48,7 @@ for agent_name, position in [ (argv.p1, 'p1'), (argv.p2, 'p2') ]:
     elif agent_name == 'AlphaBetaBitboard':        agent = AlphaBetaBitboard.agent(**kwargs)
     elif agent_name == 'MontyCarloTreeSearch':     agent = MontyCarloTreeSearch(**kwargs)
     elif agent_name == 'MontyCarloLinkedList':     agent = MontyCarloLinkedList(**kwargs)
+    elif agent_name == 'MontyCarloHeuristic':      agent = MontyCarloHeuristic(**kwargs)
     elif agent_name == 'Negamax':                  agent = Negamax(**kwargs)
     elif agent_name == 'negamax':                  agent = agent_name
     elif agent_name == 'random':                   agent = agent_name

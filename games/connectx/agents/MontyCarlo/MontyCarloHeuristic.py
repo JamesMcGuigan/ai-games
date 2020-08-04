@@ -22,7 +22,7 @@ class MontyCarloHeuristicNode(MontyCarloNode):
             parent:        Union['MontyCarloNode', None] = None,
             parent_action: Union[int,None]              = None,
             exploration:     float = 1.0,
-            heuristic_scale: float = 5.0,  # 5 seems to score best against other values
+            heuristic_scale: float = 6.0,  # 6 seems to score best against other values
             **kwargs
     ):
         super().__init__(

@@ -11,13 +11,15 @@ from core.ConnectXBBNN import *
 
 Hyperparameters = namedtuple('hyperparameters', [])
 
-class MCNode:
+class MontyCarloNode:
+    root_nodes: List[Union['MontyCarloNode', None]] = [None, None, None]  # root_nodes[observation.mark]
+
     def __init__(
             self,
             bitboard:      np.ndarray,
             player_id:     int,
             config:        Configuration,
-            parent:        Union['MCNode', None] = None,
+            parent:        Union['MontyCarloNode', None] = None,
             parent_action: Union[int,None]       = None,
             exploration: float = 1.0,
             # action_policy: str = 'max'  # 'max' or 'random'
@@ -37,7 +39,7 @@ class MCNode:
 
         self.parent        = parent
         self.parent_action = parent_action
-        self.children: List[Union[MCNode,None]] = [ None for action in range(config.columns) ]  # include illegal moves to preserve indexing
+        self.children: List[Union[MontyCarloNode, None]] = [None for action in range(config.columns)]  # include illegal moves to preserve indexing
         self.total_score   = 0.0
         self.total_visits  = 0
         self.is_expanded   = False
@@ -48,11 +50,11 @@ class MCNode:
 
     ### Constructors and Lookups
 
-    def create_child( self, action: int ) -> 'MCNode':
+    def create_child( self, action: int ) -> 'MontyCarloNode':
         result = result_action(self.bitboard, action, self.player_id)
         child  = self.find_child(result)
         if child is None:
-            child = MCNode(
+            child = self.__class__(
                 bitboard      = result,
                 player_id     = next_player_id(self.player_id),
                 parent        = self,
@@ -64,7 +66,7 @@ class MCNode:
         self.is_expanded      = self._is_expanded()
         return child
 
-    def find_child( self, bitboard: np.array ) -> Union['MCNode', None]:
+    def find_child( self, bitboard: np.array ) -> Union['MontyCarloNode', None]:
         mirror_hash = hash_bitboard(bitboard)
         if self.mirror_hash == mirror_hash:
             return self
@@ -154,7 +156,7 @@ class MCNode:
             child.single_run()
 
 
-    def expand(self) -> 'MCNode':
+    def expand(self) -> 'MontyCarloNode':
         assert not self.is_gameover
         assert not self.is_expanded
 
@@ -188,12 +190,8 @@ class MCNode:
             node = node.parent      # when we reach the root: node.parent == None which terminates
 
 
-root_nodes: List[Union[MCNode,None]] = [ None, None, None ]  # root_nodes[observation.mark]
-
-def MontyCarloLinkedList(**kwargs):
-    # observation   = {'mark': 1, 'board': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
-    # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 8}
-    def _MontyCarloLinkedList_(observation: Struct, _configuration_: Struct) -> int:
+    @classmethod
+    def agent( cls, observation: Struct, _configuration_: Struct, **kwargs ):
         first_move_time = 0
         safety_time     = 2
         start_time      = time.perf_counter()
@@ -206,9 +204,9 @@ def MontyCarloLinkedList(**kwargs):
         is_first_move = int(move_number < 2)
         endtime       = start_time + _configuration_.timeout - safety_time - (first_move_time * is_first_move)
 
-        root_node = root_nodes[player_id]
+        root_node = cls.root_nodes[player_id]
         if root_node is None or root_node.find_child(bitboard) is None:
-            root_node = root_nodes[player_id] = MCNode(
+            root_node = cls.root_nodes[player_id] = cls(
                 bitboard    = bitboard,
                 player_id   = player_id,
                 parent      = None,
@@ -216,7 +214,7 @@ def MontyCarloLinkedList(**kwargs):
                 exploration = kwargs.get('exploration', 1.0)
             )
         else:
-            root_node = root_nodes[player_id] = root_nodes[player_id].find_child(bitboard)
+            root_node = cls.root_nodes[player_id] = cls.root_nodes[player_id].find_child(bitboard)
         assert root_node is not None
 
         count = 0
@@ -226,9 +224,16 @@ def MontyCarloLinkedList(**kwargs):
 
         action     = root_node.get_best_action()
         time_taken = time.perf_counter() - start_time
-        print(f'MontyCarloLinkedList: p{player_id} action = {action} after {count} simulations in {time_taken:.3f}s')
+        print(f'{cls.__name__}: p{player_id} action = {action} after {count} simulations in {time_taken:.3f}s')
         return int(action)
-    return _MontyCarloLinkedList_
 
-def MontyCarloLinkedListKaggle(observation, _configuration_):
-    return MontyCarloLinkedList()(observation, _configuration_)
+
+def MontyCarloLinkedList(**kwargs):
+    # observation   = {'mark': 1, 'board': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
+    # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 8}
+    def MontyCarloLinkedList(observation: Struct, configuration: Struct) -> int:
+        return MontyCarloNode.agent(observation, configuration, **kwargs)
+    return MontyCarloLinkedList
+
+def MontyCarloLinkedListKaggle(observation, configuration):
+    return MontyCarloLinkedList()(observation, configuration)

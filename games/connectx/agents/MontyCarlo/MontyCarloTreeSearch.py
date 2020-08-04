@@ -188,7 +188,7 @@ def expand_node(state: Dict, path: List, bitboard: np.ndarray, player_id: int) -
         if not is_legal_move(bitboard, action): continue
 
         result  = result_action(bitboard, action, player_id)
-        score   = run_simulation(result, player_id)
+        score   = run_random_simulation(result, player_id)
         wins   += score
         totals += 1
         backpropergate_scores(state, [ PathEdge(bitboard, action) ], player_id, score)
@@ -200,20 +200,6 @@ def expand_node(state: Dict, path: List, bitboard: np.ndarray, player_id: int) -
     return totals  # returns number of simulations run
 
 
-### Simulate
-
-#@njit
-def run_simulation( bitboard: np.ndarray, player_id: int ) -> float:
-    """ Returns +1 = victory | 0.5 = draw | 0 = loss """
-    move_number = get_move_number(bitboard)
-    next_player = 1 if move_number % 2 == 0 else 2  # player 1 has the first move on an empty board
-    while not is_gameover(bitboard):
-        action      = get_random_move(bitboard)
-        bitboard    = result_action(bitboard, action, next_player)
-        next_player = next_player_id(next_player)
-        # print( bitboard_to_numpy2d(bitboard) )  # DEVUG
-    score = get_utility_zero_one(bitboard, player_id)
-    return score
 
 
 
@@ -293,7 +279,7 @@ def run_search_loop( state: Dict, bitboard: np.ndarray, player_id: int, simulati
             leaf_bitboard     = result_action(leaf_bitboard, action, player_id)
             simulation_count += expand_node(state, path, leaf_bitboard, player_id)
 
-        score = run_simulation(leaf_bitboard, player_id)
+        score = run_random_simulation(leaf_bitboard, player_id)
         backpropergate_scores(state, path, player_id, score)
     return simulation_count
 
@@ -334,6 +320,7 @@ def MontyCarloTreeSearch( exploration: float = None, numba: bool = None, persist
     # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 8}
     def _MontyCarloTreeSearch_(observation: Struct, _configuration_: Struct) -> int:
         global hyperparameters
+        # noinspection PyArgumentList
         hyperparameters = Hyperparameters(
             exploration = exploration if exploration is not None else hyperparameters.exploration,
             numba       = numba       if numba       is not None else hyperparameters.numba,
@@ -370,6 +357,7 @@ def MontyCarloTreeSearch( exploration: float = None, numba: bool = None, persist
 
         return int(action)          # kaggle_environments requires a python int, not np.int32
     return _MontyCarloTreeSearch_
+
 
 def MontyCarloTreeSearchKaggle(observation: Struct, _configuration_: Struct):
     return MontyCarloTreeSearch()(observation, _configuration_)

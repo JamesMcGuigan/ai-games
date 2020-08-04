@@ -202,28 +202,33 @@ def has_no_more_moves(bitboard: np.ndarray) -> bool:
     return bitboard[0] & mask_legal_moves == mask_legal_moves
 
 
-_legal_moves_mask  = ((1 << configuration.columns) - 1)
-_legal_moves_cache = np.array([
+_is_legal_move_mask  = ((1 << configuration.columns) - 1)
+_is_legal_move_cache = np.array([
     [
         int( (bits >> action) & 1 == 0 )
         for action in range(configuration.columns)
     ]
     for bits in range(2**configuration.columns)
 ], dtype=np.int8)
+
 #@njit
 def is_legal_move(bitboard: np.ndarray, action: int) -> int:
-    bits = bitboard[0] & _legal_moves_mask  # faster than: int( (bitboard[0] >> action) & 1 == 0 )
-    return _legal_moves_cache[bits,action]  # NOTE: [bits,action] is faster than
-
+    bits = bitboard[0] & _is_legal_move_mask   # faster than: int( (bitboard[0] >> action) & 1 == 0 )
+    return _is_legal_move_cache[bits, action]  # NOTE: [bits,action] is faster than [bits][action]
 
 #@njit
 def get_legal_moves(bitboard: np.ndarray) -> np.ndarray:
     # First 7 bytes represent the top row. Moves are legal if the sky is unplayed
     global configuration
-    if has_no_illegal_moves(bitboard):
-        return get_all_moves()
+    bits = bitboard[0] & _is_legal_move_mask  # faster than: int( (bitboard[0] >> action) & 1 == 0 )
+    if bits == 0:
+        return actions  # get_all_moves()
     else:
-        return np.array([ action for action in range(configuration.columns) if is_legal_move(bitboard, action) ])
+        return np.array([
+            action
+            for action in range(configuration.columns)
+            if _is_legal_move_cache[bits, action]
+        ], dtype=np.int8)
 
 
 actions = np.array([ action for action in range(configuration.columns) ], dtype=np.int64)
@@ -282,6 +287,22 @@ def result_action(bitboard: np.ndarray, action: int, player_id: int) -> np.ndarr
     ], dtype=bitboard.dtype)
     return output
 
+
+### Simulations
+
+#@njit
+def run_random_simulation( bitboard: np.ndarray, player_id: int ) -> float:
+    """ Returns +1 = victory | 0.5 = draw | 0 = loss """
+    move_number = get_move_number(bitboard)
+    next_player = 1 if move_number % 2 == 0 else 2  # player 1 has the first move on an empty board
+    while not is_gameover(bitboard):
+        actions     = get_legal_moves(bitboard)
+        action      = np.random.choice(actions)
+        bitboard    = result_action(bitboard, action, next_player)
+        next_player = next_player_id(next_player)
+        # print( bitboard_to_numpy2d(bitboard) )  # DEVUG
+    score = get_utility_zero_one(bitboard, player_id)
+    return score
 
 
 ### Endgame

@@ -45,6 +45,7 @@ for agent_name, position in [ (argv.p1, 'p1'), (argv.p2, 'p2') ]:
     if   agent_name == 'AlphaBetaAgent':           agent = AlphaBetaAgent.agent(**kwargs)
     elif agent_name == 'AlphaBetaBitboard':        agent = AlphaBetaBitboard.agent(**kwargs)
     elif agent_name == 'MontyCarloTreeSearch':     agent = MontyCarloTreeSearch(**kwargs)
+    elif agent_name == 'MontyCarloLinkedList':     agent = MontyCarloTreeSearch(**kwargs)
     elif agent_name == 'Negamax':                  agent = Negamax(**kwargs)
     elif agent_name == 'negamax':                  agent = agent_name
     elif agent_name == 'random':                   agent = agent_name

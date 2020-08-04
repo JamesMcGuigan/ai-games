@@ -166,7 +166,7 @@ def negamax_deepening(
 def precompile_numba():
     negamax(bitboard = empty_bitboard(), player_id = 1, depth = 1)
 
-def Negamax():
+def Negamax(**kwargs):
     def _Negamax_(observation: Struct, _configuration_: Struct) -> int:
         # observation   = {'mark': 1, 'board': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
         # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 8}

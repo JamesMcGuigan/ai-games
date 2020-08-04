@@ -107,7 +107,7 @@ class MCNode:
 
 
     def get_exploration_action(self) -> int:
-        scores = [ self.ucb1_score( self.children[action] )
+        scores = [ self.children[action].ucb1_score
                    for action in self.legal_moves ]
         index  = np.argmax(scores)
         action = self.legal_moves[index]
@@ -118,12 +118,12 @@ class MCNode:
     ### Scores
 
     @staticmethod
-    def ucb1_score(node) -> float:
+    def get_ucb1_score(node: 'MontyCarloNode') -> float:
         if node is None or node.total_visits == 0:
             return np.inf
         else:
             score = node.total_score / node.total_visits
-            if node.parent is not None:
+            if node.parent is not None and node.parent.total_visits > 0:
                 score += (
                     node.exploration * np.sqrt(2)
                     * np.log(node.parent.total_visits) / node.total_visits
@@ -167,7 +167,6 @@ class MCNode:
 
 
     def simulate(self) -> float:
-        # score from perspective of player who made last move
         return run_random_simulation(self.bitboard, self.player_id)
 
 
@@ -175,16 +174,18 @@ class MCNode:
         # child.simulate()  returns score for the player 2
         # child.total_score is accessed via the parent node, so score on this node is from the perspective of player 1
         node = self
-        while 1:
+        while node is not None:
             score = self.opponents_score(score)
             node.total_score  += score
             node.total_visits += 1
-            if node.parent is not None:
-                node  = node.parent
-            else:
-                break  # Reached the root node, so terminate
+            node = node.parent      # when we reach the root: node.parent == None which terminates
 
-
+        # get_ucb1_score() gets called 4x less often if we cache the value after backpropagation
+        # get_ucb1_score() depends on parent.total_visits, so needs to be called after updating scores
+        node = self
+        while node is not None:
+            node.ucb1_score = node.get_ucb1_score(node)
+            node = node.parent      # when we reach the root: node.parent == None which terminates
 
 
 root_nodes: List[Union[MCNode,None]] = [ None, None, None ]  # root_nodes[observation.mark]

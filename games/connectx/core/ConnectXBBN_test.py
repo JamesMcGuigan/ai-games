@@ -120,3 +120,19 @@ def test_game_result_actions():
         [0,0,0,1,0,2,0],
         [0,0,0,1,0,0,2],
     ]
+
+def test_legal_moves():
+    # Fill the board up square by square to test is_legal_move() and get_legal_moves() for all possibilities
+    player_id = 1
+    bitboard = empty_bitboard()
+    for column in range(configuration.columns):
+        for row in range(configuration.rows):
+            assert is_legal_move(bitboard, column), f'column={column} | row={row} | bitboard={bitboard} {bitboard_to_numpy2d(bitboard)}'
+            assert get_legal_moves(bitboard).tolist() == list(range(column, configuration.columns)), f'column={column} | row={row} | bitboard={bitboard} {bitboard_to_numpy2d(bitboard)}'
+            bitboard  = result_action(bitboard, column, player_id)
+            player_id = next_player_id(player_id)
+
+        assert not is_legal_move(bitboard, column), f'column={column} | bitboard={bitboard} {bitboard_to_numpy2d(bitboard)}'
+        assert     get_legal_moves(bitboard).tolist() == list(range(column+1, configuration.columns)), f'column={column} | bitboard={bitboard} {bitboard_to_numpy2d(bitboard)}'
+        for action in range(0, column):
+            assert not is_legal_move(bitboard, action), f'action={action} | column={column} | bitboard={bitboard} {bitboard_to_numpy2d(bitboard)}'

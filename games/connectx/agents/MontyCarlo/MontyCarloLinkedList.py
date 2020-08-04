@@ -2,8 +2,6 @@
 # Inspired by https://www.kaggle.com/matant/monte-carlo-tree-search-connectx
 import time
 from struct import Struct
-from typing import List
-from typing import Union
 
 from core.ConnectXBBNN import *
 
@@ -18,50 +16,56 @@ class MontyCarloNode:
             self,
             bitboard:      np.ndarray,
             player_id:     int,
-            config:        Configuration,
+            configuration: Configuration,
             parent:        Union['MontyCarloNode', None] = None,
             parent_action: Union[int,None]       = None,
             exploration: float = 1.0,
-            # action_policy: str = 'max'  # 'max' or 'random'
+            **kwargs
     ):
         self.bitboard      = bitboard
         self.player_id     = player_id
         self.next_player   = 3 - player_id
 
-        self.config        = config
+        self.configuration = configuration
         self.exploration   = exploration
+        self.kwargs        = kwargs
 
-        self.mirror_hash   = hash_bitboard(bitboard)
+        # self.mirror_hash   = hash_bitboard(bitboard)  # BUG: using mirror hashes causes get_best_action() to return invalid moves
         self.legal_moves   = get_legal_moves(bitboard)
         self.is_gameover   = is_gameover(bitboard)
         self.winner        = get_winner(bitboard) if self.is_gameover else 0
         self.utility       = 1 if self.winner == self.player_id else 0  # Scores in range 0-1
-        self.ucb1_score    = self.get_ucb1_score(self)
 
         self.parent        = parent
         self.parent_action = parent_action
-        self.children: List[Union[MontyCarloNode, None]] = [None for action in range(config.columns)]  # include illegal moves to preserve indexing
+        self.is_expanded   = False
+        self.children: List[Union[MontyCarloNode, None]] = [None for action in range(configuration.columns)]  # include illegal moves to preserve indexing
         self.total_score   = 0.0
         self.total_visits  = 0
-        self.is_expanded   = False
+        self.ucb1_score    = self.get_ucb1_score(self)
+
 
 
     def __hash__(self):
-        return self.mirror_hash
+        return tuple(self.bitboard)
+        # return self.mirror_hash  # BUG: using mirror hashes causes get_best_action() to return invalid moves
+
+
 
     ### Constructors and Lookups
 
     def create_child( self, action: int ) -> 'MontyCarloNode':
         result = result_action(self.bitboard, action, self.player_id)
-        child  = self.find_child(result, depth=1)
+        child  = None  # self.find_mirror_child(result, depth=1)  # BUG: using mirror hashes causes get_best_action() to return invalid moves
         if child is None:
             child = self.__class__(
                 bitboard      = result,
                 player_id     = next_player_id(self.player_id),
                 parent        = self,
                 parent_action = action,
-                config        = self.config,
-                exploration   = self.exploration
+                configuration = self.configuration,
+                exploration   = self.exploration,
+                **self.kwargs
             )
         self.children[action] = child
         self.is_expanded      = self._is_expanded()
@@ -70,15 +74,14 @@ class MontyCarloNode:
 
     def find_child( self, bitboard: np.array, depth=2 ) -> Union['MontyCarloNode', None]:
         assert 0 <= depth <= 2
-        mirror_hash = hash_bitboard(bitboard)
 
         if depth >= 0:
-            if self.mirror_hash == mirror_hash:
+            if np.all( self.bitboard == bitboard ):
                 return self
         if depth >= 1:
             for child in self.children:
                 if child is None: continue
-                if child.mirror_hash == mirror_hash:
+                if np.all( child.bitboard == bitboard ):
                     return child
         if depth >= 2:
             # Avoid recursion to prevent duplicate calls to hash_bitboard()
@@ -86,9 +89,32 @@ class MontyCarloNode:
                 if child is None: continue
                 for grandchild in child.children:
                     if grandchild is None: continue
-                    if grandchild.mirror_hash == mirror_hash:
-                        return child
+                    if np.all( grandchild.bitboard == bitboard ):
+                        return grandchild
         return None
+
+    # # BUG: using mirror hashes causes get_best_action() to return invalid moves
+    # def find_mirror_child( self, bitboard: np.array, depth=2 ) -> Union['MontyCarloNode', None]:
+    #     assert 0 <= depth <= 2
+    #     mirror_hash = hash_bitboard(bitboard)
+    #
+    #     if depth >= 0:
+    #         if self.mirror_hash == mirror_hash:
+    #             return self
+    #     if depth >= 1:
+    #         for child in self.children:
+    #             if child is None: continue
+    #             if child.mirror_hash == mirror_hash:
+    #                 return child
+    #     if depth >= 2:
+    #         # Avoid recursion to prevent duplicate calls to hash_bitboard()
+    #         for child in self.children:
+    #             if child is None: continue
+    #             for grandchild in child.children:
+    #                 if grandchild is None: continue
+    #                 if grandchild.mirror_hash == mirror_hash:
+    #                     return grandchild
+    #     return None
 
 
 
@@ -226,10 +252,10 @@ class MontyCarloNode:
         root_node = cls.root_nodes[player_id]
         if root_node is None or root_node.find_child(bitboard, depth=2) is None:
             root_node = cls.root_nodes[player_id] = cls(
-                bitboard    = bitboard,
-                player_id   = player_id,
-                parent      = None,
-                config      = configuration,
+                bitboard      = bitboard,
+                player_id     = player_id,
+                parent        = None,
+                configuration = configuration,
                 **kwargs
             )
         else:

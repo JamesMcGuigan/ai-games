@@ -36,6 +36,7 @@ class MontyCarloNode:
         self.is_gameover   = is_gameover(bitboard)
         self.winner        = get_winner(bitboard) if self.is_gameover else 0
         self.utility       = 1 if self.winner == self.player_id else 0  # Scores in range 0-1
+        self.ucb1_score    = self.get_ucb1_score(self)
 
         self.parent        = parent
         self.parent_action = parent_action
@@ -52,7 +53,7 @@ class MontyCarloNode:
 
     def create_child( self, action: int ) -> 'MontyCarloNode':
         result = result_action(self.bitboard, action, self.player_id)
-        child  = self.find_child(result)
+        child  = self.find_child(result, depth=1)
         if child is None:
             child = self.__class__(
                 bitboard      = result,
@@ -66,14 +67,27 @@ class MontyCarloNode:
         self.is_expanded      = self._is_expanded()
         return child
 
-    def find_child( self, bitboard: np.array ) -> Union['MontyCarloNode', None]:
+
+    def find_child( self, bitboard: np.array, depth=2 ) -> Union['MontyCarloNode', None]:
+        assert 0 <= depth <= 2
         mirror_hash = hash_bitboard(bitboard)
-        if self.mirror_hash == mirror_hash:
-            return self
-        for child in self.children:
-            if child is None: continue
-            if child.mirror_hash == mirror_hash:
-                return child
+
+        if depth >= 0:
+            if self.mirror_hash == mirror_hash:
+                return self
+        if depth >= 1:
+            for child in self.children:
+                if child is None: continue
+                if child.mirror_hash == mirror_hash:
+                    return child
+        if depth >= 2:
+            # Avoid recursion to prevent duplicate calls to hash_bitboard()
+            for child in self.children:
+                if child is None: continue
+                for grandchild in child.children:
+                    if grandchild is None: continue
+                    if grandchild.mirror_hash == mirror_hash:
+                        return child
         return None
 
 
@@ -100,17 +114,22 @@ class MontyCarloNode:
     ### Action Selection
 
     def get_best_action(self) -> int:
-        scores = [ self.children[action].total_score
-                   if self.children[action] is not None else 0
-                   for action in self.legal_moves ]
+        scores = [
+            self.children[action].total_score
+            if self.children[action] is not None else 0
+            for action in self.legal_moves
+        ]
         index  = np.argmax(scores)
         action = self.legal_moves[index]
         return action
 
 
     def get_exploration_action(self) -> int:
-        scores = [ self.children[action].ucb1_score
-                   for action in self.legal_moves ]
+        scores = [
+            self.children[action].ucb1_score
+            if self.children[action] is not None else 0
+            for action in self.legal_moves
+        ]
         index  = np.argmax(scores)
         action = self.legal_moves[index]
         return action
@@ -205,13 +224,13 @@ class MontyCarloNode:
         endtime       = start_time + _configuration_.timeout - safety_time - (first_move_time * is_first_move)
 
         root_node = cls.root_nodes[player_id]
-        if root_node is None or root_node.find_child(bitboard) is None:
+        if root_node is None or root_node.find_child(bitboard, depth=2) is None:
             root_node = cls.root_nodes[player_id] = cls(
                 bitboard    = bitboard,
                 player_id   = player_id,
                 parent      = None,
                 config      = configuration,
-                exploration = kwargs.get('exploration', 1.0)
+                **kwargs
             )
         else:
             root_node = cls.root_nodes[player_id] = cls.root_nodes[player_id].find_child(bitboard)

@@ -1,5 +1,6 @@
 dataclasses
 fastcache
+json5
 jupyter
 kaggle
 kaggle_environments

@@ -4,6 +4,7 @@
 #
 #    pip-compile
 #
+appnope==0.1.0            # via ipykernel, ipython
 attrs==19.3.0             # via jsonschema, pytest
 backcall==0.2.0           # via ipython
 bleach==3.1.5             # via nbconvert
@@ -22,6 +23,7 @@ ipython==7.16.1           # via ipykernel, ipywidgets, jupyter-console
 ipywidgets==7.5.1         # via jupyter
 jedi==0.17.2              # via ipython
 jinja2==2.11.2            # via nbconvert, notebook
+json5==0.9.5              # via -r requirements.in
 jsonschema==3.2.0         # via kaggle-environments, nbformat
 jupyter-client==6.1.6     # via ipykernel, jupyter-console, notebook, qtconsole
 jupyter-console==6.1.0    # via jupyter

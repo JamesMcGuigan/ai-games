@@ -164,8 +164,7 @@ class MontyCarloNode:
 
     ### Scores
 
-    @staticmethod
-    def get_ucb1_score(node: 'MontyCarloNode') -> float:
+    def get_ucb1_score(self, node: 'MontyCarloNode') -> float:
         if node is None or node.total_visits == 0:
             return np.inf
         else:

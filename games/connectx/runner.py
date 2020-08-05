@@ -9,7 +9,7 @@ from agents.AlphaBetaAgent.AlphaBetaAgent import AlphaBetaAgent
 from agents.AlphaBetaAgent.AlphaBetaBitboard import AlphaBetaBitboard
 from agents.MontyCarlo.MontyCarloHeuristic import MontyCarloHeuristic
 from agents.MontyCarlo.MontyCarloLinkedList import MontyCarloLinkedList
-from agents.MontyCarlo.MontyCarloTreeSearch import MontyCarloTreeSearch
+from agents.MontyCarlo.AntColonyTreeSearch import AntColonyTreeSearch
 from agents.Negamax.Negamax import Negamax
 
 
@@ -46,9 +46,9 @@ for agent_name, position in [ (argv.p1, 'p1'), (argv.p2, 'p2') ]:
     kwargs = (argv.arg1 if position == 'p1' else argv.arg2) or {}
     if   agent_name == 'AlphaBetaAgent':           agent = AlphaBetaAgent.agent(**kwargs)
     elif agent_name == 'AlphaBetaBitboard':        agent = AlphaBetaBitboard.agent(**kwargs)
-    elif agent_name == 'MontyCarloTreeSearch':     agent = MontyCarloTreeSearch(**kwargs)
     elif agent_name == 'MontyCarloLinkedList':     agent = MontyCarloLinkedList(**kwargs)
     elif agent_name == 'MontyCarloHeuristic':      agent = MontyCarloHeuristic(**kwargs)
+    elif agent_name == 'AntColonyTreeSearch':      agent = AntColonyTreeSearch(**kwargs)
     elif agent_name == 'Negamax':                  agent = Negamax(**kwargs)
     elif agent_name == 'negamax':                  agent = agent_name
     elif agent_name == 'random':                   agent = agent_name

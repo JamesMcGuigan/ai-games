@@ -6,12 +6,14 @@ import gzip
 import json
 import os
 import time
+from copy import deepcopy
 from struct import Struct
 from typing import Dict
 
 from core.ConnectXBBNN import *
 import pickle
 
+from util.base64_file import base64_file_save, base64_file_load
 
 Hyperparameters = namedtuple('hyperparameters', [])
 
@@ -60,92 +62,56 @@ class MontyCarloNode:
 
     ### Loading and Saving
 
-    def prune(self, depth=8):
+    @classmethod
+    def prune(self, root_node: 'MontyCarloNode', depth=8):
         if depth >= 1:
-            for child in self.children:
+            for child in root_node.children:
                 if child is not None:
                     child.prune(depth-1)
         else:
-            self.children    = [ None ] * len(self.children)
-            self.is_expanded = False  # Use def expand(self)
+            root_node.children    = [ None ] * len(root_node.children)
+            root_node.is_expanded = False  # Use def expand(self)
 
-
-    @classmethod
-    def varname(cls):
-        return f"base64_{cls.__name__}"
 
     @classmethod
     def filename(cls):
-        return f"data/{cls.__name__}.pickle.zip.base64"
+        return f"data/{cls.__name__}_base64.py"
 
     @classmethod
-    def filesize_limit_mb(cls):
-        return 99  # Kaggle filesize limit is actually 100Mb, but spare 1Mb for the code
+    def max_filesize(cls):
+        return 99 * 1024 * 1024  # Kaggle filesize limit is actually 100Mb, but spare 1Mb for the code
 
 
     @classmethod
     def load(cls):
-        start_time = time.perf_counter()
-        filename   = cls.filename()
-        try:
-            # Hard-coding PyTorch weights into a script - https://www.kaggle.com/c/connectx/discussion/126678
-            data = None
-            if cls.varname() in globals():
-                data = globals()[cls.varname()]
-            if data is not None and os.path.exists(filename):
-                with open(filename, 'rb') as file:
-                    data = file.read()
-            if data is not None:
-                data = base64.b64decode(data)
-                data = gzip.decompress(data)
-                data = pickle.loads(data)
-
-                cls.save_node[cls.__name__] = data
-                print("Loaded: {:40s} | {:4.1f}MB in {:4.1f}s".format(
-                    filename,
-                    os.path.getsize(filename)/1024/1024,
-                    time.perf_counter() - start_time
-                ))
-                return cls.save_node[cls.__name__]
-        except Exception as exception:
-            print(f'{cls.__name__}.load(): Exception:', exception)
-
-        return None
+        filename = cls.filename()
+        loaded   = base64_file_load(filename)
+        if loaded is not None:
+            cls.save_node[cls.__name__] = loaded
+            return loaded
+        else:
+            return None
 
 
     @classmethod
-    def save(cls, depth=None):
-        filename = cls.filename()
+    def save(cls, depth=None) -> Union[str,None]:
         if cls.persist == True and cls.save_node.get(cls.__name__, None) is not None:
-            try:
-                start_time = time.perf_counter()
-                os.makedirs(os.path.dirname(filename), exist_ok=True)
-                save_node = cls.save_node[cls.__name__]
+            save_node = cls.save_node[cls.__name__]
+            if depth: save_node = cls.prune(deepcopy(save_node), depth)
 
-                with open(filename, 'wb') as file:
-                    data = pickle.dumps(save_node)
-                    data = gzip.compress(data)
-                    data = base64.encodebytes(data)
-                    file.write(data)
-                    if os.path.getsize(filename)/1024/1024 > cls.filesize_limit_mb():
-                        depth = depth or configuration.row * configuration.columns
-                        depth = depth - 4
-                        print(f"{cls.__name__}.save() - {filename} ({os.path.getsize(filename)/1024/1024}Mb)",
-                              f"is too large - retrying at depth {depth}")
-                        save_node.prune(depth)  # trim the search tree
-                        return cls.save(depth)  # recurse until filesize limit is met
+            filename = cls.filename()
+            filesize = base64_file_save(save_node, filename)
 
-                    print("Wrote: {:40s} | {:4.1f}MB in {:4.1f}s".format(
-                        filename,
-                        os.path.getsize(filename)/1024/1024,
-                        time.perf_counter() - start_time
-                    ))
-                    return True
-            except Exception as exception:
-                print(f'{cls.__name__}.save(): Exception:', exception)
-                return False
-
-
+            # Kaggle allows a maximum of 100Mb filesize, so prune until we fit
+            if filesize > cls.max_filesize():
+                prune_depth = depth or configuration.rows * configuration.columns
+                save_node   = deepcopy(save_node)
+                while filesize > cls.max_filesize():
+                    prune_depth -= 2
+                    cls.prune(save_node, prune_depth)
+                    filesize = base64_file_save(save_node)
+            return filename
+        return None
 
     ### Constructors and Lookups
 

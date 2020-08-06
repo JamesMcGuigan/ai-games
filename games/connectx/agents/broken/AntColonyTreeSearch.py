@@ -2,14 +2,11 @@
 # However the choice of which node to expand is chosen via a random weighting of past scores
 import time
 from struct import Struct
-from typing import Union
 
-from numba import int32
+from numba import int32, njit, int64
 
 from core.ConnectXBBNN import *
 from core.ConnectXBBNN import configuration
-
-
 
 configuration = configuration  # prevent optimize imports from removing configuration import
 

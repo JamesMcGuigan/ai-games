@@ -1,5 +1,6 @@
 # AntColonyTreeSearch differs from MontyCarloTreeSearch in the choice of the node selection algorithm
 # AntColonyTreeSearch used weighted randomness of accumulated scores, rather than UCB1 (Upper Confidence Bound)
+import atexit
 import random
 from struct import Struct
 
@@ -16,7 +17,6 @@ class AntColonyTreeSearchNode(MontyCarloHeuristicNode):
             self,
             bitboard:      np.ndarray,
             player_id:     int,
-            configuration: Configuration,
             parent:        Union['MontyCarloNode', None] = None,
             parent_action: Union[int,None]       = None,
             start_pheromones: float = 1.0,
@@ -29,7 +29,6 @@ class AntColonyTreeSearchNode(MontyCarloHeuristicNode):
         super().__init__(
             bitboard         = bitboard,
             player_id        = player_id,
-            configuration    = configuration,
             parent           = parent,
             parent_action    = parent_action,
             start_pheromones = start_pheromones,
@@ -55,13 +54,13 @@ class AntColonyTreeSearchNode(MontyCarloHeuristicNode):
 
             if node.parent is not None and node.parent.is_expanded:
                 # Profiler reports that addition [8% runtime] rather than sum() [18% runtime] results in a 2.5x speedup,
-                if node.parent.pheromones_total == 0.0:
-                    node.parent.pheromones_total = sum([ node.parent.children[action].pheromone_score for action in node.parent.legal_moves ])
-                else:
-                    node.parent.pheromones_total += (node.pheromone_score - previous_pheromones)
+                node.parent.pheromones_total += (node.pheromone_score - previous_pheromones)
                 # assert np.math.isclose(node.parent.pheromones_total, sum([ node.parent.children[action].pheromone_score for action in node.parent.legal_moves ]), rel_tol=1e-6 ), f"{node.parent.pheromones_total} != {sum([ node.parent.children[action].pheromone_score for action in node.parent.legal_moves ])}"
             node = node.parent  # when we reach the root: node.parent == None which terminates
 
+    def on_expanded(self) -> None:
+        super().on_expanded()
+        self.pheromones_total = sum([ self.children[action].pheromone_score for action in self.legal_moves ])
 
     def get_exploration_action(self) -> int:
         # Random choice weighted by pheromone_score

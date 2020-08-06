@@ -18,7 +18,6 @@ class MontyCarloHeuristicNode(MontyCarloNode):
             self,
             bitboard:      np.ndarray,
             player_id:     int,
-            configuration: Configuration,
             parent:        Union['MontyCarloNode', None] = None,
             parent_action: Union[int,None]              = None,
             exploration:     float = 1.0,
@@ -28,7 +27,6 @@ class MontyCarloHeuristicNode(MontyCarloNode):
         super().__init__(
             bitboard        = bitboard,
             player_id       = player_id,
-            configuration   = configuration,
             parent          = parent,
             parent_action   = parent_action,
             exploration     = exploration,

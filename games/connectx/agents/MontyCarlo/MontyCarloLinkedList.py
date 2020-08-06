@@ -1,32 +1,38 @@
 # This is a LinkedList implementation of MontyCarlo Tree Search
 # Inspired by https://www.kaggle.com/matant/monte-carlo-tree-search-connectx
+import atexit
+import base64
+import gzip
+import json
+import os
 import time
 from struct import Struct
+from typing import Dict
 
 from core.ConnectXBBNN import *
-
+import pickle
 
 
 Hyperparameters = namedtuple('hyperparameters', [])
 
 class MontyCarloNode:
+    persist   = True
+    save_node = {}                                                        # save_node[cls.__name__] = cls(empty_bitboard(), 1)
     root_nodes: List[Union['MontyCarloNode', None]] = [None, None, None]  # root_nodes[observation.mark]
 
     def __init__(
             self,
             bitboard:      np.ndarray,
             player_id:     int,
-            configuration: Configuration,
             parent:        Union['MontyCarloNode', None] = None,
             parent_action: Union[int,None]       = None,
-            exploration: float = 1.0,
+            exploration:   float = 1.0,
             **kwargs
     ):
         self.bitboard      = bitboard
         self.player_id     = player_id
         self.next_player   = 3 - player_id
 
-        self.configuration = configuration
         self.exploration   = exploration
         self.kwargs        = kwargs
 
@@ -39,7 +45,7 @@ class MontyCarloNode:
         self.parent        = parent
         self.parent_action = parent_action
         self.is_expanded   = False
-        self.children: List[Union[MontyCarloNode, None]] = [None for action in range(configuration.columns)]  # include illegal moves to preserve indexing
+        self.children: List[Union[MontyCarloNode, None]] = [None for action in get_all_moves()]  # include illegal moves to preserve indexing
         self.total_score   = 0.0
         self.total_visits  = 0
         self.ucb1_score    = self.get_ucb1_score(self)
@@ -49,6 +55,93 @@ class MontyCarloNode:
     def __hash__(self):
         return tuple(self.bitboard)
         # return self.mirror_hash  # BUG: using mirror hashes causes get_best_action() to return invalid moves
+
+
+
+    ### Loading and Saving
+
+    def prune(self, depth=8):
+        if depth >= 1:
+            for child in self.children:
+                if child is not None:
+                    child.prune(depth-1)
+        else:
+            self.children    = [ None ] * len(self.children)
+            self.is_expanded = False  # Use def expand(self)
+
+
+    @classmethod
+    def varname(cls):
+        return f"base64_{cls.__name__}"
+
+    @classmethod
+    def filename(cls):
+        return f"data/{cls.__name__}.pickle.zip.base64"
+
+    @classmethod
+    def filesize_limit_mb(cls):
+        return 99  # Kaggle filesize limit is actually 100Mb, but spare 1Mb for the code
+
+
+    @classmethod
+    def load(cls):
+        start_time = time.perf_counter()
+        filename   = cls.filename()
+        try:
+            # Hard-coding PyTorch weights into a script - https://www.kaggle.com/c/connectx/discussion/126678
+            data = globals().get(cls.varname(), None)
+            if data is not None and os.path.exists(filename):
+                with open(filename, 'rb') as file:
+                    data = file.read()
+            if data is not None:
+                data = file.read()
+                data = base64.b64decode(data)
+                data = gzip.decompress(data)
+                data = pickle.loads(data)
+
+                cls.save_node[cls.__name__] = data
+                print("Loaded: {:40s} | {:4.1f}MB in {:4.1f}s".format(
+                    filename,
+                    os.path.getsize(filename)/1024/1024,
+                    time.perf_counter() - start_time
+                ))
+            return cls.save_node[cls.__name__]
+        except Exception as exception:
+            print(f'{cls.__name__}.wrote(): Exception:', exception)
+        return None
+
+
+    @classmethod
+    def save(cls, depth=None):
+        filename = cls.filename()
+        if cls.persist == True and cls.save_node.get(cls.__name__, None) is not None:
+            try:
+                start_time = time.perf_counter()
+                os.makedirs(os.path.dirname(filename), exist_ok=True)
+                save_node = cls.save_node[cls.__name__]
+
+                with open(filename, 'wb') as file:
+                    data = pickle.dumps(save_node)
+                    data = gzip.compress(data)
+                    data = base64.encodebytes(data)
+                    file.write(data)
+                    if os.path.getsize(filename)/1024/1024 > cls.filesize_limit_mb():
+                        depth = depth or configuration.row * configuration.columns
+                        depth = depth - 4
+                        print(f"{cls.__name__}.save() - {filename} ({os.path.getsize(filename)/1024/1024}Mb)",
+                              f"is too large - retrying at depth {depth}")
+                        save_node.prune(depth)  # trim the search tree
+                        return cls.save(depth)  # recurse until filesize limit is met
+
+                    print("Wrote: {:40s} | {:4.1f}MB in {:4.1f}s".format(
+                        filename,
+                        os.path.getsize(filename)/1024/1024,
+                        time.perf_counter() - start_time
+                    ))
+                    return True
+            except Exception as exception:
+                print(f'{cls.__name__}.save(): Exception:', exception)
+                return False
 
 
 
@@ -63,12 +156,13 @@ class MontyCarloNode:
                 player_id     = next_player_id(self.player_id),
                 parent        = self,
                 parent_action = action,
-                configuration = self.configuration,
                 exploration   = self.exploration,
                 **self.kwargs
             )
         self.children[action] = child
         self.is_expanded      = self._is_expanded()
+        if self.is_expanded:
+            self.on_expanded()
         return child
 
 
@@ -211,6 +305,9 @@ class MontyCarloNode:
         child      = self.create_child(action)
         return child
 
+    def on_expanded(self) -> None:
+        # Callback placeholder for any subclass hooks
+        pass
 
     def simulate(self) -> float:
         return run_random_simulation(self.bitboard, self.player_id)
@@ -234,12 +331,15 @@ class MontyCarloNode:
             node = node.parent      # when we reach the root: node.parent == None which terminates
 
 
+
+    ### Agent
+
     @classmethod
     def agent( cls, observation: Struct, _configuration_: Struct, **kwargs ):
         first_move_time = 0
         safety_time     = 2
         start_time      = time.perf_counter()
-        configuration   = cast_configuration(_configuration_)
+        # configuration   = cast_configuration(_configuration_)
 
         player_id     = int(observation.mark)
         listboard     = np.array(observation.board, dtype=np.int8)
@@ -248,13 +348,18 @@ class MontyCarloNode:
         is_first_move = int(move_number < 2)
         endtime       = start_time + _configuration_.timeout - safety_time - (first_move_time * is_first_move)
 
+        if cls.persist == True and cls.save_node.get(cls.__name__, None) is None:
+            atexit.register(cls.save)
+            cls.save_node[cls.__name__] = cls.load() or cls(empty_bitboard(), player_id=1)
+            cls.root_nodes[1] = cls.root_nodes[2] = cls.save_node[cls.__name__]  # implement shared state
+
         root_node = cls.root_nodes[player_id]
         if root_node is None or root_node.find_child(bitboard, depth=2) is None:
             root_node = cls.root_nodes[player_id] = cls(
                 bitboard      = bitboard,
                 player_id     = player_id,
                 parent        = None,
-                configuration = configuration,
+                # configuration = configuration,
                 **kwargs
             )
         else:

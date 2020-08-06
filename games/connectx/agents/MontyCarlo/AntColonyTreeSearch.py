@@ -7,10 +7,12 @@ from struct import Struct
 from agents.MontyCarlo.MontyCarloHeuristic import MontyCarloHeuristicNode
 from agents.MontyCarlo.MontyCarloLinkedList import MontyCarloNode
 from core.ConnectXBBNN import *
+from heuristics.BitboardHeuristic import bitboard_gameovers_heuristic
+from util.sigmoid import scaled_sigmoid
 
 Hyperparameters = namedtuple('hyperparameters', [])
 
-class AntColonyTreeSearchNode(MontyCarloHeuristicNode):
+class AntColonyTreeSearchNode(MontyCarloNode):
     root_nodes: List[Union['MontyCarloNode', None]] = [None, None, None]  # root_nodes[observation.mark]
 
     def __init__(
@@ -19,6 +21,7 @@ class AntColonyTreeSearchNode(MontyCarloHeuristicNode):
             player_id:     int,
             parent:        Union['MontyCarloNode', None] = None,
             parent_action: Union[int,None]       = None,
+            heuristic_scale:  float = 6.0,   # 6 seems to score best against other values
             start_pheromones: float = 1.0,
             pheromone_power:  float = 1.25,
             **kwargs
@@ -31,14 +34,21 @@ class AntColonyTreeSearchNode(MontyCarloHeuristicNode):
             player_id        = player_id,
             parent           = parent,
             parent_action    = parent_action,
+            heuristic_scale  = heuristic_scale,
             start_pheromones = start_pheromones,
             pheromone_power  = pheromone_power,  # saved in self.kwargs in parent constructor
             **kwargs
         )
-
+        self.heuristic_scale  = heuristic_scale
         self.total_score      = 0.0
         self.pheromone_score  = start_pheromones
         self.pheromones_total = 0.0
+
+
+    def simulate(self) -> float:
+        score = bitboard_gameovers_heuristic(self.bitboard, self.player_id)
+        score = scaled_sigmoid(score, self.heuristic_scale)
+        return score
 
 
     def backpropagate(self, score: float):

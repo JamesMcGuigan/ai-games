@@ -89,12 +89,13 @@ class MontyCarloNode:
         filename   = cls.filename()
         try:
             # Hard-coding PyTorch weights into a script - https://www.kaggle.com/c/connectx/discussion/126678
-            data = globals().get(cls.varname(), None)
+            data = None
+            if cls.varname() in globals():
+                data = globals()[cls.varname()]
             if data is not None and os.path.exists(filename):
                 with open(filename, 'rb') as file:
                     data = file.read()
             if data is not None:
-                data = file.read()
                 data = base64.b64decode(data)
                 data = gzip.decompress(data)
                 data = pickle.loads(data)
@@ -105,9 +106,10 @@ class MontyCarloNode:
                     os.path.getsize(filename)/1024/1024,
                     time.perf_counter() - start_time
                 ))
-            return cls.save_node[cls.__name__]
+                return cls.save_node[cls.__name__]
         except Exception as exception:
-            print(f'{cls.__name__}.wrote(): Exception:', exception)
+            print(f'{cls.__name__}.load(): Exception:', exception)
+
         return None
 
 

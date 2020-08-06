@@ -14,8 +14,8 @@ from agents.Negamax.Negamax import Negamax
 from agents.RulesAgent import CenterBot
 
 training_agents = [
-    AntColonyTreeSearch(),
-    MontyCarloLinkedList(),
+    # AntColonyTreeSearch(),
+    # MontyCarloLinkedList(),
     MontyCarloHeuristic(),
 ]
 opponent_agents = [
@@ -26,20 +26,14 @@ opponent_agents = [
     negamax_agent,
     random_agent,
 ]
-random.shuffle(training_agents)
-random.shuffle(opponent_agents)
+# random.shuffle(training_agents)
+# random.shuffle(opponent_agents)
 
 
 env = make("connectx", debug=True)
 env.render()
 env.reset()
-
-# First have each training agent play against each other
-for agent_1, agent_2 in itertools.product(training_agents, training_agents):
-    for round in range(2):
-        agent_order = [agent_1, agent_2] if round % 2 == 0 else [agent_2, agent_1]
-        env.run(agent_order)
-        env.reset()
+env.configuration.timeout = 3  # MontyCarlo has a safety time of 2s, so this gives 1s of runtime to expand nodes
 
 # Next play 100 rounds against random agent (7x7x2 = 98) which should cover most 2-deep opening positions
 for agent_1 in training_agents:
@@ -48,6 +42,14 @@ for agent_1 in training_agents:
         agent_order = [agent_1, agent_2] if round % 2 == 0 else [agent_2, agent_1]
         env.run(agent_order)
         env.reset()
+
+# Have each training agent play against each other
+for agent_1, agent_2 in itertools.product(training_agents, training_agents):
+    for round in range(2):
+        agent_order = [agent_1, agent_2] if round % 2 == 0 else [agent_2, agent_1]
+        env.run(agent_order)
+        env.reset()
+
 
 # Train against real opponents
 for agent_1, agent_2 in itertools.product(training_agents, training_agents):

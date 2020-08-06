@@ -1,5 +1,6 @@
 dataclasses
 fastcache
+humanize
 json5
 jupyter
 kaggle

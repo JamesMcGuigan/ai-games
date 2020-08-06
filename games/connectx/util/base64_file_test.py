@@ -21,32 +21,64 @@ def test_base64_file_varname():
 
 
 def test_base64_wrap_unwrap(data):
-    varname     = base64_file_varname('test')
-    input_bytes = base64.encodebytes(pickle.dumps(data))
-    input_str   = base64_bytes_to_str(input_bytes)
-    encoded     = base64_file_var_wrap(input_bytes, varname)
-    decoded     = base64_file_var_unwrap(encoded)
+    varname   = base64_file_varname('test')
+    input     = base64.encodebytes(pickle.dumps(data)).decode('utf8').strip()
+    wrapped   = base64_file_var_wrap(input, varname)
+    unwrapped = base64_file_var_unwrap(wrapped)
 
-    assert isinstance(input_bytes, bytes)
-    assert isinstance(input_str,   str)
-    assert isinstance(encoded, str)
-    assert isinstance(decoded, str)
-    assert varname     in encoded
-    assert varname not in decoded
-    assert input_str != encoded
-    assert input_str == decoded
+    assert isinstance(input,   str)
+    assert isinstance(wrapped, str)
+    assert isinstance(unwrapped, str)
+    assert varname     in wrapped
+    assert varname not in unwrapped
+    assert input != wrapped
+    assert input == unwrapped
 
 
 def test_base64_save_load(data):
+    assert data == data
+
     filename = '/tmp/test_base64_save_load'
     if os.path.exists(filename): os.remove(filename)
     assert not os.path.exists(filename)
-    assert data == data
 
+    loaded   = base64_file_load(filename)
+    assert loaded is None
+
+    varname  = base64_file_varname(filename)
     filesize = base64_file_save(data, filename)
-    output   = base64_file_load(filename)
+    loaded   = base64_file_load(filename)
 
     assert os.path.exists(filename)
-    assert filesize < 1/1024  # less than 1kb
-    assert data == output
+    assert filesize < 1024  # less than 1kb
+    assert data == loaded
+
+    # assert varname in globals()          # globals are not shared between modules
+    # assert output == globals()[varname]  # globals are not shared between modules
+
+
+def test_base64_static_import(data):
+    assert data == data
+
+    filename = '/tmp/test_base64_static_import'
+    if os.path.exists(filename): os.remove(filename)
+    assert not os.path.exists(filename)
+
+
+    varname  = base64_file_varname(filename)
+    filesize = base64_file_save(data, filename)
+    loaded   = base64_file_load(filename)
+
+    if varname in globals(): del globals()[varname]  # globals are not shared between modules
+    contents = open(filename, 'r').read()
+    exec(contents, globals())
+    assert varname in globals()
+    encoded = globals()[varname]
+    decoded = base64_file_decode(encoded)
+
+    assert varname in contents
+    assert data == loaded == decoded
+
+
+
 

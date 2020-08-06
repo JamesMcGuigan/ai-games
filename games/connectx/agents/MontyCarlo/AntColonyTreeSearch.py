@@ -37,9 +37,9 @@ class AntColonyTreeSearchNode(MontyCarloHeuristicNode):
             **kwargs
         )
 
-        self.total_score      = 0
+        self.total_score      = 0.0
         self.pheromone_score  = start_pheromones
-        self.pheromones_total = start_pheromones * len(self.legal_moves)
+        self.pheromones_total = 0.0
 
 
     def backpropagate(self, score: float):
@@ -47,15 +47,19 @@ class AntColonyTreeSearchNode(MontyCarloHeuristicNode):
         # child.total_score is accessed via the parent node, so score on this node is from the perspective of player 1
         node = self
         while node is not None:
-            score                         = self.opponents_score(score)
-            node.total_score             += score
-            node.pheromone_score          = self.start_pheromones + node.total_score ** self.pheromone_power
+            score                = self.opponents_score(score)
+            node.total_score    += score
+
+            previous_pheromones  = node.pheromone_score
+            node.pheromone_score = self.start_pheromones + node.total_score ** self.pheromone_power
 
             if node.parent is not None and node.parent.is_expanded:
-                node.parent.pheromones_total = sum([
-                    node.parent.children[action].pheromone_score
-                    for action in node.parent.legal_moves
-                ])
+                # Profiler reports that addition [8% runtime] rather than sum() [18% runtime] results in a 2.5x speedup,
+                if node.parent.pheromones_total == 0.0:
+                    node.parent.pheromones_total = sum([ node.parent.children[action].pheromone_score for action in node.parent.legal_moves ])
+                else:
+                    node.parent.pheromones_total += (node.pheromone_score - previous_pheromones)
+                # assert np.math.isclose(node.parent.pheromones_total, sum([ node.parent.children[action].pheromone_score for action in node.parent.legal_moves ]), rel_tol=1e-6 ), f"{node.parent.pheromones_total} != {sum([ node.parent.children[action].pheromone_score for action in node.parent.legal_moves ])}"
             node = node.parent  # when we reach the root: node.parent == None which terminates
 
 

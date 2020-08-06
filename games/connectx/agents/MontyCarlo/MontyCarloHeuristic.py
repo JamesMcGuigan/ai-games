@@ -6,8 +6,7 @@ from struct import Struct
 from agents.MontyCarlo.MontyCarloLinkedList import MontyCarloNode
 from core.ConnectXBBNN import *
 from heuristics.BitboardHeuristic import bitboard_gameovers_heuristic
-
-
+from util.sigmoid import scaled_sigmoid
 
 Hyperparameters = namedtuple('hyperparameters', [])
 
@@ -38,19 +37,8 @@ class MontyCarloHeuristicNode(MontyCarloNode):
 
     def simulate(self) -> float:
         score = bitboard_gameovers_heuristic(self.bitboard, self.player_id)
-        score = self.sigmoid(score)
+        score = scaled_sigmoid(score, self.heuristic_scale)
         return score
-
-
-    def sigmoid(self, score: float):
-        # self.heuristic_scale == 2 means a heuristic score of +-2 will return +-0.73
-        # 1 / (1 + math.exp(-(+np.inf))) == 1.0
-        # 1 / (1 + math.exp(-(2.0)))     == 0.88
-        # 1 / (1 + math.exp(-(1.0)))     == 0.73
-        # 1 / (1 + math.exp(-(0.5)))     == 0.62
-        # 1 / (1 + math.exp(-(0.0)))     == 0.5
-        # 1 / (1 + math.exp(-(-np.inf))) == 0.0
-        return 1 / (1 + np.exp( - score / self.heuristic_scale ))
 
 
 

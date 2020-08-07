@@ -1,18 +1,10 @@
 # This is a LinkedList implementation of MontyCarlo Tree Search
 # Inspired by https://www.kaggle.com/matant/monte-carlo-tree-search-connectx
 import atexit
-import base64
-import gzip
-import json
-import os
 import time
-from copy import deepcopy
 from struct import Struct
-from typing import Dict
 
 from core.ConnectXBBNN import *
-import pickle
-
 from util.base64_file import base64_file_save, base64_file_load
 
 Hyperparameters = namedtuple('hyperparameters', [])
@@ -63,24 +55,23 @@ class MontyCarloNode:
     ### Loading and Saving
 
     @classmethod
-    def prune(self, root_node: 'MontyCarloNode', depth=8):
-        if depth >= 1:
-            for child in root_node.children:
-                if child is not None:
-                    child.prune(depth-1)
-        else:
-            root_node.children    = [ None ] * len(root_node.children)
-            root_node.is_expanded = False  # Use def expand(self)
+    def prune(cls, node: 'MontyCarloNode', min_visits=7, pruned_count=0, total_count=0):
+        for n, child in enumerate(node.children):
+            if child is None: continue
+            if child.total_visits < min_visits:
+                pruned_count    += child.total_visits  # excepting terminal states, this equals the number of grandchildren
+                total_count     += child.total_visits  # excepting terminal states, this equals the number of grandchildren
+                node.children[n] = None
+                node.is_expanded = False  # Use def expand(self) to reinitalize state
+            else:
+                total_count += 1
+                pruned_count, total_count = cls.prune(child, min_visits, pruned_count, total_count)
+        return pruned_count, total_count
 
 
     @classmethod
     def filename(cls):
         return f"data/{cls.__name__}_base64.py"
-
-    @classmethod
-    def max_filesize(cls):
-        return 99 * 1024 * 1024  # Kaggle filesize limit is actually 100Mb, but spare 1Mb for the code
-
 
     @classmethod
     def load(cls):
@@ -94,22 +85,16 @@ class MontyCarloNode:
 
 
     @classmethod
-    def save(cls, depth=None) -> Union[str,None]:
+    def save(cls) -> Union[str,None]:
         if cls.persist == True and cls.save_node.get(cls.__name__, None) is not None:
-            save_node = cls.save_node[cls.__name__]
-            if depth: save_node = cls.prune(deepcopy(save_node), depth)
+            save_node    = cls.save_node[cls.__name__]
+
+            start_time   = time.perf_counter()
+            pruned_count, total_count = cls.prune(save_node)  # This reduces a 47MB base64 file down to 5Mb
+            print(f'{cls.__name__}.save() - pruned {pruned_count:.0f}/{total_count:.0f} nodes leaving {total_count-pruned_count:.0f} in {time.perf_counter() - start_time:.2f}s')
 
             filename = cls.filename()
             filesize = base64_file_save(save_node, filename)
-
-            # Kaggle allows a maximum of 100Mb filesize, so prune until we fit
-            if filesize > cls.max_filesize():
-                prune_depth = depth or configuration.rows * configuration.columns
-                save_node   = deepcopy(save_node)
-                while filesize > cls.max_filesize():
-                    prune_depth -= 2
-                    cls.prune(save_node, prune_depth)
-                    filesize = base64_file_save(save_node)
             return filename
         return None
 

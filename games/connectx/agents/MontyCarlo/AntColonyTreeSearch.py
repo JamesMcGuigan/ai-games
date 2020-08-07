@@ -1,10 +1,8 @@
 # AntColonyTreeSearch differs from MontyCarloTreeSearch in the choice of the node selection algorithm
 # AntColonyTreeSearch used weighted randomness of accumulated scores, rather than UCB1 (Upper Confidence Bound)
-import atexit
 import random
 from struct import Struct
 
-from agents.MontyCarlo.MontyCarloHeuristic import MontyCarloHeuristicNode
 from agents.MontyCarlo.MontyCarloLinkedList import MontyCarloNode
 from core.ConnectXBBNN import *
 from heuristics.BitboardHeuristic import bitboard_gameovers_heuristic
@@ -43,6 +41,22 @@ class AntColonyTreeSearchNode(MontyCarloNode):
         self.total_score      = 0.0
         self.pheromone_score  = start_pheromones
         self.pheromones_total = 0.0
+
+
+    # BUGFIX: this makes .prune() work without total_count
+    @classmethod
+    def prune(cls, node: 'MontyCarloNode', min_visits=7, pruned_count=0, total_count=0):
+        for n, child in enumerate(node.children):
+            if child is None: continue
+            if child.total_score < min_visits:
+                pruned_count    += child.total_score  # excepting terminal states, this equals the number of grandchildren
+                total_count     += child.total_score  # excepting terminal states, this equals the number of grandchildren
+                node.children[n] = None
+                node.is_expanded = False  # Use def expand(self) to reinitalize state
+            else:
+                total_count += 1
+                pruned_count, total_count = cls.prune(child, min_visits, pruned_count, total_count)
+        return pruned_count, total_count
 
 
     def simulate(self) -> float:

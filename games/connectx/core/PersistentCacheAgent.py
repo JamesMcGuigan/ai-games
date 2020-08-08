@@ -1,11 +1,8 @@
 import atexit
-import gzip
 import math
-import os
-import pickle
-import time
-import zlib
 
+from util.base64_file import base64_file_load
+from util.base64_file import base64_file_save
 
 
 class PersistentCacheAgent:
@@ -39,29 +36,16 @@ class PersistentCacheAgent:
 
     @classmethod
     def filename( cls ):
-        return './.cache/' + cls.__name__ + '.zip.pickle'
+        return f'./data/{cls.__name__}_base64'
 
     @classmethod
     def load( cls ):
         if not cls.persist: return  # disable persistent caching
-        if cls.cache:       return  # skip loading if the file is already in class memory
-        try:
-            # class cache may be more upto date than the pickle file, so avoid race conditions with multiple instances
-            filename   = cls.filename()
-            start_time = time.perf_counter()
-            with gzip.GzipFile(filename, 'rb') as file:  # reduce filesystem cache_size
-                # print("loading: "+cls.file )
-                data = pickle.load(file)
-                cls.cache.update({ **data, **cls.cache })
-                if cls.verbose:
-                    print("loaded: {:40s} | {:4.1f}MB in {:4.1f}s | entries: {}".format(
-                        filename,
-                        os.path.getsize(filename)/1024/1024,
-                        time.perf_counter() - start_time,
-                        cls.cache_size(cls.cache),
-                    ))
-        except (IOError, TypeError, EOFError, zlib.error) as exception:
-            pass
+        if cls.cache:       return  # skip loading if the file is already in class memory, empty dict is False
+        filename = cls.filename()
+        loaded   = base64_file_load(filename, vebose=cls.verbose)
+        if loaded:  # cls.cache should not be set to None
+            cls.cache = loaded
 
     @classmethod
     def save( cls ):
@@ -69,19 +53,8 @@ class PersistentCacheAgent:
         # cls.load()                # update any new information from the file
         if cls.cache:
             filename = cls.filename()
-            dirname  = os.path.dirname(filename)
-            if not os.path.exists(dirname): os.mkdir(dirname)
-            start_time = time.perf_counter()
-            # print("saving: " + filename )
-            with gzip.GzipFile(filename, 'wb') as file:  # reduce filesystem cache_size
-                pickle.dump(cls.cache, file)
-                if cls.verbose:
-                    print("wrote:  {:40s} | {:4.1f}MB in {:4.1f}s | entries: {}".format(
-                        filename,
-                        os.path.getsize(filename)/1024/1024,
-                        time.perf_counter() - start_time,
-                        cls.cache_size(cls.cache),
-                    ))
+            base64_file_save(cls.cache, filename, vebose=cls.verbose)
+
 
     @staticmethod
     def cache_size( data ):

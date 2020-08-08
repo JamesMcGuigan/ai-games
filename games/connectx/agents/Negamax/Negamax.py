@@ -6,8 +6,6 @@ from struct import Struct
 
 from heuristics.BitboardHeuristic import *
 
-
-
 configuration = configuration  # prevent optimize imports from removing configuration import
 
 # @njit
@@ -189,11 +187,11 @@ def Negamax(**kwargs):
         action  = negamax_deepening(
             bitboard   = bitboard,
             player_id  = player_id,
-            min_depth  = 1,
-            max_depth  = 100,
-            depth_step = 1,
-            timeout    = timeout,
-            verbose    = 1
+            min_depth  = kwargs.get('min_depth',  1),
+            max_depth  = kwargs.get('max_depth',  100),
+            depth_step = kwargs.get('depth_step', 1),
+            timeout    = kwargs.get('timeout',    timeout),
+            verbose    = kwargs.get('verbose',    1)
         )
         if is_first_move:
             return 3            # BUGFIX: always play the center on the first move | TODO: create opening book

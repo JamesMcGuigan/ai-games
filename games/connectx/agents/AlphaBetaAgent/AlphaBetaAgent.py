@@ -44,7 +44,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
     def iterative_deepening_search( self, endtime=0.0 ) -> int:
         # The real trick with iterative deepening is caching, which allows us to out-depth the default minimax Agent
         time_start = time.perf_counter()
-        if self.verbose_depth: print('\n'+ self.__class__.__name__.ljust(23) +' | depth:', end=' ', flush=True)
+        if self.verbose_depth: print(self.__class__.__name__.ljust(23) +' | depth:', end=' ', flush=True)
         best_action = random.choice(self.game.actions)
         try:
             for depth in range(1, self.search_max_depth+1, self.search_step):
@@ -59,7 +59,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
         except TimeoutError:
             pass  # This is the fastest way to exit a loop: https://www.kaggle.com/c/connectx/discussion/158190
 
-        if self.verbose_depth: print( f' = {action} | in {time.perf_counter() - time_start:.2f}s' )
+        if self.verbose_depth: print( f' = {best_action} | in {time.perf_counter() - time_start:.2f}s' )
         return int(best_action)
 
 

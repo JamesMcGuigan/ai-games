@@ -7,6 +7,7 @@ from kaggle_environments.envs.connectx.connectx import random_agent
 
 from agents.AlphaBetaAgent.AlphaBetaAgent import AlphaBetaAgent
 from agents.AlphaBetaAgent.AlphaBetaBitboard import AlphaBetaBitboard
+from agents.AlphaBetaAgent.MinimaxBitboard import MinimaxBitboard
 from agents.MontyCarlo.AntColonyTreeSearch import AntColonyTreeSearch
 from agents.MontyCarlo.MontyCarloHeuristic import MontyCarloHeuristic
 from agents.MontyCarlo.MontyCarloLinkedList import MontyCarloLinkedList
@@ -15,7 +16,8 @@ from agents.Negamax.Negamax import Negamax
 training_agents = [
     # AntColonyTreeSearch(),
     # MontyCarloLinkedList(),
-    MontyCarloHeuristic(),
+    # MontyCarloHeuristic(),
+    MinimaxBitboard.agent(),
 ]
 opponent_agents = [
     random_agent,

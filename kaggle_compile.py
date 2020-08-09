@@ -27,7 +27,7 @@ module_names = [ name for name in os.listdir(args.python_path)
                  if os.path.isdir(os.path.join(args.python_path, name))
                  and not name.startswith('.') ]
 module_regex = '(?:' + "|".join(map(re.escape, module_names)) + ')'
-import_regex = re.compile(fr'^from\s+({module_regex}.*?)\s+import', re.MULTILINE)
+import_regex = re.compile(fr'^from\s+({module_regex}\b.*?)\s+import', re.MULTILINE)
 assert_regex = re.compile(fr'\bassert\s', re.MULTILINE)
 
 

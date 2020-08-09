@@ -133,7 +133,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
             # - 0.75s = kaggle error rate of 26/154 = 15%
             # - 1.15s = kaggle error rate of 16/360 = 4.5%
             gc.disable()
-            safety_time = 1.5    # 250ms fails on Kaggle Submit
+            safety_time = 2    # 250ms fails on Kaggle Submit
             endtime = time.perf_counter() + configuration.timeout - safety_time
 
             game    = cls.game_class(observation, configuration, heuristic_class, **kwargs)

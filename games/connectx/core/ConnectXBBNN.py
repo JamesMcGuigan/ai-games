@@ -8,8 +8,6 @@ from typing import Union
 import numba
 import numpy as np
 
-
-
 # Hardcode for simplicity
 # observation   = {'mark': 1, 'board': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
 # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 8}
@@ -174,7 +172,7 @@ def coords_to_index(row: int, column: int) -> int:
 ### Moves
 
 #@njit(int64[:](int8))
-def get_bitcount_mask(size: int) -> np.ndarray:
+def get_bitcount_mask(size: int = configuration.columns * configuration.rows) -> np.ndarray:
     # return np.array([1 << index for index in range(0, size)], dtype=np.int64)
     return 1 << np.arange(0, size, dtype=np.int64)
 
@@ -189,6 +187,7 @@ def get_move_number(bitboard: np.ndarray) -> int:
     return move_number
 
 
+mask_board       = (1 << configuration.columns * configuration.rows) - 1
 mask_legal_moves = (1 << configuration.columns) - 1
 
 #@njit

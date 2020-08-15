@@ -3,7 +3,7 @@
 import random
 from struct import Struct
 
-from agents.MontyCarlo.MontyCarloLinkedList import MontyCarloNode
+from agents.MontyCarlo.MontyCarloPure import MontyCarloNode
 from core.ConnectXBBNN import *
 from heuristics.BitboardGameoversHeuristic import bitboard_gameovers_heuristic
 from util.sigmoid import scaled_sigmoid

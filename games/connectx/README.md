@@ -149,11 +149,11 @@ alpha-pruning code.
 
 ## Pure Monty Carlo Search
 Leaderboard Scores: 
-- **1075 (top 6%)** | [MontyCarloLinkedList + Cached Data](https://www.kaggle.com/c/connectx/submissions?dialog=episodes-submission-16816641)
-- **1065 (top 7%)** | [MontyCarloLinkedList](https://www.kaggle.com/c/connectx/submissions?dialog=episodes-submission-16779472)
+- **1075 (top 6%)** | [MontyCarloPure + Cached Data](https://www.kaggle.com/c/connectx/submissions?dialog=episodes-submission-16816641)
+- **1065 (top 7%)** | [MontyCarloPure](https://www.kaggle.com/c/connectx/submissions?dialog=episodes-submission-16779472)
 
 Source:
-- [agents/MontyCarlo/MontyCarloLinkedList.py](agents/MontyCarlo/MontyCarloLinkedList.py)
+- [agents/MontyCarlo/MontyCarloPure.py](agents/MontyCarlo/MontyCarloPure.py)
 
 Whereas Minimax / Negamax performs a breadth first search of the game state tree, Monty Carlo selectively expands
 the tree deeper in areas where success is more probable. Tree/graph expansion follows a similar shape to A* search. 
@@ -177,7 +177,7 @@ Leaderboard Scores:
 - **1070 (top 6%)** | [MontyCarloHeuristic + BitboardGameoversHeuristic](https://www.kaggle.com/c/connectx/submissions?dialog=episodes-submission-16783457)
 
 Source:
-- [agents/MontyCarlo/MontyCarloLinkedList.py](agents/MontyCarlo/MontyCarloLinkedList.py)
+- [agents/MontyCarlo/MontyCarloPure.py](agents/MontyCarlo/MontyCarloPure.py)
 
 This approach replaces random simulation (producing an integer score of 0|1) with a sigmoided version of 
 `bitboard_gameovers_heuristic()` (producing a floating point score between 0 and 1). 

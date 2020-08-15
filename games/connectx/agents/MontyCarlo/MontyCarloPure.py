@@ -330,12 +330,12 @@ class MontyCarloNode:
         return int(action)
 
 
-def MontyCarloLinkedList(**kwargs):
+def MontyCarloPure(**kwargs):
     # observation   = {'mark': 1, 'board': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
     # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 8}
-    def MontyCarloLinkedList(observation: Struct, configuration: Struct) -> int:
+    def MontyCarloPure(observation: Struct, configuration: Struct) -> int:
         return MontyCarloNode.agent(observation, configuration, **kwargs)
-    return MontyCarloLinkedList
+    return MontyCarloPure
 
-def MontyCarloLinkedListKaggle(observation, configuration):
-    return MontyCarloLinkedList()(observation, configuration)
+def MontyCarloPureKaggle(observation, configuration):
+    return MontyCarloPure()(observation, configuration)

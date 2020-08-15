@@ -10,12 +10,12 @@ from agents.AlphaBetaAgent.AlphaBetaBitboard import AlphaBetaBitboard
 from agents.AlphaBetaAgent.MinimaxBitboard import MinimaxBitboard
 from agents.MontyCarlo.AntColonyTreeSearch import AntColonyTreeSearch
 from agents.MontyCarlo.MontyCarloHeuristic import MontyCarloHeuristic
-from agents.MontyCarlo.MontyCarloLinkedList import MontyCarloLinkedList
+from agents.MontyCarlo.MontyCarloPure import MontyCarloPure
 from agents.Negamax.Negamax import Negamax
 
 training_agents = [
     # AntColonyTreeSearch(),
-    # MontyCarloLinkedList(),
+    # MontyCarloPure(),
     # MontyCarloHeuristic(),
     MinimaxBitboard.agent(),
 ]
@@ -25,7 +25,7 @@ opponent_agents = [
     AlphaBetaAgent.agent(),
     AlphaBetaBitboard.agent(),
     AntColonyTreeSearch(),
-    MontyCarloLinkedList(),
+    MontyCarloPure(),
     MontyCarloHeuristic(),
     Negamax(),
     *[ Negamax(max_depth=max_depth) for max_depth in range(1,8+1) ],

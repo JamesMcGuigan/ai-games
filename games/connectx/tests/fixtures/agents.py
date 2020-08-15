@@ -11,7 +11,7 @@ from agents.Negamax.Negamax import Negamax
 agents = [
     ('AntColonyTreeSearch',  AntColonyTreeSearch()),
     ('MontyCarloHeuristic',  MontyCarloHeuristic()),
-    ('MontyCarloPure', MontyCarloPure()),
+    ('MontyCarloPure',       MontyCarloPure()),
     ('Negamax',              Negamax()),
     ('AlphaBetaAgent',       AlphaBetaAgent.agent()),
     ('AlphaBetaBitboard',    AlphaBetaBitboard.agent()),

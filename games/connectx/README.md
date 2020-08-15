@@ -318,6 +318,31 @@ Work in progress: create testcases for which @njit functionality works inside ka
 - https://www.kaggle.com/jamesmcguigan/connectx-numba-testcases
 
 
+# Tests
+## Unit Tests
+- [./heuristics/LibertiesHeuristic_test.py](./heuristics/LibertiesHeuristic_test.py)
+- [./core/ConnectXBBN_test.py](./core/ConnectXBBN_test.py)
+- [./core/ConnectX_test.py](./core/ConnectX_test.py)
+- [./core/ConnectXBitboard_test.py](./core/ConnectXBitboard_test.py)
+- [./util/base64_file_test.py](./util/base64_file_test.py)
+
+Unit tests validate that individual functions work as expected.
+
+
+## Integration Tests
+- [tests/test_board_positions.py](tests/test_board_positions.py)
+- [tests/test_can_win_against.py](tests/test_can_win_against.py)
+
+Integration testing can be applied to AI algorithms by giving them game puzzles to solve, 
+especially in positions where a human can verify that there is only one (or two) winning/losing moves.
+
+The simplest is being one move away from connect 4 and seeing if the agent can either find the winning move, 
+or block the opponent from that square. More complicated positions include being able to spot a double attack, 
+which requires a Minimax search depth of 4, or knowing which column to play during an endgame. 
+
+A second form of integration tests is a live matchup against the inbuilt kaggle agents: random and negamax.
+Any leaderboard worthy agent should be able score a near 100% winrate against these opponents, 
+so a logic mistake in the algorithm will show up as a test failure.
 
 
 # Future Ideas

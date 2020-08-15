@@ -5,7 +5,7 @@ from struct import Struct
 
 from agents.MontyCarlo.MontyCarloLinkedList import MontyCarloNode
 from core.ConnectXBBNN import *
-from heuristics.BitboardHeuristic import bitboard_gameovers_heuristic
+from heuristics.BitboardGameoversHeuristic import bitboard_gameovers_heuristic
 from util.sigmoid import scaled_sigmoid
 
 Hyperparameters = namedtuple('hyperparameters', [])

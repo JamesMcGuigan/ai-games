@@ -270,7 +270,7 @@ Leaderboard Scores:
 
 
 Code:
-- [heuristics/BitboardHeuristic.py](heuristics/BitboardHeuristic.py)
+- [heuristics/BitboardHeuristic.py](heuristics/BitboardGameoversHeuristic.py)
 
 This was a first attempt to write a performance optimized heuristic using vectorized bitshifting
 

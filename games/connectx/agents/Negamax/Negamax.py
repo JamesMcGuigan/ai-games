@@ -4,7 +4,7 @@
 import time
 from struct import Struct
 
-from heuristics.BitboardHeuristic import *
+from heuristics.BitboardGameoversHeuristic import *
 
 configuration = configuration  # prevent optimize imports from removing configuration import
 

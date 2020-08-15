@@ -3,8 +3,6 @@ import sys
 
 from core.ConnectXBBNN import *
 
-
-
 # Hyperparameters
 single_square_score = 0.1  # Mostly ignore single squares, that can make lines in 8 directions
 double_attack_score = 0.5  # 0.5 == 100% winrate vs AlphaBetaAgent

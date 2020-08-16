@@ -176,6 +176,8 @@ def get_bitcount_mask(size: int = configuration.columns * configuration.rows) ->
     # return np.array([1 << index for index in range(0, size)], dtype=np.int64)
     return 1 << np.arange(0, size, dtype=np.int64)
 
+bitcount_mask = get_bitcount_mask()
+
 
 #@njit(int8(int64[:]))
 def get_move_number(bitboard: np.ndarray) -> int:

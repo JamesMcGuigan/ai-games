@@ -1,3 +1,5 @@
+from fastcache._lrucache import clru_cache
+
 from core.ConnectXBBNN import *
 
 ### Predefine masks
@@ -9,93 +11,31 @@ mask_columns = np.array([
 ], dtype=np.int64)
 
 
+
 def get_oddeven_bitboard( bitboard: np.ndarray ) -> Tuple[int,int]:
     # This is the slow but simple method, loop over the grid and draw the odd/even bit pixels one by one
-    bitcount_mask = get_bitcount_mask(configuration.columns * configuration.rows)
-    column_values = (bitboard[0] & mask_columns[:]) >> np.arange(0,len(mask_columns))
-    column_counts = np.array([ np.count_nonzero( bitcount_mask[:] & value ) if value else 0 for value in column_values ])
-    column_spaces = configuration.rows - column_counts
-
-    odd = 0
-    for col in range(configuration.columns):
-        for height, row in enumerate(range(column_spaces[col]-1, -1, -1)):
-            if height % 2 == 1:       # is odd
-                index = (col + row * configuration.columns)
-                odd  |= (1 << index)  # set odd pixel
-
+    column_values = (bitboard[0] & mask_columns[:])
+    odd_columns = [
+        get_odd_column(column_value, col)  # OPTIMIZATION: cache the inner loop
+        for col, column_value in enumerate(column_values)
+    ]
+    odd  = sum(odd_columns)
     even = ~odd & ~bitboard[0] & mask_board
     return (odd,even)
 
 
-# # 7x3 bitmasks indicating the odd pixels in each column
-# mask_is_odd = np.array([
-#     [
-#         1 << (col + row * configuration.columns)
-#         for row in range(configuration.rows)
-#         if row % 2 == 0
-#     ]
-#     for col in range(configuration.columns)
-# ], dtype=np.int64)
-#
-# # 7x3 bitmasks indicating the even pixels in each column
-# mask_is_even = np.array([
-#     [
-#         1 << (col + row * configuration.columns + 1)
-#         for row in range(configuration.rows)
-#         if row % 2 == 0
-#     ]
-#     for col in range(configuration.columns)
-# ], dtype=np.int64)
-#
-# # 2x1 Oddeven bitmasks for the first column
-# mask_oddeven = np.array([
-#     np.sum([ 1 << (row * configuration.columns) for row in range(1, configuration.rows, 2) ]),  # Even
-#     np.sum([ 1 << (row * configuration.columns) for row in range(0, configuration.rows, 2) ]),  # Odd
-# ], dtype=np.int64)
-#
-# # 7x2 Oddeven bitmasks[col, oddeven] aligned with columns
-# mask_oddeven_columns = np.array([
-#     mask_oddeven[:] << (col * configuration.rows)
-#     for col in range(configuration.columns)
-# ])
+@clru_cache(None)  # size = 2**configuration.rows * configuration.columns == 448
+def get_odd_column( column_bitmask: int, col: int ) -> int:
+    column_count = np.count_nonzero( bitcount_mask[:] & column_bitmask )
+    column_space = configuration.rows - column_count
 
+    odd = 0
+    for height, row in enumerate(range(column_space-1, -1, -1)):
+        if height % 2 == 1:       # is odd
+            index = (col + row * configuration.columns)
+            odd  |= (1 << index)  # set odd pixel
 
-### This version is buggy
-# def get_oddeven_bitboard( bitboard: np.ndarray ) -> np.ndarray:
-#     """
-#     Create bitmasks for odd/even pixels relative to the current floor.
-#     This will help calculate if a move can be forced.
-#     """
-#     columns_played = bitboard[0] & mask_columns[:]   # extract out individual columns
-#
-#     # If there are more played odd rows than even rows, then the column is odd=True else even=False
-#     columns_is_odd = (
-#           np.count_nonzero( columns_played & mask_is_odd.T,  axis=0)
-#         > np.count_nonzero( columns_played & mask_is_even.T, axis=0)
-#     ).astype(np.int8)
-#
-#     # Pick the appropriate mask from mask_oddeven_columns, given that we now know
-#     odd_overlays = np.array([
-#         mask_oddeven_columns[col, oddeven]
-#         for col, oddeven in enumerate(columns_is_odd)
-#     ], dtype=np.int64)
-#     even_overlays = np.array([
-#         mask_oddeven_columns[col, oddeven]
-#         for col, oddeven in enumerate(~columns_is_odd)
-#     ], dtype=np.int64)
-#
-#     # convert back to a single number
-#     odd_overlay  = np.sum(odd_overlays)
-#     even_overlay = np.sum(even_overlays)
-#
-#     # Remove played squares from output bitmasks and return as 2x1 bitboard
-#     output = np.array([
-#         odd_overlay  & ~bitboard[0],
-#         even_overlay & ~bitboard[0],
-#     ])
-#     return output
-
-
+    return odd
 
 
 

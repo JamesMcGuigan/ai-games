@@ -8,21 +8,23 @@ mask_columns = np.array([
     for col in range(configuration.columns)
 ], dtype=np.int64)
 
-def get_oddeven_bitboard( bitboard: np.ndarray ) -> np.ndarray:
+
+def get_oddeven_bitboard( bitboard: np.ndarray ) -> Tuple[int,int]:
     # This is the slow but simple method, loop over the grid and draw the odd/even bit pixels one by one
     bitcount_mask = get_bitcount_mask(configuration.columns * configuration.rows)
     column_values = (bitboard[0] & mask_columns[:]) >> np.arange(0,len(mask_columns))
     column_counts = np.array([ np.count_nonzero( bitcount_mask[:] & value ) if value else 0 for value in column_values ])
     column_spaces = configuration.rows - column_counts
-    oddeven       = np.array([0,0], dtype=np.int64)
+
+    odd = 0
     for col in range(configuration.columns):
         for height, row in enumerate(range(column_spaces[col]-1, -1, -1)):
-            index = (col + row * configuration.columns)
-            if height % 2 == 1:  # is odd
-                oddeven[0] |= (1 << index)  # odd
-            else:
-                oddeven[1] |= (1 << index)  # even
-    return oddeven
+            if height % 2 == 1:       # is odd
+                index = (col + row * configuration.columns)
+                odd  |= (1 << index)  # set odd pixel
+
+    even = ~odd & ~bitboard[0] & mask_board
+    return (odd,even)
 
 
 # # 7x3 bitmasks indicating the odd pixels in each column

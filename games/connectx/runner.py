@@ -7,6 +7,7 @@ from kaggle_environments import make
 
 from agents.AlphaBetaAgent.AlphaBetaAgent import AlphaBetaAgent
 from agents.AlphaBetaAgent.AlphaBetaBitboard import AlphaBetaBitboard
+from agents.AlphaBetaAgent.AlphaBetaBitboardEvenOdd import AlphaBetaBitboardEvenOdd
 from agents.AlphaBetaAgent.MinimaxBitboard import MinimaxBitboard
 from agents.MontyCarlo.AntColonyTreeSearch import AntColonyTreeSearch
 from agents.MontyCarlo.MontyCarloHeuristic import MontyCarloHeuristic
@@ -45,6 +46,7 @@ for agent_name, position in [ (argv.p1, 'p1'), (argv.p2, 'p2') ]:
     kwargs = (argv.arg1 if position == 'p1' else argv.arg2) or {}
     if   agent_name == 'AlphaBetaAgent':           agent = AlphaBetaAgent.agent(**kwargs)
     elif agent_name == 'AlphaBetaBitboard':        agent = AlphaBetaBitboard.agent(**kwargs)
+    elif agent_name == 'AlphaBetaBitboardEvenOdd': agent = AlphaBetaBitboardEvenOdd.agent(**kwargs)
     elif agent_name == 'MinimaxBitboard':          agent = MinimaxBitboard.agent(**kwargs)
     elif agent_name == 'MontyCarloPure':           agent = MontyCarloPure(**kwargs)
     elif agent_name == 'MontyCarloHeuristic':      agent = MontyCarloHeuristic(**kwargs)

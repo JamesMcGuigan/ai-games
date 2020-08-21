@@ -45,21 +45,26 @@ class AlphaBetaAgent(PersistentCacheAgent):
         # The real trick with iterative deepening is caching, which allows us to out-depth the default minimax Agent
         time_start = time.perf_counter()
         if self.verbose_depth: print(self.__class__.__name__.ljust(23) +' | depth:', end=' ', flush=True)
+        score       = 0
         best_action = random.choice(self.game.actions)
         try:
             for depth in range(1, self.search_max_depth+1, self.search_step):
                 action, score = self.alphabeta(self.game, depth=depth, endtime=endtime)
-                if endtime and time.perf_counter() >= endtime: break  # ignore results on timeout
 
-                best_action = action
-                if self.verbose_depth: print(depth, end=' ', flush=True)
+                if endtime and time.perf_counter() >= endtime: break  # ignore results on timeout
+                if self.verbose_depth: print(f'{depth} ({action}={score:.1f})', end=' ', flush=True)
+
+                # BUGFIX: if losing, then pick the best action from the previous depth
+                # prevent: test_single_column() | depth: 1 (5=-4.8) 2 (5=-13.7) 3 (5=-8.9) 4 (5=-9.2) 5 (5=-8.6) 6 (1=-inf)
+                if score != -math.inf:
+                    best_action = action
                 if abs(score) == math.inf:
                     # if self.verbose_depth: print(score, end=' ', flush=True)
                     break  # terminate iterative deepening on inescapable victory condition
         except TimeoutError:
             pass  # This is the fastest way to exit a loop: https://www.kaggle.com/c/connectx/discussion/158190
 
-        if self.verbose_depth: print( f' = {best_action} | in {time.perf_counter() - time_start:.2f}s' )
+        if self.verbose_depth: print( f' | action {best_action} = {score} | in {time.perf_counter() - time_start:.2f}s' )
         return int(best_action)
 
 
@@ -67,7 +72,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
         scores = []
         best_action = random.choice(game.actions)
         best_score  = -math.inf
-        for action in random.sample(game.actions, len(game.actions)):
+        for action in game.actions:
             if endtime and time.perf_counter() >= endtime: raise TimeoutError
             result = game.result(action)
             score  = self.alphabeta_min_value(result, player_id=self.player_id, depth=depth-1, endtime=endtime)

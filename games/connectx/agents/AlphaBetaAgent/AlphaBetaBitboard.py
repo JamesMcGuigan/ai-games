@@ -1,11 +1,12 @@
 from agents.AlphaBetaAgent.AlphaBetaAgent import AlphaBetaAgent
 from core.ConnextXBitboard import ConnectXBitboard
+from heuristics.BitboardGameoversHeuristic import bitboard_gameovers_heuristic
 
 
 class AlphaBetaBitboard(AlphaBetaAgent):
     game_class      = ConnectXBitboard
     heuristic_class = None
-    heuristic_fn    = None
+    heuristic_fn    = bitboard_gameovers_heuristic
 
 
 # The last function defined in the file run by Kaggle in submission.csv

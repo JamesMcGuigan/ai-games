@@ -16,9 +16,14 @@ class ConnectXBitboard(ConnectX):
     # observation   = {'mark': 1, 'board': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
     # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 2}
 
-    def __init__( self, observation, configuration,
-                  heuristic_class: Callable=None, heuristic_fn: Callable=None,
-                  verbose=True, **kwargs ):
+    def __init__( self,
+                  observation,
+                  configuration,
+                  heuristic_class: Callable=None,
+                  heuristic_fn:    Callable=bitboard_gameovers_heuristic,
+                  verbose=True,
+                  **kwargs
+    ):
         super().__init__(
             observation     = observation,
             configuration   = configuration,
@@ -194,6 +199,6 @@ class ConnectXBitboard(ConnectX):
             100% vs AlphaBetaAgent - + double_attack_score=0.5 with math.log2() (mostly wins)
         """
         last_player_to_move = 1 if self.player_id == 2 else 2
-        if self.heuristic_class: return self.heuristic_class().score()
+        if self.heuristic_class: return self.heuristic_class(self).score()
         if self.heuristic_fn:    return self.heuristic_fn(self.bitboard, last_player_to_move)
         else:                    return bitboard_gameovers_heuristic(self.bitboard, last_player_to_move)

@@ -38,6 +38,7 @@ def list_to_bitboard(listboard: Union[np.ndarray,List[int]]) -> np.ndarray:
     # bitboard[1] = player, who's token is this, if filled | 0 = empty, 1 = filled
     bitboard_played = 0  # 42 bit number for if board square has been played
     bitboard_player = 0  # 42 bit number for player 0=p1 1=p2
+    if isinstance(listboard, np.ndarray): listboard = listboard.flatten()
     for n in range(len(listboard)):  # prange
         if listboard[n] != 0:
             bitboard_played |= (1 << n)        # is a square filled (0 = empty | 1 = filled)

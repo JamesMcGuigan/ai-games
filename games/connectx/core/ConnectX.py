@@ -7,7 +7,9 @@ from typing import Union
 
 import numpy as np
 
+from core.ConnectXBBNN import list_to_bitboard
 from core.KaggleGame import KaggleGame
+from util.vendor.cached_property import cached_property
 
 
 class ConnectX(KaggleGame):
@@ -48,6 +50,10 @@ class ConnectX(KaggleGame):
 
     ### Utility Methods
 
+    @cached_property
+    def bitboard(self):
+        return list_to_bitboard(self.board)
+
     def cast_board( self, board: Union[np.ndarray,List[int]], copy=False ) -> np.ndarray:
         if isinstance(board, np.ndarray):
             if copy: return board.copy()
@@ -55,8 +61,6 @@ class ConnectX(KaggleGame):
         else:
             board = np.array(board, dtype=np.int8).reshape(self.rows, self.columns)
             return board
-
-
 
 
     ### Result Methods

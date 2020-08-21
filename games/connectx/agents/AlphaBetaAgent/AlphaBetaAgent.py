@@ -15,6 +15,7 @@ from heuristics.LibertiesHeuristic import LibertiesHeuristic
 class AlphaBetaAgent(PersistentCacheAgent):
     game_class      = ConnectX
     heuristic_class = LibertiesHeuristic
+    heuristic_fn    = None
     defaults = {
         "verbose_depth":    True,
         "search_max_depth": 100,  # if "pytest" not in sys.modules else 3,
@@ -30,6 +31,8 @@ class AlphaBetaAgent(PersistentCacheAgent):
         self.verbose_depth    = self.kwargs.get('verbose_depth')
         self.search_max_depth = self.kwargs.get('search_max_depth')
         self.search_step      = self.kwargs.get('search_step', 1)
+        self.heuristic_class  = self.kwargs.get('heuristic_class', self.__class__.heuristic_class)
+        self.heuristic_fn     = self.kwargs.get('heuristic_fn',    self.__class__.heuristic_fn)
 
 
     ### Public Interface
@@ -44,7 +47,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
     def iterative_deepening_search( self, endtime=0.0 ) -> int:
         # The real trick with iterative deepening is caching, which allows us to out-depth the default minimax Agent
         time_start = time.perf_counter()
-        if self.verbose_depth: print(self.__class__.__name__.ljust(23) +' | depth:', end=' ', flush=True)
+        if self.verbose_depth: print(self.__class__.__name__.ljust(25) +' | depth:', end=' ', flush=True)
         score       = 0
         best_action = random.choice(self.game.actions)
         try:
@@ -64,7 +67,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
         except TimeoutError:
             pass  # This is the fastest way to exit a loop: https://www.kaggle.com/c/connectx/discussion/158190
 
-        if self.verbose_depth: print( f' | action {best_action} = {score} | in {time.perf_counter() - time_start:.2f}s' )
+        if self.verbose_depth: print( f' | action {best_action} = {score:.1f} | in {time.perf_counter() - time_start:.2f}s' )
         return int(best_action)
 
 
@@ -92,7 +95,7 @@ class AlphaBetaAgent(PersistentCacheAgent):
 
         sign = 1 if player_id != game.player_id else -1
         if game.gameover():  return sign * game.utility()  # score relative to previous player who made the move
-        if depth == 0:       return sign * game.score()
+        if depth == 0:       return sign * self.score(game)
         scores = []
         score  = math.inf
         for action in game.actions:
@@ -110,8 +113,8 @@ class AlphaBetaAgent(PersistentCacheAgent):
         if endtime and time.perf_counter() >= endtime: raise TimeoutError
 
         sign = 1 if player_id != game.player_id else -1
-        if game.gameover():  return sign * game.utility()  # score relative to previous player who made the move
-        if depth == 0:       return sign * game.score()
+        if game.gameover():  return sign * game.utility()    # score relative to previous player who made the move
+        if depth == 0:       return sign * self.score(game)
         scores = []
         score  = -math.inf
         for action in game.actions:
@@ -123,7 +126,13 @@ class AlphaBetaAgent(PersistentCacheAgent):
             scores.append(score)  # for debugging
         return score
 
+    ### Score methods
 
+    def score(self, game: ConnectX):
+        last_player_to_move = 1 if game.player_id == 2 else 2
+        if   self.heuristic_class: return self.heuristic_class(game).score()
+        elif self.heuristic_fn:    return self.heuristic_fn(game.bitboard, last_player_to_move)
+        else:                      return game.score()
 
     ### Exported Interface
 

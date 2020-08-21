@@ -1,5 +1,6 @@
 import math
 from copy import deepcopy
+from typing import Callable
 from typing import Type
 from typing import Union
 
@@ -10,7 +11,6 @@ from kaggle_environments import make
 from core.ConnectX import ConnectX
 from core.ConnextXBitboard import ConnectXBitboard
 from core.Heuristic import Heuristic
-
 
 
 @pytest.fixture
@@ -32,8 +32,17 @@ def heuristic_class() -> Union[None,Type[Heuristic]]:
     return None
 
 @pytest.fixture
-def game(observation, configuration, heuristic_class) -> ConnectX:
-    return ConnectXBitboard(observation, configuration, heuristic_class)
+def heuristic_fn() -> Union[None,Type[Heuristic]]:
+    return None
+
+@pytest.fixture
+def game(observation, configuration, heuristic_class: Callable=None, heuristic_fn: Callable=None) -> ConnectX:
+    return ConnectXBitboard(
+        observation     = observation,
+        configuration   = configuration,
+        heuristic_class = heuristic_class,
+        heuristic_fn    = heuristic_fn
+    )
 
 
 def test_cast_numpy(game):

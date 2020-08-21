@@ -1,4 +1,3 @@
-import itertools
 import math
 from typing import Callable
 from typing import List
@@ -9,14 +8,24 @@ import numpy as np
 from fastcache import clru_cache
 
 from core.ConnectX import ConnectX
+from heuristics.BitboardGameoversHeuristic import bitboard_gameovers_heuristic
+from util.vendor.cached_property import cached_property
 
 
 class ConnectXBitboard(ConnectX):
     # observation   = {'mark': 1, 'board': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
     # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 2}
 
-    def __init__( self, observation, configuration, heuristic_class: Callable=None, verbose=True, **kwargs ):
-        super().__init__(observation, configuration, heuristic_class, verbose)
+    def __init__( self, observation, configuration,
+                  heuristic_class: Callable=None, heuristic_fn: Callable=None,
+                  verbose=True, **kwargs ):
+        super().__init__(
+            observation     = observation,
+            configuration   = configuration,
+            heuristic_class = heuristic_class,
+            heuristic_fn    = heuristic_fn,
+            verbose         = verbose
+        )
 
 
     ### Magic Methods
@@ -33,6 +42,15 @@ class ConnectXBitboard(ConnectX):
 
 
     ### Utility Methods
+
+    # BBNN and later code uses np.array([ int64, int64 ]) format rather than int128
+    @cached_property
+    def bitboard(self):
+        bitboard_size  = self.columns * self.rows
+        played_board   = self.board & ((1 << bitboard_size) - 1)
+        player_board   = self.board >> bitboard_size
+        bitboard       = np.array([played_board, player_board], np.int64)
+        return bitboard
 
     # noinspection PyMethodOverriding
     def cast_board(self, board: Union[int,List[int]]) -> int:
@@ -175,46 +193,7 @@ class ConnectXBitboard(ConnectX):
              80% vs AlphaBetaAgent - + double_attack_score=8   with math.log2() (mostly wins)
             100% vs AlphaBetaAgent - + double_attack_score=0.5 with math.log2() (mostly wins)
         """
-        if self.heuristic_class: return self.heuristic().score()
-
-        gameovers      = self.get_gameovers(rows=self.rows, columns=self.columns, inarow=self.inarow)
-        bitboard_size  = self.columns * self.rows
-        invert_mask    = (1 << bitboard_size+1)-1
-        player_board   = self.board >> bitboard_size
-        p1_tokens      = self.board & (player_board ^ invert_mask)
-        p2_tokens      = self.board & player_board
-
-        p1_score = 0.0
-        p2_score = 0.0
-        p1_gameovers = []
-        p2_gameovers = []
-        for gameover in gameovers:
-            p1_can_play = p1_tokens & gameover
-            p2_can_play = p2_tokens & gameover
-            if p1_can_play and not p2_can_play:
-                if   p1_can_play == gameover:         p1_score += math.inf   # Connect 4
-                elif math.log2(p1_can_play) % 1 == 0: p1_score += 0.1        # Mostly ignore single square lines
-                else:                                 p1_score += 1; p1_gameovers.append(gameover);
-            elif p2_can_play and not p1_can_play:
-                if   p2_can_play == gameover:         p2_score += math.inf   # Connect 4
-                elif math.log2(p2_can_play) % 1 == 0: p2_score += 0.1        # Mostly ignore single square lines
-                else:                                 p2_score += 1; p2_gameovers.append(gameover);
-
-        double_attack_score = 0.5  # 0.5 == 100% winrate vs AlphaBetaAgent
-        for gameover1, gameover2 in itertools.product(p1_gameovers, p1_gameovers):
-            overlap = gameover1 & gameover2
-            if gameover1 == gameover2:      continue  # Ignore self
-            if overlap == 0:                continue  # Ignore no overlap
-            if math.log2(overlap) % 1 != 0: continue  # Only count double_attacks with a single overlap square
-            p1_score += double_attack_score
-        for gameover1, gameover2 in itertools.product(p2_gameovers, p2_gameovers):
-            overlap = gameover1 & gameover2
-            if gameover1 == gameover2:      continue  # Ignore self
-            if overlap == 0:                continue  # Ignore no overlap
-            if math.log2(overlap) % 1 != 0: continue  # Only count double_attacks with a single overlap square
-            p2_score += double_attack_score
-
-        if self.player_id != 1:  # perspective of the previous move
-            return p1_score - p2_score
-        else:
-            return p2_score - p1_score
+        last_player_to_move = 1 if self.player_id == 2 else 2
+        if self.heuristic_class: return self.heuristic_class().score()
+        if self.heuristic_fn:    return self.heuristic_fn(self.bitboard, last_player_to_move)
+        else:                    return bitboard_gameovers_heuristic(self.bitboard, last_player_to_move)

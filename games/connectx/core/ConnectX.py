@@ -14,8 +14,16 @@ class ConnectX(KaggleGame):
 
     # observation   = {'mark': 1, 'board': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
     # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 2}
-    def __init__( self, observation, configuration, heuristic_class: Callable=None, verbose=True, **kwargs ):
-        super().__init__(observation, configuration, heuristic_class, verbose)
+    def __init__( self, observation, configuration,
+                  heuristic_class: Callable=None, heuristic_fn: Callable=None,
+                  verbose=True, **kwargs ):
+        super().__init__(
+            observation     = observation,
+            configuration   = configuration,
+            heuristic_class = heuristic_class,
+            heuristic_fn    = heuristic_fn,
+            verbose         = verbose
+        )
         self.players:   int = 2  # Numba doesn't like class properties
         self.rows:      int = configuration.rows
         self.columns:   int = configuration.columns
@@ -58,7 +66,13 @@ class ConnectX(KaggleGame):
         if not hasattr(self, '_results_cache'): self._results_cache = {}
         if action not in self._results_cache:
             observation = self.result_observation(self.observation, action)
-            result      = self.__class__(observation, self.configuration, self.heuristic_class, self.verbose)
+            result      = self.__class__(
+                observation     = observation,
+                configuration   = self.configuration,
+                heuristic_class = self.heuristic_class,
+                heuristic_fn    = self.heuristic_fn,
+                verbose         = self.verbose,
+            )
             self._results_cache[action] = result
         return self._results_cache[action]
 

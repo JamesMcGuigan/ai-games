@@ -5,6 +5,7 @@ from core.ConnextXBitboard import ConnectXBitboard
 class AlphaBetaBitboard(AlphaBetaAgent):
     game_class      = ConnectXBitboard
     heuristic_class = None
+    heuristic_fn    = None
 
 
 # The last function defined in the file run by Kaggle in submission.csv

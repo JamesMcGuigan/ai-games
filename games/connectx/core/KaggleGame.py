@@ -18,7 +18,7 @@ class KaggleGame:
         return random.choice(game.actions())
     """
 
-    def __init__(self, observation, configuration, heuristic_class, verbose=True):
+    def __init__(self, observation, configuration, heuristic_class, heuristic_fn, verbose=True):
         self.time_start         = time.perf_counter()
         self.observation        = observation
         self.configuration      = configuration
@@ -26,6 +26,7 @@ class KaggleGame:
         self.player_id          = None
         self._hash              = None
         self.heuristic_class    = heuristic_class
+        self.heuristic_fn       = heuristic_fn
         self.actions: List[int] = []  # self.get_actions()
 
     def __hash__(self):
@@ -44,7 +45,11 @@ class KaggleGame:
     def result( self, action ) -> 'KaggleGame':
         """This returns the next KaggleGame after applying action"""
         observation = self.result_observation(self.observation, action)
-        return self.__class__(observation, self.configuration, self.verbose)
+        return self.__class__(
+            observation   = observation,
+            configuration = self.configuration,
+            verbose       = self.verbose
+        )
 
     def result_observation( self, observation: Struct, action ) -> Dict:
         """This returns the next observation after applying action"""

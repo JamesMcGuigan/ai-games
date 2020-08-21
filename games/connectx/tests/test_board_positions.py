@@ -4,7 +4,6 @@ from kaggle_environments.envs.connectx.connectx import play
 from tests.fixtures.agents import agents
 
 
-
 @pytest.mark.parametrize("agent_name, agent", agents)
 def test_p1_one_move_to_win(observation, configuration, agent_name, agent):
     observation.mark  = 1
@@ -127,7 +126,7 @@ def test_foil_double_attack_2(observation, configuration, agent_name, agent):
     action = agent(observation, configuration)
     assert action in [2, 5]
 
-
+# BUG: this test randomly fails for AlphaBetaAgent
 @pytest.mark.parametrize("agent_name, agent", agents)
 def test_single_column(observation, configuration, agent_name, agent):
     configuration.timeout = 60

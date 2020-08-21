@@ -8,3 +8,4 @@ kaggle_environments
 numba
 numpy
 pytest
+joblib

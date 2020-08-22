@@ -130,7 +130,11 @@ class AlphaBetaAgent(PersistentCacheAgent):
 
     def score(self, game: ConnectX):
         last_player_to_move = 1 if game.player_id == 2 else 2
-        if   self.heuristic_class: return self.heuristic_class(game).score()
+        if self.heuristic_class:
+            # WORKAROUND: LibertiesHeuristic is a @cached_property
+            self.heuristic_instance = getattr(self, 'heuristic_instance') or self.heuristic_class(game)
+            if callable(self.heuristic_instance.score): return self.heuristic_instance.score()
+            else:                                       return self.heuristic_instance.score
         elif self.heuristic_fn:    return self.heuristic_fn(game.bitboard, last_player_to_move)
         else:                      return game.score()
 

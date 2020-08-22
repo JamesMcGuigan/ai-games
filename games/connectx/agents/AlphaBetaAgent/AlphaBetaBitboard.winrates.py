@@ -4,14 +4,13 @@ import argparse
 import multiprocessing
 import time
 
-import numpy as np
 from joblib import delayed
 from joblib import Parallel
 from kaggle_environments import make
 
 from agents.AlphaBetaAgent.AlphaBetaBitboard import AlphaBetaBitboard
 from agents.AlphaBetaAgent.AlphaBetaBitboardEvenOdd import AlphaBetaBitboardEvenOdd
-from heuristics.BitboardOddEvenHeuristic import bitboard_evenodd_heuristic
+from heuristics.BitsquaresHeuristic import bitsquares_heuristic
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-r', '--rounds',  type=int, default=60)
@@ -37,14 +36,15 @@ def run_round(agent, opponent, round=0):
     }
     agent_kwargs    = { **kwargs }
     opponent_kwargs = {
-        "heuristic_fn": bitboard_evenodd_heuristic(
-            reward_gameover        = np.inf,
-            reward_single_token    = 0.1,
-            reward_multi           = 1,
-            reward_evenodd_pair    = 4,
-            reward_odd_with_player = 0.5,
-            reward_odd_with_column = 1,
-        ),
+        "heuristic_fn": bitsquares_heuristic(),
+        # "heuristic_fn": bitboard_evenodd_heuristic(
+        #     reward_gameover        = np.inf,
+        #     reward_single_token    = 0.1,
+        #     reward_multi           = 1,
+        #     reward_evenodd_pair    = 4,
+        #     reward_odd_with_player = 0.5,
+        #     reward_odd_with_column = 1,
+        # ),
         **kwargs
     }
 
@@ -73,9 +73,13 @@ all_scores = Parallel(n_jobs=n_jobs)([
     for round in range(rounds)
 ])
 
-wins    = sum([ scores[agent.__name__] for scores in all_scores ])
-winrate = 100 * wins / rounds
-print(f'{wins:.1f}/{rounds:.0f} = {winrate:3.0f}% winrate {agent.__name__} vs {opponent.__name__}')
+wins     = sum([ scores[agent.__name__]    for scores in all_scores ])
+losses   = sum([ scores[opponent.__name__] for scores in all_scores ])
+winrate  = 100 * wins   / rounds
+lossrate = 100 * losses / rounds
+print(f'{  wins:.1f}/{rounds:.0f} = { winrate:3.0f}% winrate  {agent.__name__} vs {opponent.__name__}')
+print(f'{losses:.1f}/{rounds:.0f} = {lossrate:3.0f}% lossrate {agent.__name__} vs {opponent.__name__}')
+
 
 ### Winrates @ timeout=5
 #  55% winrate AlphaBetaBitboard vs AlphaBetaAgent | original heuristic

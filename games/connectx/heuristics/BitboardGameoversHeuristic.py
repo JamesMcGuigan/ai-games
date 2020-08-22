@@ -96,6 +96,7 @@ def bitboard_gameovers_heuristic( bitboard: np.ndarray, player_id: int ) -> floa
     return score
 
 
+### Previous implementations of the above code
 
 # @njit
 def bitboard_gameovers_heuristic_unvectorized( bitboard: np.ndarray, player_id: int, gameovers: np.ndarray = get_gameovers() ) -> float:

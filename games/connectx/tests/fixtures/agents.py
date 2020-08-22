@@ -2,6 +2,7 @@
 from agents.AlphaBetaAgent.AlphaBetaAgent import AlphaBetaAgent
 from agents.AlphaBetaAgent.AlphaBetaBitboard import AlphaBetaBitboard
 from agents.AlphaBetaAgent.AlphaBetaBitboardEvenOdd import AlphaBetaBitboardEvenOdd
+from agents.AlphaBetaAgent.AlphaBetaBitsquares import AlphaBetaBitsquares
 from agents.MontyCarlo.AntColonyTreeSearch import AntColonyTreeSearch
 from agents.MontyCarlo.MontyCarloHeuristic import MontyCarloHeuristic
 from agents.MontyCarlo.MontyCarloPure import MontyCarloPure
@@ -17,6 +18,7 @@ agents = [
     ('AlphaBetaAgent',           AlphaBetaAgent.agent()),
     ('AlphaBetaBitboard',        AlphaBetaBitboard.agent()),
     ('AlphaBetaBitboardEvenOdd', AlphaBetaBitboardEvenOdd.agent()),
+    ('AlphaBetaBitsquares',      AlphaBetaBitsquares.agent()),
 ]
 
 kaggle_agents = [

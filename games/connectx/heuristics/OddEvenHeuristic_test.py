@@ -51,7 +51,7 @@ def test_oddeven_heuristic__empty():
 ])
 def test_oddeven_heuristic(listboard, expected):
     bitboard  = list_to_bitboard(listboard)
-    heuristic = oddeven_heuristic(reward_3_pair=0, reward_2_endgame=1, reward_3_endgame=0)
+    heuristic = oddeven_heuristic(reward=1, reward_3_pair=0, reward_2_endgame=1, reward_3_endgame=0)
 
     p1_score  = heuristic(bitboard, player_id=1)
     p2_score  = heuristic(bitboard, player_id=2)
@@ -78,7 +78,7 @@ def test_oddeven_heuristic(listboard, expected):
 ])
 def test_oddeven_heuristic__reward_3_pair(listboard, expected):
     bitboard  = list_to_bitboard(listboard)
-    heuristic = oddeven_heuristic(reward_3_pair=1, reward_2_endgame=0, reward_3_endgame=0)
+    heuristic = oddeven_heuristic(reward=1, reward_3_pair=1, reward_2_endgame=0, reward_3_endgame=0)
 
     p1_score  = heuristic(bitboard, player_id=1)
     p2_score  = heuristic(bitboard, player_id=2)
@@ -106,7 +106,7 @@ def test_oddeven_heuristic__reward_3_pair(listboard, expected):
 ])
 def test_oddeven_heuristic__reward_3_endgame(listboard, expected):
     bitboard  = list_to_bitboard(listboard)
-    heuristic = oddeven_heuristic(reward_3_pair=0, reward_2_endgame=0, reward_3_endgame=1)
+    heuristic = oddeven_heuristic(reward=1, reward_3_pair=0, reward_2_endgame=0, reward_3_endgame=1)
 
     p1_score  = heuristic(bitboard, player_id=1)
     p2_score  = heuristic(bitboard, player_id=2)

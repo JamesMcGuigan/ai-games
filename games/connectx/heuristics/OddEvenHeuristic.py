@@ -1,11 +1,41 @@
 from fastcache import clru_cache
 
 from core.ConnectXBBNN import *
+from heuristics.BitsquaresHeuristic import bitsquares_heuristic
 from heuristics.BitsquaresHeuristic import get_playable_lines_by_length
 
 
-def oddeven_heuristic(reward_3_pair=1, reward_2_endgame=1, reward_3_endgame=1):
-    def _oddeven_heuristic(bitboard: np.ndarray, player_id: int) -> float:
+# Winrates vs bitsquares_heuristic(reward_power=1.75)
+#   30% winrate @ reward_oddeven=10
+#   26% winrate @ reward_oddeven=5
+#   30% winrate @ reward_oddeven=3
+#   28% winrate @ reward_oddeven=2
+#   52% winrate @ reward_oddeven=1
+#   35% winrate @ reward_oddeven=0 - this reflects the computational penalty
+def oddeven_bitsquares_heuristic(reward_power=1.75, reward_oddeven=1):
+    bitsquares = bitsquares_heuristic(
+        reward_power=reward_power
+    )
+    oddeven    = oddeven_heuristic(
+        reward=reward_oddeven,
+        reward_3_pair=1,
+        reward_3_endgame=1,
+        reward_2_endgame=1,
+    )
+    def _oddeven_bitsquares_heuristic(bitboard: np.ndarray, player_id: int) -> float:
+        playable_lines   = get_playable_lines_by_length(bitboard)
+        bitsquares_score = bitsquares(bitboard, player_id, playable_lines=playable_lines)
+        oddeven_score    = oddeven(bitboard,    player_id, playable_lines=playable_lines)
+        return bitsquares_score + oddeven_score
+    return _oddeven_bitsquares_heuristic
+
+# Winrates vs bitsquares_heuristic(reward_power=1.75)
+#
+def oddeven_heuristic(reward=1, reward_3_pair=1, reward_3_endgame=1, reward_2_endgame=1 ):
+    reward_3_pair    = reward * reward_3_pair
+    reward_3_endgame = reward * reward_3_endgame
+    reward_2_endgame = reward * reward_2_endgame
+    def _oddeven_heuristic(bitboard: np.ndarray, player_id: int, playable_lines=None) -> float:
         played_squares = bitboard[0]
         empty_squares  = mask_board  & ~bitboard[0]
 
@@ -14,9 +44,9 @@ def oddeven_heuristic(reward_3_pair=1, reward_2_endgame=1, reward_3_endgame=1):
             bitboard[0] &  bitboard[1]
         ]
         oddeven_bitboards = get_oddeven_bitboard(bitboard)
-        endgame_bitboards = get_endgame_bitboard(bitboard)
         endgame_columns   = get_endgame_oddeven_columns(bitboard)
-        playable_lines    = get_playable_lines_by_length(bitboard)
+        endgame_bitboards = get_endgame_bitboard(bitboard, endgame_columns=endgame_columns)
+        playable_lines    = playable_lines or get_playable_lines_by_length(bitboard)
         current_player    = current_player_index(bitboard)
 
         scores = [ 0, 0 ]
@@ -99,11 +129,11 @@ def get_even_column( column_bitmask: int, col: int ) -> int:
     return even
 
 
-def get_endgame_bitboard( bitboard: np.ndarray ) -> Tuple[int,int]:
-    oddeven = get_oddeven_bitboard(bitboard)
-    columns = get_endgame_oddeven_columns(bitboard)
+def get_endgame_bitboard( bitboard: np.ndarray, endgame_columns=None ) -> Tuple[int,int]:
+    oddeven_bitboard = get_oddeven_bitboard(bitboard)
+    endgame_columns  = get_endgame_oddeven_columns(bitboard) if endgame_columns is None else endgame_columns
     endgame = int(np.sum([
-        mask_columns[col] & oddeven[columns[col]]
+        mask_columns[col] & oddeven_bitboard[endgame_columns[col]]
         for col in range(len(mask_columns))
     ]))
     return ( endgame, ~endgame & mask_board )  # Needs to be this way round to work with with player_index

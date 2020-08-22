@@ -9,11 +9,12 @@ from joblib import Parallel
 from kaggle_environments import make
 
 from agents.AlphaBetaAgent.AlphaBetaBitboard import AlphaBetaBitboard
-from agents.AlphaBetaAgent.AlphaBetaBitboardEvenOdd import AlphaBetaBitboardEvenOdd
+from agents.AlphaBetaAgent.AlphaBetaOddEven import AlphaBetaOddEven
 from heuristics.BitsquaresHeuristic import bitsquares_heuristic
+from heuristics.OddEvenHeuristic import oddeven_bitsquares_heuristic
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-r', '--rounds',  type=int, default=60)
+parser.add_argument('-r', '--rounds',  type=int, default=30)
 parser.add_argument('-t', '--timeout', type=int, default=1 + 2)  # 1s for faster benchmarks | AlphaBetaBitboard has depth=4 opening
 parser.add_argument('argv', nargs=argparse.REMAINDER)
 argv = parser.parse_args()
@@ -26,7 +27,7 @@ configuration = env.configuration
 
 rounds   = argv.rounds
 agent    = AlphaBetaBitboard
-opponent = AlphaBetaBitboardEvenOdd
+opponent = AlphaBetaOddEven
 
 
 scores = { agent.__name__: 0, opponent.__name__: 0 }
@@ -34,17 +35,12 @@ def run_round(agent, opponent, round=0):
     kwargs = {
         "verbose_depth":  False,
     }
-    agent_kwargs    = { **kwargs }
-    opponent_kwargs = {
+    agent_kwargs    = {
         "heuristic_fn": bitsquares_heuristic(),
-        # "heuristic_fn": bitboard_evenodd_heuristic(
-        #     reward_gameover        = np.inf,
-        #     reward_single_token    = 0.1,
-        #     reward_multi           = 1,
-        #     reward_evenodd_pair    = 4,
-        #     reward_odd_with_player = 0.5,
-        #     reward_odd_with_column = 1,
-        # ),
+        **kwargs
+    }
+    opponent_kwargs = {
+        "heuristic_fn": oddeven_bitsquares_heuristic(),
         **kwargs
     }
 

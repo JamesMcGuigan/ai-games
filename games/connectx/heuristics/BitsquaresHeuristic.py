@@ -11,12 +11,12 @@ from core.ConnectXBBNN import *
 #   69% winrate @ reward_power=3
 #   25% winrate @ reward_power=4
 def bitsquares_heuristic(reward_power=1.75):
-    def _bitsquares_heuristic(bitboard: np.ndarray, player_id: int):
-        lines  = get_playable_lines_by_length(bitboard)
+    def _bitsquares_heuristic(bitboard: np.ndarray, player_id: int, playable_lines = None):
+        playable_lines = playable_lines or get_playable_lines_by_length(bitboard)
         scores = [ 0, 0 ]
         for player in [0,1]:
             for n in range(1, configuration.inarow+1):
-                scores[player] += len(lines[player][n]) * (n ** reward_power)
+                scores[player] += len(playable_lines[player][n]) * (n ** reward_power)
 
         score = (scores[0] - scores[1]) if player_id == 1 else (scores[1] - scores[0])
         return score

@@ -31,9 +31,9 @@ class AlphaBetaAgent(PersistentCacheAgent):
         self.verbose_depth    = self.kwargs.get('verbose_depth')
         self.search_max_depth = self.kwargs.get('search_max_depth')
         self.search_step      = self.kwargs.get('search_step', 1)
-        self.heuristic_class  = self.kwargs.get('heuristic_class', self.__class__.heuristic_class)
         self.heuristic_fn     = self.kwargs.get('heuristic_fn',    self.__class__.heuristic_fn)
-
+        self.heuristic_class  = self.kwargs.get('heuristic_class', self.__class__.heuristic_class)
+        self.heuristic_instance = self.heuristic_class(self.game) if self.heuristic_class else None
 
     ### Public Interface
 
@@ -132,7 +132,6 @@ class AlphaBetaAgent(PersistentCacheAgent):
         last_player_to_move = 1 if game.player_id == 2 else 2
         if self.heuristic_class:
             # WORKAROUND: LibertiesHeuristic is a @cached_property
-            self.heuristic_instance = getattr(self, 'heuristic_instance') or self.heuristic_class(game)
             if callable(self.heuristic_instance.score): return self.heuristic_instance.score()
             else:                                       return self.heuristic_instance.score
         elif self.heuristic_fn:    return self.heuristic_fn(game.bitboard, last_player_to_move)

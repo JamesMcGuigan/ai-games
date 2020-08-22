@@ -12,21 +12,11 @@ from core.ConnectXBBNN import *
 #   25% winrate @ reward_power=4
 def bitsquares_heuristic(reward_power=1.75):
     def _bitsquares_heuristic(bitboard: np.ndarray, player_id: int):
-        player_tokens  = [ bitboard[0] & ~bitboard[1], bitboard[0] &  bitboard[1] ]
-        playable_lines = get_playable_lines(bitboard)
-        played_bits    = [ player_tokens[0] & playable_lines[0], player_tokens[1] & playable_lines[1] ]
-
+        lines  = get_playable_lines_by_length(bitboard)
         scores = [ 0, 0 ]
         for player in [0,1]:
-            is_gameover  = (playable_lines[player][:] == played_bits[player][:])
-            is_singlebit = np.log2(played_bits[player][:]) % 1 == 0
-            to_count     = played_bits[player][ ~is_gameover & ~is_singlebit ]
-            bitcounts    = np.array([ np.count_nonzero(bitcount_mask[:] & bitmask) for bitmask in to_count[:] ])
-            bitsquares   = bitcounts ** reward_power
-
-            scores[player] += np.inf if np.count_nonzero(is_gameover[:]) else 0
-            scores[player] += 1 * np.count_nonzero(is_singlebit[:])
-            scores[player] += np.sum( bitsquares[:] ) if len(bitsquares) else 0
+            for n in range(1, configuration.inarow+1):
+                scores[player] += len(lines[player][n]) * (n ** reward_power)
 
         score = (scores[0] - scores[1]) if player_id == 1 else (scores[1] - scores[0])
         return score
@@ -50,3 +40,27 @@ def get_playable_lines(bitboard: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     p1_playable_lines = p1_playable_lines[p1_is_valid]
     p2_playable_lines = p2_playable_lines[p2_is_valid]
     return p1_playable_lines, p2_playable_lines
+
+
+def get_playable_lines_by_length(bitboard: np.ndarray) -> List[List[np.ndarray]]:
+    """
+    Returns outputs[player][length] = gameovers[bitcount == length]
+    """
+    outputs        = [ [], [] ]
+    player_tokens  = [ bitboard[0] & ~bitboard[1], bitboard[0] &  bitboard[1] ]
+    playable_lines = get_playable_lines(bitboard)
+    played_bits    = [ player_tokens[0] & playable_lines[0], player_tokens[1] & playable_lines[1] ]
+
+    for player in [0,1]:
+        is_gameover  = (playable_lines[player][:] == played_bits[player][:])
+        is_singlebit = np.log2(played_bits[player][:]) % 1 == 0
+        to_count     = played_bits[player][ ~is_gameover & ~is_singlebit ]
+        bitcounts    = np.array([ np.count_nonzero(bitcount_mask[:] & bitmask) for bitmask in to_count[:] ])
+
+        inarow                  = configuration.inarow
+        outputs[player]         = [ np.array([], dtype=np.int64) for _ in range(inarow + 2) ]
+        outputs[player][1]      = playable_lines[player][ is_singlebit ]
+        outputs[player][inarow] = playable_lines[player][ is_gameover  ]
+        for n in range(2, inarow):
+            outputs[player][n]  = to_count[ bitcounts == n ]
+    return outputs

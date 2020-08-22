@@ -50,17 +50,25 @@ def get_playable_lines_by_length(bitboard: np.ndarray) -> List[List[np.ndarray]]
     player_tokens  = [ bitboard[0] & ~bitboard[1], bitboard[0] &  bitboard[1] ]
     playable_lines = get_playable_lines(bitboard)
     played_bits    = [ player_tokens[0] & playable_lines[0], player_tokens[1] & playable_lines[1] ]
+    inarow         = configuration.inarow
 
     for player in [0,1]:
         is_gameover  = (playable_lines[player][:] == played_bits[player][:])
         is_singlebit = np.log2(played_bits[player][:]) % 1 == 0
-        to_count     = played_bits[player][ ~is_gameover & ~is_singlebit ]
-        bitcounts    = np.array([ np.count_nonzero(bitcount_mask[:] & bitmask) for bitmask in to_count[:] ])
+        is_multibit  = ~is_gameover[:] & ~is_singlebit[:]
+        bitcounts    = np.array([
+            np.count_nonzero(
+                bitcount_mask[:] & playable_lines[player][n] & player_tokens[player]
+            ) if is_multibit[n]
+            # else 1      if is_singlebit[n]
+            # else inarow if is_gameover[n]
+            else 0
+            for n in range(len(playable_lines[player]))
+        ])
 
-        inarow                  = configuration.inarow
-        outputs[player]         = [ np.array([], dtype=np.int64) for _ in range(inarow + 2) ]
+        outputs[player]         = [ np.array([], dtype=np.int64) for _ in range(inarow + 1) ]
         outputs[player][1]      = playable_lines[player][ is_singlebit ]
         outputs[player][inarow] = playable_lines[player][ is_gameover  ]
         for n in range(2, inarow):
-            outputs[player][n]  = to_count[ bitcounts == n ]
+            outputs[player][n]  = playable_lines[player][ bitcounts == n ]
     return outputs

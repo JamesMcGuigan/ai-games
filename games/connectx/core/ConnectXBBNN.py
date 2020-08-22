@@ -70,6 +70,16 @@ def empty_bitboard() -> np.ndarray:
     return np.array([0, 0], dtype=np.int64)
 
 
+def bitboard_from_actions(actions: List[Union[int, Tuple[int]]]) -> np.ndarray:
+    bitboard  = empty_bitboard()
+    player_id = 1
+    for action in actions:
+        if isinstance(action, tuple): action, player_id = action
+        bitboard  = result_action(bitboard, action, player_id=player_id % 2)
+        player_id = next_player_id(player_id)
+    return bitboard
+
+
 #@njit
 def hash_bitboard( bitboard: np.ndarray ) -> Tuple[int,int]:
     """ Create a tupleised mirror hash, the minimum value of the bitboard and its mirrored reverse """
@@ -141,8 +151,15 @@ def mirror_bitboard( bitboard: np.ndarray ) -> np.ndarray:
 
 #@njit
 def current_player_id( bitboard: np.ndarray ) -> int:
+    """ Returns next player to move: 1 = p1, 2 = p2 """
     move_number = get_move_number(bitboard)
     next_player = 1 if move_number % 2 == 0 else 2  # player 1 has the first move on an empty board
+    return next_player
+
+def current_player_index( bitboard: np.ndarray ) -> int:
+    """ Returns next player to move: 0 = p1, 1 = p2 """
+    move_number = get_move_number(bitboard)
+    next_player = 0 if move_number % 2 == 0 else 1  # player 1 has the first move on an empty board
     return next_player
 
 

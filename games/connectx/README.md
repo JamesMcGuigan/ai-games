@@ -316,6 +316,12 @@ The score is based counting the number of bits in each line and squaring the bit
 Hyperparameter tuning discovered that using a power of 1.75 rather than 2 improved the winrate against
 `bitboard_gameovers_heuristic()` from 48% to 94%, without using any `double_attack_score` logic.
 
+Optimal Reward Values given: **n ** 1.75**:
+- 1-in-a-row = 1 
+- 2-in-a-row = 3.4
+- 3-in-a-row = 6.8
+- 4-in-a-row = inf
+
 
 ## OddEven Heuristic 
 Leaderboard Scores: 

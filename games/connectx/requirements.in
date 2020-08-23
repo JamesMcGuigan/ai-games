@@ -9,3 +9,4 @@ numba
 numpy
 pytest
 joblib
+torch

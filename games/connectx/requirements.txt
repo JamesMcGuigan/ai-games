@@ -16,13 +16,14 @@ decorator==4.4.2          # via ipython, traitlets
 defusedxml==0.6.0         # via nbconvert
 entrypoints==0.3          # via nbconvert
 fastcache==1.1.0          # via -r requirements.in
+future==0.18.2            # via torch
 humanize==2.6.0           # via -r requirements.in
 idna==2.10                # via requests
 importlib-metadata==1.7.0  # via jsonschema, pluggy, pytest
 iniconfig==1.0.1          # via pytest
 ipykernel==5.3.4          # via ipywidgets, jupyter, jupyter-console, notebook, qtconsole
 ipython-genutils==0.2.0   # via nbformat, notebook, qtconsole, traitlets
-ipython==7.16.1           # via ipykernel, ipywidgets, jupyter-console
+ipython==7.17.0           # via ipykernel, ipywidgets, jupyter-console
 ipywidgets==7.5.1         # via jupyter
 jedi==0.17.2              # via ipython
 jinja2==2.11.2            # via nbconvert, notebook
@@ -43,7 +44,7 @@ nbconvert==5.6.1          # via jupyter, notebook
 nbformat==5.0.7           # via ipywidgets, nbconvert, notebook
 notebook==6.1.3           # via jupyter, widgetsnbextension
 numba==0.51.0             # via -r requirements.in
-numpy==1.19.1             # via -r requirements.in, numba
+numpy==1.19.1             # via -r requirements.in, numba, torch
 packaging==20.4           # via bleach, pytest
 pandocfilters==1.4.2      # via nbconvert
 parso==0.7.1              # via jedi
@@ -71,6 +72,7 @@ terminado==0.8.3          # via notebook
 testpath==0.4.4           # via nbconvert
 text-unidecode==1.3       # via python-slugify
 toml==0.10.1              # via pytest
+torch==1.6.0              # via -r requirements.in
 tornado==6.0.4            # via ipykernel, jupyter-client, notebook, terminado
 tqdm==4.48.2              # via kaggle
 traitlets==4.3.3          # via ipykernel, ipython, ipywidgets, jupyter-client, jupyter-core, nbconvert, nbformat, notebook, qtconsole

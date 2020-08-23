@@ -12,15 +12,22 @@ from heuristics.BitsquaresHeuristic import get_playable_lines_by_length
 #   28% winrate @ reward_oddeven=2
 #   52% winrate @ reward_oddeven=1
 #   35% winrate @ reward_oddeven=0 - this reflects the computational penalty
-def oddeven_bitsquares_heuristic(reward_power=1.75, reward_oddeven=1):
+def oddeven_bitsquares_heuristic(reward_power=1.75, reward_3_pair=0, reward_3_endgame=1, reward_2_endgame=0.05):
     bitsquares = bitsquares_heuristic(
         reward_power=reward_power
     )
     oddeven    = oddeven_heuristic(
-        reward=reward_oddeven,
-        reward_3_pair=1,
-        reward_3_endgame=1,
-        reward_2_endgame=1,
+        # Winrates vs bitsquares_heuristic(reward_power=1.75) @ 30 trials
+        # (1,    0, 0)    = 40%     | 2 = 63% | 3 = 62% | 4 = 52%   | 5 = 57%    | 0.5 = 47%
+        # (0,    1, 0)    = 80%/72% | 2 = 65% | 5 = 63% | 0.5 = 67% | 0.75 = 68% | 1.25 = 53%
+        # (0,    0, 1)    = 53%     | 2 = 58% | 3 = 40% | 0.5 = 70% | 0.25 = 32% | 0.75 = 42%
+        # (2,    1, 0.5)  = 23%     | /2  = 43%  | /3 = 38%
+        # (0.1,  1, 0)    = 60/80%  | (0.25,1,0) = 65% | (0.5,1,0) = 73% | (1,1,0) = 47%
+        # (0.01, 1, 0.05) = 52%         | (0.04,1,0.05) = 55%
+        # (0,    1, 0.05) = 92%/87%/70% | (0,1,0.5)  = 47% | (0,1,0.1) = 67%  | (0,1,0.01) = 55% | (0,1,0.075) = 72% | (0,1,0.025) = 67%
+        reward_3_pair=reward_3_pair,        # alone 2   = 63%
+        reward_3_endgame=reward_3_endgame,  # alone 1   = 80%
+        reward_2_endgame=reward_2_endgame,  # alone 0.5 = 70%
     )
     def _oddeven_bitsquares_heuristic(bitboard: np.ndarray, player_id: int) -> float:
         playable_lines   = get_playable_lines_by_length(bitboard)
@@ -31,10 +38,7 @@ def oddeven_bitsquares_heuristic(reward_power=1.75, reward_oddeven=1):
 
 # Winrates vs bitsquares_heuristic(reward_power=1.75)
 #
-def oddeven_heuristic(reward=1, reward_3_pair=1, reward_3_endgame=1, reward_2_endgame=1 ):
-    reward_3_pair    = reward * reward_3_pair
-    reward_3_endgame = reward * reward_3_endgame
-    reward_2_endgame = reward * reward_2_endgame
+def oddeven_heuristic(reward_3_pair=1, reward_3_endgame=1, reward_2_endgame=1 ):
     def _oddeven_heuristic(bitboard: np.ndarray, player_id: int, playable_lines=None) -> float:
         played_squares = bitboard[0]
         empty_squares  = mask_board  & ~bitboard[0]
@@ -54,40 +58,46 @@ def oddeven_heuristic(reward=1, reward_3_pair=1, reward_3_endgame=1, reward_2_en
             # Safeguard against future changes to board size
             n3 = configuration.inarow - 1
             n2 = configuration.inarow - 2
+            is_current_player = 0 if player == current_player else 1
 
             # 4 in a row
             is_4_gameover   = len(playable_lines[player][configuration.inarow])
 
+
             # 2 in a row
-            # For a forced double attack to work, player must force capture of one or both ends via endgame position
-            is_current_player  = 0 if player == current_player else 1
-            is_2_endgame       = playable_lines[player][n2] == playable_lines[player][n2] & (played_squares | endgame_bitboards[is_current_player])
-            is_2_endgame_count = np.count_nonzero( is_2_endgame )
+            is_2_endgame_count = 0
+            if reward_2_endgame:
+                # For a forced double attack to work, player must force capture of one or both ends via endgame position
+                is_2_endgame       = playable_lines[player][n2] == playable_lines[player][n2] & (played_squares | endgame_bitboards[is_current_player])
+                is_2_endgame_count = np.count_nonzero( is_2_endgame )
+
 
             # 3 in a row + 2 odd or 2 even squares - opponent can't block both
             is_3_odd   = playable_lines[player][n3] == (playable_lines[player][n3] & (tokens[player] | oddeven_bitboards[1]))
             is_3_even  = playable_lines[player][n3] == (playable_lines[player][n3] & (tokens[player] | oddeven_bitboards[0]))
-            oddeven_pair_count = np.count_nonzero(is_3_odd) // 2 + np.count_nonzero(is_3_even) // 2
+            is_3_pair_count = np.count_nonzero(is_3_odd) // 2 + np.count_nonzero(is_3_even) // 2
+
 
             # Check for endgame columns
             # TODO: could this be done quicker using endgame_bitboard
             is_3_endgame_count = 0
-            for col in range(len(mask_columns)):
-                oddeven_index       = (current_player + endgame_columns[col]) % 2 == 1
-                oddeven_col_bitmask = oddeven_bitboards[ endgame_columns[col] ] & mask_columns[col]
-                if not oddeven_col_bitmask: continue  # skip if no empty oddeven squares that can be played
+            if reward_3_endgame:
+                for col in range(len(mask_columns)):
+                    oddeven_index       = ( current_player + endgame_columns[col] ) % 2 == 1
+                    oddeven_col_bitmask = oddeven_bitboards[ endgame_columns[col] ] & mask_columns[col]
+                    if not oddeven_col_bitmask: continue  # skip if no empty oddeven squares that can be played
 
-                is_3_oddeven        = [ is_3_even, is_3_odd ][ oddeven_index ]
-                oddeven_lines       = playable_lines[player][n3][ is_3_oddeven ]
-                oddeven_in_col      = oddeven_lines[:] & empty_squares & oddeven_col_bitmask
-                is_3_endgame_count += np.count_nonzero(oddeven_in_col)
+                    is_3_oddeven        = [ is_3_even, is_3_odd ][ oddeven_index ]
+                    oddeven_lines       = playable_lines[player][n3][ is_3_oddeven ]
+                    oddeven_in_col      = oddeven_lines[:] & empty_squares & oddeven_col_bitmask
+                    is_3_endgame_count += np.count_nonzero(oddeven_in_col)
 
 
             # Calculate scores based on rewards
             scores[player] += np.inf          if is_4_gameover else 0
-            scores[player] += reward_3_pair    * oddeven_pair_count
-            scores[player] += reward_2_endgame * is_2_endgame_count
+            scores[player] += reward_3_pair    * is_3_pair_count
             scores[player] += reward_3_endgame * is_3_endgame_count
+            scores[player] += reward_2_endgame * is_2_endgame_count
 
         score = (scores[0] - scores[1]) if player_id == 1 else (scores[1] - scores[0])
         return score

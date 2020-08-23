@@ -281,6 +281,10 @@ The heuristic presents a simplified problem by counting the number of possible c
 empty squares when comparing against the bitmask. A bitmask containing only a single bit can be quickly detected using  
 `log2() % 1 == 0`. 
 
+Lines with multiple spaces on either end are rewarded by double counting, 
+as three tokens in a row with spaces on one end will also match 
+"2 in a row + 2 spaces" and "1 in a row + 3 spaces".
+
 Lines containing only a single player piece are discounted with a score of 0.1, compared to 1 for a multibit mask of player piece. 
 
 An additional `double_attack_score` of 0.5 is given if any two gameover bitmasks happen to overlap by a single square.
@@ -289,6 +293,64 @@ somewhat correlated with double attacks. In practice it improved the winrate vs 
 from 50% to near 100%.
 
 The heuristic returns the difference between the players bitmask count and the opponents bitmask count.
+
+
+Having discovered that Monty Carlo Tree search works well with a heuristic, and in preperation for the idea
+of a AlphaZero style neural network based heuristic, an attempt was m
+
+
+
+## Bitsquares Heuristic 
+
+Leaderboard Scores: 
+- **(pending)** | [AlphaBetaBitboard + bitsquares_heuristic(reward_power=1.75)](https://www.kaggle.com/c/connectx/submissions?dialog=episodes-submission-16964089)
+
+Code:
+- [heuristics/BitsquaresHeuristic.py](heuristics/BitsquaresHeuristic.py)
+ 
+This takes a similar approach to Bitboard Gameovers Heuristic, in that it checks for every possible connect 4
+bitmask, containing only player owned or empty squares that is not blocked by opponent pieces.
+
+The score is based counting the number of bits in each line and squaring the bitcount. 
+
+Hyperparameter tuning discovered that using a power of 1.75 rather than 2 improved the winrate against
+`bitboard_gameovers_heuristic()` from 48% to 94%, without using any `double_attack_score` logic.
+
+
+## OddEven Heuristic 
+Leaderboard Scores: 
+- **(pending)** | [AlphaBetaBitboard + oddeven_bitsquares_heuristic(reward_power=1.75, reward_3_pair=0, reward_3_endgame=1, reward_2_endgame=0.05)](https://www.kaggle.com/c/connectx/submissions?dialog=episodes-submission-16971197)
+- **(pending)** | [AlphaBetaBitboard + oddeven_bitsquares_heuristic(reward_power=1.75, reward_3_pair=0, reward_3_endgame=1, reward_2_endgame=0)](https://www.kaggle.com/c/connectx/submissions?dialog=episodes-submission-16971358)
+
+Code:
+- [heuristics/OddEvenHeuristic.py](heuristics/OddEvenHeuristic.py)
+- [heuristics/OddEvenHeuristic_test.py](heuristics/OddEvenHeuristic_test.py)
+
+This heuristic rewards three additional conditions based on he even/odd height of empty squares relative 
+to player turn and the endgame would play out if there was a series of forced moves in the final column
+that would result in an endgame win/loss/draw.
+
+Alone the heuristic only scores a 5% winrate vs `bitsquares_heuristic()`, but the two can be added together
+as a combined heuristic for improved results over baseline.
+
+The rewards are for:
+- `reward_3_pair=0` - A pair of 3-in-a-rows, with each having an empty bit at an even or odd height from the current floor.
+This leads to a chance of double attack, but did not seem to provide a winrate advantage in practice.
+
+- `reward_3_endgame=1` - A 3 in a row with an empty space that would be playable if found in the last 
+endgame column. The was the strongest rule, that produced a winrate of 70-80% against `bitsquares_heuristic()`
+alone, but higher or lower values for the hyperparameter could produce winrates as low as 30%.
+
+- `reward_2_endgame=0.5 | 0.05` - This is similar to `reward_3_endgame` but checks for 2-in-a-row lines with 
+both spaces correctly alighned for the endgame. Unit tests where written to demonstrate detection of 
+starting positions that would eventually result in winning/drawn/lost endgames. 
+Used alone at a value of `0.5`, it could produce 70% winrates against `bitsquares_heuristic()` alone, 
+but when combined with `reward_3_endgame=1` the winrate would drop to 40% unless set to a very low number. 
+
+This advanced heuristic is competing against its own performance cost. 
+`bitsquares_heuristic()` runs in 0.1ms, but `_oddeven_heuristic()` takes an additional 0.25ms, 
+even after avoiding recomputing unnecessary data. If set to return a 0 score, the additional 
+computational cost of `_oddeven_heuristic()` alone sets the baseline winrate to 35% vs `bitsquares_heuristic()`.
 
 
 # Numba 

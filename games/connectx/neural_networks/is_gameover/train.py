@@ -8,19 +8,22 @@ from core.ConnectXBBNN import *
 from neural_networks.is_gameover.IsGameoverSquareNN import isGameoverSquareNN
 
 model     = isGameoverSquareNN
+# model     = isGameoverCNN
 criterion = nn.MSELoss()  # NOTE: nn.CrossEntropyLoss() is for multi-output classification
 optimizer = optim.Adadelta(model.parameters())
 
-def train(model, criterion, optimizer, epochs=100):
+
+def train(model, criterion, optimizer, epochs=1000):
     time_start = time.perf_counter()
     try:
         model.load()
 
-        count_move       = 0
         last_accuracy    = 0
         running_accuracy = 0
         running_loss     = 0.0
-        for count_game in range(epochs):
+        running_count    = 0
+        count_move       = 0
+        for count_game in range(1, epochs+1):
             if last_accuracy == 1.0: break
 
             bitboard    = empty_bitboard()
@@ -47,21 +50,25 @@ def train(model, criterion, optimizer, epochs=100):
                 actual            = bool( np.round( outputs.data.numpy().flatten()[0] ) )
                 running_accuracy += int( actual == expected )
                 running_loss     += loss.item()
+                running_count    += 1
 
-                # Print statistics
-                window = 100
-                if count_move % window == 0:
-                    last_accuracy = running_accuracy/window
-                    print(f'game: {count_game+1:4d} | move: {count_move:5d}] | loss: {running_loss/window:.3f} | accuracy: {running_accuracy/window:.3f} ')
-                    running_accuracy = 0
-                    running_loss     = 0.0
-                    break
+            # Print statistics
+            window = 10
+            if count_game % window == 0 or count_game == epochs-1:
+                last_loss     =     running_loss/running_count
+                last_accuracy = running_accuracy/running_count
+                print(f'game: {count_game:4d} | move: {count_move:5d} | loss: {last_loss:.3f} | accuracy: {last_accuracy:.3f} ')
+                running_accuracy = 0
+                running_loss     = 0.0
+                running_count    = 0
 
-    except: pass
+    except KeyboardInterrupt:
+        pass
     finally:
         time_taken = time.perf_counter() - time_start
         print(f'Finished Training: {epochs} epochs in {time_taken:.1f}s')
         model.save()
 
 
-train(model, criterion, optimizer)
+if __name__ == '__main__':
+    train(model, criterion, optimizer)

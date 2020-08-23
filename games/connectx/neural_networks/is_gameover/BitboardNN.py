@@ -18,11 +18,11 @@ class BitboardNN(nn.Module):
     def cast(self, x):
         if is_bitboard(x):
             x = bitboard_to_numpy2d(x).flatten()
-        x = torch.from_numpy(x).to(torch.int64)                                # int64 required for functional.one_hot()
+        x = torch.from_numpy(x).to(torch.int64)  # int64 required for functional.one_hot()
         x = F.one_hot(x, num_classes=self.one_hot_size)
-        x = x.view(-1, self.input_size * self.one_hot_size).to(torch.float32)  # float32 required for self.fc1(x)
+        x = x.to(torch.float32)  # float32 required for self.fc1(x)
         # x = x.to(self.device)  # TODO: get CUDA GPU working with torch
-        return x
+        return x  # x.shape = (42,3)
 
     @property
     def filename(self):

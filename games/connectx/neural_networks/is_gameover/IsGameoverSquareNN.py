@@ -22,6 +22,11 @@ class IsGameoverSquareNN(BitboardNN):
         self.fc3 = nn.Linear(self.model_size, self.model_size)
         self.fc4 = nn.Linear(self.model_size, 1)
 
+    def cast(self, x):
+        x = super().cast(x)
+        x = x.view(-1, self.input_size * self.one_hot_size)
+        return x
+
     def forward(self, x):
         x = self.cast(x)
         x = F.relu(self.fc1(x))

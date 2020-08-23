@@ -34,5 +34,8 @@ class BitboardNN(nn.Module):
 
     def load(self):
         if os.path.exists(self.filename):
-            self.load_state_dict(torch.load(self.filename))
-            self.eval()
+            # Ignore errors caused by model size mismatch
+            try:
+                self.load_state_dict(torch.load(self.filename))
+                self.eval()
+            except: pass

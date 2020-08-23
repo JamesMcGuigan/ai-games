@@ -32,6 +32,12 @@ def cast_configuration(configuration):
     )
 
 
+def is_bitboard(bitboard) -> bool:
+    if isinstance(bitboard, np.ndarray) and bitboard.dtype == np.int64 and bitboard.shape == (2,):
+        return True
+    else:
+        return False
+
 #@njit
 def list_to_bitboard(listboard: Union[np.ndarray,List[int]]) -> np.ndarray:
     # bitboard[0] = played, is a square filled             | 0 = empty, 1 = filled
@@ -321,7 +327,7 @@ def run_random_simulation( bitboard: np.ndarray, player_id: int ) -> float:
         action      = np.random.choice(actions)
         bitboard    = result_action(bitboard, action, next_player)
         next_player = next_player_id(next_player)
-        # print( bitboard_to_numpy2d(bitboard) )  # DEVUG
+        # print( bitboard_to_numpy2d(bitboard) )  # DEBUG
     score = get_utility_zero_one(bitboard, player_id)
     return score
 
@@ -377,7 +383,7 @@ def is_gameover(bitboard: np.ndarray) -> bool:
 
 #@njit
 def get_winner(bitboard: np.ndarray) -> int:
-    """ Endgamme get_winner: 0 for no get_winner, 1 = player 1, 2 = player 2"""
+    """ Endgame get_winner: 0 for no get_winner, 1 = player 1, 2 = player 2"""
     global gameovers
     # gameovers = get_gameovers()
     p2_wins = (bitboard[0] &  bitboard[1]) & gameovers == gameovers

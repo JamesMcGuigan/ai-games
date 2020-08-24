@@ -2,6 +2,7 @@
 import argparse
 import contextlib
 import os
+import sys
 import time
 import traceback
 
@@ -97,21 +98,31 @@ else:
                     { "agent": agent_1, "name": f"{agent_1_name}({agent_1_args or ''}) (p2)", "index": 0, },
                 ]
 
-            # Disable logfiles with --quiet
+
+            env.reset()
             time_start = time.perf_counter()
-            stdout = os.stdout if not argv.quiet else os.devnull
-            with open(stdout, "w") as f, contextlib.redirect_stdout(f):
-                env.reset()
+
+            # Disable logfiles with --quiet
+            # BUG: this throws exception on next print() in debugger if argv.quiet
+            if argv.quiet:
+                with open(os.devnull, "w") as f, contextlib.redirect_stdout(f):
+                    env.run([agent_order[0]['agent'], agent_order[1]['agent']])
+            else:
                 env.run([agent_order[0]['agent'], agent_order[1]['agent']])
                 print()
+
             time_taken = time.perf_counter() - time_start
 
-            scores[ agent_order[0]['index'] ] += ((env.state[0].reward or 0) + 1)/2
-            scores[ agent_order[1]['index'] ] += ((env.state[1].reward or 0) + 1)/2
+            rewards = [
+                env.state[0].reward if env.state[0].reward is not None else -1,
+                env.state[1].reward if env.state[1].reward is not None else -1,
+            ]
+            scores[ agent_order[0]['index'] ] += ((rewards[0] or 0) + 1)/2
+            scores[ agent_order[1]['index'] ] += ((rewards[1] or 0) + 1)/2
 
             message = (
-                     f"Draw: {agent_order[0]['name']} vs {agent_order[1]['name']}"           if env.state[0].reward == env.state[1].reward
-                else f"Winner: {agent_order[0]['name']} vs Loser: {agent_order[1]['name']} " if env.state[0].reward >  env.state[1].reward
+                     f"Draw: {agent_order[0]['name']} vs {agent_order[1]['name']}"           if rewards[0] == rewards[1]
+                else f"Winner: {agent_order[0]['name']} vs Loser: {agent_order[1]['name']} " if rewards[0] >  rewards[1]
                 else f"Winner: {agent_order[1]['name']} vs Loser: {agent_order[0]['name']}"
             )
 

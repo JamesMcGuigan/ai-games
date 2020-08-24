@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import time
 
 import torch.nn as nn
@@ -5,6 +6,7 @@ import torch.optim as optim
 
 from core.ConnectXBBNN import *
 from neural_networks.is_gameover.IsGameoverCNN import isGameoverCNN
+from neural_networks.is_gameover.IsGameoverSquareNN import isGameoverSquareNN
 
 # model     = isGameoverSquareNN
 model     = isGameoverCNN
@@ -13,6 +15,7 @@ optimizer = optim.Adadelta(model.parameters())
 
 
 def train(model, criterion, optimizer, epochs=1000000):
+    print(f'Training: {model.__class__.__name__}')
     time_start = time.perf_counter()
     count_game = 0
     try:
@@ -45,23 +48,16 @@ def train(model, criterion, optimizer, epochs=1000000):
                 # zero the parameter gradients
                 optimizer.zero_grad()
 
-                # Retry each failed input until it has been learnt
-                # This improves training speed and is designed to increase sample size for no_more_moves() condition
-                # log10() ensures this has less of an effect early in training, before accuracy is fairly high
-                # Aiming for 100% function accuracy
-                for n in range( 1 + int(np.log10(count_game)) ):
-                    outputs = model(bitboard)
-                    loss    = criterion(outputs, labels)
-                    loss.backward()
-                    optimizer.step()
+                outputs = model(bitboard)
+                loss    = criterion(outputs, labels)
+                loss.backward()
+                optimizer.step()
 
-                    # Update running losses and accuracy
-                    actual            = model.cast_from_outputs(outputs)  # convert (1,1) tensor back to bool
-                    running_accuracy += int( actual == expected )
-                    running_loss     += loss.item()
-                    running_count    += 1
-
-                    if actual == expected: break
+                # Update running losses and accuracy
+                actual            = model.cast_from_outputs(outputs)  # convert (1,1) tensor back to bool
+                running_accuracy += int( actual == expected )
+                running_loss     += loss.item()
+                running_count    += 1
 
             # Print statistics
             window = 10000
@@ -79,7 +75,7 @@ def train(model, criterion, optimizer, epochs=1000000):
         pass
     finally:
         time_taken = time.perf_counter() - time_start
-        print(f'Finished Training: {count_game} epochs in {time_taken:.1f}s')
+        print(f'Finished Training: {model.__class__.__name__} - {count_game} epochs in {time_taken:.1f}s')
         model.save()
 
 

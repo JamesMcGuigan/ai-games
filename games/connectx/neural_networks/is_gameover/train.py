@@ -1,6 +1,5 @@
 import time
 
-import torch
 import torch.nn as nn
 import torch.optim as optim
 
@@ -37,7 +36,7 @@ def train(model, criterion, optimizer, epochs=1000000):
                 bitboard  = result_action(bitboard, action, player_id)
                 player_id = next_player_id(player_id)
                 expected  = is_gameover(bitboard)
-                labels    = torch.tensor([ expected ], dtype=torch.float)  # nn.MSELoss() == float | nn.CrossEntropyLoss() == long
+                labels    = model.cast_to_labels(expected)
 
                 # normalize the distribution of training data = 1 gameover for every 1 non-gameover
                 if not is_gameover(bitboard) and np.random.rand() < base_accuracy:
@@ -57,7 +56,7 @@ def train(model, criterion, optimizer, epochs=1000000):
                     optimizer.step()
 
                     # Update running losses and accuracy
-                    actual            = model.cast_outputs(outputs)  # convert (1,1) tensor back to bool
+                    actual            = model.cast_from_outputs(outputs)  # convert (1,1) tensor back to bool
                     running_accuracy += int( actual == expected )
                     running_loss     += loss.item()
                     running_count    += 1

@@ -7,7 +7,7 @@ from core.ConnectXBBNN import configuration
 from neural_networks.is_gameover.BitboardNN import BitboardNN
 
 
-# BUG: 99.8% accuracy may be having trouble with the no_move_moves() endgame condition
+# BUG: 99.8% accuracy may be having trouble with the no_move_moves)
 # self.cnn_channels = (10 + 16) | game:  100000 | move: 2130054 | loss: 0.113 | accuracy: 0.854 / 0.953 | time: 587s
 # self.cnn_channels = (10 + 16) | game:  200000 | move: 4261355 | loss: 0.092 | accuracy: 0.885 / 0.953 | time: 1156s
 # self.cnn_channels = (10 + 16) | game:  300000 | move: 6398089 | loss: 0.082 | accuracy: 0.900 / 0.953 | time: 1724s
@@ -15,7 +15,6 @@ from neural_networks.is_gameover.BitboardNN import BitboardNN
 class IsGameoverCNN(BitboardNN):
     def __init__(self):
         super().__init__()
-        self.device           = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu")
         self.one_hot_size     = 3
         self.input_size       = configuration.rows * configuration.columns * self.one_hot_size
         self.output_size      = 1
@@ -46,14 +45,17 @@ class IsGameoverCNN(BitboardNN):
 
     def forward(self, x):
         x = self.cast(x)                    # x.shape = (1,3,6,7)
-        x = F.relu(self.conv1(x))           # x.shape = (1,10,3,4)
-        # x = self.pool(x)                  # x.shape = (1,10,1,1)  - this will break is_gameover() logic
-        x = x.view(-1)                      # x.shape = (120,)      - required for transition into dense layers
-        x = F.relu(self.fc1(x))             # x.shape = (60,)
-        x = F.relu(self.fc2(x))             # x.shape = (30,)
-        x = F.relu(self.fc3(x))             # x.shape = (15,)
+        x = F.relu(self.conv1(x))           # x.shape = (1,26,3,4)
+        # x = self.pool(x)                  # x.shape = (1,26,1,1)  - this will break is_gameover() logic
+        # NOTE: reshape(-1) required for transition into dense layers
+        # WARNING (ignore):  Mixed memory format inputs detected - https://github.com/pytorch/pytorch/issues/42300
+        x = x.reshape(-1)                   # x.shape = (312,)
+        x = F.relu(self.fc1(x))             # x.shape = (156,)
+        x = F.relu(self.fc2(x))             # x.shape = (78,)
+        x = F.relu(self.fc3(x))             # x.shape = (39,)
         x = torch.sigmoid(self.output(x))   # x.shape = (1,)
         return x
 
 
 isGameoverCNN = IsGameoverCNN()
+isGameoverCNN.cuda()

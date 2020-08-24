@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 import argparse
+import contextlib
+import os
+import time
 import traceback
 
 import json5
@@ -22,12 +25,15 @@ env.reset()
 parser = argparse.ArgumentParser()
 parser.add_argument('--debug',         action="store_true")
 parser.add_argument('--inline',        action="store_true")
+parser.add_argument('-v', '--verbose', action="store_true")
+parser.add_argument('-q', '--quiet',   action="store_true")
 parser.add_argument('-t', '--timeout', type=int)
 parser.add_argument('-r', '--rounds',  type=int, default=1)
 parser.add_argument('-1', '--p1',      type=str, required=True)
 parser.add_argument('-2', '--p2',      type=str, default='negamax')
 parser.add_argument('--arg1',          type=json5.loads)  # eg: '{ "exploration": 1 }'
 parser.add_argument('--arg2',          type=json5.loads)
+
 
 argv = parser.parse_args()
 print(argv)
@@ -79,26 +85,51 @@ else:
     rounds = 0
     try:
         for round in range(argv.rounds):
-            rounds    += 1
-            env.reset()
-            agent_order = [agent_1, agent_2] if round % 2 == 0 else [agent_2, agent_1]
-            env.run(agent_order)
-            # noinspection PyTypeChecker
-            env.render(mode="human")
-            scores[0] += ((env.state[0].reward or 0) + 1)/2
-            scores[1] += ((env.state[1].reward or 0) + 1)/2
+            rounds += 1
+            if round % 2 == 0:
+                agent_order = [
+                    { "agent": agent_1, "name": f"{agent_1_name}({agent_1_args or ''}) (p1)", "index": 0, },
+                    { "agent": agent_2, "name": f"{agent_2_name}({agent_2_args or ''}) (p2)", "index": 1, },
+                ]
+            else:
+                agent_order = [
+                    { "agent": agent_2, "name": f"{agent_2_name}({agent_2_args or ''}) (p1)", "index": 1, },
+                    { "agent": agent_1, "name": f"{agent_1_name}({agent_1_args or ''}) (p2)", "index": 0, },
+                ]
+
+            # Disable logfiles with --quiet
+            time_start = time.perf_counter()
+            stdout = os.stdout if not argv.quiet else os.devnull
+            with open(stdout, "w") as f, contextlib.redirect_stdout(f):
+                env.reset()
+                env.run([agent_order[0]['agent'], agent_order[1]['agent']])
+                print()
+            time_taken = time.perf_counter() - time_start
+
+            scores[ agent_order[0]['index'] ] += ((env.state[0].reward or 0) + 1)/2
+            scores[ agent_order[1]['index'] ] += ((env.state[1].reward or 0) + 1)/2
+
+            message = (
+                     f"Draw: {agent_order[0]['name']} vs {agent_order[1]['name']}"           if env.state[0].reward == env.state[1].reward
+                else f"Winner: {agent_order[0]['name']} vs Loser: {agent_order[1]['name']} " if env.state[0].reward >  env.state[1].reward
+                else f"Winner: {agent_order[1]['name']} vs Loser: {agent_order[0]['name']}"
+            )
+
+            print(f'Round {round} ({time_taken:.1f}s) = {message}')
+            if argv.verbose: print(env.render(mode="ansi"))
+
     except Exception as exception:
         print('runner.py: Exception: ', exception)
         traceback.print_tb(exception.__traceback__)
 
     print()
     print('runner.py', argv)
-    print(f'{scores[0]:3.1f}/{rounds:.1f} = {scores[0]/rounds:.2f} | {agent_1_name}({agent_1_args})')
-    print(f'{scores[1]:3.1f}/{rounds:.1f} = {scores[1]/rounds:.2f} | {agent_2_name}({agent_2_args})')
+    print(f'{scores[0]:3.1f}/{rounds:.1f} = {100 * scores[0]/rounds:3.0f}% | {agent_1_name}({agent_1_args})')
+    print(f'{scores[1]:3.1f}/{rounds:.1f} = {100 * scores[1]/rounds:3.0f}% | {agent_2_name}({agent_2_args})')
     if scores[0] == scores[1]:
         print('Draw!')
     else:
-        winner = f'{agent_1_name}({agent_1_args})' if scores[0] > scores[1] else f'{agent_2_name}({agent_2_args})'
-        loser  = f'{agent_1_name}({agent_1_args})' if scores[0] < scores[1] else f'{agent_2_name}({agent_2_args})'
+        winner = f"{agent_1_name}({agent_1_args or ''})" if scores[0] > scores[1] else f"{agent_2_name}({agent_2_args or ''})"
+        loser  = f"{agent_1_name}({agent_1_args or ''})" if scores[0] < scores[1] else f"{agent_2_name}({agent_2_args or ''})"
         print(f'Winner: {winner}')
         print(f'Loser:  {loser}')

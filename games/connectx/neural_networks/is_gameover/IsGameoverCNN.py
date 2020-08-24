@@ -49,7 +49,7 @@ class IsGameoverCNN(BitboardNN):
         # x = self.pool(x)                  # x.shape = (1,26,1,1)  - this will break is_gameover() logic
         # NOTE: reshape(-1) required for transition into dense layers
         # WARNING (ignore):  Mixed memory format inputs detected - https://github.com/pytorch/pytorch/issues/42300
-        x = x.reshape(-1)                   # x.shape = (312,)
+        x = x.permute(0,2,3,1).reshape(-1)  # x.shape = (312,) + convert to columns_last (batch_size, height, width, channels)
         x = F.relu(self.fc1(x))             # x.shape = (156,)
         x = F.relu(self.fc2(x))             # x.shape = (78,)
         x = F.relu(self.fc3(x))             # x.shape = (39,)

@@ -98,7 +98,7 @@ else:
     if scores[0] == scores[1]:
         print('Draw!')
     else:
-        winner = f'{agent_1_name}({agent_1_args})' if scores[0] < scores[1] else f'{agent_2_name}({agent_2_args})'
-        loser  = f'{agent_1_name}({agent_1_args})' if scores[0] > scores[1] else f'{agent_2_name}({agent_2_args})'
+        winner = f'{agent_1_name}({agent_1_args})' if scores[0] > scores[1] else f'{agent_2_name}({agent_2_args})'
+        loser  = f'{agent_1_name}({agent_1_args})' if scores[0] < scores[1] else f'{agent_2_name}({agent_2_args})'
         print(f'Winner: {winner}')
         print(f'Loser:  {loser}')

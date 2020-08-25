@@ -2,13 +2,15 @@ import math
 import sys
 
 from core.ConnectXBBNN import *
-
 # Hyperparameters
+from util.sigmoid import scaled_sigmoid
+
 single_square_score = 0.1  # Mostly ignore single squares, that can make lines in 8 directions
 double_attack_score = 0.5  # 0.5 == 100% winrate vs AlphaBetaAgent
 
 min_score =  math.inf  # min_score: -32.3
 max_score = -math.inf  # max_score:  26.4
+
 
 # Profiler (Macbook Pro 2011): This vectorized implementation is actually slower than unvectorized
 # bitboard_gameovers_heuristic	                call_count=9469	    time=1558	own_time=1141
@@ -94,6 +96,14 @@ def bitboard_gameovers_heuristic( bitboard: np.ndarray, player_id: int ) -> floa
     # if score < min_score: min_score = score; print(f'min_score: {min_score}')  # min_score: -32.3
     # if score > max_score: max_score = score; print(f'max_score: {max_score}')  # max_score:  26.4
     return score
+
+
+def bitboard_gameovers_heuristic_sigmoid(heuristic_scale = 6.0):
+    def _bitboard_gameovers_heuristic_sigmoid( bitboard: np.ndarray, player_id: int ) -> float:
+        score = bitboard_gameovers_heuristic(bitboard, player_id)
+        score = scaled_sigmoid(score, heuristic_scale)
+        return score
+    return _bitboard_gameovers_heuristic_sigmoid
 
 
 ### Previous implementations of the above code

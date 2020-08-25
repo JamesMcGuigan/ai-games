@@ -8,10 +8,8 @@ from joblib import delayed
 from joblib import Parallel
 from kaggle_environments import make
 
-from agents.AlphaBetaAgent.AlphaBetaBitboard import AlphaBetaBitboard
-from agents.AlphaBetaAgent.AlphaBetaOddEven import AlphaBetaOddEven
-from heuristics.BitsquaresHeuristic import bitsquares_heuristic
-from heuristics.OddEvenHeuristic import oddeven_bitsquares_heuristic
+from agents.MontyCarlo.MontyCarloBitsquares import MontyCarloBitsquaresNode
+from agents.MontyCarlo.MontyCarloBitsquares import MontyCarloBitsquaresNode2
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-r', '--rounds',  type=int, default=30)
@@ -26,8 +24,8 @@ observation   = env.state[0].observation
 configuration = env.configuration
 
 rounds   = argv.rounds
-agent    = AlphaBetaBitboard
-opponent = AlphaBetaOddEven
+agent    = MontyCarloBitsquaresNode
+opponent = MontyCarloBitsquaresNode2
 
 
 scores = { agent.__name__: 0, opponent.__name__: 0 }
@@ -36,11 +34,11 @@ def run_round(agent, opponent, round=0):
         "verbose_depth":  False,
     }
     agent_kwargs    = {
-        "heuristic_fn": bitsquares_heuristic(),
+        "heuristic_scale": 8.0,
         **kwargs
     }
     opponent_kwargs = {
-        "heuristic_fn": oddeven_bitsquares_heuristic(),
+        "heuristic_scale": 6.0,
         **kwargs
     }
 
@@ -62,6 +60,7 @@ def run_round(agent, opponent, round=0):
     time_taken = time.perf_counter() - time_start
     print(f'{time_taken:6.1f}s', scores)
     return scores
+
 
 n_jobs = rounds if rounds < multiprocessing.cpu_count() * 2 else multiprocessing.cpu_count()
 all_scores = Parallel(n_jobs=n_jobs)([

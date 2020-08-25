@@ -160,6 +160,8 @@ class AlphaBetaAgent(PersistentCacheAgent):
             gc.enable()  # re-enable the gc to run during our opponents turn!
             # print( f'T{-(endtime - time.perf_counter()):+.5f}s')  # depth_range 0.1-3ms but gc triggers huge timeouts 1000ms+
             return int(action)
+
+        kaggle_agent.__name__ = cls.__name__
         return kaggle_agent
 
 # The last function defined in the file run by Kaggle in submission.csv

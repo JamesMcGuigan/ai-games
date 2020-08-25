@@ -10,6 +10,9 @@ from core.ConnectXBBNN import *
 #   64% winrate @ reward_power=2.5
 #   69% winrate @ reward_power=3
 #   25% winrate @ reward_power=4
+from util.sigmoid import scaled_sigmoid
+
+
 def bitsquares_heuristic(reward_power=1.75):
     def _bitsquares_heuristic(bitboard: np.ndarray, player_id: int, playable_lines = None):
         playable_lines = playable_lines or get_playable_lines_by_length(bitboard)
@@ -22,6 +25,14 @@ def bitsquares_heuristic(reward_power=1.75):
         return score
     return _bitsquares_heuristic
 
+
+def bitsquares_heuristic_sigmoid(reward_power=1.75, heuristic_scale=6.0):
+    heuristic = bitsquares_heuristic(reward_power=reward_power)
+    def _bitsquares_heuristic_sigmoid(bitboard: np.ndarray, player_id: int, playable_lines = None) -> float:
+        score = heuristic(bitboard=bitboard, player_id=player_id, playable_lines=playable_lines)
+        score = scaled_sigmoid(score, heuristic_scale)
+        return score
+    return _bitsquares_heuristic_sigmoid
 
 ### Utility Functions
 

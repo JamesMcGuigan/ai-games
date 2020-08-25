@@ -2,7 +2,6 @@
 import argparse
 import contextlib
 import os
-import sys
 import time
 import traceback
 
@@ -15,7 +14,9 @@ from agents.AlphaBetaAgent.AlphaBetaBitsquares import AlphaBetaBitsquares
 from agents.AlphaBetaAgent.AlphaBetaOddEven import AlphaBetaOddEven
 from agents.AlphaBetaAgent.MinimaxBitboard import MinimaxBitboard
 from agents.MontyCarlo.AntColonyTreeSearch import AntColonyTreeSearch
+from agents.MontyCarlo.MontyCarloBitsquares import MontyCarloBitsquares
 from agents.MontyCarlo.MontyCarloHeuristic import MontyCarloHeuristic
+from agents.MontyCarlo.MontyCarloOddEven import MontyCarloOddEven
 from agents.MontyCarlo.MontyCarloPure import MontyCarloPure
 from agents.Negamax.Negamax import Negamax
 
@@ -59,6 +60,8 @@ for agent_name, position in [ (argv.p1, 'p1'), (argv.p2, 'p2') ]:
     elif agent_name == 'MinimaxBitboard':          agent = MinimaxBitboard.agent(**kwargs)
     elif agent_name == 'MontyCarloPure':           agent = MontyCarloPure(**kwargs)
     elif agent_name == 'MontyCarloHeuristic':      agent = MontyCarloHeuristic(**kwargs)
+    elif agent_name == 'MontyCarloBitsquares':     agent = MontyCarloBitsquares(**kwargs)
+    elif agent_name == 'MontyCarloOddEven':        agent = MontyCarloOddEven(**kwargs)
     elif agent_name == 'AntColonyTreeSearch':      agent = AntColonyTreeSearch(**kwargs)
     elif agent_name == 'Negamax':                  agent = Negamax(**kwargs)
     elif agent_name == 'negamax':                  agent = agent_name

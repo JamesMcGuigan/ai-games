@@ -3,9 +3,11 @@
 import atexit
 import time
 from struct import Struct
+from typing import Callable
 
 from core.ConnectXBBNN import *
-from util.base64_file import base64_file_save, base64_file_load
+from util.base64_file import base64_file_load
+from util.base64_file import base64_file_save
 
 Hyperparameters = namedtuple('hyperparameters', [])
 
@@ -286,55 +288,57 @@ class MontyCarloNode:
 
 
     ### Agent
-
     @classmethod
-    def agent( cls, observation: Struct, _configuration_: Struct, **kwargs ):
-        first_move_time = 0
-        safety_time     = 2
-        start_time      = time.perf_counter()
-        # configuration   = cast_configuration(_configuration_)
+    def agent(cls, **kwargs) -> Callable[[Struct, Struct],int]:
+        def kaggle_agent( observation: Struct, _configuration_: Struct ):
+            first_move_time = 0
+            safety_time     = 2
+            start_time      = time.perf_counter()
+            # configuration   = cast_configuration(_configuration_)
 
-        player_id     = int(observation.mark)
-        listboard     = np.array(observation.board, dtype=np.int8)
-        bitboard      = list_to_bitboard(listboard)
-        move_number   = get_move_number(bitboard)
-        is_first_move = int(move_number < 2)
-        endtime       = start_time + _configuration_.timeout - safety_time - (first_move_time * is_first_move)
+            player_id     = int(observation.mark)
+            listboard     = np.array(observation.board, dtype=np.int8)
+            bitboard      = list_to_bitboard(listboard)
+            move_number   = get_move_number(bitboard)
+            is_first_move = int(move_number < 2)
+            endtime       = start_time + _configuration_.timeout - safety_time - (first_move_time * is_first_move)
 
-        if cls.persist == True and cls.save_node.get(cls.__name__, None) is None:
-            atexit.register(cls.save)
-            cls.save_node[cls.__name__] = cls.load() or cls(empty_bitboard(), player_id=1)
-            cls.root_nodes[1] = cls.root_nodes[2] = cls.save_node[cls.__name__]  # implement shared state
+            if cls.persist == True and cls.save_node.get(cls.__name__, None) is None:
+                atexit.register(cls.save)
+                cls.save_node[cls.__name__] = cls.load() or cls(empty_bitboard(), player_id=1)
+                cls.root_nodes[1] = cls.root_nodes[2] = cls.save_node[cls.__name__]  # implement shared state
 
-        root_node = cls.root_nodes[player_id]
-        if root_node is None or root_node.find_child(bitboard, depth=2) is None:
-            root_node = cls.root_nodes[player_id] = cls(
-                bitboard      = bitboard,
-                player_id     = player_id,
-                parent        = None,
-                # configuration = configuration,
-                **kwargs
-            )
-        else:
-            root_node = cls.root_nodes[player_id] = cls.root_nodes[player_id].find_child(bitboard)
-        assert root_node is not None
+            root_node = cls.root_nodes[player_id]
+            if root_node is None or root_node.find_child(bitboard, depth=2) is None:
+                root_node = cls.root_nodes[player_id] = cls(
+                    bitboard      = bitboard,
+                    player_id     = player_id,
+                    parent        = None,
+                    # configuration = configuration,
+                    **kwargs
+                )
+            else:
+                root_node = cls.root_nodes[player_id] = cls.root_nodes[player_id].find_child(bitboard)
+            assert root_node is not None
 
-        count = 0
-        while time.perf_counter() < endtime:
-            count += 1
-            root_node.single_run()
+            count = 0
+            while time.perf_counter() < endtime:
+                count += 1
+                root_node.single_run()
 
-        action     = root_node.get_best_action()
-        time_taken = time.perf_counter() - start_time
-        print(f'{cls.__name__}: p{player_id} action = {action} after {count} simulations in {time_taken:.3f}s')
-        return int(action)
+            action     = root_node.get_best_action()
+            time_taken = time.perf_counter() - start_time
+            print(f'{cls.__name__}: p{player_id} action = {action} after {count} simulations in {time_taken:.3f}s')
+            return int(action)
 
+        kaggle_agent.__name__ = cls.__name__
+        return kaggle_agent
 
 def MontyCarloPure(**kwargs):
     # observation   = {'mark': 1, 'board': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
     # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 8}
     def MontyCarloPure(observation: Struct, configuration: Struct) -> int:
-        return MontyCarloNode.agent(observation, configuration, **kwargs)
+        return MontyCarloNode.agent(**kwargs)(observation, configuration)
     return MontyCarloPure
 
 def MontyCarloPureKaggle(observation, configuration):

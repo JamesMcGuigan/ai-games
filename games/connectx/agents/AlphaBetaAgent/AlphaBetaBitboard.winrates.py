@@ -12,8 +12,8 @@ from agents.MontyCarlo.MontyCarloBitsquares import MontyCarloBitsquaresNode
 from agents.MontyCarlo.MontyCarloBitsquares import MontyCarloBitsquaresNode2
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-r', '--rounds',  type=int, default=30)
-parser.add_argument('-t', '--timeout', type=int, default=1 + 2)  # 1s for faster benchmarks | AlphaBetaBitboard has depth=4 opening
+parser.add_argument('-r', '--rounds',  type=int, default=120)
+parser.add_argument('-t', '--timeout', type=int, default=0.25 + 2)  # 1s for faster benchmarks | AlphaBetaBitboard has depth=4 opening
 parser.add_argument('argv', nargs=argparse.REMAINDER)
 argv = parser.parse_args()
 
@@ -34,11 +34,11 @@ def run_round(agent, opponent, round=0):
         "verbose_depth":  False,
     }
     agent_kwargs    = {
-        "heuristic_scale": 8.0,
+        "heuristic_args": { "heuristic_scale": 17 },
         **kwargs
     }
     opponent_kwargs = {
-        "heuristic_scale": 6.0,
+        "heuristic_args": { "heuristic_scale": 21 },
         **kwargs
     }
 
@@ -72,8 +72,8 @@ wins     = sum([ scores[agent.__name__]    for scores in all_scores ])
 losses   = sum([ scores[opponent.__name__] for scores in all_scores ])
 winrate  = 100 * wins   / rounds
 lossrate = 100 * losses / rounds
-print(f'{  wins:.1f}/{rounds:.0f} = { winrate:3.0f}% winrate  {agent.__name__} vs {opponent.__name__}')
-print(f'{losses:.1f}/{rounds:.0f} = {lossrate:3.0f}% lossrate {agent.__name__} vs {opponent.__name__}')
+print(f'{  wins:.1f}/{rounds:.0f} = { winrate:3.0f}% winrate  {agent.__name__}() vs {opponent.__name__}')
+print(f'{losses:.1f}/{rounds:.0f} = {lossrate:3.0f}% lossrate {agent.__name__}() vs {opponent.__name__}')
 
 
 ### Winrates @ timeout=5

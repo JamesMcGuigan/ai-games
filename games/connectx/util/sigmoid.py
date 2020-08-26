@@ -13,4 +13,4 @@ def sigmoid(self, value: float):
 
 def scaled_sigmoid(value: float, scale: float):
     # scale == 2 means a heuristic score of +-2 will return +-0.73
-    return 1 / (1 + np.exp(-value/scale))
+    return 1 / (1 + np.exp(-value/scale)) if scale else 0

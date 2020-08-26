@@ -49,8 +49,8 @@ if argv.debug:
     env.configuration.steps   = 1
 
 agent_1 = agent_2 = agent_1_name = agent_2_name = None
-agent_1_args = {}
-agent_2_args = {}
+agent_1_args = { }  # "safety_time": 0
+agent_2_args = { }  # "safety_time": 0
 for agent_name, position in [ (argv.p1, 'p1'), (argv.p2, 'p2') ]:
     kwargs = (argv.arg1 if position == 'p1' else argv.arg2) or {}
     if   agent_name == 'AlphaBetaAgent':           agent = AlphaBetaAgent.agent(**kwargs)

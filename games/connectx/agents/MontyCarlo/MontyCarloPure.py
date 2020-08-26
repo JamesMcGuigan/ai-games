@@ -292,7 +292,7 @@ class MontyCarloNode:
     def agent(cls, **kwargs) -> Callable[[Struct, Struct],int]:
         def kaggle_agent( observation: Struct, _configuration_: Struct ):
             first_move_time = 0
-            safety_time     = 2
+            safety_time     = kwargs.get('safety_time', 0.25)
             start_time      = time.perf_counter()
             # configuration   = cast_configuration(_configuration_)
 

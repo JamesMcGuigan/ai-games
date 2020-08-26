@@ -13,7 +13,7 @@ from agents.MontyCarlo.MontyCarloBitsquares import MontyCarloBitsquaresNode2
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-r', '--rounds',  type=int, default=120)
-parser.add_argument('-t', '--timeout', type=int, default=0.25 + 2)  # 1s for faster benchmarks | AlphaBetaBitboard has depth=4 opening
+parser.add_argument('-t', '--timeout', type=int, default=0.25)  # 1s for faster benchmarks | AlphaBetaBitboard has depth=4 opening
 parser.add_argument('argv', nargs=argparse.REMAINDER)
 argv = parser.parse_args()
 
@@ -35,10 +35,12 @@ def run_round(agent, opponent, round=0):
     }
     agent_kwargs    = {
         "heuristic_args": { "heuristic_scale": 17 },
+        "safety_time": 0,
         **kwargs
     }
     opponent_kwargs = {
         "heuristic_args": { "heuristic_scale": 21 },
+        "safety_time": 0,
         **kwargs
     }
 

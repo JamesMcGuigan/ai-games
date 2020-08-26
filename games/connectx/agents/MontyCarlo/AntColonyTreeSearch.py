@@ -11,8 +11,6 @@ from util.sigmoid import scaled_sigmoid
 Hyperparameters = namedtuple('hyperparameters', [])
 
 class AntColonyTreeSearchNode(MontyCarloNode):
-    root_nodes: List[Union['MontyCarloNode', None]] = [None, None, None]  # root_nodes[observation.mark]
-
     def __init__(
             self,
             bitboard:      np.ndarray,
@@ -103,7 +101,7 @@ def AntColonyTreeSearch(**kwargs):
     # observation   = {'mark': 1, 'board': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
     # configuration = {'columns': 7, 'rows': 6, 'inarow': 4, 'steps': 1000, 'timeout': 8}
     def AntColonyTreeSearch(observation: Struct, configuration: Struct) -> int:
-        return AntColonyTreeSearchNode.agent(observation, configuration, **kwargs)
+        return AntColonyTreeSearchNode.agent(**kwargs)(observation, configuration)
     return AntColonyTreeSearch
 
 def AntColonyTreeSearchKaggle(observation, configuration):

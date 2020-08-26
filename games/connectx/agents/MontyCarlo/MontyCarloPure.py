@@ -16,6 +16,20 @@ class MontyCarloNode:
     save_node = {}                                                        # save_node[cls.__name__] = cls(empty_bitboard(), 1)
     root_nodes: List[Union['MontyCarloNode', None]] = [None, None, None]  # root_nodes[observation.mark]
 
+    def __new__(cls, *args, **kwargs):
+        # noinspection PyUnresolvedReferences
+        # create a new cls.save_node and cls.root_nodes for each class
+        for parentclass in cls.__mro__:  # https://stackoverflow.com/questions/2611892/how-to-get-the-parents-of-a-python-class
+            if cls is parentclass: continue
+            if ( cls.save_node  is getattr(parentclass, 'save_node',  None)
+              or cls.root_nodes is getattr(parentclass, 'root_nodes', None)
+            ):
+                cls.cache      = {}
+                cls.root_nodes = [None, None, None]
+                break
+        instance = object.__new__(cls)
+        return instance
+
     def __init__(
             self,
             bitboard:      np.ndarray,
@@ -93,12 +107,15 @@ class MontyCarloNode:
 
             start_time   = time.perf_counter()
             pruned_count, total_count = cls.prune(save_node)  # This reduces a 47MB base64 file down to 5Mb
-            print(f'{cls.__name__}.save() - pruned {pruned_count:.0f}/{total_count:.0f} nodes leaving {total_count-pruned_count:.0f} in {time.perf_counter() - start_time:.2f}s')
+            print(f'{cls.__name__}.save() - pruned {pruned_count:.0f}/{total_count:.0f} nodes '
+                  + f'leaving {total_count-pruned_count:.0f} in {time.perf_counter() - start_time:.2f}s - ')
 
             filename = cls.filename()
             filesize = base64_file_save(save_node, filename)
             return filename
         return None
+
+
 
     ### Constructors and Lookups
 
@@ -329,6 +346,7 @@ class MontyCarloNode:
             action     = root_node.get_best_action()
             time_taken = time.perf_counter() - start_time
             print(f'{cls.__name__}: p{player_id} action = {action} after {count} simulations in {time_taken:.3f}s')
+            cls.save()
             return int(action)
 
         kaggle_agent.__name__ = cls.__name__

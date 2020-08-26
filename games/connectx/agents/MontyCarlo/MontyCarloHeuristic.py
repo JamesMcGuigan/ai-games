@@ -12,7 +12,6 @@ from heuristics.BitboardGameoversHeuristic import bitboard_gameovers_heuristic_s
 Hyperparameters = namedtuple('hyperparameters', [])
 
 class MontyCarloHeuristicNode(MontyCarloNode):
-    root_nodes:    List[Union['MontyCarloNode', None]] = [None, None, None]  # root_nodes[observation.mark]
     heuristic_fn   =  bitboard_gameovers_heuristic_sigmoid
     heuristic_args = {}
 
@@ -40,13 +39,17 @@ class MontyCarloHeuristicNode(MontyCarloNode):
         # self.kwargs[] needs to be defined in order to pass arguments down to child nodes
         self.kwargs['heuristic_fn']   = self.heuristic_fn   = heuristic_fn   or self.__class__.heuristic_fn
         self.kwargs['heuristic_args'] = self.heuristic_args = heuristic_args or self.__class__.heuristic_args
-        self.heuristic = self.heuristic_fn(**(heuristic_args or {}))
 
     def simulate(self) -> float:
+        self.heuristic = getattr(self, 'heuristic', self.heuristic_fn(**(self.heuristic_args or {})))
         score = self.heuristic(self.bitboard, self.player_id)
         return score
 
-
+    # BUGFIX: pickle() throws exceptions for functions as local properties
+    @classmethod
+    def prune(cls, node: 'MontyCarloNode', *args, **kwargs):
+        node.heuristic = None  # remove from pickle, will be restored by simulate()
+        return super().prune(node, *args, **kwargs)
 
 
 def MontyCarloHeuristic(**kwargs):

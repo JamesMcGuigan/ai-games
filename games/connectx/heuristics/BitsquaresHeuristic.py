@@ -27,8 +27,7 @@ def bitsquares_heuristic(reward_power=1.75):
 
 
 # Scores for: *heuristic_scale=1.75**: 1-in-a-row = 1 | 2-in-a-row = 3.4 | 3-in-a-row = 6.8
-# heuristic_scale between 6 and 34 produces similar MCTS winrates vs self | 17 == 2.5 * 3-in-a-row
-def bitsquares_heuristic_sigmoid(reward_power=1.75, heuristic_scale=17):
+def bitsquares_heuristic_sigmoid(reward_power=1.75, heuristic_scale=7):
     heuristic = bitsquares_heuristic(reward_power=reward_power)
     def _bitsquares_heuristic_sigmoid(bitboard: np.ndarray, player_id: int, playable_lines = None) -> float:
         score = heuristic(bitboard=bitboard, player_id=player_id, playable_lines=playable_lines)

@@ -346,7 +346,6 @@ class MontyCarloNode:
             action     = root_node.get_best_action()
             time_taken = time.perf_counter() - start_time
             print(f'{cls.__name__}: p{player_id} action = {action} after {count} simulations in {time_taken:.3f}s')
-            cls.save()
             return int(action)
 
         kaggle_agent.__name__ = cls.__name__

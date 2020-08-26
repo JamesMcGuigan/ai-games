@@ -11,9 +11,10 @@ from heuristics.BitsquaresHeuristic import bitsquares_heuristic_sigmoid
 Hyperparameters = namedtuple('hyperparameters', [])
 
 class MontyCarloBitsquaresNode(MontyCarloHeuristicNode):
-    persist   = False
     root_nodes: List[Union['MontyCarloNode', None]] = [None, None, None]  # root_nodes[observation.mark]
-    heuristic_fn = bitsquares_heuristic_sigmoid
+    persist        = False
+    heuristic_fn   = bitsquares_heuristic_sigmoid
+    heuristic_args = {}
 
 class MontyCarloBitsquaresNode2(MontyCarloBitsquaresNode):
     pass

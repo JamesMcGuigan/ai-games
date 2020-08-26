@@ -12,9 +12,9 @@ from heuristics.BitboardGameoversHeuristic import bitboard_gameovers_heuristic_s
 Hyperparameters = namedtuple('hyperparameters', [])
 
 class MontyCarloHeuristicNode(MontyCarloNode):
-    root_nodes:     List[Union['MontyCarloNode', None]] = [None, None, None]  # root_nodes[observation.mark]
-    heuristic_fn:   bitboard_gameovers_heuristic_sigmoid
-    heuristic_args: {}
+    root_nodes:    List[Union['MontyCarloNode', None]] = [None, None, None]  # root_nodes[observation.mark]
+    heuristic_fn   =  bitboard_gameovers_heuristic_sigmoid
+    heuristic_args = {}
 
     def __init__(
             self,

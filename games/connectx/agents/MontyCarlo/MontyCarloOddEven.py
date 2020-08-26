@@ -6,14 +6,16 @@ from struct import Struct
 from agents.MontyCarlo.MontyCarloHeuristic import MontyCarloHeuristicNode
 from agents.MontyCarlo.MontyCarloPure import MontyCarloNode
 from core.ConnectXBBNN import *
-from heuristics.OddEvenHeuristic import oddeven_bitsquares_heuristic_sigmoid
+from heuristics.BitsquaresHeuristic import bitsquares_heuristic_sigmoid
 
 Hyperparameters = namedtuple('hyperparameters', [])
 
 class MontyCarloOddEvenNode(MontyCarloHeuristicNode):
-    persist      = False
     root_nodes:    List[Union['MontyCarloNode', None]] = [None, None, None]  # root_nodes[observation.mark]
-    heuristic_fn = oddeven_bitsquares_heuristic_sigmoid
+    persist        = False
+    heuristic_fn   = bitsquares_heuristic_sigmoid
+    heuristic_args = {}
+
 
 class MontyCarloOddEvenNode2(MontyCarloOddEvenNode):
     pass

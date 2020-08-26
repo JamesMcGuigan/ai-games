@@ -16,7 +16,9 @@ class MontyCarloNode:
     save_node = {}                                                        # save_node[cls.__name__] = cls(empty_bitboard(), 1)
     root_nodes: List[Union['MontyCarloNode', None]] = [None, None, None]  # root_nodes[observation.mark]
 
-    def __new__(cls, *args, **kwargs):
+    # This ensures we have unique instances of cls.save_node, cls.root_nodes in case multiple subclasses are running simultaniously
+    @classmethod
+    def init_class(cls):
         # noinspection PyUnresolvedReferences
         # create a new cls.save_node and cls.root_nodes for each class
         for parentclass in cls.__mro__:  # https://stackoverflow.com/questions/2611892/how-to-get-the-parents-of-a-python-class
@@ -27,8 +29,7 @@ class MontyCarloNode:
                 cls.cache      = {}
                 cls.root_nodes = [None, None, None]
                 break
-        instance = object.__new__(cls)
-        return instance
+
 
     def __init__(
             self,
@@ -320,6 +321,7 @@ class MontyCarloNode:
             is_first_move = int(move_number < 2)
             endtime       = start_time + _configuration_.timeout - safety_time - (first_move_time * is_first_move)
 
+            cls.init_class()  # ensure unique instance of cls.save_node between subclasses
             if cls.persist == True and cls.save_node.get(cls.__name__, None) is None:
                 atexit.register(cls.save)
                 cls.save_node[cls.__name__] = cls.load() or cls(empty_bitboard(), player_id=1)

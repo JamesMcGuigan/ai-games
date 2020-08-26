@@ -7,8 +7,10 @@ from kaggle_environments.envs.connectx.connectx import random_agent
 
 from agents.AlphaBetaAgent.AlphaBetaAgent import AlphaBetaAgent
 from agents.AlphaBetaAgent.AlphaBetaBitboard import AlphaBetaBitboard
-from agents.AlphaBetaAgent.MinimaxBitboard import MinimaxBitboard
+from agents.AlphaBetaAgent.AlphaBetaBitsquares import AlphaBetaBitsquares
+from agents.AlphaBetaAgent.AlphaBetaOddEven import AlphaBetaOddEven
 from agents.MontyCarlo.AntColonyTreeSearch import AntColonyTreeSearch
+from agents.MontyCarlo.MontyCarloBitsquares import MontyCarloBitsquares
 from agents.MontyCarlo.MontyCarloHeuristic import MontyCarloHeuristic
 from agents.MontyCarlo.MontyCarloPure import MontyCarloPure
 from agents.Negamax.Negamax import Negamax
@@ -17,18 +19,32 @@ training_agents = [
     # AntColonyTreeSearch(),
     # MontyCarloPure(),
     # MontyCarloHeuristic(),
-    MinimaxBitboard.agent(),
+    MontyCarloBitsquares(),
+    # MinimaxBitboard.agent(),
 ]
 opponent_agents = [
     random_agent,
     negamax_agent,
     AlphaBetaAgent.agent(),
     AlphaBetaBitboard.agent(),
+    AlphaBetaBitsquares.agent(),
+    AlphaBetaOddEven.agent(),
     AntColonyTreeSearch(),
     MontyCarloPure(),
     MontyCarloHeuristic(),
+    MontyCarloHeuristic(),
     Negamax(),
-    *[ Negamax(max_depth=max_depth) for max_depth in range(1,8+1) ],
+
+    AlphaBetaAgent.agent(),
+    AlphaBetaBitboard.agent(),
+    AlphaBetaBitsquares.agent(),
+    AlphaBetaOddEven.agent(),
+
+    *[ random_agent                                          for _ in range(7**2) ],  # depth=2 opening book
+    *[ AlphaBetaBitboard.agent(search_max_depth=max_depth)   for max_depth in range(1,8+1) ],
+    *[ AlphaBetaBitsquares.agent(search_max_depth=max_depth) for max_depth in range(1,8+1) ],
+    *[ AlphaBetaOddEven.agent(search_max_depth=max_depth)    for max_depth in range(1,8+1) ],
+    *[ Negamax(max_depth=max_depth)                          for max_depth in range(1,8+1) ],
 ]
 # random.shuffle(training_agents)
 # random.shuffle(opponent_agents)
@@ -48,8 +64,8 @@ def print_results(env, agent_order):
     print()
 
 
-safety_time = 2
-for timeout in [3,6 ]:
+safety_time = 0.25
+for timeout in [1,3,6,8]:
     timeout += safety_time
     env.configuration.timeout = timeout  # MontyCarlo has a safety time of 2s, so this gives 1s of runtime to expand nodes
 

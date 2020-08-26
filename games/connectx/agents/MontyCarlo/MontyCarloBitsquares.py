@@ -12,7 +12,6 @@ Hyperparameters = namedtuple('hyperparameters', [])
 
 class MontyCarloBitsquaresNode(MontyCarloHeuristicNode):
     root_nodes: List[Union['MontyCarloNode', None]] = [None, None, None]  # root_nodes[observation.mark]
-    persist        = False
     heuristic_fn   = bitsquares_heuristic_sigmoid
     heuristic_args = {}
 

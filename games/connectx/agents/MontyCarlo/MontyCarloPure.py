@@ -13,7 +13,7 @@ Hyperparameters = namedtuple('hyperparameters', [])
 
 class MontyCarloNode:
     persist   = True
-    save_node = {}                                                        # save_node[cls.__name__] = cls(empty_bitboard(), 1)
+    save_node = None
     root_nodes: List[Union['MontyCarloNode', None]] = [None, None, None]  # root_nodes[observation.mark]
 
     # This ensures we have unique instances of cls.save_node, cls.root_nodes in case multiple subclasses are running simultaniously
@@ -26,7 +26,7 @@ class MontyCarloNode:
             if ( cls.save_node  is getattr(parentclass, 'save_node',  None)
               or cls.root_nodes is getattr(parentclass, 'root_nodes', None)
             ):
-                cls.cache      = {}
+                cls.save_node  = None
                 cls.root_nodes = [None, None, None]
                 break
 
@@ -95,7 +95,7 @@ class MontyCarloNode:
         filename = cls.filename()
         loaded   = base64_file_load(filename)
         if loaded is not None:
-            cls.save_node[cls.__name__] = loaded
+            cls.save_node = loaded
             return loaded
         else:
             return None
@@ -103,8 +103,8 @@ class MontyCarloNode:
 
     @classmethod
     def save(cls) -> Union[str,None]:
-        if cls.persist == True and cls.save_node.get(cls.__name__, None) is not None:
-            save_node    = cls.save_node[cls.__name__]
+        if cls.persist == True and cls.save_node is not None:
+            save_node    = cls.save_node
 
             start_time   = time.perf_counter()
             pruned_count, total_count = cls.prune(save_node)  # This reduces a 47MB base64 file down to 5Mb
@@ -322,10 +322,10 @@ class MontyCarloNode:
             endtime       = start_time + _configuration_.timeout - safety_time - (first_move_time * is_first_move)
 
             cls.init_class()  # ensure unique instance of cls.save_node between subclasses
-            if cls.persist == True and cls.save_node.get(cls.__name__, None) is None:
+            if cls.persist == True and cls.save_node is None:
                 atexit.register(cls.save)
-                cls.save_node[cls.__name__] = cls.load() or cls(empty_bitboard(), player_id=1)
-                cls.root_nodes[1] = cls.root_nodes[2] = cls.save_node[cls.__name__]  # implement shared state
+                cls.save_node = cls.load() or cls(empty_bitboard(), player_id=1)
+                cls.root_nodes[1] = cls.root_nodes[2] = cls.save_node  # implement shared state
 
             root_node = cls.root_nodes[player_id]
             if root_node is None or root_node.find_child(bitboard, depth=2) is None:

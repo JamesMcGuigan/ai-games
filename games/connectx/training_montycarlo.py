@@ -9,7 +9,7 @@ from agents.AlphaBetaAgent.AlphaBetaAgent import AlphaBetaAgent
 from agents.AlphaBetaAgent.AlphaBetaBitboard import AlphaBetaBitboard
 from agents.AlphaBetaAgent.AlphaBetaBitsquares import AlphaBetaBitsquares
 from agents.AlphaBetaAgent.AlphaBetaOddEven import AlphaBetaOddEven
-from agents.MontyCarlo.AntColonyTreeSearch import AntColonyTreeSearch
+from agents.MontyCarlo.AntColonyTreeSearch import AntColonyTreeSearchNode
 from agents.MontyCarlo.MontyCarloBitsquares import MontyCarloBitsquares
 from agents.MontyCarlo.MontyCarloHeuristic import MontyCarloHeuristic
 from agents.MontyCarlo.MontyCarloPure import MontyCarloPure
@@ -29,7 +29,7 @@ opponent_agents = [
     AlphaBetaBitboard.agent(),
     AlphaBetaBitsquares.agent(),
     AlphaBetaOddEven.agent(),
-    AntColonyTreeSearch(),
+    AntColonyTreeSearchNode.agent(),
     MontyCarloPure(),
     MontyCarloHeuristic(),
     MontyCarloHeuristic(),
@@ -65,9 +65,9 @@ def print_results(env, agent_order):
 
 
 safety_time = 0.25
-for timeout in [1,3,6,8]:
+for timeout in [1,3,7]:
     timeout += safety_time
-    env.configuration.timeout = timeout  # MontyCarlo has a safety time of 2s, so this gives 1s of runtime to expand nodes
+    env.configuration.timeout = timeout
 
     # # Next play 100 rounds against random agent (7x7x2 = 98) which should cover most 2-deep opening positions
     # for agent_1 in training_agents:

@@ -40,11 +40,11 @@ opponent_agents = [
     AlphaBetaBitsquares.agent(),
     AlphaBetaOddEven.agent(),
 
-    *[ random_agent                                          for _ in range(7**2) ],  # depth=2 opening book
     *[ AlphaBetaBitboard.agent(search_max_depth=max_depth)   for max_depth in range(1,8+1) ],
     *[ AlphaBetaBitsquares.agent(search_max_depth=max_depth) for max_depth in range(1,8+1) ],
     *[ AlphaBetaOddEven.agent(search_max_depth=max_depth)    for max_depth in range(1,8+1) ],
     *[ Negamax(max_depth=max_depth)                          for max_depth in range(1,8+1) ],
+    *[ random_agent                                          for _ in range(7**2) ],  # depth=2 opening book
 ]
 # random.shuffle(training_agents)
 # random.shuffle(opponent_agents)

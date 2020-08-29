@@ -303,7 +303,9 @@ of a AlphaZero style neural network based heuristic, an attempt was m
 ## Bitsquares Heuristic 
 
 Leaderboard Scores: 
-- **(pending)** | [AlphaBetaBitboard + bitsquares_heuristic(reward_power=1.75)](https://www.kaggle.com/c/connectx/submissions?dialog=episodes-submission-16964089)
+- **(1120)** | [AlphaBetaBitboard + bitsquares_heuristic(reward_bitsquares=1.75)](https://www.kaggle.com/c/connectx/submissions?dialog=episodes-submission-16964089)
+- **(1120)** | [MontyCarloTreeSearch + bitsquares_heuristic(reward_bitsquares=1.75, sigmoid_width=6.0)](https://www.kaggle.com/c/connectx/submissions?dialog=episodes-submission-16964089)
+- **(1140)** | [MontyCarloTreeSearch + bitsquares_heuristic(reward_bitsquares=1.75, sigmoid_width=7.0) + 1.25MB precache](https://www.kaggle.com/c/connectx/submissions?dialog=episodes-submission-16964089)
 
 Code:
 - [heuristics/BitsquaresHeuristic.py](heuristics/BitsquaresHeuristic.py)

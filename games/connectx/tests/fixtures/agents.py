@@ -1,3 +1,4 @@
+import pytest
 
 from agents.AlphaBetaAgent.AlphaBetaAgent import AlphaBetaAgent
 from agents.AlphaBetaAgent.AlphaBetaBitboard import AlphaBetaBitboard
@@ -26,3 +27,10 @@ kaggle_agents = [
     "random",
     "negamax",
 ]
+
+
+# Some of the agents have large datafiles, which might timeout on first move with a short test timer, so preload now
+@pytest.mark.parametrize("agent_name, agent", agents)
+def test_preload(observation, configuration, agent_name, agent):
+    action = agent(observation, configuration)
+    assert isinstance(action, int)

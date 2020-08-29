@@ -1,11 +1,13 @@
 import base64
 import gzip
 import os
-import pickle
 import re
 import time
 from typing import Any, Union
+
+import dill
 import humanize
+
 
 # _base64_file__test_base64_static_import = """
 # H4sIAPx9LF8C/2tgri1k0IjgYGBgKCxNLS7JzM8rZIwtZNLwZvBm8mYEkjAI4jFB2KkRbED1iXnF
@@ -14,7 +16,7 @@ import humanize
 
 
 def base64_file_varname(filename: str) -> str:
-    # ../data/AntColonyTreeSearchNode.pickle.zip.base64 -> _base64_file__AntColonyTreeSearchNode__pickle__zip__base64
+    # ../data/AntColonyTreeSearchNode.dill.zip.base64 -> _base64_file__AntColonyTreeSearchNode__dill__zip__base64
     varname = re.sub(r'^.*/',   '',   filename)  # remove directories
     varname = re.sub(r'[.\W]+', '__', varname)   # convert dots and non-ascii to __
     varname = f"_base64_file__{varname}"
@@ -33,7 +35,7 @@ def base64_file_var_unwrap(base64_data: str) -> str:
 
 
 def base64_file_encode(data: Any) -> str:
-    encoded = pickle.dumps(data)
+    encoded = dill.dumps(data)
     encoded = gzip.compress(encoded)
     encoded = base64.encodebytes(encoded).decode('utf8').strip()
     return encoded
@@ -42,7 +44,7 @@ def base64_file_encode(data: Any) -> str:
 def base64_file_decode(encoded: str) -> Any:
     data = base64.b64decode(encoded)
     data = gzip.decompress(data)
-    data = pickle.loads(data)
+    data = dill.loads(data)
     return data
 
 

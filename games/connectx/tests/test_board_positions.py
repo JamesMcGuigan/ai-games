@@ -129,7 +129,6 @@ def test_foil_double_attack_2(observation, configuration, agent_name, agent):
 
 @pytest.mark.parametrize("agent_name, agent", agents)
 def test_single_column(observation, configuration, agent_name, agent):
-    configuration.timeout = 60
     observation.mark  = 1
     observation.board = [
         2,0,2,2,1,0,2,

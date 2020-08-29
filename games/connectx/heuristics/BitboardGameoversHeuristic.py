@@ -98,10 +98,10 @@ def bitboard_gameovers_heuristic( bitboard: np.ndarray, player_id: int ) -> floa
     return score
 
 
-def bitboard_gameovers_heuristic_sigmoid(heuristic_scale = 6.0):
+def bitboard_gameovers_heuristic_sigmoid(sigmoid_width = 6.0, sigmoid_height = 1.0):
     def _bitboard_gameovers_heuristic_sigmoid( bitboard: np.ndarray, player_id: int ) -> float:
         score = bitboard_gameovers_heuristic(bitboard, player_id)
-        score = scaled_sigmoid(score, heuristic_scale)
+        score = scaled_sigmoid(score, sigmoid_width, sigmoid_height)
         return score
     return _bitboard_gameovers_heuristic_sigmoid
 
@@ -174,7 +174,7 @@ def bitboard_gameovers_heuristic_slow( bitboard: np.ndarray, player_id: int, gam
         bitboard[0] & (bitboard[1] ^ invert_mask),
         bitboard[0] & (bitboard[1]),
     ])
-    for n in range(1):  # allow short circuit break statement
+    for _ in range(1):  # allow short circuit break statement
         bitmasks = np.array([ token & gameovers for token in tokens ])
         wins     = bitmasks == gameovers
         if np.any(wins):
@@ -182,8 +182,8 @@ def bitboard_gameovers_heuristic_slow( bitboard: np.ndarray, player_id: int, gam
             if np.any(wins[1]): scores[1] = np.inf
             break
 
-        is_overlap        = (bitmasks[0] != 0) & (bitmasks[1] != 0)
-        is_valid          = (bitmasks    != 0) & ~is_overlap
+        is_overlap = (bitmasks[0] != 0) & (bitmasks[1] != 0)
+        is_valid   = (bitmasks    != 0) & ~is_overlap
         if not np.any(is_valid):
             break
 

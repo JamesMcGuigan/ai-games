@@ -15,9 +15,10 @@ class AntColonyTreeSearchNode(MontyCarloNode):
             self,
             bitboard:      np.ndarray,
             player_id:     int,
-            parent:        Union['MontyCarloNode', None] = None,
+            parent:        Union['AntColonyTreeSearchNode', None] = None,
             parent_action: Union[int,None]       = None,
-            heuristic_scale:  float = 6.0,   # 6 seems to score best against other values
+            sigmoid_width:    float = 6.0,   # 6 seems to score best against other values
+            sigmoid_height:   float = 1.0,
             start_pheromones: float = 1.0,
             pheromone_power:  float = 1.25,
             **kwargs
@@ -30,12 +31,14 @@ class AntColonyTreeSearchNode(MontyCarloNode):
             player_id        = player_id,
             parent           = parent,
             parent_action    = parent_action,
-            heuristic_scale  = heuristic_scale,
+            sigmoid_width    = sigmoid_width,
+            sigmoid_height   = sigmoid_height,
             start_pheromones = start_pheromones,
             pheromone_power  = pheromone_power,  # saved in self.kwargs in parent constructor
             **kwargs
         )
-        self.heuristic_scale  = heuristic_scale
+        self.sigmoid_width    = sigmoid_width
+        self.sigmoid_height   = sigmoid_height
         self.total_score      = 0.0
         self.pheromone_score  = start_pheromones
         self.pheromones_total = 0.0
@@ -59,7 +62,7 @@ class AntColonyTreeSearchNode(MontyCarloNode):
 
     def simulate(self) -> float:
         score = bitboard_gameovers_heuristic(self.bitboard, self.player_id)
-        score = scaled_sigmoid(score, self.heuristic_scale)
+        score = scaled_sigmoid(score, self.sigmoid_width, self.sigmoid_height)
         return score
 
 

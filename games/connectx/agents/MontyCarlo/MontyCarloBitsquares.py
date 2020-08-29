@@ -11,7 +11,7 @@ Hyperparameters = namedtuple('hyperparameters', [])
 
 class MontyCarloBitsquaresNode(MontyCarloHeuristicNode):
     heuristic_fn   = bitsquares_heuristic_sigmoid
-    heuristic_args = {}
+    heuristic_args = {}  # reward_power=1.75, sigmoid_width=7.0, sigmoid_height=1.0
 
 class MontyCarloBitsquaresNode2(MontyCarloBitsquaresNode):
     pass

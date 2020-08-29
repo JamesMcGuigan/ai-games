@@ -38,8 +38,6 @@ def oddeven_bitsquares_heuristic(reward_power=1.75, reward_3_pair=0, reward_3_en
     return _oddeven_bitsquares_heuristic
 
 
-# Winrates vs bitsquares_heuristic(reward_power=1.75)
-#
 def oddeven_heuristic(reward_3_pair=1.0, reward_3_endgame=1.0, reward_2_endgame=1.0 ):
     def _oddeven_heuristic(bitboard: np.ndarray, player_id: int, playable_lines=None) -> float:
         played_squares = bitboard[0]
@@ -97,26 +95,27 @@ def oddeven_heuristic(reward_3_pair=1.0, reward_3_endgame=1.0, reward_2_endgame=
 
 
 
+### Sigmoids
 
-def oddeven_bitsquares_heuristic_sigmoid(reward_power=1.75, reward_3_pair=0, reward_3_endgame=1, reward_2_endgame=0.05, heuristic_scale=6.0):
+def oddeven_bitsquares_heuristic_sigmoid(reward_power=1.75, reward_3_pair=0, reward_3_endgame=1, reward_2_endgame=0.05, sigmoid_width=6.0, sigmoid_height=1.0):
     heuristic = oddeven_bitsquares_heuristic(reward_power=reward_power,
                                              reward_3_pair=reward_3_pair,
                                              reward_3_endgame=reward_3_endgame,
                                              reward_2_endgame=reward_2_endgame)
     def _oddeven_bitsquares_heuristic_sigmoid(bitboard: np.ndarray, player_id: int) -> float:
         score = heuristic(bitboard=bitboard, player_id=player_id)
-        score = scaled_sigmoid(score, heuristic_scale)
+        score = scaled_sigmoid(score, sigmoid_width, sigmoid_height)
         return score
     return _oddeven_bitsquares_heuristic_sigmoid
 
 
-def oddeven_heuristic_sigmoid(reward_3_pair=0.0, reward_3_endgame=1.0, reward_2_endgame=0.05, heuristic_scale=6.0):
+def oddeven_heuristic_sigmoid(reward_3_pair=0.0, reward_3_endgame=1.0, reward_2_endgame=0.05, sigmoid_width=6.0, sigmoid_height=1.0):
     heuristic = oddeven_heuristic(reward_3_pair=reward_3_pair,
                                   reward_3_endgame=reward_3_endgame,
                                   reward_2_endgame=reward_2_endgame)
     def _oddeven_heuristic_sigmoid(bitboard: np.ndarray, player_id: int) -> float:
         score = heuristic(bitboard=bitboard, player_id=player_id)
-        score = scaled_sigmoid(score, heuristic_scale)
+        score = scaled_sigmoid(score, sigmoid_width, sigmoid_height)
         return score
     return _oddeven_heuristic_sigmoid
 

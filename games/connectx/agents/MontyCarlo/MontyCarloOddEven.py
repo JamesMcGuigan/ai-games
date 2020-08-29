@@ -5,14 +5,13 @@ from struct import Struct
 
 from agents.MontyCarlo.MontyCarloHeuristic import MontyCarloHeuristicNode
 from core.ConnectXBBNN import *
-from heuristics.BitsquaresHeuristic import bitsquares_heuristic_sigmoid
+from heuristics.OddEvenHeuristic import oddeven_bitsquares_heuristic_sigmoid
 
 Hyperparameters = namedtuple('hyperparameters', [])
 
 class MontyCarloOddEvenNode(MontyCarloHeuristicNode):
-    persist        = False
-    heuristic_fn   = bitsquares_heuristic_sigmoid
-    heuristic_args = {}
+    heuristic_fn   = oddeven_bitsquares_heuristic_sigmoid
+    heuristic_args = {}  # reward_power=1.75, reward_3_pair=0, reward_3_endgame=1, reward_2_endgame=0.05, sigmoid_width=6.0, sigmoid_height=1.0
 
 
 class MontyCarloOddEvenNode2(MontyCarloOddEvenNode):

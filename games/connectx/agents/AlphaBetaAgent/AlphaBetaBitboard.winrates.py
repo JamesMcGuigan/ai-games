@@ -34,12 +34,12 @@ def run_round(agent, opponent, round=0):
         "verbose_depth":  False,
     }
     agent_kwargs    = {
-        "heuristic_args": { "heuristic_scale": 17 },
+        "heuristic_args": { "sigmoid_width": 17 },
         "safety_time": 0,
         **kwargs
     }
     opponent_kwargs = {
-        "heuristic_args": { "heuristic_scale": 21 },
+        "heuristic_args": { "sigmoid_width": 21 },
         "safety_time": 0,
         **kwargs
     }

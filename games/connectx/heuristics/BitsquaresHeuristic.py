@@ -26,14 +26,15 @@ def bitsquares_heuristic(reward_power=1.75):
     return _bitsquares_heuristic
 
 
-# Scores for: *heuristic_scale=1.75**: 1-in-a-row = 1 | 2-in-a-row = 3.4 | 3-in-a-row = 6.8
-def bitsquares_heuristic_sigmoid(reward_power=1.75, heuristic_scale=7):
+# Scores for: *sigmoid_width=1.75**: 1-in-a-row = 1 | 2-in-a-row = 3.4 | 3-in-a-row = 6.8
+def bitsquares_heuristic_sigmoid(reward_power=1.75, sigmoid_width=7.0, sigmoid_height=1.0):
     heuristic = bitsquares_heuristic(reward_power=reward_power)
     def _bitsquares_heuristic_sigmoid(bitboard: np.ndarray, player_id: int, playable_lines = None) -> float:
         score = heuristic(bitboard=bitboard, player_id=player_id, playable_lines=playable_lines)
-        score = scaled_sigmoid(score, heuristic_scale)
+        score = scaled_sigmoid(score, sigmoid_width, sigmoid_height)
         return score
     return _bitsquares_heuristic_sigmoid
+
 
 ### Utility Functions
 

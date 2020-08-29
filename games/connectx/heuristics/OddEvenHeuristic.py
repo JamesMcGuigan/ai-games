@@ -40,18 +40,16 @@ def oddeven_bitsquares_heuristic(reward_power=1.75, reward_3_pair=0, reward_3_en
 
 # Winrates vs bitsquares_heuristic(reward_power=1.75)
 #
-def oddeven_heuristic(reward_3_pair=1, reward_3_endgame=1, reward_2_endgame=1 ):
+def oddeven_heuristic(reward_3_pair=1.0, reward_3_endgame=1.0, reward_2_endgame=1.0 ):
     def _oddeven_heuristic(bitboard: np.ndarray, player_id: int, playable_lines=None) -> float:
         played_squares = bitboard[0]
-        empty_squares  = mask_board  & ~bitboard[0]
+        # empty_squares  = mask_board  & ~bitboard[0]
 
         tokens = [
             bitboard[0] & ~bitboard[1],
             bitboard[0] &  bitboard[1]
         ]
-        oddeven_bitboards = get_oddeven_bitboard(bitboard)
-        endgame_columns   = get_endgame_oddeven_columns(bitboard)
-        endgame_bitboards = get_endgame_bitboard(bitboard, endgame_columns=endgame_columns)
+        endgame_bitboards = get_endgame_bitboard(bitboard)
         playable_lines    = playable_lines or get_playable_lines_by_length(bitboard)
         current_player    = current_player_index(bitboard)
 
@@ -65,6 +63,19 @@ def oddeven_heuristic(reward_3_pair=1, reward_3_endgame=1, reward_2_endgame=1 ):
             # 4 in a row
             is_4_gameover   = len(playable_lines[player][configuration.inarow])
 
+            # 3 in a row + 2 odd or 2 even squares - opponent can't block both - doesn't seem to work in practice
+            is_3_pair_count = 0
+            if reward_3_pair:
+                oddeven_bitboards = get_oddeven_bitboard(bitboard)
+                is_3_odd   = playable_lines[player][n3] == (playable_lines[player][n3] & (tokens[player] | oddeven_bitboards[1]))
+                is_3_even  = playable_lines[player][n3] == (playable_lines[player][n3] & (tokens[player] | oddeven_bitboards[0]))
+                is_3_pair_count = np.count_nonzero(is_3_odd) // 2 + np.count_nonzero(is_3_even) // 2
+
+            # For a forced double attack to work, player must force capture of one or both ends via endgame position
+            is_3_endgame_count = 0
+            if reward_3_endgame:
+                is_3_endgame       = playable_lines[player][n3] == playable_lines[player][n3] & (played_squares | endgame_bitboards[is_current_player])
+                is_3_endgame_count = np.count_nonzero( is_3_endgame )
 
             # 2 in a row
             is_2_endgame_count = 0
@@ -72,27 +83,6 @@ def oddeven_heuristic(reward_3_pair=1, reward_3_endgame=1, reward_2_endgame=1 ):
                 # For a forced double attack to work, player must force capture of one or both ends via endgame position
                 is_2_endgame       = playable_lines[player][n2] == playable_lines[player][n2] & (played_squares | endgame_bitboards[is_current_player])
                 is_2_endgame_count = np.count_nonzero( is_2_endgame )
-
-
-            # 3 in a row + 2 odd or 2 even squares - opponent can't block both
-            is_3_odd   = playable_lines[player][n3] == (playable_lines[player][n3] & (tokens[player] | oddeven_bitboards[1]))
-            is_3_even  = playable_lines[player][n3] == (playable_lines[player][n3] & (tokens[player] | oddeven_bitboards[0]))
-            is_3_pair_count = np.count_nonzero(is_3_odd) // 2 + np.count_nonzero(is_3_even) // 2
-
-
-            # Check for endgame columns
-            # TODO: could this be done quicker using endgame_bitboard
-            is_3_endgame_count = 0
-            if reward_3_endgame:
-                for col in range(len(mask_columns)):
-                    oddeven_index       = ( current_player + endgame_columns[col] ) % 2 == 1
-                    oddeven_col_bitmask = oddeven_bitboards[ endgame_columns[col] ] & mask_columns[col]
-                    if not oddeven_col_bitmask: continue  # skip if no empty oddeven squares that can be played
-
-                    is_3_oddeven        = [ is_3_even, is_3_odd ][ oddeven_index ]
-                    oddeven_lines       = playable_lines[player][n3][ is_3_oddeven ]
-                    oddeven_in_col      = oddeven_lines[:] & empty_squares & oddeven_col_bitmask
-                    is_3_endgame_count += np.count_nonzero(oddeven_in_col)
 
 
             # Calculate scores based on rewards
@@ -120,7 +110,7 @@ def oddeven_bitsquares_heuristic_sigmoid(reward_power=1.75, reward_3_pair=0, rew
     return _oddeven_bitsquares_heuristic_sigmoid
 
 
-def oddeven_heuristic_sigmoid(reward_3_pair=0, reward_3_endgame=1, reward_2_endgame=0.05, heuristic_scale=6.0):
+def oddeven_heuristic_sigmoid(reward_3_pair=0.0, reward_3_endgame=1.0, reward_2_endgame=0.05, heuristic_scale=6.0):
     heuristic = oddeven_heuristic(reward_3_pair=reward_3_pair,
                                   reward_3_endgame=reward_3_endgame,
                                   reward_2_endgame=reward_2_endgame)

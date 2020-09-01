@@ -6,6 +6,8 @@ import torch.nn.functional as F
 from core.ConnectXBBNN import configuration
 from neural_networks.is_gameover.BitboardNN import BitboardNN
 
+device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu")
+
 
 # BUG: 99.8% accuracy may be having trouble with the no_move_moves)
 # self.cnn_channels = (10 + 16) | game:  100000 | move: 2130054 | loss: 0.113 | accuracy: 0.854 / 0.953 | time: 587s
@@ -58,4 +60,4 @@ class IsGameoverCNN(BitboardNN):
 
 
 isGameoverCNN = IsGameoverCNN()
-isGameoverCNN.cuda()
+isGameoverCNN.to(device)

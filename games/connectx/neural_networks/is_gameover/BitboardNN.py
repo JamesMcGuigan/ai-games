@@ -7,11 +7,10 @@ import torch.nn.functional as F
 from core.ConnectXBBNN import bitboard_to_numpy2d
 from core.ConnectXBBNN import is_bitboard
 
-
-# torch.cuda#.init()
-# torch.cuda.set_device(0)
+device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu")
 
 
+# noinspection PyAbstractClass
 class BitboardNN(nn.Module):
     """Base class for bitboard based NNs, handles casting inputs and save/load functionality"""
 
@@ -25,11 +24,11 @@ class BitboardNN(nn.Module):
         x = torch.from_numpy(x).to(torch.int64)  # int64 required for functional.one_hot()
         x = F.one_hot(x, num_classes=self.one_hot_size)
         x = x.to(torch.float32)  # float32 required for self.fc1(x)
-        x = x.cuda()  # TODO: get CUDA GPU working with torch
+        x = x.to(device)
         return x  # x.shape = (42,3)
 
     def cast_to_labels(self, expected):
-        labels = torch.tensor([ expected ], dtype=torch.float).cuda()  # nn.MSELoss() == float | nn.CrossEntropyLoss() == long
+        labels = torch.tensor([ expected ], dtype=torch.float).to(device)  # nn.MSELoss() == float | nn.CrossEntropyLoss() == long
         return labels
 
     def cast_from_outputs(self, outputs: torch.Tensor) -> bool:

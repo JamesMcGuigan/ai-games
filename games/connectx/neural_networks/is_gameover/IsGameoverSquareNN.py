@@ -6,6 +6,8 @@ import torch.nn.functional as F
 from core.ConnectXBBNN import configuration
 from neural_networks.is_gameover.BitboardNN import BitboardNN
 
+device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu")
+
 
 # self.model_size = 128 | game:  100000 | move:  2130207 | loss: 0.137 | accuracy: 0.810 / 0.953 | time: 519s
 # self.model_size = 128 | game:  200000 | move:  2132342 | loss: 0.134 | accuracy: 0.834 / 0.953
@@ -13,7 +15,6 @@ from neural_networks.is_gameover.BitboardNN import BitboardNN
 class IsGameoverSquareNN(BitboardNN):
     def __init__(self):
         super().__init__()
-        self.device       = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu")
         self.one_hot_size = 3
         self.input_size   = configuration.rows * configuration.columns
         self.output_size  = 1
@@ -40,3 +41,4 @@ class IsGameoverSquareNN(BitboardNN):
 
 
 isGameoverSquareNN = IsGameoverSquareNN()
+isGameoverSquareNN.to(device)

@@ -17,7 +17,7 @@ def test_base64_file_varname():
 
 def test_base64_wrap_unwrap(data):
     varname   = base64_file_varname('test')
-    input     = base64.encodebytes(pickle.dumps(data)).decode('utf8').strip()
+    input     = base64.encodebytes(dill.dumps(data)).decode('utf8').strip()
     wrapped   = base64_file_var_wrap(input, varname)
     unwrapped = base64_file_var_unwrap(wrapped)
 

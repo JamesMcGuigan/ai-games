@@ -1,6 +1,8 @@
-dataclasses
+dataclasses==0.6
+dill
 fastcache
 humanize
+joblib
 json5
 jupyter
 kaggle
@@ -8,5 +10,4 @@ kaggle_environments
 numba
 numpy
 pytest
-joblib
 torch

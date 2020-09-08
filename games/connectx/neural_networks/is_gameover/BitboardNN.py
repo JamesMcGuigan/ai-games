@@ -1,6 +1,7 @@
 import os
 from typing import List
 
+import humanize
 import numpy as np
 import torch
 import torch.nn as nn
@@ -46,6 +47,7 @@ class BitboardNN(nn.Module):
     # DOCS: https://pytorch.org/tutorials/beginner/saving_loading_models.html
     def save(self):
         torch.save(self.state_dict(), self.filename)
+        print(f'{self.__class__.__name__}:save(): {self.filename} = {humanize.naturalsize(os.path.getsize(self.filename))}')
 
     def load(self):
         if os.path.exists(self.filename):
@@ -53,4 +55,5 @@ class BitboardNN(nn.Module):
             try:
                 self.load_state_dict(torch.load(self.filename))
                 self.eval()
+                print(f'{self.__class__.__name__}:load(): {self.filename} = {humanize.naturalsize(os.path.getsize(self.filename))}')
             except: pass

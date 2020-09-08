@@ -14,6 +14,7 @@ from joblib import Parallel
 from core.ConnectXBBNN import *
 from neural_networks.is_gameover.device import device
 from neural_networks.is_gameover.IsGameoverCNN import isGameoverCNN
+from neural_networks.is_gameover.IsGameoverSquareNN import isGameoverSquareNN
 
 DatasetItem = namedtuple('DatasetItem', ['expected', 'bitboard'])
 def generate_dataset(dataset_size: int, bitboard_fn, duplicates=2, verbose=False) -> Tuple[int, np.ndarray]:
@@ -76,16 +77,15 @@ def generate_dataset(dataset_size: int, bitboard_fn, duplicates=2, verbose=False
     return output
 
 
-def train(model, criterion, optimizer, bitboard_fn=is_gameover, dataset_size=1000, timeout=4*60*60):
+def train(model, criterion, optimizer, bitboard_fn=is_gameover, dataset_size=10000, timeout=4*60*60):
     print(f'Training: {model.__class__.__name__}')
     time_start = time.perf_counter()
     epoch = 0
     try:
         model.load()
-        hist_accuracy = [0]
-
+        epoch_accuracy = [0]
         # dataset generation is expensive, so loop over each dataset until fully learnt
-        while np.min(hist_accuracy[-10:]) < 1.0:  # need multiple epochs of 100% accuracy to pass
+        while np.min(epoch_accuracy[-10:]) < 1.0:  # need multiple epochs of 100% accuracy to pass
             if time.perf_counter() - time_start > timeout: break
             epoch         += 1
             epoch_start    = time.perf_counter()
@@ -98,9 +98,10 @@ def train(model, criterion, optimizer, bitboard_fn=is_gameover, dataset_size=100
             bitboards = [ d.bitboard for d in dataset ]
             inputs    = torch.stack([ model.cast(bitboard) for bitboard in bitboards ]).to(device)
 
+            hist_accuracy = [0]
             while hist_accuracy[-1] < 1.0:      # loop until 100% accuracy on dataset
                 if time.perf_counter() - time_start > timeout: break
-                if dataset_epoch > 10: break  # if we plataeu after many iterations, then generate a new dataset
+                if dataset_epoch > 100: break  # if we plataeu after many iterations, then generate a new dataset
 
                 dataset_epoch   += 1
                 bitboard_count  += len(inputs)
@@ -120,11 +121,22 @@ def train(model, criterion, optimizer, bitboard_fn=is_gameover, dataset_size=100
                 last_loss        = running_loss     / running_count
                 last_accuracy    = running_accuracy / running_count
                 hist_accuracy.append(last_accuracy)
+                # Record the first accuracy from each epoch
+                if dataset_epoch == 1: epoch_accuracy.append(last_accuracy)
+
+                # Add the failures back onto the training loop, but prevent dataset from growing unbounded
+                if dataset_epoch <= 5:
+                    failures = actual != expected
+                    inputs   = torch.cat(( inputs,   inputs[failures]),   dim=0 )
+                    labels   = torch.cat(( labels,   labels[failures]),   dim=0 )
+                    expected = np.concatenate(( expected, expected[failures] ))
+
 
                 # Print statistics after each epoch
                 if dataset_epoch % 1 == 0:
                     print(f'epoch: {epoch:4d} | bitboards: {bitboard_count:5d} | loss: {last_loss:.5f} | accuracy: {last_accuracy:.5f} | time: {epoch_time :.0f}s')
             print(f'epoch: {epoch:4d} | bitboards: {bitboard_count:5d} | loss: {last_loss:.5f} | accuracy: {last_accuracy:.5f} | time: {epoch_time :.0f}s')
+            print("epoch_accuracy[-10:]", epoch_accuracy[-10:], np.min(epoch_accuracy[-10:]))
             model.save()
 
 
@@ -141,12 +153,12 @@ def train(model, criterion, optimizer, bitboard_fn=is_gameover, dataset_size=100
 
 if __name__ == '__main__':
 
-    # model     = isGameoverSquareNN
-    # criterion = nn.MSELoss()  # NOTE: nn.CrossEntropyLoss() is for multi-output classification
-    # optimizer = optim.Adadelta(model.parameters())
-    # train(model, criterion, optimizer)
-
     model     = isGameoverCNN
+    criterion = nn.MSELoss()  # NOTE: nn.CrossEntropyLoss() is for multi-output classification
+    optimizer = optim.Adadelta(model.parameters())
+    train(model, criterion, optimizer)
+
+    model     = isGameoverSquareNN
     criterion = nn.MSELoss()  # NOTE: nn.CrossEntropyLoss() is for multi-output classification
     optimizer = optim.Adadelta(model.parameters())
     train(model, criterion, optimizer)

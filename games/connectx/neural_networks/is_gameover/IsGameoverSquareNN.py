@@ -5,8 +5,7 @@ import torch.nn.functional as F
 
 from core.ConnectXBBNN import configuration
 from neural_networks.is_gameover.BitboardNN import BitboardNN
-
-device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu")
+from neural_networks.is_gameover.device import device
 
 
 # self.model_size = 128 | game:  100000 | move:  2130207 | loss: 0.137 | accuracy: 0.810 / 0.953 | time: 519s
@@ -31,12 +30,12 @@ class IsGameoverSquareNN(BitboardNN):
         return x
 
     def forward(self, x):
-        x = self.cast(x)                   # x.shape = (1,126)
-        x = F.relu(self.fc1(x))            # x.shape = (1,256)
-        x = F.relu(self.fc2(x))            # x.shape = (1,256)
-        x = F.relu(self.fc3(x))            # x.shape = (1,256)
-        x = torch.sigmoid(self.output(x))  # x.shape = (1,1)
-        x = x.view(1)                      # x.shape = (1,)  | return 1d array of outputs, to match isGameoverCNN
+        x = self.cast(x)                   # x.shape = (-1,126)
+        x = F.relu(self.fc1(x))            # x.shape = (-1,256)
+        x = F.relu(self.fc2(x))            # x.shape = (-1,256)
+        x = F.relu(self.fc3(x))            # x.shape = (-1,256)
+        x = torch.sigmoid(self.output(x))  # x.shape = (-1,1)
+        x = x.flatten()                    # x.shape = (-1)
         return x
 
 

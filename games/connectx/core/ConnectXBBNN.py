@@ -278,6 +278,20 @@ def get_random_move(bitboard: np.ndarray) -> int:
         if is_legal_move(bitboard, action):
             return action
 
+#@njit
+def get_random_draw_move(bitboard: np.ndarray) -> int:
+    # Get a random move, but deliberately don't play any winning moves to generate has_no_move_moves() endgames
+    # Statistically, only 1 in 7 games generated this way are draws
+    actions   = get_legal_moves(bitboard)
+    player_id = current_player_id(bitboard)
+    while len(actions):
+        action = np.random.choice(actions)
+        result = result_action(bitboard, action, player_id)
+        if get_winner(result):
+            actions = np.delete(actions, np.where(actions == action))
+        else:
+            return action
+    return np.random.choice(get_legal_moves(bitboard))  # winning is unavoidable
 
 
 # Actions + Results

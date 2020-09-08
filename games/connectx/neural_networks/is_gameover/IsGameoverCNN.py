@@ -5,8 +5,7 @@ import torch.nn.functional as F
 
 from core.ConnectXBBNN import configuration
 from neural_networks.is_gameover.BitboardNN import BitboardNN
-
-device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu")
+from neural_networks.is_gameover.device import device
 
 
 # BUG: 99.8% accuracy may be having trouble with the no_move_moves)
@@ -51,11 +50,12 @@ class IsGameoverCNN(BitboardNN):
         # x = self.pool(x)                  # x.shape = (1,26,1,1)  - this will break is_gameover() logic
         # NOTE: reshape(-1) required for transition into dense layers
         # WARNING (ignore):  Mixed memory format inputs detected - https://github.com/pytorch/pytorch/issues/42300
-        x = x.permute(0,2,3,1).reshape(-1)  # x.shape = (312,) + convert to columns_last (batch_size, height, width, channels)
-        x = F.relu(self.fc1(x))             # x.shape = (156,)
-        x = F.relu(self.fc2(x))             # x.shape = (78,)
-        x = F.relu(self.fc3(x))             # x.shape = (39,)
-        x = torch.sigmoid(self.output(x))   # x.shape = (1,)
+        x = x.permute(0,2,3,1).reshape(x.shape[0], -1)  # x.shape = (-1, 312, 1) + convert to columns_last (batch_size, height, width, channels)
+        x = F.relu(self.fc1(x))             # x.shape = (-1, 156, 1)
+        x = F.relu(self.fc2(x))             # x.shape = (-1, 78, 1)
+        x = F.relu(self.fc3(x))             # x.shape = (-1, 39, 1)
+        x = torch.sigmoid(self.output(x))   # x.shape = (-1, 1, 1)
+        x = x.flatten()                     # x.shape = (-1, 1)
         return x
 
 

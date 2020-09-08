@@ -5,33 +5,34 @@ import random
 import time
 from collections import defaultdict
 
+import torch
 import torch.nn as nn
 import torch.optim as optim
 from joblib import delayed
 from joblib import Parallel
 
 from core.ConnectXBBNN import *
+from neural_networks.is_gameover.device import device
 from neural_networks.is_gameover.IsGameoverCNN import isGameoverCNN
-from neural_networks.is_gameover.IsGameoverSquareNN import isGameoverSquareNN
 
 DatasetItem = namedtuple('DatasetItem', ['expected', 'bitboard'])
-def generate_dataset(dataset_size: int, bitboard_fn, verbose=False) -> Tuple[int, np.ndarray]:
+def generate_dataset(dataset_size: int, bitboard_fn, duplicates=2, verbose=False) -> Tuple[int, np.ndarray]:
     """ Creates a statistically balanced dataset of all the edgecases """
     time_start   = time.perf_counter()
-    dataset_size = int(dataset_size/20)  # 20 = (5 + 5 + 10)
     data = {
         "not_gameover":      [],
         "is_gameover":       [],
         "has_no_more_moves": []
     }
+    dataset_size = int( dataset_size / duplicates / len(data) )  # 6 = (2 + 2 + 2)
     while min(map(len, data.values())) < dataset_size:
-        def generate(games=100):
+        def generate(games=100, agent=get_random_move):
             data      = defaultdict(list)
             bitboard  = empty_bitboard()
             player_id = current_player_id(bitboard)
             for n in range(games):
                 while not is_gameover(bitboard):
-                    action    = get_random_move(bitboard)
+                    action    = agent(bitboard)
                     bitboard  = result_action(bitboard, action, player_id)
                     mirror    = mirror_bitboard(bitboard)  # mirror here for random sampling or mirrors and bitboards
                     player_id = next_player_id(player_id)
@@ -40,16 +41,19 @@ def generate_dataset(dataset_size: int, bitboard_fn, verbose=False) -> Tuple[int
                     else:                             [ data['not_gameover'     ].append(x) for x in [ bitboard, mirror ] ]
             return data
 
-        batched_datas = [ generate() ]  # for debugging
-        batched_datas = Parallel(n_jobs=os.cpu_count())([ delayed(generate)(100) for round in range(100) ])
+        # batched_datas = [ generate() ]  # for debugging
+        batched_datas = Parallel(n_jobs=os.cpu_count())(
+            # [ delayed(generate)(100, get_random_move)      for round in range(100) ]  # 1 in 335 games are draws
+            [ delayed(generate)(100, get_random_draw_move) for round in range(100) ]    # 1 in   7 games are draws
+        )
         for (key, value), batched_data in itertools.product(data.items(), batched_datas):
             data[key] += batched_data[key]
 
     # has_no_more_moves are very rare, so duplicate datapoints, mirror and then resample from the rest
     bitboards = [
-        *random.sample(data['not_gameover']      * 10,  dataset_size * 10),
-        *random.sample(data['is_gameover']       *  5,  dataset_size *  5),
-        *random.sample(data['has_no_more_moves'] *  5,  dataset_size *  5),
+        *random.sample(data['not_gameover']      * duplicates,  dataset_size * duplicates),
+        *random.sample(data['is_gameover']       * duplicates,  dataset_size * duplicates),
+        *random.sample(data['has_no_more_moves'] * duplicates,  dataset_size * duplicates),
     ]
     np.random.shuffle(bitboards)
     output = [
@@ -88,37 +92,29 @@ def train(model, criterion, optimizer, bitboard_fn=is_gameover, dataset_size=100
             bitboard_count = 0
 
             dataset_epoch = 0
-            dataset = generate_dataset(dataset_size, bitboard_fn, verbose=True)
+            dataset   = generate_dataset(dataset_size, bitboard_fn, verbose=True)
+            expected  = np.array([ d.expected for d in dataset ])
+            labels    = torch.tensor(expected, dtype=torch.float).to(device)  # nn.MSELoss() == float | nn.CrossEntropyLoss() == long
+            bitboards = [ d.bitboard for d in dataset ]
+            inputs    = torch.stack([ model.cast(bitboard) for bitboard in bitboards ]).to(device)
+
             while hist_accuracy[-1] < 1.0:      # loop until 100% accuracy on dataset
                 if time.perf_counter() - time_start > timeout: break
-                if dataset_epoch > 100: break  # if we plataeu after many iterations, then generate a new dataset
+                if dataset_epoch > 10: break  # if we plataeu after many iterations, then generate a new dataset
 
                 dataset_epoch   += 1
-                running_accuracy = 0
-                running_loss     = 0.0
-                running_count    = 0
+                bitboard_count  += len(inputs)
 
-                random.shuffle(dataset)
-                for (expected, bitboard) in dataset:
-                    assert isinstance(expected, bool)
-                    assert isinstance(bitboard, np.ndarray)
+                optimizer.zero_grad()
+                outputs   = model(inputs)
+                loss      = criterion(outputs, labels)
+                loss.backward()
+                optimizer.step()
 
-                    bitboard_count += 1
-                    labels = model.cast_to_labels(expected)
-
-                    # zero the parameter gradients
-                    optimizer.zero_grad()
-
-                    outputs = model(bitboard)
-                    loss    = criterion(outputs, labels)
-                    loss.backward()
-                    optimizer.step()
-
-                    # Update running losses and accuracy
-                    actual            = model.cast_from_outputs(outputs)  # convert (1,1) tensor back to bool
-                    running_accuracy += int( actual == expected )
-                    running_loss     += loss.item()
-                    running_count    += 1
+                actual           = model.cast_from_outputs(outputs)  # convert (1,1) tensor back to bool
+                running_accuracy = np.count_nonzero( actual == expected ) / len(actual)
+                running_loss     = loss.item()
+                running_count    = 1
 
                 epoch_time       = time.perf_counter() - epoch_start
                 last_loss        = running_loss     / running_count
@@ -126,7 +122,7 @@ def train(model, criterion, optimizer, bitboard_fn=is_gameover, dataset_size=100
                 hist_accuracy.append(last_accuracy)
 
                 # Print statistics after each epoch
-                if bitboard_count % 10000 == 0:
+                if dataset_epoch % 1 == 0:
                     print(f'epoch: {epoch:4d} | bitboards: {bitboard_count:5d} | loss: {last_loss:.5f} | accuracy: {last_accuracy:.5f} | time: {epoch_time :.0f}s')
             print(f'epoch: {epoch:4d} | bitboards: {bitboard_count:5d} | loss: {last_loss:.5f} | accuracy: {last_accuracy:.5f} | time: {epoch_time :.0f}s')
             model.save()
@@ -145,10 +141,10 @@ def train(model, criterion, optimizer, bitboard_fn=is_gameover, dataset_size=100
 
 if __name__ == '__main__':
 
-    model     = isGameoverSquareNN
-    criterion = nn.MSELoss()  # NOTE: nn.CrossEntropyLoss() is for multi-output classification
-    optimizer = optim.Adadelta(model.parameters())
-    train(model, criterion, optimizer)
+    # model     = isGameoverSquareNN
+    # criterion = nn.MSELoss()  # NOTE: nn.CrossEntropyLoss() is for multi-output classification
+    # optimizer = optim.Adadelta(model.parameters())
+    # train(model, criterion, optimizer)
 
     model     = isGameoverCNN
     criterion = nn.MSELoss()  # NOTE: nn.CrossEntropyLoss() is for multi-output classification

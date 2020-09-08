@@ -1,13 +1,14 @@
 import os
+from typing import List
 
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
 from core.ConnectXBBNN import bitboard_to_numpy2d
 from core.ConnectXBBNN import is_bitboard
-
-device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu")
+from neural_networks.is_gameover.device import device
 
 
 # noinspection PyAbstractClass
@@ -19,6 +20,8 @@ class BitboardNN(nn.Module):
         self.device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu")
 
     def cast(self, x):
+        if torch.is_tensor(x):  return x
+        if isinstance(x, list): return torch.stack([ self.cast(b) for b in x ])
         if is_bitboard(x):
             x = bitboard_to_numpy2d(x)
         x = torch.from_numpy(x).to(torch.int64)  # int64 required for functional.one_hot()
@@ -27,13 +30,13 @@ class BitboardNN(nn.Module):
         x = x.to(device)
         return x  # x.shape = (42,3)
 
-    def cast_to_labels(self, expected):
-        labels = torch.tensor([ expected ], dtype=torch.float).to(device)  # nn.MSELoss() == float | nn.CrossEntropyLoss() == long
+    def cast_to_label(self, expected: List[bool]):
+        labels = torch.tensor(expected, dtype=torch.float).to(device)  # nn.MSELoss() == float | nn.CrossEntropyLoss() == long
         return labels
 
-    def cast_from_outputs(self, outputs: torch.Tensor) -> bool:
+    def cast_from_outputs(self, outputs: torch.Tensor) -> np.array:
         """ convert (1,1) tensor back to bool """
-        actual = bool( round( outputs.data.cpu().numpy().flatten()[0] ) )
+        actual = np.array([ bool(round(output)) for output in outputs.data.cpu().numpy().flatten() ])
         return actual
 
     @property

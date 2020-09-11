@@ -55,5 +55,6 @@ class BitboardNN(nn.Module):
             try:
                 self.load_state_dict(torch.load(self.filename))
                 self.eval()
+                self.to(device)
                 print(f'{self.__class__.__name__}.load(): {self.filename} = {humanize.naturalsize(os.path.getsize(self.filename))}')
             except: pass

@@ -77,6 +77,7 @@ def generate_dataset(dataset_size: int, bitboard_fn, duplicates=2, verbose=False
     return output
 
 
+# noinspection PyUnboundLocalVariable
 def train(model, criterion, optimizer, bitboard_fn=is_gameover, dataset_size=10000, timeout=4*60*60):
     print(f'Training: {model.__class__.__name__}')
     time_start = time.perf_counter()
@@ -153,13 +154,18 @@ def train(model, criterion, optimizer, bitboard_fn=is_gameover, dataset_size=100
 
 if __name__ == '__main__':
 
-    model     = isGameoverCNN
+    model     = isGameoverCNNShapes
     criterion = nn.MSELoss()  # NOTE: nn.CrossEntropyLoss() is for multi-output classification
     optimizer = optim.Adadelta(model.parameters())
     train(model, criterion, optimizer)
 
-    model     = isGameoverSquareNN
-    criterion = nn.MSELoss()  # NOTE: nn.CrossEntropyLoss() is for multi-output classification
-    optimizer = optim.Adadelta(model.parameters())
-    train(model, criterion, optimizer)
+    # model     = isGameoverCNN
+    # criterion = nn.MSELoss()  # NOTE: nn.CrossEntropyLoss() is for multi-output classification
+    # optimizer = optim.Adadelta(model.parameters())
+    # train(model, criterion, optimizer)
+
+    # model     = isGameoverSquareNN
+    # criterion = nn.MSELoss()  # NOTE: nn.CrossEntropyLoss() is for multi-output classification
+    # optimizer = optim.Adadelta(model.parameters())
+    # train(model, criterion, optimizer)
 

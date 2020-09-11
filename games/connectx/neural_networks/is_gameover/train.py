@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import itertools
+import math
 import os
 import random
 import time
@@ -13,11 +14,10 @@ from joblib import Parallel
 
 from core.ConnectXBBNN import *
 from neural_networks.is_gameover.device import device
-from neural_networks.is_gameover.IsGameoverCNN import isGameoverCNN
-from neural_networks.is_gameover.IsGameoverSquareNN import isGameoverSquareNN
+from neural_networks.is_gameover.IsGameoverCNNShapes import isGameoverCNNShapes
 
 DatasetItem = namedtuple('DatasetItem', ['expected', 'bitboard'])
-def generate_dataset(dataset_size: int, bitboard_fn, duplicates=2, verbose=False) -> Tuple[int, np.ndarray]:
+def generate_dataset(dataset_size: int, bitboard_fn, duplicates=1, verbose=False) -> List[DatasetItem]:
     """ Creates a statistically balanced dataset of all the edgecases """
     time_start   = time.perf_counter()
     data = {
@@ -25,8 +25,8 @@ def generate_dataset(dataset_size: int, bitboard_fn, duplicates=2, verbose=False
         "is_gameover":       [],
         "has_no_more_moves": []
     }
-    dataset_size = int( dataset_size / duplicates / len(data) )  # 6 = (2 + 2 + 2)
-    while min(map(len, data.values())) < dataset_size:
+    dataset_fn_size = math.ceil(dataset_size / duplicates / 4)  # 6 = (2 + 2 + 2*2)
+    while min(map(len, data.values())) < dataset_fn_size:
         def generate(games=100, agent=get_random_move):
             data      = defaultdict(list)
             bitboard  = empty_bitboard()
@@ -44,19 +44,20 @@ def generate_dataset(dataset_size: int, bitboard_fn, duplicates=2, verbose=False
 
         # batched_datas = [ generate() ]  # for debugging
         batched_datas = Parallel(n_jobs=os.cpu_count())(
-            # [ delayed(generate)(100, get_random_move)      for round in range(100) ]  # 1 in 335 games are draws
-            [ delayed(generate)(100, get_random_draw_move) for round in range(100) ]    # 1 in   7 games are draws
+            [ delayed(generate)(100, get_random_move)      for _ in range(100) ] + # 1 in 335 games are draws
+            [ delayed(generate)(100, get_random_draw_move) for _ in range(100) ]   # 1 in   7 games are draws
         )
         for (key, value), batched_data in itertools.product(data.items(), batched_datas):
             data[key] += batched_data[key]
 
     # has_no_more_moves are very rare, so duplicate datapoints, mirror and then resample from the rest
     bitboards = [
-        *random.sample(data['not_gameover']      * duplicates,  dataset_size * duplicates),
-        *random.sample(data['is_gameover']       * duplicates,  dataset_size * duplicates),
-        *random.sample(data['has_no_more_moves'] * duplicates,  dataset_size * duplicates),
+        *random.sample(data['not_gameover']      * duplicates*2, dataset_fn_size * duplicates*2),
+        *random.sample(data['is_gameover']       * duplicates,   dataset_fn_size * duplicates),
+        *random.sample(data['has_no_more_moves'] * duplicates,   dataset_fn_size * duplicates),
     ]
     np.random.shuffle(bitboards)
+    bitboards = bitboards[:dataset_size]
     output = [
         DatasetItem(bitboard_fn(bitboard), bitboard)
         for bitboard in bitboards
@@ -102,7 +103,7 @@ def train(model, criterion, optimizer, bitboard_fn=is_gameover, dataset_size=100
             hist_accuracy = [0]
             while hist_accuracy[-1] < 1.0:      # loop until 100% accuracy on dataset
                 if time.perf_counter() - time_start > timeout: break
-                if dataset_epoch > 100: break  # if we plataeu after many iterations, then generate a new dataset
+                if dataset_epoch > 10: break  # if we plataeu after many iterations, then generate a new dataset
 
                 dataset_epoch   += 1
                 bitboard_count  += len(inputs)
@@ -127,10 +128,15 @@ def train(model, criterion, optimizer, bitboard_fn=is_gameover, dataset_size=100
 
                 # Add the failures back onto the training loop, but prevent dataset from growing unbounded
                 if dataset_epoch <= 5:
-                    failures = actual != expected
-                    inputs   = torch.cat(( inputs,   inputs[failures]),   dim=0 )
-                    labels   = torch.cat(( labels,   labels[failures]),   dim=0 )
-                    expected = np.concatenate(( expected, expected[failures] ))
+                    failures  = actual != expected
+                    inputs    = torch.cat(( inputs,   inputs[failures]),   dim=0 )
+                    labels    = torch.cat(( labels,   labels[failures]),   dim=0 )
+                    expected  = np.concatenate(( expected, expected[failures] ))
+
+                    reshuffle = np.arange(0, len(inputs)); np.random.shuffle(reshuffle)
+                    inputs    = inputs[reshuffle]
+                    labels    = labels[reshuffle]
+                    expected  = expected[reshuffle]
 
 
                 # Print statistics after each epoch

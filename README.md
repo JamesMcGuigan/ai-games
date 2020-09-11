@@ -13,14 +13,14 @@ Writeup on a variety of approaches to competitive AI agent design, exploring cla
 - Simple Rules Agent
 - Minimax with AlphaBeta Pruning, Iterative Deepening and custom heuristic
     - Object Oriented / Numpy implementation (slow)
-    - Bitboard Implementions  implementation (fast)
+    - Bitboard Implementation (fast)
     
 ### Knights Isolation
 - Source: [games/knights-isolation](games/knights-isolation)
 - Report: [games/knights-isolation/report.ipynb](games/knights-isolation/report.ipynb)
  
  
-Minimax adversarial search with alphaBeta pruning, iterative deepening, area heuristic, and persistant caching.
+Minimax adversarial search with alphaBeta pruning, iterative deepening, area heuristic, and persistent caching.
  
 Monty Carlo Tree Search reinforcement learning 
  
@@ -48,9 +48,9 @@ Object model and frameworks for reasoning by analogy function solvers.
 
 Brute force search of simple geometry and tessellation transformations with numpy. 
 
-XGBoost with a large multidimentional feature map was able to autosolve a wide range of transformations. 
+XGBoost with a large multidimensional feature map was able to auto-solve a wide range of transformations. 
 
-AbstractSolver - Proof of Concept code using inspect.signiture() to figure out all possible permutations of `f(g(h(x)))` implementing a IoC dependency injection solver.
+AbstractSolver - Proof of Concept code using inspect.signature() to figure out all possible permutations of `f(g(h(x)))` implementing a IoC dependency injection solver.
 
 
 ### Pacman - A* Search

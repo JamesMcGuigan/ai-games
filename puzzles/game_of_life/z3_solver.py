@@ -16,8 +16,10 @@ from util import csv_to_numpy
 from util import numpy_to_dict
 
 
-def game_of_life_solver(board: np.ndarray, delta=1, verbose=True):
+# The true kaggle solution requires warmup=5, but this is very slow to compute
+def game_of_life_solver(board: np.ndarray, delta=1, warmup=0, verbose=True):
     time_start = time.perf_counter()
+    max_t      = warmup + delta+1
 
     # Create a 25x25 board for each timestep we need to solve for
     # T=0 for start_time, T=delta-1 for stop_time
@@ -28,27 +30,19 @@ def game_of_life_solver(board: np.ndarray, delta=1, verbose=True):
             [ z3.Int(f"({x:02d},{y:02d})@t={t}") for y in range(size_y) ]
             for x in range(size_x)
         ]
-        for t in range(0, delta+1)
+        for t in range(0, max_t+1)
     ]
     z3_solver = z3.Solver()  # create a solver instance
 
     # Add constraints that every box has a boolean value of 1 or 0
     z3_solver.add([ z3.Or(cell == 0, cell == 1) for cell in pydash.flatten_deep(t_cells) ])
 
-
-    # Add constraints for T=delta-1 the problem defined in the input board
-    z3_solver.add([
-        t_cells[-1][x][y] == int(board[x][y])
-        for x,y in itertools.product(range(size_x), range(size_y))
-    ])
-
-
     # Rules expressed forwards:
     # living + 4-8 neighbours = dies
     # living + 2-3 neighbours = lives
     # living + 0-1 neighbour  = dies
     # dead   +   3 neighbours = lives
-    for t in range(1, delta+1):
+    for t in range(1, max_t+1):
         for x,y in itertools.product(range(size_x), range(size_y)):
             cell               = t_cells[t][x][y]
             past_cell          = t_cells[t-1][x][y]
@@ -85,8 +79,17 @@ def game_of_life_solver(board: np.ndarray, delta=1, verbose=True):
                 )
             ])
 
+    z3_solver.push()  # Create checkpoint before dataset constraints
+
+    # Add constraints for T=delta-1 the problem defined in the input board
+    z3_solver.add([
+        t_cells[-1][x][y] == int(board[x][y])
+        for x,y in itertools.product(range(size_x), range(size_y))
+    ])
+
+
     # if z3_solver.check() != z3.sat: print('Unsolvable!')
-    solution_3d = solver_to_numpy_3d(z3_solver, t_cells)  # calls z3_solver.check()
+    solution_3d = solver_to_numpy_3d(z3_solver, t_cells[warmup:])  # calls z3_solver.check()
 
     # Validate that forward play matches backwards solution
     if np.count_nonzero(solution_3d):  # quicker than calling z3_solver.check() again

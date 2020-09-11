@@ -1,4 +1,5 @@
 import itertools
+import os
 import time
 from typing import List
 from typing import Tuple
@@ -7,10 +8,14 @@ import numpy as np
 import pandas as pd
 import pydash
 import z3
+from joblib import delayed
+from joblib import Parallel
 
+from datasets import test_df
 from datasets import train_df
 from game import life_step
 from plot import plot_3d
+from util import batch
 from util import csv_to_delta
 from util import csv_to_numpy
 from util import numpy_to_dict
@@ -149,33 +154,71 @@ def solver_to_numpy_3d(z3_solver, t_cells) -> np.ndarray:  # np.int8[time][x][y]
     return output
 
 
-def solve_dataframe(df: pd.DataFrame, save='submission.csv') -> pd.DataFrame:
+
+# Parallel(n_jobs=n_jobs)([ delayed(solve_dataframe_idx)(board, delta, idx) ])
+def solve_dataframe_idx(board: np.ndarray, delta: int, idx: int, verbose=True) -> Tuple[np.ndarray,int]:
+    time_start = time.perf_counter()
+
+    z3_solver, t_cells, solution_3d = game_of_life_solver(board, delta, verbose=False)
+
+    time_taken = time.perf_counter() - time_start
+    if verbose:
+        message = "Solved! " if np.count_nonzero(solution_3d) else "unsolved"
+        print(f'{idx:05d}: {message} in {time_taken:.1f}s')
+    return solution_3d, idx
+
+
+def solve_dataframe(df: pd.DataFrame = test_df, save='submission.csv') -> pd.DataFrame:
     solved = 0
     total  = 0
-    submision_df = df.copy().drop('delta', axis=1)
-    loop_start   = time.perf_counter()
-    for idx, row in df.T.iteritems():
-        time_start = time.perf_counter()
+    submision_df = pd.read_csv(save, index_col='id')  # manually copy/paste sample_submission.csv to location
+    time_start   = time.perf_counter()
 
-        delta = csv_to_delta(df, idx)
-        board = csv_to_numpy(df, idx, type='stop')
-        z3_solver, t_cells, solution_3d = game_of_life_solver(board, delta, verbose=False)  # takes ~10s
-        solution_dict     = numpy_to_dict(solution_3d[0])
-        submision_df[idx] = pd.Series(solution_dict)
+    # Create list of all remaining idxs to be solved
+    original_df = df
+    for delta in sorted(df['delta'].unique()):  # [1,2,3,4,5]
+        # Process in assumed order of difficulty, easiest first
+        df = original_df
+        df = df[ df['delta'] == delta ]                               # smaller deltas are easier
+        df = df.iloc[ df.apply(np.count_nonzero, axis=1).argsort() ]  # smaller grids are easier
 
-        time_taken = time.perf_counter() - time_start
-        total += 1
-        if z3_solver.check() == z3.sat:
-            solved += 1
-            print(f'{idx:05d}: Solved!  in {time_taken:.1f}s')
-        else:
-            print(f'{idx:05d}: unsolved in {time_taken:.1f}s')
+        # Create list of unsolved idxs
+        idxs = []
+        for idx in df.index:
+            try:
+                if np.count_nonzero(submision_df.loc[idx]) != 0:
+                    solved += 1
+                    total  += 1
+                else:
+                    idxs.append(idx)
+            except:
+                idxs.append(idx)
 
-        if save:
+        # Create multi-process batch jobs as 50,000 datapoints may take a while
+        n_jobs     = os.cpu_count()
+        batch_size = n_jobs * 8
+        for idx_batch in batch(idxs, batch_size):
+            jobs_batch = []
+            for idx in idx_batch:
+                delta = csv_to_delta(df, idx)
+                board = csv_to_numpy(df, idx, type='stop')
+                jobs_batch.append( delayed(solve_dataframe_idx)(board, delta, idx) )
+
+            solution_idx_batch = Parallel(n_jobs=n_jobs)(jobs_batch)
+            for solution_3d, idx in solution_idx_batch:
+                solution_dict         = numpy_to_dict(solution_3d[0])
+                submision_df.loc[idx] = pd.Series(solution_dict)
+
+                if np.count_nonzero(solution_3d) != 0:
+                    solved += 1
+                total += 1
+
+            # write to file periodically, incase of crash
             submision_df.to_csv(save)
 
-    loop_taken = time.perf_counter() - loop_start
-    print(f'Solved: {solved}/{total} = {100*solved/total}% in {loop_taken:.1f}s')
+    time_taken = time.perf_counter() - time_start
+    percentage = (100 * solved / total) if total else 0
+    print(f'Solved: {solved}/{total} = {percentage}% in {time_taken:.1f}s')
     return submision_df
 
 

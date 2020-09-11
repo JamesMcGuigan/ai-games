@@ -20,3 +20,12 @@ def numpy_to_dict(board: np.ndarray, type='start') -> Dict:
     board  = np.array(board).flatten().tolist()
     output = { f"{type}_{n}": board[n] for n in range(len(board)) }
     return output
+
+
+# Source: https://stackoverflow.com/questions/8290397/how-to-split-an-iterable-in-constant-size-chunks
+def batch(iterable, n=1):
+    l = len(iterable)
+    for ndx in range(0, l, n):
+        yield iterable[ndx:min(ndx + n, l)]
+
+

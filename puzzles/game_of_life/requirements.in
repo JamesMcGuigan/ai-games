@@ -1,5 +1,6 @@
 fastcache
 kaggle
+joblib
 matplotlib
 pandas
 pip-tools

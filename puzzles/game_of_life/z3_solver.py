@@ -94,7 +94,7 @@ def game_of_life_solver(board: np.ndarray, delta=1, verbose=True):
             assert np.all( life_step(solution_3d[t]) == solution_3d[t+1] )
 
     time_taken  = time.perf_counter() - time_start
-    if verbose: print(f'reverse_game_of_life_solver() - took: {time_taken:.1f}s | {"Solved! " if np.count_nonzero(solution_3d) else "unsolved" }')
+    if verbose: print(f'game_of_life_solver() - took: {time_taken:.1f}s | {"Solved! " if np.count_nonzero(solution_3d) else "unsolved" }')
     return z3_solver, t_cells, solution_3d
 
 
@@ -106,7 +106,7 @@ def game_of_life_next_solution(z3_solver, t_cells, verbose=True):
     ]))
     solution_3d = solver_to_numpy_3d(z3_solver, t_cells)
     time_taken  = time.perf_counter() - time_start
-    if verbose: print(f'reverse_game_of_life_next_solution() - took: {time_taken:.1f}s')
+    if verbose: print(f'game_of_life_next_solution() - took: {time_taken:.1f}s')
     return z3_solver, t_cells, solution_3d
 
 

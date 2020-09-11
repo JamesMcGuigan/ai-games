@@ -1,5 +1,7 @@
 import IPython
 
+
+# noinspection PyUnresolvedReferences
 def display_source(code):
     def _jupyterlab_repr_html_(self):
         from pygments import highlight

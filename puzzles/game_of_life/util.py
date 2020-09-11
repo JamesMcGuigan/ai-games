@@ -14,6 +14,8 @@ def csv_to_numpy(df, idx, type='start') -> np.ndarray:
     X = X.reshape((size,size)).astype(np.int8)
     return X
 
+
+# noinspection PyTypeChecker,PyUnresolvedReferences
 def numpy_to_dict(board: np.ndarray, type='start') -> Dict:
     board  = np.array(board).flatten().tolist()
     output = { f"{type}_{n}": board[n] for n in range(len(board)) }

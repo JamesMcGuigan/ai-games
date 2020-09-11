@@ -8,13 +8,15 @@ import pandas as pd
 import pydash
 import z3
 
-from datasets import test_df
+from datasets import train_df
+from game import life_step
+from plot import plot_3d
 from util import csv_to_delta
 from util import csv_to_numpy
 from util import numpy_to_dict
 
 
-def reverse_game_of_life_solver(board: np.ndarray, delta=1, verbose=True):
+def game_of_life_solver(board: np.ndarray, delta=1, verbose=True):
     time_start = time.perf_counter()
 
     # Create a 25x25 board for each timestep we need to solve for
@@ -23,7 +25,7 @@ def reverse_game_of_life_solver(board: np.ndarray, delta=1, verbose=True):
     size_y  = board.shape[1]
     t_cells = [
         [
-            [ z3.Int(f"{x}{y}@{t}") for y in range(size_y) ]
+            [ z3.Int(f"({x:02d},{y:02d})@t={t}") for y in range(size_y) ]
             for x in range(size_x)
         ]
         for t in range(0, delta+1)
@@ -58,14 +60,14 @@ def reverse_game_of_life_solver(board: np.ndarray, delta=1, verbose=True):
                         z3.And(
                             past_cell == 0,
                             z3.Sum( *past_neighbours ) == 3,
-                            ),
+                        ),
                         # living + 2-3 neighbours = lives
                         z3.And(
                             past_cell == 1,
                             z3.Or(
                                 z3.Sum( *past_neighbours ) == 2,
                                 z3.Sum( *past_neighbours ) == 3,
-                                )
+                            )
                         )
                     ),
                     1, 0  # cast back from boolean to int
@@ -74,31 +76,38 @@ def reverse_game_of_life_solver(board: np.ndarray, delta=1, verbose=True):
 
             # Ignore any currently dead cell with 0 neighbours,
             # This considerably reduces the state space and prevents zero-point energy solutions
-            current_neighbours = get_neighbourhood_cells(t_cells[t], x, y, distance=2)
+            current_neighbours = get_neighbourhood_cells(t_cells[t], x, y, distance=1)
             z3_solver.add([
                 z3.If(
-                    z3.And( cell == 0, z3.Sum(current_neighbours) == 0 ),
+                    z3.And( cell == 0, z3.Sum( *current_neighbours ) == 0 ),
                     past_cell == 0,
                     True
                 )
             ])
 
     # if z3_solver.check() != z3.sat: print('Unsolvable!')
-    time_taken = time.perf_counter() - time_start
-    if verbose: print(f'reverse_game_of_life_solver() - took: {time_taken:.1f}s | {z3_solver.check()}')
-    return z3_solver, t_cells
+    solution_3d = solver_to_numpy_3d(z3_solver, t_cells)  # calls z3_solver.check()
+
+    # Validate that forward play matches backwards solution
+    if np.count_nonzero(solution_3d):  # quicker than calling z3_solver.check() again
+        for t in range(0, delta):
+            assert np.all( life_step(solution_3d[t]) == solution_3d[t+1] )
+
+    time_taken  = time.perf_counter() - time_start
+    if verbose: print(f'reverse_game_of_life_solver() - took: {time_taken:.1f}s | {"Solved! " if np.count_nonzero(solution_3d) else "unsolved" }')
+    return z3_solver, t_cells, solution_3d
 
 
-def reverse_game_of_life_next_solution(z3_solver, t_cells, verbose=True):
+def game_of_life_next_solution(z3_solver, t_cells, verbose=True):
     time_start = time.perf_counter()
     z3_solver.add(z3.Or(*[
         cell != z3_solver.model()[cell]
         for cell in pydash.flatten_deep(t_cells[0])
     ]))
-    z3_solver.check()
-    time_taken = time.perf_counter() - time_start
+    solution_3d = solver_to_numpy_3d(z3_solver, t_cells)
+    time_taken  = time.perf_counter() - time_start
     if verbose: print(f'reverse_game_of_life_next_solution() - took: {time_taken:.1f}s')
-    return z3_solver, t_cells
+    return z3_solver, t_cells, solution_3d
 
 
 def get_neighbourhood_coords(board: List[List[int]], x: int, y: int, distance=1) -> List[Tuple[int,int]]:
@@ -117,23 +126,22 @@ def get_neighbourhood_cells(cells: List[List[int]], x: int, y: int, distance=1) 
     return output
 
 
-def solver_to_list_2d(z3_solver, t_cells) -> List[List[int]]:
+def solver_to_numpy_3d(z3_solver, t_cells) -> np.ndarray:  # np.int8[time][x][y]
     is_sat = z3_solver.check() == z3.sat
-    output = [
+    output = np.array([
         [
-            int(z3_solver.model()[cell].as_string()) if is_sat else 0
-            for y, cell in enumerate(cells)
+            [
+                int(z3_solver.model()[cell].as_string()) if is_sat else 0
+                for y, cell in enumerate(cells)
+            ]
+            for x, cells in enumerate(t_cells[t])
         ]
-        for x, cells in enumerate(t_cells[-1])
-    ]
+        for t in range(len(t_cells))
+    ], dtype=np.int8)
     return output
 
-def solver_to_numpy(z3_solver, t_cells) -> np.ndarray:
-    solution = solver_to_list_2d(z3_solver, t_cells)
-    return np.array( solution, dtype=np.int8 )
 
-
-def solve_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+def solve_dataframe(df: pd.DataFrame, save='submission.csv') -> pd.DataFrame:
     solved = 0
     total  = 0
     submision_df = df.copy().drop('delta', axis=1)
@@ -143,10 +151,9 @@ def solve_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
         delta = csv_to_delta(df, idx)
         board = csv_to_numpy(df, idx, type='stop')
-        z3_solver, t_cells = reverse_game_of_life_solver(board, delta, verbose=False)  # takes ~10s
-        solution_np        = solver_to_numpy(z3_solver, t_cells)
-        solution_dict      = numpy_to_dict(solution_np)
-        submision_df[idx]  = pd.Series(solution_dict)
+        z3_solver, t_cells, solution_3d = game_of_life_solver(board, delta, verbose=False)  # takes ~10s
+        solution_dict     = numpy_to_dict(solution_3d[0])
+        submision_df[idx] = pd.Series(solution_dict)
 
         time_taken = time.perf_counter() - time_start
         total += 1
@@ -156,6 +163,9 @@ def solve_dataframe(df: pd.DataFrame) -> pd.DataFrame:
         else:
             print(f'{idx:05d}: unsolved in {time_taken:.1f}s')
 
+        if save:
+            submision_df.to_csv(save)
+
     loop_taken = time.perf_counter() - loop_start
     print(f'Solved: {solved}/{total} = {100*solved/total}% in {loop_taken:.1f}s')
     return submision_df
@@ -163,5 +173,16 @@ def solve_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
 
 if __name__ == '__main__':
-    # solve_dataframe(train_df).to_csv('train.csv')
-    solve_dataframe(test_df).to_csv('train.csv')
+    for df, idx in [
+        (train_df, 0),  # delta = 3 - solved  9.8s
+        (train_df, 4),  # delta = 1 - solved  3.9s
+        (train_df, 0),  # delta = 3
+    ]:
+        delta    = csv_to_delta(df, idx)
+        board    = csv_to_numpy(df, idx, type='stop')
+        expected = csv_to_numpy(df, idx, type='start')
+        z3_solver, t_cells, solution_3d = game_of_life_solver(board, delta)
+        plot_3d(solution_3d)
+
+    # solve_dataframe(train_df, save=None)
+    # solve_dataframe(test_df, save='submission.csv')

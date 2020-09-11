@@ -16,15 +16,12 @@ from util import csv_to_numpy
 from util import numpy_to_dict
 
 
-# The true kaggle solution requires warmup=5, but this is very slow to compute
-def game_of_life_solver(board: np.ndarray, delta=1, warmup=0, verbose=True):
-    time_start = time.perf_counter()
-    max_t      = warmup + delta+1
+def game_of_life_ruleset(size=(25,25), delta=1, warmup=0):
 
     # Create a 25x25 board for each timestep we need to solve for
     # T=0 for start_time, T=delta-1 for stop_time
-    size_x  = board.shape[0]
-    size_y  = board.shape[1]
+    max_t = warmup + delta+1
+    size_x, size_y = size
     t_cells = [
         [
             [ z3.Int(f"({x:02d},{y:02d})@t={t}") for y in range(size_y) ]
@@ -54,14 +51,14 @@ def game_of_life_solver(board: np.ndarray, delta=1, warmup=0, verbose=True):
                         z3.And(
                             past_cell == 0,
                             z3.Sum( *past_neighbours ) == 3,
-                        ),
+                            ),
                         # living + 2-3 neighbours = lives
                         z3.And(
                             past_cell == 1,
                             z3.Or(
                                 z3.Sum( *past_neighbours ) == 2,
                                 z3.Sum( *past_neighbours ) == 3,
-                            )
+                                )
                         )
                     ),
                     1, 0  # cast back from boolean to int
@@ -80,13 +77,21 @@ def game_of_life_solver(board: np.ndarray, delta=1, warmup=0, verbose=True):
             ])
 
     z3_solver.push()  # Create checkpoint before dataset constraints
+    return z3_solver, t_cells
+
+
+# The true kaggle solution requires warmup=5, but this is very slow to compute
+def game_of_life_solver(board: np.ndarray, delta=1, warmup=0, verbose=True):
+    time_start = time.perf_counter()
+
+    size = (size_x, size_y) = board.shape
+    z3_solver, t_cells = game_of_life_ruleset(size=size, delta=delta, warmup=warmup)
 
     # Add constraints for T=delta-1 the problem defined in the input board
     z3_solver.add([
         t_cells[-1][x][y] == int(board[x][y])
         for x,y in itertools.product(range(size_x), range(size_y))
     ])
-
 
     # if z3_solver.check() != z3.sat: print('Unsolvable!')
     solution_3d = solver_to_numpy_3d(z3_solver, t_cells[warmup:])  # calls z3_solver.check()

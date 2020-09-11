@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/ai-games.iml" filepath="$PROJECT_DIR$/.idea/ai-games.iml" />
       <module fileurl="file://$PROJECT_DIR$/search/arc/arc.iml" filepath="$PROJECT_DIR$/search/arc/arc.iml" />
       <module fileurl="file://$PROJECT_DIR$/games/connectx/connectx.iml" filepath="$PROJECT_DIR$/games/connectx/connectx.iml" />
+      <module fileurl="file://$PROJECT_DIR$/puzzles/game_of_life/game_of_life.iml" filepath="$PROJECT_DIR$/puzzles/game_of_life/game_of_life.iml" />
       <module fileurl="file://$PROJECT_DIR$/games/knights-isolation/knights-isolation.iml" filepath="$PROJECT_DIR$/games/knights-isolation/knights-isolation.iml" />
       <module fileurl="file://$PROJECT_DIR$/search/pacman/pacman.iml" filepath="$PROJECT_DIR$/search/pacman/pacman.iml" />
     </modules>

@@ -1,5 +1,7 @@
 .cache/
 games/connectx/submissions/
 
+__pycache__/
+*.py[cod]
 *.wip
 *.wip.*

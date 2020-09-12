@@ -196,7 +196,7 @@ def solve_dataframe(df: pd.DataFrame = test_df, save='submission.csv', timeout=0
 
         # Create multi-process batch jobs as 50,000 datapoints may take a while
         n_jobs     = os.cpu_count()
-        batch_size = n_jobs * 8
+        batch_size = n_jobs * 4
         for idx_batch in batch(idxs, batch_size):
             jobs_batch = []
             for idx in idx_batch:

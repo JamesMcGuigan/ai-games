@@ -8,14 +8,12 @@ import numpy as np
 import pandas as pd
 import pydash
 import z3
-from joblib import delayed
-from joblib import Parallel
+from pathos.multiprocessing import ProcessPool
 
 from datasets import test_df
 from datasets import train_df
 from game import life_step
 from plot import plot_3d
-from util import batch
 from util import csv_to_delta
 from util import csv_to_numpy
 from util import numpy_to_dict
@@ -155,6 +153,25 @@ def solver_to_numpy_3d(z3_solver, t_cells) -> np.ndarray:  # np.int8[time][x][y]
 
 
 
+def get_unsolved_idxs( df: pd.DataFrame, submision_df: pd.DataFrame, sort=True ) -> List[int]:
+    idxs = []
+    deltas = sorted(df['delta'].unique()) if sort else [0]
+    for delta in deltas:  # [1,2,3,4,5]
+        # Process in assumed order of difficulty, easiest first
+        if sort:
+            df = df[ df['delta'] == delta ]                               # smaller deltas are easier
+            df = df.iloc[ df.apply(np.count_nonzero, axis=1).argsort() ]  # smaller grids are easier
+
+        # Create list of unsolved idxs
+        for idx in df.index:
+            try:
+                if np.count_nonzero(submision_df.loc[idx]) == 0:
+                    idxs.append(idx)
+            except:
+                idxs.append(idx)
+    return idxs
+
+
 # Parallel(n_jobs=n_jobs)([ delayed(solve_dataframe_idx)(board, delta, idx) ])
 def solve_dataframe_idx(board: np.ndarray, delta: int, idx: int, verbose=True) -> Tuple[np.ndarray,int]:
     time_start = time.perf_counter()
@@ -168,65 +185,44 @@ def solve_dataframe_idx(board: np.ndarray, delta: int, idx: int, verbose=True) -
     return solution_3d, idx
 
 
-def solve_dataframe(df: pd.DataFrame = test_df, save='submission.csv', timeout=0) -> pd.DataFrame:
-    solved = 0
-    total  = 0
-    submision_df = pd.read_csv(save, index_col='id')  # manually copy/paste sample_submission.csv to location
+def solve_dataframe(df: pd.DataFrame = test_df, save='submission.csv', timeout=0, max_count=0) -> pd.DataFrame:
     time_start   = time.perf_counter()
 
+    submision_df = pd.read_csv(save, index_col='id')  # manually copy/paste sample_submission.csv to location
+    solved = 0
+    total  = 0  # only count number solved in current runtime, ignore history
+
+    # Pathos multiprocessing allows iterator semantics, whilst joblib has reduced CPU usage at the end of each batche
+    cpus = os.cpu_count() * 3//4  # 75% CPU load to optimize for CPU cache
+    pool = ProcessPool(ncpus=cpus)
     try:
-        # Create list of all remaining idxs to be solved
-        original_df = df
-        for delta in sorted(df['delta'].unique()):  # [1,2,3,4,5]
-            # Process in assumed order of difficulty, easiest first
-            df = original_df
-            # df = df[ df['delta'] == delta ]                               # smaller deltas are easier
-            df = df.iloc[ df.apply(np.count_nonzero, axis=1).argsort() ]  # smaller grids are easier
+        idxs   = get_unsolved_idxs(df, submision_df, sort=True)
+        deltas = ( csv_to_delta(df, idx)              for idx in idxs )  # generator
+        boards = ( csv_to_numpy(df, idx, type='stop') for idx in idxs )  # generator
 
-            # Create list of unsolved idxs
-            idxs = []
-            for idx in df.index:
-                try:
-                    if np.count_nonzero(submision_df.loc[idx]) != 0:
-                        solved += 1
-                        total  += 1
-                    else:
-                        idxs.append(idx)
-                except:
-                    idxs.append(idx)
+        solution_idx_iter = pool.uimap(solve_dataframe_idx, boards, deltas, idxs)
+        for solution_3d, idx in solution_idx_iter:
+            total += 1
+            if np.count_nonzero(solution_3d) != 0:
+                solved += 1
 
-            # Create multi-process batch jobs as 50,000 datapoints may take a while
-            n_jobs     = os.cpu_count()
-            batch_size = n_jobs * 4
-            for idx_batch in batch(idxs, batch_size):
-                jobs_batch = []
-                for idx in idx_batch:
-                    delta = csv_to_delta(df, idx)
-                    board = csv_to_numpy(df, idx, type='stop')
-                    jobs_batch.append( delayed(solve_dataframe_idx)(board, delta, idx) )
-
-                solution_idx_batch = Parallel(n_jobs=n_jobs)(reversed(jobs_batch))  # larger cell counts inside batch start first
-                for solution_3d, idx in solution_idx_batch:
-                    if np.count_nonzero(solution_3d) != 0:
-                        solution_dict         = numpy_to_dict(solution_3d[0])
-                        submision_df.loc[idx] = pd.Series(solution_dict)
-                        solved += 1
-                    total += 1
-
-                # write to file periodically, incase of crash or timeout
+                # Reread file, update and persist
+                submision_df          = pd.read_csv(save, index_col='id')
+                solution_dict         = numpy_to_dict(solution_3d[0])
+                submision_df.loc[idx] = pd.Series(solution_dict)
                 submision_df.to_csv(save)
-                time_taken = time.perf_counter() - time_start
-                percentage = (100 * solved / total) if total else 0
-                print(f'Savepoint: {solved}/{total} = {percentage}% in {time_taken:.1f}s')
-                if timeout and timeout < time.perf_counter() - time_start: raise TimeoutError()  # timeout for kaggle submissions
+
+            # timeouts for kaggle submissions
+            if max_count and max_count <= total:                            raise TimeoutError()
+            if timeout   and timeout   <= time.perf_counter() - time_start: raise TimeoutError()
     except: pass
     finally:
         time_taken = time.perf_counter() - time_start
         percentage = (100 * solved / total) if total else 0
         print(f'Solved: {solved}/{total} = {percentage}% in {time_taken:.1f}s')
 
-        submision_df.to_csv(save)  # save on exit
-        print(f'Wrote:  {save}')
+        pool.terminate()
+        pool.clear()
     return submision_df
 
 

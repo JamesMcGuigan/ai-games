@@ -224,6 +224,9 @@ def solve_dataframe(df: pd.DataFrame = test_df, save='submission.csv', timeout=0
         time_taken = time.perf_counter() - time_start
         percentage = (100 * solved / total) if total else 0
         print(f'Solved: {solved}/{total} = {percentage}% in {time_taken:.1f}s')
+
+        submision_df.to_csv(save)  # save on exit
+        print(f'Wrote:  {save}')
     return submision_df
 
 

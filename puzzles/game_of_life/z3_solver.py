@@ -168,7 +168,7 @@ def solve_dataframe_idx(board: np.ndarray, delta: int, idx: int, verbose=True) -
     return solution_3d, idx
 
 
-def solve_dataframe(df: pd.DataFrame = test_df, save='submission.csv') -> pd.DataFrame:
+def solve_dataframe(df: pd.DataFrame = test_df, save='submission.csv', timeout=0) -> pd.DataFrame:
     solved = 0
     total  = 0
     submision_df = pd.read_csv(save, index_col='id')  # manually copy/paste sample_submission.csv to location
@@ -213,8 +213,9 @@ def solve_dataframe(df: pd.DataFrame = test_df, save='submission.csv') -> pd.Dat
                     solved += 1
                 total += 1
 
-            # write to file periodically, incase of crash
+            # write to file periodically, incase of crash or timeout
             submision_df.to_csv(save)
+            if timeout and timeout > time.perf_counter() - time_start: break  # timeout for kaggle submissions
 
     time_taken = time.perf_counter() - time_start
     percentage = (100 * solved / total) if total else 0

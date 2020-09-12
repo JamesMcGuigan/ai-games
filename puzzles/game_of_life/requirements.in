@@ -3,6 +3,7 @@ kaggle
 joblib
 matplotlib
 pandas
+pathos
 pip-tools
 pydash
 pygments

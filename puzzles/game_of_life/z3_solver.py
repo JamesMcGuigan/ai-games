@@ -164,7 +164,7 @@ def solve_dataframe_idx(board: np.ndarray, delta: int, idx: int, verbose=True) -
     time_taken = time.perf_counter() - time_start
     if verbose:
         message = "Solved! " if np.count_nonzero(solution_3d) else "unsolved"
-        print(f'{idx:05d}: {message} in {time_taken:.1f}s')
+        print(f'{idx:05d} | delta = {delta} | cells = {np.count_nonzero(board):3d} -> {np.count_nonzero(solution_3d):3d} | {message} in {time_taken:.1f}s')
     return solution_3d, idx
 
 
@@ -174,52 +174,56 @@ def solve_dataframe(df: pd.DataFrame = test_df, save='submission.csv', timeout=0
     submision_df = pd.read_csv(save, index_col='id')  # manually copy/paste sample_submission.csv to location
     time_start   = time.perf_counter()
 
-    # Create list of all remaining idxs to be solved
-    original_df = df
-    for delta in sorted(df['delta'].unique()):  # [1,2,3,4,5]
-        # Process in assumed order of difficulty, easiest first
-        df = original_df
-        df = df[ df['delta'] == delta ]                               # smaller deltas are easier
-        df = df.iloc[ df.apply(np.count_nonzero, axis=1).argsort() ]  # smaller grids are easier
+    try:
+        # Create list of all remaining idxs to be solved
+        original_df = df
+        for delta in sorted(df['delta'].unique()):  # [1,2,3,4,5]
+            # Process in assumed order of difficulty, easiest first
+            df = original_df
+            # df = df[ df['delta'] == delta ]                               # smaller deltas are easier
+            df = df.iloc[ df.apply(np.count_nonzero, axis=1).argsort() ]  # smaller grids are easier
 
-        # Create list of unsolved idxs
-        idxs = []
-        for idx in df.index:
-            try:
-                if np.count_nonzero(submision_df.loc[idx]) != 0:
-                    solved += 1
-                    total  += 1
-                else:
+            # Create list of unsolved idxs
+            idxs = []
+            for idx in df.index:
+                try:
+                    if np.count_nonzero(submision_df.loc[idx]) != 0:
+                        solved += 1
+                        total  += 1
+                    else:
+                        idxs.append(idx)
+                except:
                     idxs.append(idx)
-            except:
-                idxs.append(idx)
 
-        # Create multi-process batch jobs as 50,000 datapoints may take a while
-        n_jobs     = os.cpu_count()
-        batch_size = n_jobs * 4
-        for idx_batch in batch(idxs, batch_size):
-            jobs_batch = []
-            for idx in idx_batch:
-                delta = csv_to_delta(df, idx)
-                board = csv_to_numpy(df, idx, type='stop')
-                jobs_batch.append( delayed(solve_dataframe_idx)(board, delta, idx) )
+            # Create multi-process batch jobs as 50,000 datapoints may take a while
+            n_jobs     = os.cpu_count()
+            batch_size = n_jobs * 4
+            for idx_batch in batch(idxs, batch_size):
+                jobs_batch = []
+                for idx in idx_batch:
+                    delta = csv_to_delta(df, idx)
+                    board = csv_to_numpy(df, idx, type='stop')
+                    jobs_batch.append( delayed(solve_dataframe_idx)(board, delta, idx) )
 
-            solution_idx_batch = Parallel(n_jobs=n_jobs)(jobs_batch)
-            for solution_3d, idx in solution_idx_batch:
-                solution_dict         = numpy_to_dict(solution_3d[0])
-                submision_df.loc[idx] = pd.Series(solution_dict)
+                solution_idx_batch = Parallel(n_jobs=n_jobs)(reversed(jobs_batch))  # larger cell counts inside batch start first
+                for solution_3d, idx in solution_idx_batch:
+                    if np.count_nonzero(solution_3d) != 0:
+                        solution_dict         = numpy_to_dict(solution_3d[0])
+                        submision_df.loc[idx] = pd.Series(solution_dict)
+                        solved += 1
+                    total += 1
 
-                if np.count_nonzero(solution_3d) != 0:
-                    solved += 1
-                total += 1
-
-            # write to file periodically, incase of crash or timeout
-            submision_df.to_csv(save)
-            if timeout and timeout > time.perf_counter() - time_start: break  # timeout for kaggle submissions
-
-    time_taken = time.perf_counter() - time_start
-    percentage = (100 * solved / total) if total else 0
-    print(f'Solved: {solved}/{total} = {percentage}% in {time_taken:.1f}s')
+                # write to file periodically, incase of crash or timeout
+                submision_df.to_csv(save)
+                time_taken = time.perf_counter() - time_start
+                percentage = (100 * solved / total) if total else 0
+                print(f'Savepoint: {solved}/{total} = {percentage}% in {time_taken:.1f}s')
+                if timeout and timeout < time.perf_counter() - time_start: raise TimeoutError()  # timeout for kaggle submissions
+    except: pass
+    finally:
+        time_taken = time.perf_counter() - time_start
+        percentage = (100 * solved / total) if total else 0
+        print(f'Solved: {solved}/{total} = {percentage}% in {time_taken:.1f}s')
     return submision_df
 
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PYTHONUNBUFFERED=1 time ./z3_solver.run.py | tee -a submission.log
+# PYTHONUNBUFFERED=1 time -p nice ./z3_solver.run.py | tee -a submission.log
 
 from datasets import test_df
 from z3_solver import solve_dataframe

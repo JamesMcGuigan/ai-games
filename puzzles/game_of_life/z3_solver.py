@@ -185,7 +185,7 @@ def solve_dataframe_idx(board: np.ndarray, delta: int, idx: int, verbose=True) -
     return solution_3d, idx
 
 
-def solve_dataframe(df: pd.DataFrame = test_df, save='submission.csv', timeout=0, max_count=0) -> pd.DataFrame:
+def solve_dataframe(df: pd.DataFrame = test_df, save='submission.csv', timeout=0, max_count=0, sort=True) -> pd.DataFrame:
     time_start   = time.perf_counter()
 
     submision_df = pd.read_csv(save, index_col='id')  # manually copy/paste sample_submission.csv to location
@@ -196,9 +196,9 @@ def solve_dataframe(df: pd.DataFrame = test_df, save='submission.csv', timeout=0
     cpus = os.cpu_count() * 3//4  # 75% CPU load to optimize for CPU cache
     pool = ProcessPool(ncpus=cpus)
     try:
-        idxs   = get_unsolved_idxs(df, submision_df, sort=True)
-        deltas = ( csv_to_delta(df, idx)              for idx in idxs )  # generator
-        boards = ( csv_to_numpy(df, idx, type='stop') for idx in idxs )  # generator
+        idxs   = get_unsolved_idxs(df, submision_df, sort=sort)
+        deltas = ( csv_to_delta(df, idx)            for idx in idxs )  # generator
+        boards = (csv_to_numpy(df, idx, key='stop') for idx in idxs)  # generator
 
         solution_idx_iter = pool.uimap(solve_dataframe_idx, boards, deltas, idxs)
         for solution_3d, idx in solution_idx_iter:
@@ -234,8 +234,8 @@ if __name__ == '__main__':
         (train_df, 0),  # delta = 3
     ]:
         delta    = csv_to_delta(df, idx)
-        board    = csv_to_numpy(df, idx, type='stop')
-        expected = csv_to_numpy(df, idx, type='start')
+        board    = csv_to_numpy(df, idx, key='stop')
+        expected = csv_to_numpy(df, idx, key='start')
         z3_solver, t_cells, solution_3d = game_of_life_solver(board, delta)
         plot_3d(solution_3d)
 

@@ -11,13 +11,13 @@ import pydash
 import z3
 from pathos.multiprocessing import ProcessPool
 
-from util.datasets import test_df
-from util.datasets import train_df
-from util.game import life_step
-from util.plot import plot_3d
-from util.util import csv_to_delta
-from util.util import csv_to_numpy
-from util.util import numpy_to_dict
+from utils.datasets import test_df
+from utils.datasets import train_df
+from utils.game import life_step
+from utils.plot import plot_3d
+from utils.util import csv_to_delta
+from utils.util import csv_to_numpy
+from utils.util import numpy_to_dict
 
 
 def game_of_life_ruleset(size=(25,25), delta=1, warmup=0):

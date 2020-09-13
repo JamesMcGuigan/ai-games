@@ -1,9 +1,9 @@
 import numpy as np
 
-from util.datasets import train_df
-from util.hashmaps import hash_geometric
-from util.hashmaps import hash_translations
-from util.util import csv_to_numpy
+from utils.datasets import train_df
+from utils.hashmaps import hash_geometric
+from utils.hashmaps import hash_translations
+from utils.util import csv_to_numpy
 
 
 def test_hash_geometric():

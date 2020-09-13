@@ -9,12 +9,12 @@ from typing import Union
 
 import numpy as np
 
-from util.datasets import train_df
-from util.game import life_step
-from util.game import life_step_1
-from util.game import life_step_2
-from util.hashmaps import hash_geometric
-from util.hashmaps import hash_translations
+from utils.datasets import train_df
+from utils.game import life_step
+from utils.game import life_step_1
+from utils.game import life_step_2
+from utils.hashmaps import hash_geometric
+from utils.hashmaps import hash_translations
 
 dataset = np.array( train_df[ train_df.columns[-624:] ] ).reshape(-1, 25, 25)
 dataset = dataset[:1000]

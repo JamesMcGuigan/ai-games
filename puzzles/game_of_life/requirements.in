@@ -9,3 +9,6 @@ pydash
 pygments
 z3-solver
 scipy==1.4.1  # ERROR: tensorflow 2.1.0 has requirement scipy==1.4.1; python_version >= "3", but you'll have scipy 1.5.2 which is incompatible.
+torch
+ignite
+numba

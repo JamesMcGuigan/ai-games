@@ -28,15 +28,12 @@ def game_of_life_ruleset(size=(25,25), delta=1, warmup=0):
     size_x, size_y = size
     t_cells = [
         [
-            [ z3.Int(f"({x:02d},{y:02d})@t={t}") for y in range(size_y) ]
+            [ z3.Bool(f"({x:02d},{y:02d})@t={t}") for y in range(size_y) ]
             for x in range(size_x)
         ]
         for t in range(0, max_t+1)
     ]
     z3_solver = z3.Solver()  # create a solver instance
-
-    # Add constraints that every box has a boolean value of 1 or 0
-    z3_solver.add([ z3.Or(cell == 0, cell == 1) for cell in pydash.flatten_deep(t_cells) ])
 
     # Rules expressed forwards:
     # living + 4-8 neighbours = dies
@@ -45,28 +42,16 @@ def game_of_life_ruleset(size=(25,25), delta=1, warmup=0):
     # dead   +   3 neighbours = lives
     for t in range(1, max_t+1):
         for x,y in itertools.product(range(size_x), range(size_y)):
-            cell               = t_cells[t][x][y]
-            past_cell          = t_cells[t-1][x][y]
-            past_neighbours    = get_neighbourhood_cells(t_cells[t-1], x, y)  # excludes self
+            cell            = t_cells[t][x][y]
+            past_cell       = t_cells[t-1][x][y]
+            past_neighbours = get_neighbourhood_cells(t_cells[t-1], x, y)  # excludes self
             z3_solver.add([
-                cell == z3.If(
-                    z3.Or(
-                        # dead + 3 neighbours = lives
-                        z3.And(
-                            past_cell == 0,
-                            z3.Sum( *past_neighbours ) == 3,
-                            ),
-                        # living + 2-3 neighbours = lives
-                        z3.And(
-                            past_cell == 1,
-                            z3.Or(
-                                z3.Sum( *past_neighbours ) == 2,
-                                z3.Sum( *past_neighbours ) == 3,
-                                )
-                        )
-                    ),
-                    1, 0  # cast back from boolean to int
-                )
+                # dead   + 3 neighbours   = lives
+                # living + 2-3 neighbours = lives
+                cell == z3.And([
+                    z3.AtLeast( past_cell, *past_neighbours, 3 ),
+                    z3.AtMost(             *past_neighbours, 3 ),
+                ])
             ])
 
             # Ignore any currently dead cell with 0 neighbours,
@@ -74,11 +59,16 @@ def game_of_life_ruleset(size=(25,25), delta=1, warmup=0):
             current_neighbours = get_neighbourhood_cells(t_cells[t], x, y, distance=1)
             z3_solver.add([
                 z3.If(
-                    z3.And( cell == 0, z3.Sum( *current_neighbours ) == 0 ),
-                    past_cell == 0,
+                    z3.AtMost( cell, *current_neighbours, 0 ),
+                    past_cell == False,
                     True
                 )
             ])
+
+    # Add constraint that there can be no empty boards
+    for t in range(1, max_t+1):
+        layer = pydash.flatten_deep(t_cells[t])
+        z3_solver.add([ z3.AtLeast( *layer, 1 ) ])
 
     z3_solver.push()  # Create checkpoint before dataset constraints
     return z3_solver, t_cells
@@ -93,7 +83,7 @@ def game_of_life_solver(board: np.ndarray, delta=1, warmup=0, verbose=True):
 
     # Add constraints for T=delta-1 the problem defined in the input board
     z3_solver.add([
-        t_cells[-1][x][y] == int(board[x][y])
+        t_cells[-1][x][y] == bool(board[x][y])
         for x,y in itertools.product(range(size_x), range(size_y))
     ])
 
@@ -143,7 +133,7 @@ def solver_to_numpy_3d(z3_solver, t_cells) -> np.ndarray:  # np.int8[time][x][y]
     output = np.array([
         [
             [
-                int(z3_solver.model()[cell].as_string()) if is_sat else 0
+                int(z3.is_true(z3_solver.model()[cell])) if is_sat else 0
                 for y, cell in enumerate(cells)
             ]
             for x, cells in enumerate(t_cells[t])
@@ -240,10 +230,11 @@ def solve_dataframe(
 
 
 if __name__ == '__main__':
+    # With boolean logic gives 2-4x speedup over integer logic
     for df, idx in [
-        (train_df, 0),  # delta = 3 - solved  9.8s
-        (train_df, 4),  # delta = 1 - solved  3.9s
-        (train_df, 0),  # delta = 3
+        (train_df, 0),  # delta = 3 - solved  4.2s (boolean logic) | 16.1s (integer logic)
+        (train_df, 4),  # delta = 1 - solved  7.6s (boolean logic) | 57.6s (integer logic)
+        (train_df, 0),  # delta = 3 - solved  4.0s (boolean logic) | 17.3s (integer logic)
     ]:
         delta    = csv_to_delta(df, idx)
         board    = csv_to_numpy(df, idx, key='stop')

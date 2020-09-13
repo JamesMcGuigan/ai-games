@@ -1,10 +1,10 @@
 import numpy as np
 
-from datasets import train_df
-from game import life_step
-from game import life_step_1
-from game import life_step_2
-from util import csv_to_numpy
+from util.datasets import train_df
+from util.game import life_step
+from util.game import life_step_1
+from util.game import life_step_2
+from util.util import csv_to_numpy
 
 
 def test_life_step():

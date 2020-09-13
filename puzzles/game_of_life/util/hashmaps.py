@@ -1,7 +1,7 @@
 import numpy as np
 from numba import njit
 
-from primes import primes_np
+from util.primes import primes_np
 
 
 @njit()

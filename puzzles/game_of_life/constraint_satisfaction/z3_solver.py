@@ -144,7 +144,7 @@ def solver_to_numpy_3d(z3_solver, t_cells) -> np.ndarray:  # np.int8[time][x][y]
 
 
 
-def get_unsolved_idxs(df: pd.DataFrame, submision_df: pd.DataFrame, sort_cells=True, sort_delta=False) -> List[int]:
+def get_unsolved_idxs(df: pd.DataFrame, submision_df: pd.DataFrame, modulo=(1,0), sort_cells=True, sort_delta=False) -> List[int]:
     idxs = []
     deltas = sorted(df['delta'].unique()) if sort_delta else [0]
     for delta in deltas:  # [1,2,3,4,5]
@@ -156,6 +156,7 @@ def get_unsolved_idxs(df: pd.DataFrame, submision_df: pd.DataFrame, sort_cells=T
 
         # Create list of unsolved idxs
         for idx in df.index:
+            if modulo and idx % modulo[0] != modulo[1]: continue  # allow splitting dataset between different servers
             try:
                 if np.count_nonzero(submision_df.loc[idx]) == 0:
                     idxs.append(idx)
@@ -187,6 +188,7 @@ def solve_dataframe(
         max_count=0,
         sort_cells=True,
         sort_delta=True,
+        modulo=(1,0)
 ) -> pd.DataFrame:
     time_start = time.perf_counter()
 
@@ -198,7 +200,7 @@ def solve_dataframe(
     cpus = os.cpu_count() * 3//4  # 75% CPU load to optimize for CPU cache
     pool = ProcessPool(ncpus=cpus)
     try:
-        idxs   = get_unsolved_idxs(df, submision_df, sort_cells=sort_cells, sort_delta=sort_delta)
+        idxs   = get_unsolved_idxs(df, submision_df, modulo=modulo, sort_cells=sort_cells, sort_delta=sort_delta)
         deltas = ( csv_to_delta(df, idx)             for idx in idxs )  # generator
         boards = ( csv_to_numpy(df, idx, key='stop') for idx in idxs )  # generator
 

@@ -1,5 +1,6 @@
 import itertools
 import os
+import random
 import time
 from typing import List
 from typing import Tuple
@@ -169,6 +170,9 @@ def get_unsolved_idxs( df: pd.DataFrame, submision_df: pd.DataFrame, sort=True )
                     idxs.append(idx)
             except:
                 idxs.append(idx)
+
+    if sort == 'random':
+        random.shuffle(idxs)
     return idxs
 
 

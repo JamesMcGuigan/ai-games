@@ -154,13 +154,14 @@ def solver_to_numpy_3d(z3_solver, t_cells) -> np.ndarray:  # np.int8[time][x][y]
 
 
 
-def get_unsolved_idxs( df: pd.DataFrame, submision_df: pd.DataFrame, sort=True ) -> List[int]:
+def get_unsolved_idxs(df: pd.DataFrame, submision_df: pd.DataFrame, sort_cells=True, sort_delta=False) -> List[int]:
     idxs = []
-    deltas = sorted(df['delta'].unique()) if sort else [0]
+    deltas = sorted(df['delta'].unique()) if sort_delta else [0]
     for delta in deltas:  # [1,2,3,4,5]
         # Process in assumed order of difficulty, easiest first
-        if sort:
+        if sort_delta:
             df = df[ df['delta'] == delta ]                               # smaller deltas are easier
+        if sort_cells:
             df = df.iloc[ df.apply(np.count_nonzero, axis=1).argsort() ]  # smaller grids are easier
 
         # Create list of unsolved idxs
@@ -171,7 +172,7 @@ def get_unsolved_idxs( df: pd.DataFrame, submision_df: pd.DataFrame, sort=True )
             except:
                 idxs.append(idx)
 
-    if sort == 'random':
+    if sort_cells == 'random':
         random.shuffle(idxs)
     return idxs
 
@@ -189,8 +190,15 @@ def solve_dataframe_idx(board: np.ndarray, delta: int, idx: int, verbose=True) -
     return solution_3d, idx
 
 
-def solve_dataframe(df: pd.DataFrame = test_df, save='submission.csv', timeout=0, max_count=0, sort=True) -> pd.DataFrame:
-    time_start   = time.perf_counter()
+def solve_dataframe(
+        df: pd.DataFrame = test_df,
+        save='submission.csv',
+        timeout=0,
+        max_count=0,
+        sort_cells=True,
+        sort_delta=True,
+) -> pd.DataFrame:
+    time_start = time.perf_counter()
 
     submision_df = pd.read_csv(save, index_col='id')  # manually copy/paste sample_submission.csv to location
     solved = 0
@@ -200,9 +208,9 @@ def solve_dataframe(df: pd.DataFrame = test_df, save='submission.csv', timeout=0
     cpus = os.cpu_count() * 3//4  # 75% CPU load to optimize for CPU cache
     pool = ProcessPool(ncpus=cpus)
     try:
-        idxs   = get_unsolved_idxs(df, submision_df, sort=sort)
-        deltas = ( csv_to_delta(df, idx)            for idx in idxs )  # generator
-        boards = (csv_to_numpy(df, idx, key='stop') for idx in idxs)  # generator
+        idxs   = get_unsolved_idxs(df, submision_df, sort_cells=sort_cells, sort_delta=sort_delta)
+        deltas = ( csv_to_delta(df, idx)             for idx in idxs )  # generator
+        boards = ( csv_to_numpy(df, idx, key='stop') for idx in idxs )  # generator
 
         solution_idx_iter = pool.uimap(solve_dataframe_idx, boards, deltas, idxs)
         for solution_3d, idx in solution_idx_iter:

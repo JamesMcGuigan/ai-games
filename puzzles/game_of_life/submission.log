@@ -4203,3 +4203,143 @@
 77355 | delta = 1 | cells =   3 ->  15 | Solved!  in 2.8s
 94257 | delta = 3 | cells =   3 ->  48 | Solved!  in 7.5s
 81527 | delta = 2 | cells =   3 ->  26 | Solved!  in 5.1s
+82037 | delta = 5 | cells =   3 ->  46 | Solved!  in 72.0s
+98651 | delta = 4 | cells =   3 ->  57 | Solved!  in 30.3s
+98847 | delta = 5 | cells =   3 ->  77 | Solved!  in 72.3s
+96731 | delta = 5 | cells =   3 ->  91 | Solved!  in 87.6s
+87269 | delta = 3 | cells =   3 ->  47 | Solved!  in 7.4s
+77805 | delta = 1 | cells =   3 ->  17 | Solved!  in 1.9s
+87265 | delta = 3 | cells =   3 ->  32 | Solved!  in 9.0s
+78377 | delta = 4 | cells =   3 ->  49 | Solved!  in 31.9s
+87287 | delta = 2 | cells =   3 ->  25 | Solved!  in 4.9s
+82925 | delta = 3 | cells =   3 ->  42 | Solved!  in 10.1s
+96969 | delta = 3 | cells =   3 ->  26 | Solved!  in 9.3s
+81483 | delta = 1 | cells =   3 ->  18 | Solved!  in 2.5s
+79245 | delta = 3 | cells =   3 ->  53 | Solved!  in 11.1s
+96399 | delta = 1 | cells =   3 ->  14 | Solved!  in 2.7s
+93399 | delta = 2 | cells =   3 ->  20 | Solved!  in 4.8s
+97103 | delta = 5 | cells =   3 -> 105 | Solved!  in 95.4s
+81243 | delta = 1 | cells =   3 ->  15 | Solved!  in 2.8s
+82127 | delta = 2 | cells =   3 ->  19 | Solved!  in 4.6s
+72789 | delta = 5 | cells =   3 ->  84 | Solved!  in 110.0s
+69681 | delta = 2 | cells =   3 ->  28 | Solved!  in 3.4s
+99171 | delta = 3 | cells =   3 ->  44 | Solved!  in 9.0s
+93421 | delta = 2 | cells =   3 ->  26 | Solved!  in 4.2s
+87097 | delta = 4 | cells =   3 ->  77 | Solved!  in 28.8s
+81467 | delta = 5 | cells =   3 -> 114 | Solved!  in 98.6s
+87107 | delta = 2 | cells =   3 ->  20 | Solved!  in 5.0s
+98713 | delta = 5 | cells =   3 -> 105 | Solved!  in 80.4s
+71353 | delta = 3 | cells =   3 ->  33 | Solved!  in 10.0s
+93413 | delta = 4 | cells =   3 ->  59 | Solved!  in 40.4s
+83475 | delta = 2 | cells =   3 ->  31 | Solved!  in 5.2s
+64549 | delta = 5 | cells =   3 ->  94 | Solved!  in 63.2s
+85817 | delta = 5 | cells =   3 -> 102 | Solved!  in 88.6s
+94505 | delta = 5 | cells =   3 ->  92 | Solved!  in 84.5s
+86377 | delta = 4 | cells =   3 ->  81 | Solved!  in 32.0s
+71321 | delta = 4 | cells =   3 ->  48 | Solved!  in 28.7s
+80127 | delta = 4 | cells =   3 ->  48 | Solved!  in 34.9s
+60219 | delta = 2 | cells =   3 ->  29 | Solved!  in 4.8s
+84041 | delta = 2 | cells =   3 ->  24 | Solved!  in 5.0s
+74075 | delta = 1 | cells =   3 ->  11 | Solved!  in 2.1s
+76001 | delta = 2 | cells =   3 ->  26 | Solved!  in 4.1s
+88183 | delta = 1 | cells =   3 ->  16 | Solved!  in 2.4s
+75919 | delta = 1 | cells =   3 ->  14 | Solved!  in 2.7s
+89173 | delta = 4 | cells =   3 ->  81 | Solved!  in 27.1s
+91183 | delta = 1 | cells =   3 ->  17 | Solved!  in 2.7s
+92641 | delta = 5 | cells =   3 ->  64 | Solved!  in 80.0s
+68455 | delta = 2 | cells =   3 ->  26 | Solved!  in 5.2s
+98973 | delta = 1 | cells =   3 ->  16 | Solved!  in 3.0s
+66663 | delta = 3 | cells =   3 ->  41 | Solved!  in 10.4s
+62327 | delta = 5 | cells =   3 ->  92 | Solved!  in 71.1s
+54763 | delta = 4 | cells =   3 ->  57 | Solved!  in 21.7s
+66673 | delta = 2 | cells =   3 ->  27 | Solved!  in 5.5s
+58965 | delta = 2 | cells =   3 ->  33 | Solved!  in 5.7s
+96627 | delta = 4 | cells =   3 ->  81 | Solved!  in 26.6s
+60353 | delta = 4 | cells =   3 ->  63 | Solved!  in 25.7s
+72941 | delta = 4 | cells =   3 ->  46 | Solved!  in 29.5s
+91969 | delta = 4 | cells =   3 ->  79 | Solved!  in 32.5s
+91969 | delta = 4 | cells =   3 ->  47 | Solved!  in 17.9s
+68031 | delta = 3 | cells =   3 ->  30 | Solved!  in 8.5s
+66035 | delta = 5 | cells =   3 ->  73 | Solved!    58.4s
+96681 | delta = 5 | cells =   3 -> 116 | Solved!    62.0s
+84775 | delta = 5 | cells =   3 ->  70 | Solved!    75.1s
+50873 | delta = 5 | cells =   3 -> 105 | Solved!    75.2s
+63021 | delta = 5 | cells =   3 -> 111 | Solved!    80.7s
+88239 | delta = 4 | cells =   3 ->  72 | Solved!    18.7s
+92651 | delta = 1 | cells =   3 ->  17 | Solved!     3.0s
+99061 | delta = 3 | cells =   3 ->  59 | Solved!    10.7s
+68015 | delta = 4 | cells =   3 ->  54 | Solved!    28.8s
+94399 | delta = 5 | cells =   3 -> 123 | Solved!    90.6s
+88311 | delta = 2 | cells =   3 ->  25 | Solved!     4.7s
+61375 | delta = 2 | cells =   3 ->  27 | Solved!     4.9s
+81319 | delta = 3 | cells =   3 ->  30 | Solved!     6.5s
+70313 | delta = 3 | cells =   3 ->  49 | Solved!     8.9s
+78789 | delta = 3 | cells =   3 ->  47 | Solved!     9.5s
+88265 | delta = 2 | cells =   3 ->  19 | Solved!     3.1s
+96475 | delta = 4 | cells =   3 ->  58 | Solved!    20.9s
+60305 | delta = 2 | cells =   3 ->  29 | Solved!     5.0s
+65241 | delta = 3 | cells =   3 ->  33 | Solved!     9.3s
+75509 | delta = 3 | cells =   3 ->  43 | Solved!     9.8s
+72239 | delta = 3 | cells =   3 ->  46 | Solved!    10.9s
+87499 | delta = 2 | cells =   3 ->  21 | Solved!     5.1s
+52991 | delta = 4 | cells =   3 ->  53 | Solved!    21.9s
+68113 | delta = 3 | cells =   3 ->  41 | Solved!    11.2s
+84563 | delta = 1 | cells =   3 ->  14 | Solved!     3.0s
+80339 | delta = 2 | cells =   3 ->  22 | Solved!     5.0s
+74639 | delta = 3 | cells =   3 ->  44 | Solved!     8.9s
+51555 | delta = 2 | cells =   3 ->  26 | Solved!     5.1s
+55455 | delta = 3 | cells =   3 ->  53 | Solved!    10.7s
+66243 | delta = 3 | cells =   3 ->  42 | Solved!    10.3s
+84563 | delta = 1 | cells =   3 ->  14 | Solved!!    3.3s
+80339 | delta = 2 | cells =   3 ->  22 | Solved!!    4.8s
+55455 | delta = 3 | cells =   3 ->  53 | Solved!!    7.8s
+51555 | delta = 2 | cells =   3 ->  26 | Solved!!    3.7s
+74639 | delta = 3 | cells =   3 ->  34 | Solved!!    9.2s
+66243 | delta = 3 | cells =   3 ->  35 | Solved!!    8.9s
+98201 | delta = 3 | cells =   3 ->  39 | Solved!!   10.8s
+72269 | delta = 4 | cells =   3 ->  77 | Solved!!   23.9s
+80083 | delta = 4 | cells =   3 ->  71 | Solved!!   25.5s
+87503 | delta = 4 | cells =   3 ->  54 | Solved!!   27.5s
+55477 | delta = 2 | cells =   3 ->  24 | Solved!!    4.9s
+66207 | delta = 4 | cells =   3 ->  53 | Solved!!   19.0s
+59239 | delta = 2 | cells =   3 ->  28 | Solved!!    6.1s
+80329 | delta = 2 | cells =   3 ->  28 | Solved!!    5.8s
+55205 | delta = 3 | cells =   3 ->  32 | Solved!!   11.2s
+75093 | delta = 3 | cells =   3 ->  39 | Solved!!    9.3s
+79025 | delta = 4 | cells =   3 ->  86 | Solved!!   22.0s
+94483 | delta = 5 | cells =   3 ->  86 | Solved!!   62.3s
+96511 | delta = 5 | cells =   3 -> 106 | Solved!!   69.1s
+68153 | delta = 4 | cells =   3 ->  69 | Solved!!   21.4s
+74601 | delta = 4 | cells =   3 ->  67 | Solved!!   24.4s
+85751 | delta = 2 | cells =   3 ->  27 | Solved!!    4.9s
+84457 | delta = 2 | cells =   3 ->  26 | Solved!!    5.1s
+75089 | delta = 4 | cells =   3 ->  81 | Solved!!   27.6s
+67459 | delta = 3 | cells =   3 ->  29 | Solved!!   10.2s
+87471 | delta = 4 | cells =   3 ->  49 | Solved!!   14.4s
+81713 | delta = 3 | cells =   3 ->  30 | Solved!!    9.8s
+56339 | delta = 3 | cells =   3 ->  42 | Solved!!    9.9s
+55227 | delta = 4 | cells =   3 ->  53 | Solved!!   22.7s
+92771 | delta = 2 | cells =   3 ->  32 | Solved!!    6.6s
+85775 | delta = 2 | cells =   3 ->  31 | Solved!!    5.2s
+74903 | delta = 4 | cells =   3 ->  65 | Solved!!   29.3s
+83893 | delta = 5 | cells =   3 ->  69 | Solved!!   73.4s
+51763 | delta = 2 | cells =   3 ->  26 | Solved!!    5.5s
+79095 | delta = 1 | cells =   3 ->  16 | Solved!!    3.0s
+97937 | delta = 3 | cells =   3 ->  50 | Solved!!   10.9s
+79087 | delta = 3 | cells =   3 ->  39 | Solved!!   10.0s
+57541 | delta = 5 | cells =   3 ->  82 | Solved!!   69.4s
+98299 | delta = 5 | cells =   3 ->  92 | Solved!!   89.0s
+94015 | delta = 5 | cells =   3 ->  86 | Solved!!   75.6s
+97955 | delta = 4 | cells =   3 ->  75 | Solved!!   33.4s
+58707 | delta = 3 | cells =   3 ->  40 | Solved!!   11.8s
+98043 | delta = 2 | cells =   3 ->  29 | Solved!!    5.2s
+80391 | delta = 2 | cells =   3 ->  33 | Solved!!    5.1s
+68135 | delta = 4 | cells =   3 ->  57 | Solved!!   32.6s
+64359 | delta = 3 | cells =   3 ->  40 | Solved!!   11.9s
+51599 | delta = 3 | cells =   3 ->  35 | Solved!!   11.5s
+69997 | delta = 4 | cells =   3 ->  52 | Solved!!   27.4s
+74891 | delta = 1 | cells =   3 ->  18 | Solved!!    2.7s
+80407 | delta = 2 | cells =   3 ->  28 | Solved!!    5.2s
+91489 | delta = 5 | cells =   3 ->  85 | Solved!!   74.2s
+91441 | delta = 1 | cells =   3 ->  17 | Solved!!    2.7s
+51697 | delta = 5 | cells =   3 ->  62 | Solved!!   64.7s

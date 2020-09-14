@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # PYTHONUNBUFFERED=1 time -p nice ././constraint_satisfaction/z3_solver.run.py | tee -a submission.log
-
-from constraint_satisfaction.z3_solver import solve_dataframe
+from constraint_satisfaction.solve_dataframe import solve_dataframe
 from utils.datasets import test_df
 
 if __name__ == '__main__':

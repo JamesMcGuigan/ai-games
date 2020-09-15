@@ -1,7 +1,5 @@
 import os
-import random
 import time
-from typing import List
 from typing import Tuple
 
 import numpy as np
@@ -9,40 +7,18 @@ import pandas as pd
 from pathos.multiprocessing import ProcessPool
 
 from constraint_satisfaction.z3_solver import game_of_life_solver
+from utils.datasets import submission_file
 from utils.datasets import test_df
 from utils.datasets import train_df
+from utils.idx_lookup import get_unsolved_idxs
 from utils.plot import plot_3d
 from utils.util import csv_to_delta
 from utils.util import csv_to_numpy
 from utils.util import numpy_to_dict
 
 
-def get_unsolved_idxs(df: pd.DataFrame, submision_df: pd.DataFrame, modulo=(1,0), sort_cells=True, sort_delta=False) -> List[int]:
-    idxs = []
-    deltas = sorted(df['delta'].unique()) if sort_delta else [0]
-    for delta in deltas:  # [1,2,3,4,5]
-        # Process in assumed order of difficulty, easiest first
-        if sort_delta:
-            df = df[ df['delta'] == delta ]                               # smaller deltas are easier
-        if sort_cells:
-            df = df.iloc[ df.apply(np.count_nonzero, axis=1).argsort() ]  # smaller grids are easier
-
-        # Create list of unsolved idxs
-        for idx in df.index:
-            if modulo and idx % modulo[0] != modulo[1]: continue  # allow splitting dataset between different servers
-            try:
-                if np.count_nonzero(submision_df.loc[idx]) == 0:
-                    idxs.append(idx)
-            except:
-                idxs.append(idx)
-
-    if sort_cells == 'random':
-        random.shuffle(idxs)
-    return idxs
-
-
-# Parallel(n_jobs=n_jobs)([ delayed(solve_dataframe_idx)(board, delta, idx) ])
-def solve_dataframe_idx(board: np.ndarray, delta: int, idx: int, verbose=True) -> Tuple[np.ndarray,int]:
+# Parallel(n_jobs=n_jobs)([ delayed(solve_board_idx)(board, delta, idx) ])
+def solve_board_idx(board: np.ndarray, delta: int, idx: int, verbose=True) -> Tuple[np.ndarray, int]:
     time_start = time.perf_counter()
 
     z3_solver, t_cells, solution_3d = game_of_life_solver(board, delta, verbose=False)
@@ -56,16 +32,17 @@ def solve_dataframe_idx(board: np.ndarray, delta: int, idx: int, verbose=True) -
 
 def solve_dataframe(
         df: pd.DataFrame = test_df,
-        save='submission.csv',
+        savefile=submission_file,
         timeout=0,
         max_count=0,
         sort_cells=True,
         sort_delta=True,
         modulo=(1,0)
 ) -> pd.DataFrame:
+    if not os.path.exists(savefile):  open(savefile, 'a').close()
     time_start = time.perf_counter()
 
-    submision_df = pd.read_csv(save, index_col='id')  # manually copy/paste sample_submission.csv to location
+    submission_df = pd.read_csv(savefile, index_col='id')  # manually copy/paste sample_submission.csv to location
     solved = 0
     total  = 0  # only count number solved in current runtime, ignore history
 
@@ -73,21 +50,21 @@ def solve_dataframe(
     cpus = os.cpu_count() * 3//4  # 75% CPU load to optimize for CPU cache
     pool = ProcessPool(ncpus=cpus)
     try:
-        idxs   = get_unsolved_idxs(df, submision_df, modulo=modulo, sort_cells=sort_cells, sort_delta=sort_delta)
+        idxs   = get_unsolved_idxs(df, submission_df, modulo=modulo, sort_cells=sort_cells, sort_delta=sort_delta)
         deltas = ( csv_to_delta(df, idx)             for idx in idxs )  # generator
         boards = ( csv_to_numpy(df, idx, key='stop') for idx in idxs )  # generator
 
-        solution_idx_iter = pool.uimap(solve_dataframe_idx, boards, deltas, idxs)
+        solution_idx_iter = pool.uimap(solve_board_idx, boards, deltas, idxs)
         for solution_3d, idx in solution_idx_iter:
             total += 1
             if np.count_nonzero(solution_3d) != 0:
                 solved += 1
 
                 # Reread file, update and persist
-                submision_df          = pd.read_csv(save, index_col='id')
-                solution_dict         = numpy_to_dict(solution_3d[0])
-                submision_df.loc[idx] = pd.Series(solution_dict)
-                submision_df.to_csv(save)
+                submission_df          = pd.read_csv(savefile, index_col='id')
+                solution_dict          = numpy_to_dict(solution_3d[0])
+                submission_df.loc[idx] = pd.Series(solution_dict)
+                submission_df.sort_index().to_csv(savefile)
 
             # timeouts for kaggle submissions
             if max_count and max_count <= total:                            raise TimeoutError()
@@ -100,7 +77,7 @@ def solve_dataframe(
 
         pool.terminate()
         pool.clear()
-    return submision_df
+    return submission_df
 
 
 
@@ -117,5 +94,5 @@ if __name__ == '__main__':
         z3_solver, t_cells, solution_3d = game_of_life_solver(board, delta)
         plot_3d(solution_3d)
 
-    # solve_dataframe(train_df, save=None)
-    # solve_dataframe(test_df, save='submission.csv')
+    # solve_dataframe(train_df, savefile=None)
+    # solve_dataframe(test_df, savefile='submission.csv')

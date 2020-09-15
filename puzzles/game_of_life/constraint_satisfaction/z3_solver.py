@@ -10,7 +10,7 @@ import z3
 from utils.game import life_step
 
 
-def game_of_life_ruleset(size=(25,25), delta=1, warmup=0):
+def game_of_life_ruleset(size=(25,25), delta=1, warmup=0, zero_point_distance=1):
 
     # Create a 25x25 board for each timestep we need to solve for
     # T=0 for start_time, T=delta-1 for stop_time
@@ -47,14 +47,15 @@ def game_of_life_ruleset(size=(25,25), delta=1, warmup=0):
             # Ignore any currently dead cell with 0 neighbours,
             # This considerably reduces the state space and prevents zero-point energy solutions
             # BUGFIX: distance=1 breaks test_df[90081]
-            current_neighbours = get_neighbourhood_cells(t_cells[t], x, y, distance=2)
-            z3_solver.add([
-                z3.If(
-                    z3.AtMost( cell, *current_neighbours, 0 ),
-                    past_cell == False,
-                    True
-                )
-            ])
+            if zero_point_distance:
+                current_neighbours = get_neighbourhood_cells(t_cells[t], x, y, distance=zero_point_distance)
+                z3_solver.add([
+                    z3.If(
+                        z3.AtMost( cell, *current_neighbours, 0 ),
+                        past_cell == False,
+                        True
+                    )
+                ])
 
     # Add constraint that there can be no empty boards
     for t in range(1, max_t+1):
@@ -66,28 +67,40 @@ def game_of_life_ruleset(size=(25,25), delta=1, warmup=0):
 
 
 # The true kaggle solution requires warmup=5, but this is very slow to compute
+# noinspection PyUnboundLocalVariable
 def game_of_life_solver(board: np.ndarray, delta=1, warmup=0, verbose=True):
     time_start = time.perf_counter()
+    size       = (size_x, size_y) = board.shape
 
-    size = (size_x, size_y) = board.shape
-    z3_solver, t_cells = game_of_life_ruleset(size=size, delta=delta, warmup=warmup)
+    # BUGFIX: zero_point_distance=1 breaks test_df[90081]
+    # NOTE:   zero_point_distance=2 results in: 2*delta slowdown
+    # NOTE:   zero_point_distance=3 results in another 2-6x slowdown (but in rare cases can be quicker)
+    for zero_point_distance in [1,2]:
+        z3_solver, t_cells = game_of_life_ruleset(
+            size=size,
+            delta=delta,
+            warmup=warmup,
+            zero_point_distance=zero_point_distance
+        )
 
-    # Add constraints for T=delta-1 the problem defined in the input board
-    z3_solver.add([
-        t_cells[-1][x][y] == bool(board[x][y])
-        for x,y in itertools.product(range(size_x), range(size_y))
-    ])
+        # Add constraints for T=delta-1 the problem defined in the input board
+        z3_solver.add([
+            t_cells[-1][x][y] == bool(board[x][y])
+            for x,y in itertools.product(range(size_x), range(size_y))
+        ])
 
-    # if z3_solver.check() != z3.sat: print('Unsolvable!')
-    solution_3d = solver_to_numpy_3d(z3_solver, t_cells[warmup:])  # calls z3_solver.check()
+        # if z3_solver.check() != z3.sat: print('Unsolvable!')
+        solution_3d = solver_to_numpy_3d(z3_solver, t_cells[warmup:])  # calls z3_solver.check()
+        time_taken  = time.perf_counter() - time_start
 
-    # Validate that forward play matches backwards solution
-    if np.count_nonzero(solution_3d):  # quicker than calling z3_solver.check() again
-        for t in range(0, delta):
-            assert np.all( life_step(solution_3d[t]) == solution_3d[t+1] )
-
-    time_taken  = time.perf_counter() - time_start
-    if verbose: print(f'game_of_life_solver() - took: {time_taken:6.1f}s | {"Solved! " if np.count_nonzero(solution_3d) else "unsolved" }')
+        # Validate that forward play matches backwards solution
+        if np.count_nonzero(solution_3d):  # quicker than calling z3_solver.check() again
+            for t in range(0, delta):
+                assert np.all( life_step(solution_3d[t]) == solution_3d[t+1] )
+            if verbose: print(f'game_of_life_solver() - took: {time_taken:6.1f}s | Solved! ')
+            break
+    else:
+        if verbose: print(f'game_of_life_solver() - took: {time_taken:6.1f}s | unsolved')
     return z3_solver, t_cells, solution_3d
 
 

@@ -11,4 +11,4 @@ from utils.datasets import submission_file
 from utils.datasets import test_df
 
 if __name__ == '__main__':
-    solve_dataframe(test_df, savefile=submission_file, modulo=(2, 1), sort_cells=True, sort_delta=False)
+    solve_dataframe(test_df, savefile=submission_file, modulo=(10, 0), sort_cells=True, sort_delta=False)

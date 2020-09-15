@@ -2,6 +2,7 @@ import os
 import time
 from typing import Tuple
 
+import humanize
 import numpy as np
 import pandas as pd
 from pathos.multiprocessing import ProcessPool
@@ -78,7 +79,7 @@ def solve_dataframe(
     finally:
         time_taken = time.perf_counter() - time_start
         percentage = (100 * solved / total) if total else 0
-        print(f'Solved: {solved}/{total} = {percentage}% in {time_taken:.1f}s')
+        print(f'Solved: {solved}/{total} = {percentage:.1f}% in {humanize.naturaldelta(time_taken)}')
 
         pool.terminate()
         pool.clear()

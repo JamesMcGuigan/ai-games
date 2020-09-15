@@ -11,6 +11,7 @@ cycler==0.10.0            # via matplotlib
 dill==0.3.2               # via multiprocess, pathos
 fastcache==1.1.0          # via -r requirements.in
 future==0.18.2            # via torch
+humanize==2.6.0           # via -r requirements.in
 idna==2.10                # via requests
 ignite==1.1.0             # via -r requirements.in
 joblib==0.16.0            # via -r requirements.in

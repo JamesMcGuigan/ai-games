@@ -12,3 +12,4 @@ scipy==1.4.1  # ERROR: tensorflow 2.1.0 has requirement scipy==1.4.1; python_ver
 torch
 ignite
 numba
+humanize

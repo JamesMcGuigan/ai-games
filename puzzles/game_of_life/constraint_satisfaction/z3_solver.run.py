@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-# PYTHONUNBUFFERED=1 time -p nice ././constraint_satisfaction/z3_solver.run.py | tee -a submission.log
+#
+# Merge Submission Files
+#   find ./ -name 'submission*.csv' | xargs cat | sort -nr | awk -F',' '!a[$1]++' | sort -n | sponge > output/submission.csv
+#
+# Run Main Script:
+#   PYTHONUNBUFFERED=1 time -p nice ././constraint_satisfaction/z3_solver.run.py | tee -a submission.log
+#
 from constraint_satisfaction.solve_dataframe import solve_dataframe
 from utils.datasets import submission_file
 from utils.datasets import test_df

@@ -5,3 +5,5 @@ __pycache__/
 *.py[cod]
 *.wip
 *.wip.*
+*.backup
+*.backup*

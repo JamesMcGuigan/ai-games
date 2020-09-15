@@ -14,7 +14,7 @@ def game_of_life_ruleset(size=(25,25), delta=1, warmup=0):
 
     # Create a 25x25 board for each timestep we need to solve for
     # T=0 for start_time, T=delta-1 for stop_time
-    max_t = warmup + delta+1
+    max_t = warmup + delta  # BUGFIX: delta not delta-1 | see fix_submission()
     size_x, size_y = size
     t_cells = [
         [

@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 from pathos.multiprocessing import ProcessPool
 
+from constraint_satisfaction.fix_submission import fix_submission
 from constraint_satisfaction.z3_solver import game_of_life_solver
 from utils.datasets import submission_file
 from utils.datasets import test_df
@@ -41,6 +42,10 @@ def solve_dataframe(
 ) -> pd.DataFrame:
     if not os.path.exists(savefile):  open(savefile, 'a').close()
     time_start = time.perf_counter()
+
+    # BUGFIX: game_of_life_solver() previously implemented delta+1, so fix any previous savefiles
+    fix_submission()  # TODO: remove once all datasets have been updated
+
 
     submission_df = pd.read_csv(savefile, index_col='id')  # manually copy/paste sample_submission.csv to location
     solved = 0

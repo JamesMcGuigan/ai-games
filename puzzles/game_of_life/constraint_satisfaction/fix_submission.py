@@ -3,6 +3,7 @@ import time
 import numpy as np
 from numba import njit
 
+from utils.datasets import submission_df
 from utils.datasets import submission_file
 from utils.datasets import test_df
 from utils.game import life_step
@@ -29,8 +30,6 @@ def fix_submission(max_offset=5):
 
     See: tests/test_submission.py
     """
-    global submission_df
-
     time_start = time.perf_counter()
     idxs  = [ idx for idx in submission_df.index if np.count_nonzero(submission_df.loc[idx]) ]
     stats = {

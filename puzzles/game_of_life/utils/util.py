@@ -11,9 +11,10 @@ def csv_to_delta(df, idx, type='start'):
 def csv_to_numpy(df, idx, key='start') -> np.ndarray:
     columns = [col for col in df if col.startswith(key)]
     size    = int(math.sqrt(len(columns)))
-    X = df.loc[idx][columns].values
-    X = X.reshape((size,size)).astype(np.int8)
-    return X
+    board   = df.loc[idx][columns].values
+    if len(board) == 0: board = np.zeros((size, size))
+    board = board.reshape((size,size)).astype(np.int8)
+    return board
 
 
 # noinspection PyTypeChecker,PyUnresolvedReferences

@@ -46,7 +46,8 @@ def game_of_life_ruleset(size=(25,25), delta=1, warmup=0):
 
             # Ignore any currently dead cell with 0 neighbours,
             # This considerably reduces the state space and prevents zero-point energy solutions
-            current_neighbours = get_neighbourhood_cells(t_cells[t], x, y, distance=1)
+            # BUGFIX: distance=1 breaks test_df[90081]
+            current_neighbours = get_neighbourhood_cells(t_cells[t], x, y, distance=2)
             z3_solver.add([
                 z3.If(
                     z3.AtMost( cell, *current_neighbours, 0 ),

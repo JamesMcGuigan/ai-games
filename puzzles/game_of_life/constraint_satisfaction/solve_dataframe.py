@@ -53,8 +53,9 @@ def solve_dataframe(
     solved = 0
     total  = 0  # only count number solved in current runtime, ignore history
 
-    # Pathos multiprocessing allows iterator semantics, whilst joblib has reduced CPU usage at the end of each batche
-    cpus = os.cpu_count() * 3//4  # 75% CPU load to optimize for CPU cache
+    # Pathos multiprocessing allows iterator semantics, whilst joblib has reduced CPU usage at the end of each batch
+    # 75% CPU load to optimize for CPU cache, but run at full capacity on Kaggle Servers
+    cpus = int( os.cpu_count() * (1 if os.environ.get('KAGGLE_KERNEL_RUN_TYPE') else 3/4) )
     pool = ProcessPool(ncpus=cpus)
     try:
         idxs   = get_unsolved_idxs(df, submission_df, modulo=modulo, sort_cells=sort_cells, sort_delta=sort_delta)
@@ -82,6 +83,7 @@ def solve_dataframe(
     finally:
         time_taken = time.perf_counter() - time_start
         percentage = (100 * solved / total) if total else 0
+        # noinspection PyTypeChecker
         print(f'Solved: {solved}/{total} = {percentage:.1f}% in {humanize.naturaldelta(time_taken)}')
 
         pool.terminate()

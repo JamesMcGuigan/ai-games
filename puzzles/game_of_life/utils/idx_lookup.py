@@ -28,6 +28,8 @@ def get_unsolved_idxs(df: pd.DataFrame, submision_df: pd.DataFrame, modulo=(1,0)
 
     if sort_cells == 'random':
         random.shuffle(idxs)
+    if sort_cells == 'reverse':
+        idxs = reversed(idxs)
     return idxs
 
 

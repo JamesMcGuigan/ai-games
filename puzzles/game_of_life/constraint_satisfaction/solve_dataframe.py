@@ -13,6 +13,7 @@ from utils.datasets import submission_file
 from utils.datasets import test_df
 from utils.datasets import train_df
 from utils.idx_lookup import get_unsolved_idxs
+from utils.plot import plot_3d
 from utils.util import csv_to_delta
 from utils.util import csv_to_numpy
 from utils.util import numpy_to_dict
@@ -38,7 +39,8 @@ def solve_dataframe(
         max_count=0,
         sort_cells=True,
         sort_delta=False,
-        modulo=(1,0)
+        modulo=(1,0),
+        plot=False,
 ) -> pd.DataFrame:
     if not os.path.exists(savefile):  open(savefile, 'a').close()
     time_start = time.perf_counter()
@@ -70,6 +72,8 @@ def solve_dataframe(
                 solution_dict          = numpy_to_dict(solution_3d[0])
                 submission_df.loc[idx] = pd.Series(solution_dict)
                 submission_df.sort_index().to_csv(savefile)
+
+                if plot: plot_3d(solution_3d)
 
             # timeouts for kaggle submissions
             if max_count and max_count <= total:                            raise TimeoutError()

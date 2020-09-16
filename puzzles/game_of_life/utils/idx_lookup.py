@@ -29,8 +29,10 @@ def get_unsolved_idxs(df: pd.DataFrame, submision_df: pd.DataFrame, modulo=(1,0)
     if sort_cells == 'random':
         random.shuffle(idxs)
     if sort_cells == 'reverse':
-        idxs = reversed(idxs)
-    return idxs
+        idxs = list(reversed(idxs))
+
+    assert isinstance(idxs, list)  # BUGFIX: must return list (not generator), else invalid csv entries occur
+    return list(idxs)
 
 
 

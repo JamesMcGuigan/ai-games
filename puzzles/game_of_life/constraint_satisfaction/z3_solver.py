@@ -95,9 +95,9 @@ def game_of_life_solver(board: np.ndarray, delta=1, warmup=0, verbose=True):
 
         # Validate that forward play matches backwards solution
         if np.count_nonzero(solution_3d):  # quicker than calling z3_solver.check() again
-            # assert is_valid_solution(solution_3d[0], board, delta)
-            while not is_valid_solution(solution_3d[0], board, delta):
-                z3_solver, t_cells, solution_3d = game_of_life_next_solution(z3_solver, t_cells, verbose=verbose)
+            assert is_valid_solution(solution_3d[0], board, delta)
+            # while not is_valid_solution(solution_3d[0], board, delta):
+            #     z3_solver, t_cells, solution_3d = game_of_life_next_solution(z3_solver, t_cells, verbose=verbose)
             if verbose: print(f'game_of_life_solver() - took: {time_taken:6.1f}s | Solved! ')
     else:
         if verbose: print(f'game_of_life_solver() - took: {time_taken:6.1f}s | unsolved')

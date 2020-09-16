@@ -59,13 +59,15 @@ def fix_submission(max_offset=5):
                 stats['fixed'] += 1
                 break
         else:
-            print( 'fix_submission() invalid idx', idx, np.count_nonzero(solution != stop) )
+            submission_df.loc[idx] = numpy_to_series(np.zeros(stop.shape), key='start')  # zero out the entry and retry
+            print( f'fix_submission() invalid idx: {idx} | delta: {delta} | cells: {np.count_nonzero(solution != stop)}' )
             stats['invalid'] += 1
             pass
     assert stats['total'] == stats['valid'] + stats['fixed'] + stats['invalid']
 
-    if stats['fixed'] > 0:
+    if stats['fixed'] + stats['invalid'] > 0:
         submission_df.sort_index().to_csv(submission_file)
+        print( f'fix_submission() wrote: {submission_file}' )
         pass
 
     time_taken = time.perf_counter() - time_start

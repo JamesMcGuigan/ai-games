@@ -7,7 +7,7 @@ import numpy as np
 import pydash
 import z3
 
-from utils.game import life_step
+from constraint_satisfaction.fix_submission import is_valid_solution
 
 
 def game_of_life_ruleset(size=(25,25), delta=1, warmup=0, zero_point_distance=1):
@@ -95,10 +95,10 @@ def game_of_life_solver(board: np.ndarray, delta=1, warmup=0, verbose=True):
 
         # Validate that forward play matches backwards solution
         if np.count_nonzero(solution_3d):  # quicker than calling z3_solver.check() again
-            for t in range(0, delta):
-                assert np.all( life_step(solution_3d[t]) == solution_3d[t+1] )
+            # assert is_valid_solution(solution_3d[0], board, delta)
+            while not is_valid_solution(solution_3d[0], board, delta):
+                z3_solver, t_cells, solution_3d = game_of_life_next_solution(z3_solver, t_cells, verbose=verbose)
             if verbose: print(f'game_of_life_solver() - took: {time_taken:6.1f}s | Solved! ')
-            break
     else:
         if verbose: print(f'game_of_life_solver() - took: {time_taken:6.1f}s | unsolved')
     return z3_solver, t_cells, solution_3d

@@ -32,6 +32,7 @@ def test_game_of_life_solver_delta():
 
 
 def test_submission_df():
+    failed = []
     for idx in submission_df.index:
         if np.count_nonzero(submission_df.loc[idx]) == 0: continue  # skip empty datapoints
 
@@ -46,7 +47,10 @@ def test_submission_df():
         for t in range(delta):
             board = life_step(board)
 
-        assert np.all( board == stop ), idx
+        if not np.all( board == stop ):
+            print(idx)
+            failed.append(idx)
+    assert failed == []
 
 
 

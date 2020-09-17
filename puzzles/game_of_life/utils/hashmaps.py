@@ -14,8 +14,8 @@ def hash_geometric(board: np.ndarray) -> int:
     """
     assert board.shape[0] == board.shape[1]  # assumes square board
     size     = board.shape[0]
-    l_primes = primes_np[:size//2+1]         # each distance index is represented by a different prime
-    r_primes = np.flip(l_primes)             # symmetric distance values in reversed direction from center
+    l_primes = hashable_primes[:size//2+1]   # each distance index is represented by a different prime
+    r_primes = l_primes[::-1]                # symmetric distance values in reversed direction from center
 
     hashed = 0
     for x in range(size):

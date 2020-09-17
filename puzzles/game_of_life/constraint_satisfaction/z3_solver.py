@@ -6,6 +6,7 @@ from typing import Tuple
 import numpy as np
 import pydash
 import z3
+from fastcache._lrucache import clru_cache
 
 from constraint_satisfaction.fix_submission import is_valid_solution
 
@@ -119,18 +120,20 @@ def game_of_life_next_solution(z3_solver, t_cells, verbose=True):
     return z3_solver, t_cells, solution_3d
 
 
-def get_neighbourhood_coords(board: List[List[int]], x: int, y: int, distance=1) -> List[Tuple[int,int]]:
+@clru_cache(None)
+def get_neighbourhood_coords(shape: Tuple[int,int], x: int, y: int, distance=1) -> List[Tuple[int,int]]:
     output = []
     for dx, dy in itertools.product(range(-distance,distance+1), range(-distance,distance+1)):
         if dx == dy == 0: continue      # ignore self
-        nx = (x + dx) % len(board)      # wrap board
-        ny = (y + dy) % len(board[0])
+        nx = (x + dx) % shape[0]        # modulo loop = board wraparound
+        ny = (y + dy) % shape[1]
         output.append( (nx, ny) )
     return output
 
 
 def get_neighbourhood_cells(cells: List[List[int]], x: int, y: int, distance=1) -> List[int]:
-    coords = get_neighbourhood_coords(cells, x, y, distance)
+    shape  = ( len(cells), len(cells[0]) )
+    coords = get_neighbourhood_coords(shape, x, y, distance)
     output = [ cells[x][y] for (x,y) in coords ]
     return output
 

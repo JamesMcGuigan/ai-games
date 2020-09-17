@@ -8115,3 +8115,7 @@ copy_sample_submission_missing_indexes(): copied 46674 missing indexes from /hom
 72560 | delta = 5 | cells =  24 -> 364 | Solved!  2793.0s
 72220 | delta = 4 | cells =  24 -> 306 | Solved!   832.9s
 73050 | delta = 4 | cells =  24 -> 223 | Solved!   315.3s
+fix_submission() {'time': '28.9', 'empty': 40403, 'total': 9597, 'valid': 9597, 'fixed': 0, 'invalid': 0}
+70051 | delta = 1 | cells = 225 -> 473 | Solved!   727.0s
+65151 | delta = 1 | cells = 233 -> 489 | Solved!   817.3s
+52575 | delta = 1 | cells = 228 -> 480 | Solved!  1467.9s

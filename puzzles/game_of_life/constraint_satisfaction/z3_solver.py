@@ -90,7 +90,7 @@ def game_of_life_solver(board: np.ndarray, delta=1, warmup=0, timeout=2*60*60, v
 
         # This is a safety catch to prevent timeouts when running in Kaggle notebooks
         if timeout:
-            z3_solver.set("timeout", timeout)
+            z3_solver.set("timeout", int(timeout * 1000/2.5))  # timeout is in milliseconds, but inexact and ~2.5x slow
 
         # if z3_solver.check() != z3.sat: print('Unsolvable!')
         solution_3d = solver_to_numpy_3d(z3_solver, t_cells[warmup:])  # calls z3_solver.check()

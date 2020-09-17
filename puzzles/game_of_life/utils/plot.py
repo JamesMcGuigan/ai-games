@@ -14,7 +14,7 @@ def plot_3d(solution_3d: np.ndarray):
     plt.show()
 
 
-def plot_fig(df, idx: int):
+def plot_idx(df, idx: int):
     # pd.read_csv(index_col='id') implies offset of 1 (original code uses offset = 2)
     shape = (25,25)
     delta = csv_to_delta(df, idx)

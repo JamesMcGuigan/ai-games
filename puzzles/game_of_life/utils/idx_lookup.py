@@ -9,7 +9,7 @@ import pandas as pd
 from utils.util import csv_to_numpy
 
 
-def get_unsolved_idxs(df: pd.DataFrame, submision_df: pd.DataFrame, modulo=(1,0), sort_cells=True, sort_delta=False) -> List[int]:
+def get_unsolved_idxs(df: pd.DataFrame, submision_df: pd.DataFrame, modulo=(1,0), sort_cells=False, sort_delta=False) -> List[int]:
     """ Compare test_df with submision_df and return any idxs without a matching non-zero entry in submision_df """
     idxs = []
     deltas = sorted(df['delta'].unique()) if sort_delta else [0]
@@ -21,15 +21,17 @@ def get_unsolved_idxs(df: pd.DataFrame, submision_df: pd.DataFrame, modulo=(1,0)
             df = df.iloc[ df.apply(np.count_nonzero, axis=1).argsort() ]  # smaller grids are easier
 
         # Create list of unsolved idxs
+        delta_idxs = []
         for idx in df.index:
             if modulo and idx % modulo[0] != modulo[1]: continue  # allow splitting dataset between different servers
             if idx not in submision_df.index or np.count_nonzero(submision_df.loc[idx]) == 0:
-                idxs.append(idx)
+                delta_idxs.append(idx)
 
-    if sort_cells == 'random':
-        random.shuffle(idxs)
-    if sort_cells == 'reverse':
-        idxs = list(reversed(idxs))
+        if sort_cells == 'random':
+            random.shuffle(delta_idxs)
+        if sort_cells == 'reverse':
+            delta_idxs = list(reversed(delta_idxs))
+        idxs += delta_idxs
 
     assert isinstance(idxs, list)  # BUGFIX: must return list (not generator), else invalid csv entries occur
     return list(idxs)

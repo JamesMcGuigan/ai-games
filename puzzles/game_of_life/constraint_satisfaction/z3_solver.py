@@ -68,7 +68,7 @@ def game_of_life_ruleset(size=(25,25), delta=1, warmup=0, zero_point_distance=1)
 
 # The true kaggle solution requires warmup=5, but this is very slow to compute
 # noinspection PyUnboundLocalVariable
-def game_of_life_solver(board: np.ndarray, delta=1, warmup=0, verbose=True):
+def game_of_life_solver(board: np.ndarray, delta=1, warmup=0, timeout=2*60*60, verbose=True):
     time_start = time.perf_counter()
     size       = (size_x, size_y) = board.shape
 
@@ -80,14 +80,17 @@ def game_of_life_solver(board: np.ndarray, delta=1, warmup=0, verbose=True):
             size=size,
             delta=delta,
             warmup=warmup,
-            zero_point_distance=zero_point_distance
+            zero_point_distance=zero_point_distance,
         )
-
         # Add constraints for T=delta-1 the problem defined in the input board
         z3_solver.add([
             t_cells[-1][x][y] == bool(board[x][y])
             for x,y in itertools.product(range(size_x), range(size_y))
         ])
+
+        # This is a safety catch to prevent timeouts when running in Kaggle notebooks
+        if timeout:
+            z3_solver.set("timeout", timeout)
 
         # if z3_solver.check() != z3.sat: print('Unsolvable!')
         solution_3d = solver_to_numpy_3d(z3_solver, t_cells[warmup:])  # calls z3_solver.check()

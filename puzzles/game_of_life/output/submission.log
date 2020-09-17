@@ -8119,3 +8119,5 @@ fix_submission() {'time': '28.9', 'empty': 40403, 'total': 9597, 'valid': 9597, 
 70051 | delta = 1 | cells = 225 -> 473 | Solved!   727.0s
 65151 | delta = 1 | cells = 233 -> 489 | Solved!   817.3s
 52575 | delta = 1 | cells = 228 -> 480 | Solved!  1467.9s
+fix_submission() {'time': '45.9', 'empty': 32702, 'total': 17298, 'valid': 17298, 'fixed': 0, 'invalid': 0}
+52575 | delta = 1 | cells = 228 -> 480 | Solved!  1448.3s

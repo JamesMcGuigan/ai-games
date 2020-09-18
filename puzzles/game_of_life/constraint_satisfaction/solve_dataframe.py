@@ -65,7 +65,7 @@ def solve_dataframe(
         boards = ( csv_to_numpy(df, idx, key='stop') for idx in idxs )  # generator
 
         solution_idx_iter = pool.uimap(solve_board_idx, boards, deltas, idxs)
-        for solution_3d, idx in solution_idx_iter:
+        for solution_3d, idx, time_taken in solution_idx_iter:
             total += 1
             if np.count_nonzero(solution_3d) != 0:
                 solved += 1

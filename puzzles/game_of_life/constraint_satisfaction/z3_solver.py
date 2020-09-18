@@ -45,9 +45,25 @@ def game_of_life_ruleset(size=(25,25), delta=1, warmup=0, zero_point_distance=1)
                 ])
             ])
 
-            # Ignore any currently dead cell with 0 neighbours,
-            # This considerably reduces the state space and prevents zero-point energy solutions
-            # BUGFIX: distance=1 breaks test_df[90081]
+    # Add constraint that there can be no empty boards
+    for t in range(1, max_t+1):
+        layer = pydash.flatten_deep(t_cells[t])
+        z3_solver.add([ z3.AtLeast( *layer, 1 ) ])
+
+    z3_solver.push()  # Create checkpoint before dataset constraints
+    return z3_solver, t_cells
+
+
+def add_zero_point_constraint(z3_solver, t_cells, zero_point_distance: int):
+    # Ignore any currently dead cell with 0 neighbours,
+    # This considerably reduces the state space and prevents zero-point energy solutions
+    # BUGFIX: distance=1 breaks test_df[90081]
+    max_t = len(t_cells)
+    size_x, size_y = ( len(t_cells[0]), len(t_cells[0][0]) )
+    for t in range(1, max_t):
+        for x,y in itertools.product(range(size_x), range(size_y)):
+            cell      = t_cells[t][x][y]
+            past_cell = t_cells[t-1][x][y]
             if zero_point_distance:
                 current_neighbours = get_neighbourhood_cells(t_cells[t], x, y, distance=zero_point_distance)
                 z3_solver.add([
@@ -57,14 +73,7 @@ def game_of_life_ruleset(size=(25,25), delta=1, warmup=0, zero_point_distance=1)
                         True
                     )
                 ])
-
-    # Add constraint that there can be no empty boards
-    for t in range(1, max_t+1):
-        layer = pydash.flatten_deep(t_cells[t])
-        z3_solver.add([ z3.AtLeast( *layer, 1 ) ])
-
-    z3_solver.push()  # Create checkpoint before dataset constraints
-    return z3_solver, t_cells
+    return z3_solver
 
 
 # The true kaggle solution requires warmup=5, but this is very slow to compute
@@ -76,22 +85,26 @@ def game_of_life_solver(board: np.ndarray, delta=1, warmup=0, timeout=0, verbose
     # BUGFIX: zero_point_distance=1 breaks test_df[90081]
     # NOTE:   zero_point_distance=2 results in: 2*delta slowdown
     # NOTE:   zero_point_distance=3 results in another 2-6x slowdown (but in rare cases can be quicker)
-    for zero_point_distance in [1,2]:
-        z3_solver, t_cells = game_of_life_ruleset(
-            size=size,
-            delta=delta,
-            warmup=warmup,
-            zero_point_distance=zero_point_distance,
-        )
-        # Add constraints for T=delta-1 the problem defined in the input board
-        z3_solver.add([
-            t_cells[-1][x][y] == bool(board[x][y])
-            for x,y in itertools.product(range(size_x), range(size_y))
-        ])
+    z3_solver, t_cells = game_of_life_ruleset(
+        size=size,
+        delta=delta,
+        warmup=warmup,
+    )
+    # This is a safety catch to prevent timeouts when running in Kaggle notebooks
+    if timeout:
+        z3_solver.set("timeout", int(timeout * 1000/2.5))  # timeout is in milliseconds, but inexact and ~2.5x slow
 
-        # This is a safety catch to prevent timeouts when running in Kaggle notebooks
-        if timeout:
-            z3_solver.set("timeout", int(timeout * 1000/2.5))  # timeout is in milliseconds, but inexact and ~2.5x slow
+    # Add constraints for T=delta-1 the problem defined in the input board
+    z3_solver.add([
+        t_cells[-1][x][y] == bool(board[x][y])
+        for x,y in itertools.product(range(size_x), range(size_y))
+    ])
+    z3_solver.push()
+
+    for zero_point_distance in [1,2]:
+        z3_solver.pop()
+        add_zero_point_constraint(z3_solver, t_cells, zero_point_distance)
+        z3_solver.push()
 
         # if z3_solver.check() != z3.sat: print('Unsolvable!')
         solution_3d = solver_to_numpy_3d(z3_solver, t_cells[warmup:])  # calls z3_solver.check()
@@ -100,9 +113,8 @@ def game_of_life_solver(board: np.ndarray, delta=1, warmup=0, timeout=0, verbose
         # Validate that forward play matches backwards solution
         if np.count_nonzero(solution_3d):  # quicker than calling z3_solver.check() again
             assert is_valid_solution(solution_3d[0], board, delta)
-            # while not is_valid_solution(solution_3d[0], board, delta):
-            #     z3_solver, t_cells, solution_3d = game_of_life_next_solution(z3_solver, t_cells, verbose=verbose)
             if verbose: print(f'game_of_life_solver() - took: {time_taken:6.1f}s | Solved! ')
+            break
     else:
         if verbose: print(f'game_of_life_solver() - took: {time_taken:6.1f}s | unsolved')
     return z3_solver, t_cells, solution_3d

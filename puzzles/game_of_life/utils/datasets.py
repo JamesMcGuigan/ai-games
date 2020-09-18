@@ -5,11 +5,12 @@ import os
 
 import pandas as pd
 
-root_directory = os.path.join(os.path.dirname(__file__), '../')
 if os.environ.get('KAGGLE_KERNEL_RUN_TYPE'):
+    root_directory   = './'
     input_directory  = os.path.join(root_directory, '../input/conways-reverse-game-of-life-2020/')
     output_directory = os.path.join(root_directory, './')
 else:
+    root_directory   = os.path.join(os.path.dirname(__file__), '../')
     input_directory  = os.path.join(root_directory, './input/')
     output_directory = os.path.join(root_directory, './output/')
 

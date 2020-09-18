@@ -97,7 +97,9 @@ def solve_dataframe(
             # timeouts for kaggle submissions
             if max_count and max_count <= total:                            raise EOFError()
             if timeout   and timeout   <= time.perf_counter() - time_start: raise TimeoutError()
-    except: pass
+    except Exception as exception:
+        print(exception)
+        pass
     finally:
         time_taken = time.perf_counter() - time_start
         percentage = (100 * solved / total) if total else 0

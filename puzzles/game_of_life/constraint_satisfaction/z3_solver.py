@@ -69,7 +69,7 @@ def game_of_life_ruleset(size=(25,25), delta=1, warmup=0, zero_point_distance=1)
 
 # The true kaggle solution requires warmup=5, but this is very slow to compute
 # noinspection PyUnboundLocalVariable
-def game_of_life_solver(board: np.ndarray, delta=1, warmup=0, timeout=2*60*60, verbose=True):
+def game_of_life_solver(board: np.ndarray, delta=1, warmup=0, timeout=6*60*60, verbose=True):
     time_start = time.perf_counter()
     size       = (size_x, size_y) = board.shape
 

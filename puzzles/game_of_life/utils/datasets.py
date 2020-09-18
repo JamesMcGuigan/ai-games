@@ -18,7 +18,7 @@ train_file             = f'{input_directory}/train.csv'
 test_file              = f'{input_directory}/test.csv'
 sample_submission_file = f'{input_directory}/sample_submission.csv'
 submission_file        = f'{output_directory}/submission.csv'
-
+timeout_file           = f'{output_directory}/timeouts.csv'
 
 assert os.path.exists(train_file)
 assert os.path.exists(test_file)
@@ -39,7 +39,7 @@ train_df             = pd.read_csv(train_file, index_col='id')
 test_df              = pd.read_csv(test_file,  index_col='id')
 submission_df        = pd.read_csv(submission_file,  index_col='id')
 sample_submission_df = pd.read_csv(sample_submission_file,  index_col='id')
-
+timeout_df           = pd.read_csv(timeout_file,  index_col='id')
 
 # Ensure submission.csv contains all required indices and is in sorted order
 def copy_sample_submission_missing_indexes():

@@ -14,6 +14,7 @@ from utils.datasets import test_df
 from utils.datasets import train_df
 from utils.idx_lookup import get_unsolved_idxs
 from utils.plot import plot_3d
+from utils.plot import plot_idx
 from utils.util import csv_to_delta
 from utils.util import csv_to_numpy
 from utils.util import numpy_to_dict
@@ -75,6 +76,8 @@ def solve_dataframe(
                 submission_df.sort_index().to_csv(savefile)
 
                 if plot: plot_3d(solution_3d)
+            else:
+                if plot: plot_idx(df, idx)  # show failures
 
             # timeouts for kaggle submissions
             if max_count and max_count <= total:                            raise TimeoutError()

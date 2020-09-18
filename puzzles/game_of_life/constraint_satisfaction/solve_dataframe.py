@@ -1,5 +1,4 @@
 import os
-import signal
 import time
 from typing import Tuple
 
@@ -61,11 +60,11 @@ def solve_dataframe(
     cpus = int( os.cpu_count() * (1 if os.environ.get('KAGGLE_KERNEL_RUN_TYPE') else 3/4) )
     pool = ProcessPool(ncpus=cpus)
     try:
-        # timeouts for kaggle submissions
-        if timeout:
-            def raise_timeout(signum, frame): raise TimeoutError    # DOC: https://docs.python.org/3.6/library/signal.html
-            signal.signal(signal.SIGALRM, raise_timeout)            # Register a function to raise a TimeoutError on the signal.
-            signal.alarm(timeout)                                   # Schedule the signal to be sent after ``time``.
+        # # timeouts for kaggle submissions
+        # if timeout:
+        #     def raise_timeout(signum, frame): raise TimeoutError    # DOC: https://docs.python.org/3.6/library/signal.html
+        #     signal.signal(signal.SIGALRM, raise_timeout)            # Register a function to raise a TimeoutError on the signal.
+        #     signal.alarm(timeout)                                   # Schedule the signal to be sent after ``time``.
 
         idxs     = get_unsolved_idxs(df, submission_df, modulo=modulo, sort_cells=sort_cells, sort_delta=sort_delta)
         idxs     = [ idx for idx in idxs if idx not in timeout_df.index ]  # exclude timeouts

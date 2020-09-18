@@ -5,27 +5,28 @@ from utils.util import csv_to_delta
 from utils.util import csv_to_numpy
 
 
-def plot_3d(solution_3d: np.ndarray):
-    plt.figure(figsize=(len(solution_3d)*3,3))
+def plot_3d(solution_3d: np.ndarray, size=4, max_cols=6):
+    cols = np.min([ len(solution_3d), max_cols ])
+    rows = len(solution_3d) // cols + 1
+    plt.figure(figsize=(cols*size, rows*size))
     for t in range(len(solution_3d)):
-        X = solution_3d[t]
-        plt.subplot(1, len(solution_3d), t + 1)
-        plt.imshow(X, cmap='binary'); plt.title(f't={t}')
+        board = solution_3d[t]
+        plt.subplot(rows, cols, t + 1)
+        plt.imshow(board, cmap='binary'); plt.title(f't={t}')
     plt.show()
 
 
-def plot_idx(df, idx: int):
+def plot_idx(df, idx: int, size=4):
     # pd.read_csv(index_col='id') implies offset of 1 (original code uses offset = 2)
-    shape = (25,25)
     delta = csv_to_delta(df, idx)
     start = csv_to_numpy(df, idx, key='start')
     stop  = csv_to_numpy(df, idx, key='stop')
-    if len(start) == 0: start = np.zeros(shape)
-    if len(stop)  == 0: start = np.zeros(shape)
+    if len(start) == 0: start = np.zeros(stop.shape)
+    if len(stop)  == 0: start = np.zeros(start.shape)
 
-    plt.figure(figsize=(16,6))
+    plt.figure(figsize=(size*2,size))
     plt.subplot(121)
-    plt.imshow(start.reshape(shape), cmap='binary'); plt.title(f'{idx}: start = T=0')
+    plt.imshow(start, cmap='binary'); plt.title(f'{idx}: start = T=0')
     plt.subplot(122)
-    plt.imshow(stop.reshape(shape),  cmap='binary');  plt.title(f'{idx}: stop = T={delta}')
+    plt.imshow(stop,  cmap='binary'); plt.title(f'{idx}: stop = T={delta}')
     plt.show()

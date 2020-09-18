@@ -9,14 +9,14 @@ from typing import Union
 
 import numpy as np
 
+from hashmaps.hashmaps import hash_geometric
+from hashmaps.hashmaps import hash_translations
 from utils.datasets import train_df
 from utils.game import life_step
 from utils.game import life_step_1
 from utils.game import life_step_2
-from utils.hashmaps import hash_geometric
-from utils.hashmaps import hash_translations
 
-dataset = np.array( train_df[ train_df.columns[-624:] ] ).reshape(-1, 25, 25)
+dataset = np.array( train_df[ train_df.columns[-624:] ] ).reshape((-1, 25, 25))
 dataset = dataset[:1000]
 assert isinstance( dataset, np.ndarray)
 

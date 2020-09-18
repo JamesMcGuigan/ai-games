@@ -1,8 +1,8 @@
 import numpy as np
 
+from hashmaps.hashmaps import hash_geometric
+from hashmaps.hashmaps import hash_translations
 from utils.datasets import train_df
-from utils.hashmaps import hash_geometric
-from utils.hashmaps import hash_translations
 from utils.util import csv_to_numpy
 
 

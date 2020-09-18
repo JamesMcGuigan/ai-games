@@ -1,7 +1,8 @@
 import numpy as np
 from numba import njit
 
-from utils.primes import primes_np
+from hashmaps.primes import hashable_primes
+from hashmaps.primes import primes_np
 
 
 @njit()
@@ -43,9 +44,9 @@ def hash_translations(board: np.ndarray) -> int:
     assert board.shape[0] == board.shape[1]
     hashes = hash_translations_board(board)
     sorted = np.sort(hashes.flatten())
-    hashed = np.flip(sorted) * primes_np[:len(sorted)]  # multiply big numbers with small numbers
-    hashed = np.sum(hashed)
+    hashed = np.sum(sorted[::-1] * primes_np[:len(sorted)])  # multiply big with small numbers | hashable_primes is too small
     return int(hashed)
+
 
 @njit()
 def hash_translations_board(board: np.ndarray) -> np.ndarray:
@@ -62,8 +63,8 @@ def hash_translations_board(board: np.ndarray) -> np.ndarray:
     #       identity == np.roll(axis=0) == np.roll(axis=1)
     #       np.flip(axis=0) == np.rot270()
     #       np.flip(axis=1) == np.rot90()
-    h_primes = primes_np[ 0*size   : 1*size   ]
-    v_primes = primes_np[ 1*size+1 : 2*size+1 ]
+    h_primes = hashable_primes[ 0*size : 1*size ]
+    v_primes = hashable_primes[ 1*size : 2*size ]
     output   = np.zeros(board.shape, dtype=np.int64)
     for x in range(size):
         for y in range(size):
@@ -74,5 +75,3 @@ def hash_translations_board(board: np.ndarray) -> np.ndarray:
             down        = np.sum( vertical   * v_primes )
             output[x,y] = left * down
     return output
-
-

@@ -3,6 +3,7 @@
 # For more information on primes see http://primes.utm.edu/
 # Source: https://primes.utm.edu/lists/small/10000.txt
 import numpy as np
+from numba import njit
 
 primes = [
 2, 3, 5, 7, 11, 13, 17, 19, 23, 29,

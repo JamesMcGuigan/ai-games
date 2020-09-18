@@ -1,5 +1,6 @@
 import os
 import time
+import traceback
 from typing import Tuple
 
 import humanize
@@ -97,9 +98,13 @@ def solve_dataframe(
             # timeouts for kaggle submissions
             if max_count and max_count <= total:                            raise EOFError()
             if timeout   and timeout   <= time.perf_counter() - time_start: raise TimeoutError()
+    except (KeyboardInterrupt, EOFError, TimeoutError): pass
     except Exception as exception:
-        print(exception)
-        pass
+         print('Exception: solve_dataframe()')
+         print(exception)
+         traceback.print_stack()
+         print(repr(traceback.extract_stack()))
+         print(repr(traceback.format_stack()))
     finally:
         time_taken = time.perf_counter() - time_start
         percentage = (100 * solved / total) if total else 0

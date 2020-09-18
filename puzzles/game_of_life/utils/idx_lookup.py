@@ -1,4 +1,3 @@
-import random
 from typing import Any
 from typing import Callable
 from typing import List
@@ -11,27 +10,15 @@ from utils.util import csv_to_numpy
 
 def get_unsolved_idxs(df: pd.DataFrame, submision_df: pd.DataFrame, modulo=(1,0), sort_cells=False, sort_delta=False) -> List[int]:
     """ Compare test_df with submision_df and return any idxs without a matching non-zero entry in submision_df """
-    idxs = []
-    deltas = sorted(df['delta'].unique()) if sort_delta else [0]
-    for delta in deltas:  # [1,2,3,4,5]
-        # Process in assumed order of difficulty, easiest first
-        if sort_delta:
-            df = df[ df['delta'] == delta ]                               # smaller deltas are easier
-        if sort_cells:
-            df = df.iloc[ df.apply(np.count_nonzero, axis=1).argsort() ]  # smaller grids are easier
+    # Process in assumed order of difficulty, easiest first | smaller grids are easier, smaller deltas are easier
+    if   sort_cells == 'random':  df = df.sample(frac=1)
+    elif sort_cells == 'reverse': df = df.iloc[::-1]
+    elif sort_cells:              df = df.iloc[ df.apply(np.count_nonzero, axis=1).argsort() ]
+    if sort_delta:                df = df.sort_values(by='delta')  # sort deltas after cells
 
-        # Create list of unsolved idxs
-        delta_idxs = []
-        for idx in df.index:
-            if modulo and idx % modulo[0] != modulo[1]: continue  # allow splitting dataset between different servers
-            if idx not in submision_df.index or np.count_nonzero(submision_df.loc[idx]) == 0:
-                delta_idxs.append(idx)
-
-        if sort_cells == 'random':
-            random.shuffle(delta_idxs)
-        if sort_cells == 'reverse':
-            delta_idxs = list(reversed(delta_idxs))
-        idxs += delta_idxs
+    idxs = df.index
+    idxs = ( idx for idx in idxs if not modulo or idx % modulo[0] == modulo[1] )  # generator
+    idxs = [ idx for idx in idxs if np.count_nonzero(submision_df.loc[idx])    ]
 
     assert isinstance(idxs, list)  # BUGFIX: must return list (not generator), else invalid csv entries occur
     return list(idxs)

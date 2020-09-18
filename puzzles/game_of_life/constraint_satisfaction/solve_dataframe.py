@@ -12,7 +12,6 @@ from constraint_satisfaction.fix_submission import is_valid_solution
 from constraint_satisfaction.z3_solver import game_of_life_solver
 from utils.datasets import submission_file
 from utils.datasets import test_df
-from utils.datasets import timeout_file
 from utils.datasets import train_df
 from utils.idx_lookup import get_unsolved_idxs
 from utils.plot import plot_3d
@@ -51,8 +50,8 @@ def solve_dataframe(
     # BUGFIX: game_of_life_solver() previously implemented delta+1, so fix any previous savefiles
     # fix_submission()  # DONE: remove once all datasets have been updated
 
-    timeout_df    = pd.read_csv(timeout_file, index_col='id')
-    submission_df = pd.read_csv(savefile,     index_col='id')  # manually copy/paste sample_submission.csv to location
+
+    submission_df = pd.read_csv(savefile, index_col='id')  # manually copy/paste sample_submission.csv to location
     solved = 0
     total  = 0  # only count number solved in current runtime, ignore history
 
@@ -61,21 +60,12 @@ def solve_dataframe(
     cpus = int( os.cpu_count() * (1 if os.environ.get('KAGGLE_KERNEL_RUN_TYPE') else 3/4) )
     pool = ProcessPool(ncpus=cpus)
     try:
-        # # timeouts for kaggle submissions
-        # if timeout:
-        #     def raise_timeout(signum, frame): raise TimeoutError    # DOC: https://docs.python.org/3.6/library/signal.html
-        #     signal.signal(signal.SIGALRM, raise_timeout)            # Register a function to raise a TimeoutError on the signal.
-        #     signal.alarm(timeout)                                   # Schedule the signal to be sent after ``time``.
+        idxs   = get_unsolved_idxs(df, submission_df, modulo=modulo, sort_cells=sort_cells, sort_delta=sort_delta)
+        deltas = ( csv_to_delta(df, idx)             for idx in idxs )  # generator
+        boards = ( csv_to_numpy(df, idx, key='stop') for idx in idxs )  # generator
 
-        idxs     = get_unsolved_idxs(df, submission_df, modulo=modulo, sort_cells=sort_cells, sort_delta=sort_delta)
-        idxs     = [ idx for idx in idxs if idx not in timeout_df.index ]  # exclude timeouts
-        deltas   = ( csv_to_delta(df, idx)             for idx in idxs )   # generator
-        boards   = ( csv_to_numpy(df, idx, key='stop') for idx in idxs )   # generator
-        timeouts = ( timeout * 0.99 - (time.perf_counter() - time_start) if timeout else 0  for _ in idxs )  # generator
-        # NOTE: Z3 timeouts are inexact, but will hopefully occur just before the signal timeout
-
-        solution_idx_iter = pool.uimap(solve_board_idx, boards, deltas, idxs, timeouts)
-        for solution_3d, idx, time_taken in solution_idx_iter:
+        solution_idx_iter = pool.uimap(solve_board_idx, boards, deltas, idxs)
+        for solution_3d, idx in solution_idx_iter:
             total += 1
             if np.count_nonzero(solution_3d) != 0:
                 solved += 1
@@ -88,12 +78,7 @@ def solve_dataframe(
 
                 if plot: plot_3d(solution_3d)
             else:
-                if plot: plot_idx(df, idx)  # plot failures
-                # Record unsat and timeout failures to prevent kaggle getting stuck on unsolved items
-                if not timeout or time_taken > timeout/3:
-                    timeout_df          = pd.read_csv(timeout_file, index_col='id')
-                    timeout_df.loc[idx] = pd.Series({ "id": idx, "timeout": int(time_taken) })
-                    timeout_df.sort_values(by='timeout').to_csv(timeout_file)
+                if plot: plot_idx(df, idx)  # show failures
 
             # timeouts for kaggle submissions
             if max_count and max_count <= total:                            raise EOFError()

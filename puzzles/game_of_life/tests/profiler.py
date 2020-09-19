@@ -9,8 +9,8 @@ from typing import Union
 
 import numpy as np
 
-from hashmaps.hashmaps import hash_geometric
-from hashmaps.hashmaps import hash_translations
+from hashmaps.hash_functions import hash_geometric
+from hashmaps.hash_functions import hash_translations
 from utils.datasets import train_df
 from utils.game import life_step
 from utils.game import life_step_1

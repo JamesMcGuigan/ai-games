@@ -1,20 +1,39 @@
-import math
 from typing import Dict
 
 import numpy as np
 import pandas as pd
+from fastcache._lrucache import clru_cache
 
 
-def csv_to_delta(df, idx, type='start'):
+@clru_cache(None)
+def csv_column_names(key='start'):
+    return [ f'{key}_{n}' for n in range(25**2) ]
+
+
+def csv_to_delta(df, idx):
     return int(df.loc[idx]['delta'])
 
+def csv_to_delta_list(df):
+    return df['delta'].values
+
+
 def csv_to_numpy(df, idx, key='start') -> np.ndarray:
-    columns = [col for col in df if col.startswith(key)]
-    size    = int(math.sqrt(len(columns)))
-    board   = df.loc[idx][columns].values
-    if len(board) == 0: board = np.zeros((size, size))
-    board = board.reshape((size,size)).astype(np.int8)
+    try:
+        columns = csv_column_names(key)
+        board   = df.loc[idx][columns].values
+    except:
+        board = np.zeros((25, 25))
+    board = board.reshape((25,25)).astype(np.int8)
     return board
+
+
+def csv_to_numpy_list(df, key='start') -> np.ndarray:
+    try:
+        columns = csv_column_names(key)
+        output  = df[columns].values.reshape(-1,25,25)
+    except:
+        output  = np.zeros((0,25,25))
+    return output
 
 
 # noinspection PyTypeChecker,PyUnresolvedReferences

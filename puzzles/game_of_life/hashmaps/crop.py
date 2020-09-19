@@ -39,3 +39,7 @@ def filter_crop_and_center(board: np.ndarray, max_size=6, shape=(25,25)) -> Unio
             # roll viewpoint and try again
             board = np.roll(np.roll(board, shape[0]//2, axis=0), shape[1]//2, axis=1)
     return None
+
+
+def roll_2d(board: np.array, shift: int = 25//2) -> np.array:
+    return np.roll( np.roll(board, shift, axis=0), shift, axis=1 )

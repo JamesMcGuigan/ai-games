@@ -11,8 +11,8 @@ from joblib import Parallel
 
 from hashmaps.crop import crop_and_center
 from hashmaps.crop import filter_crop_and_center
-from hashmaps.hashmaps import hash_geometric
-from hashmaps.hashmaps import hash_translations
+from hashmaps.hash_functions import hash_geometric
+from hashmaps.hash_functions import hash_translations
 from utils.datasets import test_df
 from utils.datasets import train_df
 from utils.game import life_step

@@ -75,3 +75,27 @@ def hash_translations_board(board: np.ndarray) -> np.ndarray:
             down        = np.sum( vertical   * v_primes )
             output[x,y] = left * down
     return output
+
+
+@njit
+def max_index_x(board: np.array): return max_index(board, axis=0)
+@njit
+def max_index_y(board: np.array): return max_index(board, axis=1)
+@njit
+def max_index(board: np.array, axis=0):
+    """
+    Find the index column with with the most number of cells, but with a unique cell count
+    This should hopefully give us a reference location for translations between geometric hashes
+    NOTE: this won't always work, such as for a 2x2 square, which could also be in the corner point
+    """
+    if axis == 0: col_counts = np.array([ np.sum(board[i,:]) for i in range(board.shape[0]) ])
+    else:         col_counts = np.array([ np.sum(board[:,i]) for i in range(board.shape[1]) ])
+    col_sorted = np.sort(col_counts)[::-1]
+    for count in col_sorted:
+        if len(col_counts[ col_counts == count ]) == 1:
+            col_value = count
+            break
+    else:
+        col_value = col_sorted[0]  # if we can't find a unique value, then just return the maximum value
+    col_index = np.where( col_counts == col_value )[0][0]
+    return col_index

@@ -11,15 +11,17 @@ from utils.util import csv_to_numpy
 def get_unsolved_idxs(df: pd.DataFrame, submision_df: pd.DataFrame, modulo=(1,0), sort_cells=False, sort_delta=False) -> List[int]:
     """ Compare test_df with submision_df and return any idxs without a matching non-zero entry in submision_df """
     # Process in assumed order of difficulty, easiest first | smaller grids are easier, smaller deltas are easier
+    if modulo:                    df = df[ df.index % modulo[0] == modulo[1] ]
     if   sort_cells == 'random':  df = df.sample(frac=1)
     elif sort_cells == 'reverse': df = df.iloc[::-1]
     elif sort_cells:              df = df.iloc[ df.apply(np.count_nonzero, axis=1).argsort() ]
-    if sort_delta:                df = df.sort_values(by='delta')  # sort deltas after cells
+    if sort_delta:                df = df.sort_values(by='delta', kind='mergesort')  # mergesort is stable sort
 
-    idxs = df.index
-    idxs = ( idx for idx in idxs if not modulo or idx % modulo[0] == modulo[1] )  # generator
-    idxs = [ idx for idx in idxs if np.count_nonzero(submision_df.loc[idx])    ]
-
+    idxs   = [
+        idx
+        for idx in df.index
+        if np.count_nonzero( csv_to_numpy(submision_df, idx, key='start') ) == 0
+    ]
     assert isinstance(idxs, list)  # BUGFIX: must return list (not generator), else invalid csv entries occur
     return list(idxs)
 

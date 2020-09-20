@@ -106,14 +106,15 @@ def z3_generate_summable_primes(size=50, combinations=2) -> List[int]:
 
 ### Output:
 if __name__ == '__main__':
-    import timeit
 
-    for n in [2,4,8,16,32,64,128]:
-        print( f'{n:3d} primes generated in: {timeit.timeit(lambda: z3_generate_primes(n), number=10)/10*1000:7.1f} ms' )
+    # for n in [2,4,8,16,32,64,128]:
+    #     print( f'{n:3d} primes generated in: {timeit.timeit(lambda: z3_generate_primes(n), number=10)/10*1000:7.1f} ms' )
 
     for size in range(2,8+1):
-        combinations    = size
-        time_start      = time.perf_counter()
-        hashable_primes = z3_generate_summable_primes(size=size, combinations=combinations)
-        time_taken      = time.perf_counter() - time_start
-        print(f'size = {size:2d} | combinations = {combinations} | time = {time_taken:5.1f}s | ', hashable_primes)
+        for combinations in [2,size]:
+            # combinations    = size
+            time_start      = time.perf_counter()
+            hashable_primes = z3_generate_summable_primes(size=size, combinations=combinations)
+            time_taken      = time.perf_counter() - time_start
+            print(f'size = {size:2d} | combinations = {combinations} | time = {time_taken:5.1f}s | ', hashable_primes)
+

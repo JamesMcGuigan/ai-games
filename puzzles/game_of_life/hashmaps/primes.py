@@ -22,7 +22,7 @@ primes_set = set(primes_np)
 
 
 @njit()
-def generate_summable_primes(size=50, combinations=2) -> np.ndarray:
+def generate_hashable_primes(size=50, combinations=2) -> np.ndarray:
     """
     Return a list of primes that have no summation collisions for N=2, for use in hashing
     NOTE: size > 50 or combinations > 2 produces no results
@@ -51,7 +51,7 @@ def generate_summable_primes(size=50, combinations=2) -> np.ndarray:
             values = candidates[indexes]
             summed = np.sum(values)
             if summed in collisions:  # then remove the largest conflicting number from the list of candidates
-                exclude    = np.min(candidates[indexes])
+                exclude    = np.max(candidates[indexes])
                 candidates = candidates[ candidates != exclude ]
                 exclusions.add(exclude)
                 break  # pick a new set of candidates and try again
@@ -67,8 +67,8 @@ def generate_summable_primes(size=50, combinations=2) -> np.ndarray:
                     indexes[i+1] += 1
     return candidates
 
-assert np.array_equal(generate_summable_primes(size=2, combinations=2), [2, 3])
-# hashable_primes = generate_summable_primes(size=50, combinations=2)
+assert np.array_equal(generate_hashable_primes(size=2, combinations=2), [2, 3])
+# hashable_primes = generate_hashable_primes(size=50, combinations=2)
 hashable_primes = np.array([
     2,     7,    23,    47,    61,     83,    131,    163,    173,    251,
     457,   491,   683,   877,   971,   2069,   2239,   2927,   3209,   3529,
@@ -82,6 +82,6 @@ hashable_primes = np.array([
 if __name__ == '__main__':
     for permutations in [2,3,4]:
         for size in range(25,50+1,25):
-            hashable_primes = generate_summable_primes(size=size, combinations=permutations)
+            hashable_primes = generate_hashable_primes(size=size, combinations=permutations)
             print(f'{permutations} @ {size} = ', hashable_primes)
             if len(hashable_primes) == 0: break

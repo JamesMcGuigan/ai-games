@@ -2,19 +2,25 @@
 
 import math
 import sys
+from typing import List
 
 import numpy as np
 from numba import njit
 
 
 # Source: https://stackoverflow.com/questions/11619942/print-series-of-prime-numbers-in-python
-def generate_primes(count):
+@njit
+def generate_primes(count) -> List[int]:
     primes = [2]
     for n in range(3, sys.maxsize, 2):
         if len(primes) >= count: break
-        if all( n % i != 0 for i in range(3, int(math.sqrt(n))+1, 2) ):
+        for i in range(3, int(math.sqrt(n))+1, 2):
+            if n % i != 0: continue
+            else:          break
+        else:
             primes.append(n)
     return primes
+assert generate_primes(10) == [ 2, 3, 5, 7, 11, 13, 17, 19, 23, 29 ]
 
 primes     = generate_primes(10_000)
 primes_np  = np.array(primes, dtype=np.int64)

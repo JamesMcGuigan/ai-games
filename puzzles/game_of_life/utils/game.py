@@ -66,3 +66,11 @@ def life_step(board: np.ndarray):
                 output[x, y] = 1
     return output
 
+
+@njit
+def life_step_3d(board: np.ndarray, delta):
+    solution_3d = [ board ]
+    for t in range(delta):
+        board = life_step(board)
+        solution_3d.append(board)
+    return np.array(solution_3d)

@@ -76,13 +76,13 @@ def build_future_hashes(board, hash_fn, future_count):
     return futures, hashes
 
 
-def solve_hashmap_dataframe(hashmap_database=None, verbose=True):
+def solve_hashmap_dataframe(hashmap_database=None, submission_df=None, verbose=True):
     solved = 0
     failed = 0
     total  = len(test_df.index)
     hashmap_database = hashmap_database or build_hashmap_database_from_pandas([ train_df, test_df ], hash_fn=hash_geometric)
 
-    submission_df = sample_submission_df.copy()
+    submission_df = submission_df if submission_df is not None else sample_submission_df.copy()
     for test_idx in test_df.index:
         delta       = csv_to_delta(test_df, test_idx)
         test_stop   = csv_to_numpy(test_df, test_idx, key='stop')

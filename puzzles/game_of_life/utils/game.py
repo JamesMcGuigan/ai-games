@@ -1,6 +1,9 @@
 # Functions for implementing Game of Life Forward Play
 
 import numpy as np
+import scipy.sparse
+from joblib import delayed
+from joblib import Parallel
 from numba import njit
 
 
@@ -74,3 +77,19 @@ def life_step_3d(board: np.ndarray, delta):
         board = life_step(board)
         solution_3d.append(board)
     return np.array(solution_3d)
+
+
+# RULES: https://www.kaggle.com/c/conway-s-reverse-game-of-life/data
+def generate_random_board():
+    # An initial board was chosen by filling the board with a random density between 1% full (mostly zeros) and 99% full (mostly ones).
+    # DOCS: https://cmdlinetips.com/2019/02/how-to-create-random-sparse-matrix-of-specific-density/
+    density = np.random.random() * 0.98 + 0.01
+    board   = scipy.sparse.random(25, 25, density=density, data_rvs=np.ones).toarray()
+
+    # The starting board's state was recorded after the 5 "warmup steps". These are the values in the start variables.
+    for t in range(5): board = life_step(board)
+    return board
+
+def generate_random_boards(count):
+    generated_boards = Parallel(-1)( delayed(generate_random_board)() for _ in range(count) )
+    return generated_boards

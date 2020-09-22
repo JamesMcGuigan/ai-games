@@ -1,0 +1,37 @@
+size =  2 | combinations = 2 | time =   0.0s |  [2, 3]
+
+size =  3 | combinations = 2 | time =   0.0s |  [3, 5, 7]
+size =  3 | combinations = 3 | time =   0.0s |  [2, 3, 7]
+
+size =  4 | combinations = 2 | time =   0.0s |  [2, 3, 7, 13]
+size =  4 | combinations = 3 | time =   0.0s |  [3, 5, 7, 11]
+size =  4 | combinations = 4 | time =   0.0s |  [2, 3, 7, 11]
+
+size =  5 | combinations = 2 | time =   0.1s |  [3, 11, 17, 19, 23]
+size =  5 | combinations = 3 | time =   0.1s |  [7, 11, 17, 19, 31]
+size =  5 | combinations = 4 | time =   0.1s |  [13, 17, 23, 29, 31]
+size =  5 | combinations = 5 | time =   0.2s |  [3, 11, 17, 19, 23]
+
+size =  6 | combinations = 2 | time =   0.1s |  [3, 7, 11, 17, 29, 31]
+size =  6 | combinations = 3 | time =   0.1s |  [3, 13, 17, 23, 29, 31]
+size =  6 | combinations = 4 | time =   0.1s |  [3, 13, 17, 23, 29, 31]
+size =  6 | combinations = 5 | time =   0.1s |  [3, 13, 17, 23, 29, 31]
+size =  6 | combinations = 6 | time =   0.1s |  [3, 13, 17, 23, 29, 31]
+
+size =  7 | combinations = 2 | time =   0.5s |  [2, 5, 17, 23, 29, 43, 53]
+size =  7 | combinations = 3 | time =   0.7s |  [3, 7, 11, 31, 47, 53, 59]
+size =  7 | combinations = 4 | time =   2.4s |  [2, 5, 41, 103, 107, 113, 127]
+size =  7 | combinations = 5 | time =   2.5s |  [2, 3, 41, 53, 103, 109, 127]
+size =  7 | combinations = 6 | time =   2.4s |  [2, 3, 7, 17, 31, 59, 127]
+size =  7 | combinations = 7 | time =   2.4s |  [3, 5, 7, 19, 43, 73, 103]
+
+size =  8 | combinations = 2 | time =   0.2s |  [2, 3, 7, 11, 23, 37, 43, 61]
+size =  8 | combinations = 3 | time =   2.3s |  [2, 3, 47, 73, 89, 97, 103, 107]
+size =  8 | combinations = 4 | time =  30.1s |  [3, 31, 53, 67, 71, 97, 103, 109]
+size =  8 | combinations = 5 | time = 197.9s |  [3, 31, 53, 71, 89, 97, 103, 109]
+size =  8 | combinations = 6 | time =  77.4s |  [3, 31, 53, 71, 89, 97, 103, 109]
+size =  8 | combinations = 7 | time = 532.7s |  [3, 29, 43, 71, 89, 101, 107, 113]
+size =  8 | combinations = 8 | time = 1011.8s |  [3, 23, 43, 71, 89, 101, 107, 113]
+
+size =  9 | combinations = 2 | time =   1.0s |  [2, 3, 7, 13, 23, 31, 67, 113, 127]
+size =  9 | combinations = 3 | time = 1164.2s |  [2, 7, 41, 113, 173, 211, 229, 241, 251]

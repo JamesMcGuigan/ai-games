@@ -1,4 +1,7 @@
-# Reference: The First 10,000 Primes - https://primes.utm.edu/lists/small/10000.txt
+#!/usr/bin/env python3
+# Kaggle Notebook: https://www.kaggle.com/jamesmcguigan/summable-primes/
+# PYTHONUNBUFFERED=1 time -p nice python3 ./hashmaps/primes_z3.py | tee ./hashmaps/primes_z3.log
+
 
 import itertools
 import time
@@ -67,7 +70,7 @@ def z3_generate_primes(count = 100):
 # size =  6 | combinations = 6 | time =   0.2s |  [3, 13, 17, 23, 29, 31]
 # size =  7 | combinations = 7 | time =  14.0s |  [2, 3, 11, 19, 37, 41, 127]
 # size =  8 | combinations = 8 | time = 971.7s |  [3, 29, 37, 71, 89, 101, 107, 113]
-def z3_generate_summable_primes(size=50, combinations=2) -> List[int]:
+def z3_generate_summable_primes(size=50, combinations=2, timeout=0) -> List[int]:
     candidates = [ z3.Int(n) for n in range(size) ]
     summations = []
     for n_combinations in range(1,combinations+1):
@@ -77,6 +80,8 @@ def z3_generate_summable_primes(size=50, combinations=2) -> List[int]:
         ]
 
     solver = z3.Solver()
+    if timeout: solver.set("timeout", int(timeout * 1000/2.5))  # timeout is in milliseconds, but inexact and ~2.5x slow
+
     solver.add([ num > 1      for num in candidates ])
     solver.add([ num % 1 == 0 for num in candidates ])
     solver.add([ candidates[n] < candidates[n+1] for n in range(len(candidates)-1) ])  # sorted
@@ -92,16 +97,17 @@ def z3_generate_summable_primes(size=50, combinations=2) -> List[int]:
         solver.pop()
         solver.push()
 
-        primes = generate_primes(domain ** 2)
+        primes = generate_primes(domain)
         solver.add([ z3.Or([ num == prime for prime in primes ])
                      for num in candidates ])
         solver.add([ num < domain for num in candidates ])
 
-        if solver.check() == z3.sat:
+        if solver.check() != z3.sat:
+            domain *= 2
+        else:
             values = sorted([ solver.model()[num].as_long() for num in candidates ])
             return list(values)
-        else:
-            domain *= 2
+
 
 
 ### Output:
@@ -110,11 +116,19 @@ if __name__ == '__main__':
     # for n in [2,4,8,16,32,64,128]:
     #     print( f'{n:3d} primes generated in: {timeit.timeit(lambda: z3_generate_primes(n), number=10)/10*1000:7.1f} ms' )
 
-    for size in range(2,8+1):
-        for combinations in [2,size]:
+    # notebook_start = time.perf_counter()
+    endtime     = 120 + time.perf_counter() # - (time.perf_counter() - notebook_start)
+    time_safety = 20
+    for size in range(2,25+1):
+        for combinations in range(2,size+1):
+            timeout = 0  # endtime - time.perf_counter()
+
             # combinations    = size
             time_start      = time.perf_counter()
-            hashable_primes = z3_generate_summable_primes(size=size, combinations=combinations)
+            hashable_primes = z3_generate_summable_primes(size=size, combinations=combinations, timeout=timeout)
             time_taken      = time.perf_counter() - time_start
             print(f'size = {size:2d} | combinations = {combinations} | time = {time_taken:5.1f}s | ', hashable_primes)
 
+            if timeout and timeout < time_safety: print('timeout'); break  # exit if we have less than an hour to go
+        print()
+        if timeout and timeout < time_safety: break

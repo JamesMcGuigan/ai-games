@@ -24,25 +24,6 @@ class GameOfLifeForward(GameOfLifeBase):
         self.conv4   = nn.Conv2d(in_channels=1+8,   out_channels=1,   kernel_size=(1,1))
         self.dropout = nn.Dropout(p=0.1)
 
-
-    # DOCS: https://towardsdatascience.com/understanding-input-and-output-shapes-in-convolution-network-keras-f143923d56ca
-    # pytorch requires:    contiguous_format = (batch_size, channels, height, width)
-    # tensorflow requires: channels_last     = (batch_size, height, width, channels)
-    def cast_inputs(self, x):
-        x = super().cast_inputs(x)
-        if len(x.shape) == 1:             # single row from dataframe
-            x = x.view(1, 1, torch.sqrt(x.shape[0]), torch.sqrt(x.shape[0]))
-        elif len(x.shape) == 2:
-            if x.shape[0] == x.shape[1]:  # single 2d board
-                x = x.view(1, 1, x.shape[0], x.shape[1])
-            else: # rows of flattened boards
-                x = x.view(-1, 1, torch.sqrt(x.shape[1]), torch.sqrt(x.shape[1]))
-        elif len(x.shape) == 3:                                 # numpy  == (batch_size, height, width)
-            x = x.view(x.shape[0], 1, x.shape[1], x.shape[2])   # x.shape = (batch_size, channels, height, width)
-        elif len(x.shape) == 4:
-            pass  # already in (batch_size, channels, height, width) format, so do nothing
-        return x
-
     def forward(self, x):
         x = input = self.cast_inputs(x)
 

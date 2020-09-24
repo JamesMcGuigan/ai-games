@@ -18,9 +18,12 @@ class GameOfLifeBase(nn.Module):
 
     def __init__(self):
         super().__init__()
-        self.device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu")
+        self.device    = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu")
+        self.criterion = nn.MSELoss()
 
-
+    ### Training Functionality
+    def loss(self, outputs, labels):
+        return self.criterion(outputs, labels)
 
     ### Load / Save Functionality
 

@@ -5,8 +5,8 @@ import time
 
 import numpy as np
 import torch
-import torch.nn as nn
 import torch.optim as optim
+from torch import tensor
 
 from neural_networks.device import device
 from neural_networks.GameOfLifeForward import gameOfLifeForward
@@ -18,9 +18,8 @@ def train(model, batch_size=25, l1=0, l2=0, timeout=0, reverse_input_output=Fals
     print(f'Training: {model.__class__.__name__}')
     time_start = time.perf_counter()
 
-    criterion = nn.MSELoss()
+    # NOTE: criterion loss function now defined via model.loss()
     optimizer = optim.RMSprop(model.parameters(), lr=0.01, momentum=0.9)
-
 
     # epoch: 14481 | board_count: 362000 | loss: 0.0000385726 | accuracy = 0.9990336000 | time: 0.965ms/board
     scheduler = None
@@ -72,10 +71,11 @@ def train(model, batch_size=25, l1=0, l2=0, timeout=0, reverse_input_output=Fals
 
             optimizer.zero_grad()
             outputs = model(inputs)
-            loss    = criterion(outputs, labels)
-            l1_loss = torch.sum(torch.tensor([ torch.sum(torch.abs(param)) for param in model.parameters() ])) / num_params
-            l2_loss = torch.sum(torch.tensor([ torch.sum(param**2)         for param in model.parameters() ])) / num_params
-            loss   += ( l1_loss * l1 ) + ( l2_loss * l2 )
+            loss    = model.loss(outputs, labels)
+            if l1 or l2:
+                l1_loss = torch.sum(tensor([ torch.sum(torch.abs(param)) for param in model.parameters() ])) / num_params
+                l2_loss = torch.sum(tensor([ torch.sum(param**2)         for param in model.parameters() ])) / num_params
+                loss   += ( l1_loss * l1 ) + ( l2_loss * l2 )
 
             loss.backward()
             optimizer.step()

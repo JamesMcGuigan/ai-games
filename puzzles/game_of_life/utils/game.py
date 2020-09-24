@@ -69,6 +69,11 @@ def life_step(board: np.ndarray):
                 output[x, y] = 1
     return output
 
+@njit
+def life_step_delta(board: np.ndarray, delta):
+    for t in range(delta): board = life_step(board)
+    return board
+
 
 @njit
 def life_step_3d(board: np.ndarray, delta):

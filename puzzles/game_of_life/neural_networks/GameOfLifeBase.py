@@ -24,21 +24,22 @@ class GameOfLifeBase(nn.Module):
         return os.path.join( os.path.dirname(__file__), 'models', f'{self.__class__.__name__}.pth')
 
 
-    def cast_to_tensor(self, x: Union[np.ndarray, torch.Tensor]) -> torch.Tensor:
+    def cast_inputs(self, x: Union[np.ndarray, torch.Tensor]) -> torch.Tensor:
         if torch.is_tensor(x):
             return x.to(device)
-        elif isinstance(x, np.ndarray):
-            x = torch.from_numpy(x).to(torch.bool)
+        if isinstance(x, list):
+            x = np.array(x)
+        if isinstance(x, np.ndarray):
+            x = torch.from_numpy(x).to(torch.float32)
             x = x.to(device)
             return x  # x.shape = (42,3)
-        else:
-            raise TypeError(f'{self.__class__.__name__}.cast_to_tensor() invalid type(x) = {type(x)}')
+        raise TypeError(f'{self.__class__.__name__}.cast_to_tensor() invalid type(x) = {type(x)}')
 
 
     def cast_to_numpy(self, x: Union[np.ndarray, torch.Tensor]) -> np.ndarray:
         if isinstance(x, np.ndarray):
-            if len(x.shape) == 3: return x.reshape(-1, self.size, self.size)
-            else:                 return x.reshape(self.size, self.size)
+            if len(x.shape) == 3: return x.reshape((-1, self.size, self.size))
+            else:                 return x.reshape((self.size, self.size))
         elif torch.is_tensor(x):
             return self.cast_to_numpy( x.detach().numpy() )
         else:

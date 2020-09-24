@@ -18,7 +18,6 @@ def train(model, batch_size=25, l1=0, l2=0, timeout=0):
     time_start = time.perf_counter()
 
     criterion = nn.MSELoss()
-    # criterion = nn.L1Loss()
     optimizer = optim.RMSprop(model.parameters(), lr=0.01, momentum=0.9)
 
 
@@ -38,6 +37,7 @@ def train(model, batch_size=25, l1=0, l2=0, timeout=0):
 
     try:
         model.load()
+        model.train()  # enable dropout
         num_params = torch.sum(torch.tensor([
             torch.prod(torch.tensor(param.shape))
             for param in model.parameters()
@@ -65,10 +65,10 @@ def train(model, batch_size=25, l1=0, l2=0, timeout=0):
             optimizer.zero_grad()
             outputs = model(inputs)
             loss    = criterion(outputs, labels)
-            l1_loss = torch.sum(torch.tensor([ torch.sum(torch.abs(param)) for param in model.parameters() ])) # / num_params
-            l2_loss = torch.sum(torch.tensor([ torch.sum(param**2)         for param in model.parameters() ])) # / num_params
+            l1_loss = torch.sum(torch.tensor([ torch.sum(torch.abs(param)) for param in model.parameters() ])) / num_params
+            l2_loss = torch.sum(torch.tensor([ torch.sum(param**2)         for param in model.parameters() ])) / num_params
             loss   += ( l1_loss * l1 ) + ( l2_loss * l2 )
-            # loss   *= ( l1_loss * 1 )
+
             loss.backward()
             optimizer.step()
             if scheduler is not None: scheduler.step(loss)
@@ -93,9 +93,6 @@ def train(model, batch_size=25, l1=0, l2=0, timeout=0):
                 loop_acc   = 0
                 loop_count = 0
 
-            # print("epoch_losses[-10:]", epoch_losses[-10:], ' min = ', np.min(epoch_losses[-10:]))
-            # model.save()
-
 
     except KeyboardInterrupt:
         pass
@@ -106,6 +103,7 @@ def train(model, batch_size=25, l1=0, l2=0, timeout=0):
         time_taken = time.perf_counter() - time_start
         print(f'Finished Training: {model.__class__.__name__} - {epoch} epochs in {time_taken:.1f}s')
         model.save()
+        # model.eval()  # disable dropout
 
 
 if __name__ == '__main__':

@@ -6,13 +6,17 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-# noinspection PyAbstractClass
 from neural_networks.device import device
 
 
+# noinspection PyAbstractClass
+
+
 class GameOfLifeBase(nn.Module):
-    """Base class for bitboard based NNs, handles casting inputs and savefile/load functionality"""
-    size = 25
+    """
+    Base class for GameOfLife based NNs
+    Handles casting of inputs and model auto save/load functionality
+    """
 
     def __init__(self):
         super().__init__()
@@ -36,12 +40,12 @@ class GameOfLifeBase(nn.Module):
         raise TypeError(f'{self.__class__.__name__}.cast_to_tensor() invalid type(x) = {type(x)}')
 
 
-    def cast_to_numpy(self, x: Union[np.ndarray, torch.Tensor]) -> np.ndarray:
-        if isinstance(x, np.ndarray):
-            if len(x.shape) == 3: return x.reshape((-1, self.size, self.size))
-            else:                 return x.reshape((self.size, self.size))
-        elif torch.is_tensor(x):
+    def cast_to_numpy(self, x: Union[np.ndarray, torch.Tensor], shape=(25,25)) -> np.ndarray:
+        if torch.is_tensor(x):
             return self.cast_to_numpy( x.detach().numpy() )
+        elif isinstance(x, np.ndarray):
+            if len(x.shape) == 3: return x.reshape((-1, shape[0], shape[1]))
+            else:                 return x.reshape(shape)
         else:
             raise TypeError(f'{self.__class__.__name__}.cast_to_numpy() invalid type(x) = {type(x)}')
 

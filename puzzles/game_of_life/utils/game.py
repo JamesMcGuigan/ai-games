@@ -92,7 +92,9 @@ def generate_random_board():
     board   = scipy.sparse.random(25, 25, density=density, data_rvs=np.ones).toarray()
 
     # The starting board's state was recorded after the 5 "warmup steps". These are the values in the start variables.
-    for t in range(5): board = life_step(board)
+    for t in range(5):
+        board = life_step(board)
+        if np.count_nonzero(board) == 0: return generate_random_board()  # exclude empty boards and try again
     return board
 
 def generate_random_boards(count):

@@ -44,7 +44,9 @@ class GameOfLifeBase(nn.Module):
                 self.eval()
                 self.to(device)
                 print(f'{self.__class__.__name__}.load(): {self.filename} = {humanize.naturalsize(os.path.getsize(self.filename))}')
-            except: pass
+            except Exception as exception:
+                print(f'{self.__class__.__name__}.load(): model has changed dimensions, discarding saved weights\n')
+                pass
 
 
 

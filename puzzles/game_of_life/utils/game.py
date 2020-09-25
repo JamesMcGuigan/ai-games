@@ -1,4 +1,5 @@
 # Functions for implementing Game of Life Forward Play
+from typing import List
 
 import numpy as np
 import scipy.sparse
@@ -54,7 +55,7 @@ def life_neighbours(board: np.ndarray, max_value=3):
 
 
 @njit
-def life_step(board: np.ndarray):
+def life_step(board: np.ndarray) -> np.ndarray:
     """Game of life step using generator expressions"""
     size_x = board.shape[0]
     size_y = board.shape[1]
@@ -68,6 +69,11 @@ def life_step(board: np.ndarray):
             ):
                 output[x, y] = 1
     return output
+
+def life_steps(boards: List[np.ndarray]) -> List[np.ndarray]:
+    """ Parallel version of life_step() but for an array of boards """
+    return Parallel(-1)( delayed(life_step)(board) for board in boards )
+
 
 @njit
 def life_step_delta(board: np.ndarray, delta):

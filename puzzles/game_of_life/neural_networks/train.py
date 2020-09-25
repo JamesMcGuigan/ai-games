@@ -9,7 +9,6 @@ import torch.optim as optim
 from torch import tensor
 
 from neural_networks.device import device
-from neural_networks.GameOfLifeForward import gameOfLifeForward
 from utils.game import generate_random_board
 from utils.game import life_step
 
@@ -17,6 +16,9 @@ from utils.game import life_step
 def train(model, batch_size=25, l1=0, l2=0, timeout=0, reverse_input_output=False):
     print(f'Training: {model.__class__.__name__}')
     time_start = time.perf_counter()
+
+    atexit.register(model.save)      # save on exit - BrokenPipeError doesn't trigger finally:
+    model.load().train().unfreeze()  # enable training and dropout
 
     # NOTE: criterion loss function now defined via model.loss()
     optimizer = optim.RMSprop(model.parameters(), lr=0.01, momentum=0.9)
@@ -36,9 +38,6 @@ def train(model, batch_size=25, l1=0, l2=0, timeout=0, reverse_input_output=Fals
     )
 
 
-    model.load()
-    atexit.register(model.save)   # save on exit - BrokenPipeError doesn't trigger finally:
-    model.train()                 # enable dropout
     num_params = torch.sum(torch.tensor([
         torch.prod(torch.tensor(param.shape))
         for param in model.parameters()
@@ -58,20 +57,21 @@ def train(model, batch_size=25, l1=0, l2=0, timeout=0, reverse_input_output=Fals
             if timeout and timeout < time.perf_counter() - time_start:  break
             epoch_start = time.perf_counter()
 
-            dataset  = [ generate_random_board() for _ in range(batch_size) ]
-            expected = [ life_step(board)        for board in dataset ]
+            inputs_np   = [ generate_random_board() for _     in range(batch_size) ]
+            expected_np = [ life_step(board)        for board in inputs_np         ]
+            inputs      = model.cast_inputs(inputs_np).to(device)
+            expected    = model.cast_inputs(expected_np).to(device)
 
             # This is for GameOfLifeReverseOneStep() function, where we are trying to learn the reverse function
             if reverse_input_output:
-                dataset, expected = expected, dataset
-                assert np.all( life_step(expected[0]) == dataset[0] )
+                inputs_np, expected_np = expected_np, inputs_np
+                inputs,    expected    = expected,    inputs
+                assert np.all( life_step(expected_np[0]) == inputs_np[0] )
 
-            inputs   = model.cast_inputs([ board for board in dataset  ]).to(device)
-            labels   = model.cast_inputs([ board for board in expected ]).to(device)
 
             optimizer.zero_grad()
             outputs = model(inputs)
-            loss    = model.loss(outputs, labels)
+            loss    = model.loss(outputs, expected, inputs)
             if l1 or l2:
                 l1_loss = torch.sum(tensor([ torch.sum(torch.abs(param)) for param in model.parameters() ])) / num_params
                 l2_loss = torch.sum(tensor([ torch.sum(param**2)         for param in model.parameters() ])) / num_params
@@ -84,7 +84,7 @@ def train(model, batch_size=25, l1=0, l2=0, timeout=0, reverse_input_output=Fals
                 scheduler.step()
 
             # noinspection PyTypeChecker
-            last_accuracy = torch.sum( outputs.to(torch.bool) == labels.to(torch.bool) ).cpu().numpy() / np.prod(outputs.shape)
+            last_accuracy = model.accuracy(outputs, expected, inputs)  # torch.sum( outputs.to(torch.bool) == expected.to(torch.bool) ).cpu().numpy() / np.prod(outputs.shape)
             last_loss     = loss.item() / batch_size
 
             epoch_losses.append(last_loss)
@@ -114,7 +114,3 @@ def train(model, batch_size=25, l1=0, l2=0, timeout=0, reverse_input_output=Fals
         model.save()
         atexit.unregister(model.save)   # model now saved, so cancel atexit handler
         # model.eval()                  # disable dropout
-
-
-if __name__ == '__main__':
-    train(gameOfLifeForward)

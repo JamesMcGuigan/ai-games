@@ -1,4 +1,9 @@
+from __future__ import annotations
+
 import os
+from abc import ABCMeta
+from typing import List
+from typing import TypeVar
 from typing import Union
 
 import humanize
@@ -8,52 +13,105 @@ import torch.nn as nn
 
 from neural_networks.device import device
 
-
-# noinspection PyAbstractClass
-class GameOfLifeBase(nn.Module):
+# noinspection PyTypeChecker
+T = TypeVar('T', bound='GameOfLifeBase')
+class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
     """
     Base class for GameOfLife based NNs
-    Handles casting of inputs and model auto save/load functionality
+    Handles casting, save/autoload, and
     """
 
     def __init__(self):
         super().__init__()
         self.device    = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu")
         self.criterion = nn.MSELoss()
+        self.loaded    = False  # can't call sell.load() in constructor, as weights/layers have not been defined yet
 
-    ### Training Functionality
-    def loss(self, outputs, labels):
-        return self.criterion(outputs, labels)
+
+
+    ### Prediction
+
+    def __call__(self, *args, **kwargs) -> torch.Tensor:
+        if not self.loaded: self.load()
+        return super().__call__(*args, **kwargs)
+
+    def predict(self, inputs: Union[List[np.ndarray], np.ndarray, torch.Tensor]) -> np.ndarray:
+        """ Wrapper function around __call__() that returns a numpy int8 array for external usage """
+        outputs = self(inputs)
+        outputs = self.int(outputs).squeeze().cpu().numpy()
+        return outputs
+
+
+
+    ### Training
+
+    def loss(self, outputs, expected, input):
+        return self.criterion(outputs, expected)
+
+    def accuracy(self, outputs, expected, inputs) -> float:
+        # noinspection PyTypeChecker
+        return torch.sum( self.int(outputs) == self.int(expected) ).cpu().numpy() / np.prod(outputs.shape)
+
+
+
+    ### Freee / Unfreeze
+
+    def freeze(self: T) -> T:
+        for name, parameter in self.named_parameters():
+            parameter.requires_grad = False
+        return self
+
+    def unfreeze(self: T) -> T:
+        if not self.loaded: self.load()  # ensure
+        for name, parameter in self.named_parameters():
+            parameter.requires_grad = True
+        return self
+
+
 
     ### Load / Save Functionality
 
     @property
-    def filename(self):
+    def filename(self) -> str:
         return os.path.join( os.path.dirname(__file__), 'models', f'{self.__class__.__name__}.pth')
 
 
     # DOCS: https://pytorch.org/tutorials/beginner/saving_loading_models.html
-    def save(self):
+    def save(self: T) -> T:
         os.makedirs(os.path.dirname(self.filename), exist_ok=True)
         torch.save(self.state_dict(), self.filename)
         print(f'{self.__class__.__name__}.savefile(): {self.filename} = {humanize.naturalsize(os.path.getsize(self.filename))}')
+        return self
 
 
-    def load(self):
+    def load(self: T) -> T:
         if os.path.exists(self.filename):
-            # Ignore errors caused by model size mismatch
             try:
                 self.load_state_dict(torch.load(self.filename))
-                self.eval()
-                self.to(device)
                 print(f'{self.__class__.__name__}.load(): {self.filename} = {humanize.naturalsize(os.path.getsize(self.filename))}')
             except Exception as exception:
+                # Ignore errors caused by model size mismatch
                 print(f'{self.__class__.__name__}.load(): model has changed dimensions, discarding saved weights\n')
                 pass
 
+        self.loaded = True    # prevent any infinite if self.loaded loops
+        self.to(self.device)  # ensure all weights, either loaded or untrained are moved to GPU
+        self.eval()           # default to production mode - disable dropout
+        self.freeze()         # default to production mode - disable training
+        return self
 
 
-    ### Casting Functions
+
+    ### Casting
+
+    def bool(self, x: torch.Tensor) -> torch.Tensor:
+        # noinspection PyTypeChecker
+        return (x > 0.5)
+
+
+    def int(self, x: torch.Tensor) -> torch.Tensor:
+        return self.bool(x).to(torch.int8)
+
 
     def cast_to_tensor(self, x: Union[np.ndarray, torch.Tensor]) -> torch.Tensor:
         if torch.is_tensor(x):
@@ -70,7 +128,7 @@ class GameOfLifeBase(nn.Module):
     # DOCS: https://towardsdatascience.com/understanding-input-and-output-shapes-in-convolution-network-keras-f143923d56ca
     # pytorch requires:    contiguous_format = (batch_size, channels, height, width)
     # tensorflow requires: channels_last     = (batch_size, height, width, channels)
-    def cast_inputs(self, x):
+    def cast_inputs(self, x: Union[List[np.ndarray], np.ndarray, torch.Tensor]) -> torch.Tensor:
         x = self.cast_to_tensor(x)
         if len(x.shape) == 1:             # single row from dataframe
             x = x.view(1, 1, torch.sqrt(x.shape[0]), torch.sqrt(x.shape[0]))
@@ -84,13 +142,3 @@ class GameOfLifeBase(nn.Module):
         elif len(x.shape) == 4:
             pass  # already in (batch_size, channels, height, width) format, so do nothing
         return x
-
-
-    def cast_to_numpy(self, x: Union[np.ndarray, torch.Tensor], shape=(25,25)) -> np.ndarray:
-        if torch.is_tensor(x):
-            return self.cast_to_numpy( x.detach().numpy() )
-        elif isinstance(x, np.ndarray):
-            if len(x.shape) == 3: return x.reshape((-1, shape[0], shape[1]))
-            else:                 return x.reshape(shape)
-        else:
-            raise TypeError(f'{self.__class__.__name__}.cast_to_numpy() invalid type(x) = {type(x)}')

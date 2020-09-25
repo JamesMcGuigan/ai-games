@@ -57,6 +57,9 @@ def solve_board_delta1_loop(board: np.ndarray, delta: int, idx: int, timeout=0, 
         print(f'{idx:05d} | delta = {delta} | cells = {np.count_nonzero(board):3d} -> {np.count_nonzero(solution_3d):3d} | {message} {time_taken:6.1f}s')
     return solution_3d, idx, time_taken
 
+# alias solve_board_idx() as this is hardcoded into Kaggle notebooks
+solve_board_idx = solve_board_delta1_loop
+
 
 
 def solve_dataframe(

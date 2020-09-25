@@ -57,12 +57,13 @@ class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
     ### Freee / Unfreeze
 
     def freeze(self: T) -> T:
+        if not self.loaded: self.load()
         for name, parameter in self.named_parameters():
             parameter.requires_grad = False
         return self
 
     def unfreeze(self: T) -> T:
-        if not self.loaded: self.load()  # ensure
+        if not self.loaded: self.load()
         for name, parameter in self.named_parameters():
             parameter.requires_grad = True
         return self

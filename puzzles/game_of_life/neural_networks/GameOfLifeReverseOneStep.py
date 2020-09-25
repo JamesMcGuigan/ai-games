@@ -39,4 +39,5 @@ class GameOfLifeReverseOneStep(GameOfLifeBase):
 if __name__ == '__main__':
     # PYTHONUNBUFFERED=1 time python3 ./neural_networks/GameOfLifeReverseOneStep.py | tee ./neural_networks/models/GameOfLifeReverseOneStep.log
     from neural_networks.train import train
-    train(GameOfLifeReverseOneStep(), reverse_input_output=True)
+    model = GameOfLifeReverseOneStep()
+    train(model, reverse_input_output=True)

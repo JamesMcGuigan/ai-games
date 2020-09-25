@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from neural_networks.device import device
 from neural_networks.GameOfLifeBase import GameOfLifeBase
 
 
@@ -37,13 +36,7 @@ class GameOfLifeReverseOneStep(GameOfLifeBase):
 
 
 
-gameOfLifeReverseOneStep = GameOfLifeReverseOneStep()
-gameOfLifeReverseOneStep.to(device)
-gameOfLifeReverseOneStep.eval()      # disable dropout
-
-
 if __name__ == '__main__':
     # PYTHONUNBUFFERED=1 time python3 ./neural_networks/GameOfLifeReverseOneStep.py | tee ./neural_networks/models/GameOfLifeReverseOneStep.log
     from neural_networks.train import train
-
-    train(gameOfLifeReverseOneStep, reverse_input_output=True)
+    train(GameOfLifeReverseOneStep(), reverse_input_output=True)

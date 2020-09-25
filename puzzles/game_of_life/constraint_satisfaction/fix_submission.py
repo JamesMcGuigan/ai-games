@@ -16,10 +16,16 @@ from utils.util import numpy_to_series
 def is_valid_solution(start: np.ndarray, stop: np.ndarray, delta: int) -> bool:
     # we are rewriting data, so lets double check our work
     test_board = start
+    is_valid   = np.count_nonzero(test_board) != 0
     for t in range(delta):
         test_board = life_step(test_board)
-    is_valid = np.all( test_board == stop )
+        is_valid   = is_valid and np.count_nonzero(test_board) != 0
+    is_valid = is_valid and np.all(test_board == stop)
     return is_valid
+
+@njit
+def is_valid_solution_3d(solution_3d: np.ndarray) -> bool:
+    return is_valid_solution(solution_3d[0], solution_3d[-1], delta=len(solution_3d)-1)
 
 
 def fix_submission(max_offset=5):

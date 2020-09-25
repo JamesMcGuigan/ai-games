@@ -9,6 +9,7 @@ import pandas as pd
 from pathos.multiprocessing import ProcessPool
 
 from constraint_satisfaction.fix_submission import is_valid_solution
+from constraint_satisfaction.fix_submission import is_valid_solution_3d
 from constraint_satisfaction.z3_solver import game_of_life_solver
 from utils.datasets import submission_file
 from utils.datasets import test_df
@@ -22,8 +23,8 @@ from utils.util import csv_to_numpy
 from utils.util import numpy_to_dict
 
 
-# Parallel(n_jobs=n_jobs)([ delayed(solve_board_idx)(board, delta, idx) ])
-def solve_board_idx(board: np.ndarray, delta: int, idx: int, timeout=0, verbose=True) -> Tuple[np.ndarray, int, float]:
+# Parallel(n_jobs=n_jobs)([ delayed(solve_board_deltaN)(board, delta, idx) ])
+def solve_board_deltaN(board: np.ndarray, delta: int, idx: int, timeout=0, verbose=True) -> Tuple[np.ndarray, int, float]:
     time_start = time.perf_counter()
 
     z3_solver, t_cells, solution_3d = game_of_life_solver(board, delta, timeout=timeout, verbose=False)
@@ -33,6 +34,29 @@ def solve_board_idx(board: np.ndarray, delta: int, idx: int, timeout=0, verbose=
         message = "Solved! " if np.count_nonzero(solution_3d) else "unsolved"
         print(f'{idx:05d} | delta = {delta} | cells = {np.count_nonzero(board):3d} -> {np.count_nonzero(solution_3d):3d} | {message} {time_taken:6.1f}s')
     return solution_3d, idx, time_taken
+
+
+def solve_board_delta1_loop(board: np.ndarray, delta: int, idx: int, timeout=0, verbose=True) -> Tuple[np.ndarray, int, float]:
+    """
+    instead of trying to solve to delta=5 in one go, what if repeatedly try to solve for delta=1
+    turns out this can be significantly faster than trying to solve to delta=N in one go
+    """
+    time_start = time.perf_counter()
+
+    output = [ board ]
+    for t in range(delta):
+        z3_solver, t_cells, solution_3d = game_of_life_solver(board, delta=1, timeout=timeout, verbose=False)
+        board = solution_3d[0]
+        output.insert(0, board)
+    solution_3d = np.array(output)
+
+    time_taken = time.perf_counter() - time_start
+    if verbose:
+        is_valid = is_valid_solution(solution_3d[0], solution_3d[-1], delta)
+        message  = "Solved! " if is_valid else "unsolved"
+        print(f'{idx:05d} | delta = {delta} | cells = {np.count_nonzero(board):3d} -> {np.count_nonzero(solution_3d):3d} | {message} {time_taken:6.1f}s')
+    return solution_3d, idx, time_taken
+
 
 
 def solve_dataframe(
@@ -74,10 +98,10 @@ def solve_dataframe(
         timeouts = ( timeout * 0.99 - (time.perf_counter() - time_start) if timeout else 0  for _ in idxs )  # generator
         # NOTE: Z3 timeouts are inexact, but will hopefully occur just before the signal timeout
 
-        solution_idx_iter = pool.uimap(solve_board_idx, boards, deltas, idxs, timeouts)
+        solution_idx_iter = pool.uimap(solve_board_delta1_loop, boards, deltas, idxs, timeouts)
         for solution_3d, idx, time_taken in solution_idx_iter:
             total += 1
-            if np.count_nonzero(solution_3d) != 0:
+            if is_valid_solution_3d(solution_3d):
                 solved += 1
 
                 # Reread file, update and persist
@@ -152,16 +176,22 @@ if __name__ == '__main__':
         (test_df, 98979),  # delta = 4
         (test_df, 58057),  # delta = 5
         (test_df, 90081),  # delta = 1  | requires zero_point_distance = 2
+        (test_df, 99391),  # delta = 2 | cells = 151 | unsat in 745.9s
+        (test_df, 85291),  # delta = 5 | cells = 30  | unsat in 5805.4s
     ]:
         time_start = time.perf_counter()
         delta    = csv_to_delta(df, idx)
         board    = csv_to_numpy(df, idx, key='stop')
         expected = csv_to_numpy(df, idx, key='start')
+        # solution_3d, idx, time_taken = solve_board_delta1_loop(board, delta, idx, verbose=False)
         z3_solver, t_cells, solution_3d = game_of_life_solver(board, delta, verbose=False)
         time_taken = time.perf_counter() - time_start
-        is_valid   = is_valid_solution(solution_3d[0], board, delta)
-
+        is_valid   = is_valid_solution_3d(solution_3d)
         print(f'idx = {idx:5d} | delta = {delta} | cells = {np.count_nonzero(board):3d} -> {np.count_nonzero(solution_3d[0]):3d} | valid = {is_valid} | time = {time_taken:4.1f}s')
+
+        assert is_valid == is_valid_solution(solution_3d[0], solution_3d[-1], delta)
+        assert len(solution_3d) == delta + 1
+
         # plot_3d(solution_3d)
 
     # solve_dataframe(train_df, savefile=None)

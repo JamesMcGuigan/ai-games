@@ -1,3 +1,5 @@
+import atexit
+import gc
 import time
 from typing import List
 from typing import Union
@@ -110,7 +112,7 @@ class OuroborosLife(GameOfLifeBase):
 
 
     def loss_dataset(self, outputs, timeline, inputs):
-        dataset_loss = torch.mean(torch.mean(( (outputs-timeline)**2 ).flatten(1), dim=1))  # average MSE per timeframe
+        dataset_loss = torch.mean(torch.mean(( (timeline-outputs)**2 ).flatten(1), dim=1))  # average MSE per timeframe
         return dataset_loss
 
 
@@ -132,21 +134,23 @@ class OuroborosLife(GameOfLifeBase):
             reinput  = outputs[:,t1,:,:].unsqueeze(1)
             reoutput = self(reinput)
             t2_range = ( max(0, self.out_channels//2-t1), max(self.out_channels+1-t1, self.out_channels-1) )
-            for delta in range(-self.out_channels//2, self.out_channels//2+1):
-                t2 = t1 + delta
-                if not ( t2_range[0] <= t2 <= t2_range[1] ): continue  # invalid index
-                ouroboros_t1_loss_per_batch = pt.tensor([
-                    pt.mean( (outputs[b][t1] - reoutput[b][t2])**2 )
-                    for b in range(timeline.shape[0])
-                ], requires_grad=True)
-                ouroboros_losses.append( ouroboros_t1_loss_per_batch )
+            ouroboros_loss_per_timeline = []
+            for b in range(timeline.shape[0]):
+                for delta in range(-self.out_channels//2, self.out_channels//2+1):
+                    t2 = t1 + delta
+                    if not ( t2_range[0] <= t2 <= t2_range[1] ): continue  # invalid index
+                    ouroboros_loss_per_timeline.append(
+                        pt.mean( (timeline[b][t1] - reoutput[b][t2])**2 )
+                    )
+            ouroboros_losses += ouroboros_loss_per_timeline
 
-        ouroboros_loss = pt.mean(pt.cat(ouroboros_losses)).requires_grad_(True)
+        ouroboros_loss = pt.mean(pt.tensor(ouroboros_losses)).requires_grad_(True)
         return ouroboros_loss
 
 
     def accuracy(self, outputs, timeline, inputs) -> float:
         """ Count the number of 100% accuracy boards predicted """
+        # noinspection PyTypeChecker
         accuracies = pt.tensor([
             pt.all( outputs[b][t] == timeline[b][t] )
             for b in range(timeline.shape[0])
@@ -156,42 +160,60 @@ class OuroborosLife(GameOfLifeBase):
         return float(accuracy)
 
 
-    def fit(self, epochs=10000, batch_size=10, max_delta=10):
-        time_start  = time.perf_counter()
+    def fit(self, epochs=10000, batch_size=100, max_delta=10):
+        gc.collect()
+        torch.cuda.empty_cache()
+        atexit.register(model.save)
+        atexit.register(torch.cuda.empty_cache)
+        atexit.register(gc.collect)
         self.train()
         self.unfreeze()
+        try:
+            time_start  = time.perf_counter()
+            board_count = 0
+            for epoch in range(1, epochs+1):
+                epoch_start = time.perf_counter()
+                timelines_batch = np.array([
+                    life_step_3d(generate_random_board(), max_delta)
+                    for _ in range(batch_size)
+                ])
+                losses           = []
+                dataset_losses   = []
+                ouroboros_losses = []
+                accuracies       = []
+                d = self.out_channels // 2  # In theory this should work for 5 or 7 channels
+                for t in range(d, max_delta - d):
+                    inputs_np   = timelines_batch[:, np.newaxis, t,:,:]  # (batch_size=10, channels=1,  width=25, height=25)
+                    timeline_np = timelines_batch[:, t-d:t+d+1,    :,:]  # (batch_size=10, channels=10, width=25, height=25)
+                    inputs   = pt.tensor(inputs_np).to(self.device).to(pt.float32)
+                    timeline = pt.tensor(timeline_np).to(self.device).to(pt.float32)
 
-        board_count = 0
-        for epoch in range(1, epochs+1):
-            epoch_start = time.perf_counter()
-            timelines_batch = np.array([
-                life_step_3d(generate_random_board(), max_delta)
-                for _ in range(batch_size)
-            ])
-            losses     = []
-            accuracies = []
-            d = self.out_channels // 2  # In theory this should work for 5 or 7 channels
-            for t in range(d, max_delta - d):
-                inputs_np   = timelines_batch[:, np.newaxis, t,:,:]  # (batch_size=10, channels=1,  width=25, height=25)
-                timeline_np = timelines_batch[:, t-d:t+d+1,    :,:]  # (batch_size=10, channels=10, width=25, height=25)
-                inputs   = pt.tensor(inputs_np).to(self.device).to(pt.float32)
-                timeline = pt.tensor(timeline_np).to(self.device).to(pt.float32)
+                    self.optimizer.zero_grad()
+                    outputs  = self(inputs)
+                    accuracy = model.accuracy(outputs, timeline, inputs)  # torch.sum( outputs.to(torch.cast_bool) == expected.to(torch.cast_bool) ).cpu().numpy() / np.prod(outputs.shape)
+                    dataset_loss    = self.loss_dataset(outputs, timeline, inputs)
+                    ouroboros_loss  = self.loss_ouroboros(outputs, timeline, inputs)
+                    # loss            = dataset_loss + ouroboros_loss
+                    loss            = 2.0 / ( 1.0/dataset_loss + 1.0/ouroboros_loss )
+                    loss.backward()
+                    self.optimizer.step()
+                    self.scheduler.step()
 
-                self.optimizer.zero_grad()
-                outputs  = self(inputs)
-                accuracy = model.accuracy(outputs, timeline, inputs)  # torch.sum( outputs.to(torch.cast_bool) == expected.to(torch.cast_bool) ).cpu().numpy() / np.prod(outputs.shape)
-                loss     = self.loss(outputs, timeline, inputs)
-                loss.backward()
-                self.optimizer.step()
-                self.scheduler.step()
+                    board_count += 1
+                    losses.append(float(loss))
+                    dataset_losses.append(float(dataset_loss))
+                    ouroboros_losses.append(float(ouroboros_loss))
+                    accuracies.append(accuracy)
 
-                board_count += 1
-                losses.append(float(loss))
-                accuracies.append(accuracy)
-
-            epoch_time = time.perf_counter() - epoch_start
-            print(f'epoch: {epoch:4d} | board_count: {board_count:5d} | loss: {np.mean(losses):.10f} | accuracy = {np.mean(accuracies):.10f} | time: {epoch_time:3.0f}s {1000*epoch_time/batch_size:.3f}ms/board')
-        time_taken = time.perf_counter() - time_start
+                epoch_time = time.perf_counter() - epoch_start
+                print(f'epoch: {epoch:4d} | boards: {board_count:5d} | loss: {np.mean(losses):.8f} | dataset: {np.mean(dataset_losses):.8f} | ouroboros: {np.mean(ouroboros_losses):.8f} | accuracy = {np.mean(accuracies):.8f} | time: {1000*epoch_time/batch_size:.3f}ms/board')
+            time_taken = time.perf_counter() - time_start
+        except KeyboardInterrupt: pass
+        finally:
+            model.save()
+            atexit.unregister(model.save)
+            torch.cuda.empty_cache()
+            gc.collect()
 
 
 if __name__ == '__main__':

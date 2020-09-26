@@ -101,7 +101,7 @@ def game_of_life_solver(board: np.ndarray, delta=1, warmup=0, timeout=0, verbose
     ])
     z3_solver.push()
 
-    for zero_point_distance in [1,2,0]:
+    for zero_point_distance in [1,2]:
         z3_solver.pop()
         add_zero_point_constraint(z3_solver, t_cells, zero_point_distance)
         z3_solver.push()

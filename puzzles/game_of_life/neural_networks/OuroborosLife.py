@@ -44,7 +44,9 @@ class OuroborosLife(GameOfLifeBase):
             self.conv_block(512, 256),
             self.conv_block(256, 128),
             self.conv_block(128,  64),
-            self.conv_block( 64,  out_channels, output=True),
+            self.conv_block( 64,  32),
+            self.conv_block( 32,  16),
+            self.conv_block( 16,  out_channels, output=True),
         ])
 
         # self.criterion = nn.BCELoss()
@@ -177,8 +179,6 @@ class OuroborosLife(GameOfLifeBase):
         gc.collect()
         torch.cuda.empty_cache()
         atexit.register(model.save)
-        atexit.register(torch.cuda.empty_cache)
-        atexit.register(gc.collect)
         self.train()
         self.unfreeze()
         try:
@@ -220,7 +220,7 @@ class OuroborosLife(GameOfLifeBase):
                     torch.cuda.empty_cache()
 
                 epoch_time = time.perf_counter() - epoch_start
-                print(f'epoch: {epoch:4d} | boards: {board_count:5d} | loss: {np.mean(losses):.8f} | dataset: {np.mean(dataset_losses):.8f} | ouroboros: {np.mean(ouroboros_losses):.8f} | accuracy = {np.mean(accuracies):.8f} | time: {1000*epoch_time/batch_size:.3f}ms/board')
+                print(f'epoch: {epoch:4d} | boards: {board_count:5d} | loss: {np.mean(losses):.6f} | dataset: {np.mean(dataset_losses):.6f} | ouroboros: {np.mean(ouroboros_losses):.6f} | accuracy = {np.mean(accuracies):.6f} | time: {1000*epoch_time/batch_size:.3f}ms/board')
             time_taken = time.perf_counter() - time_start
         except KeyboardInterrupt: pass
         finally:

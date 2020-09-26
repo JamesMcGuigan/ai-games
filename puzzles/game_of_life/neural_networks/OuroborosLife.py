@@ -9,6 +9,7 @@ import torch
 import torch as pt
 import torch.nn as nn
 
+from neural_networks.FocalLoss import FocalLoss
 from neural_networks.GameOfLifeBase import GameOfLifeBase
 from utils.game import generate_random_board
 from utils.game import life_step_3d
@@ -33,28 +34,27 @@ class OuroborosLife(GameOfLifeBase):
         self.in_channels  = in_channels
         self.out_channels = out_channels  # Past, Present and Future
 
-        self.relu     = nn.LeakyReLU()
+        self.relu = nn.LeakyReLU()
 
         # 2**9 = 512 filters and kernel size of 3x3 to allow for full encoding of game rules
+        # Pixels can see distance 5 neighbours, (hopefully) sufficient for delta=2 timesteps or out_channels=5
         # https://www.youtube.com/watch?v=H3g26EVADgY&feature=youtu.be&t=1h39m410s&ab_channel=JeremyHoward
         self.cnn_layers = nn.ModuleList([
             self.conv_block(self.in_channels, 512, kernel_size=(3,3)),
             self.conv_block(512, 256),
             self.conv_block(256, 128),
             self.conv_block(128,  64),
-            self.conv_block( 64,  32),
-            self.conv_block( 32,  16),
-            self.conv_block( 16,  self.out_channels, output=True),
+            self.conv_block( 64,  out_channels, output=True),
         ])
 
         # self.criterion = nn.BCELoss()
-        self.criterion = nn.MSELoss()
+        self.criterion = FocalLoss()
         self.optimizer = pt.optim.RMSprop(self.parameters(), lr=0.01, momentum=0.9)
         self.scheduler = torch.optim.lr_scheduler.CyclicLR(
             self.optimizer,
             max_lr=1,
             base_lr=1e-3,
-            step_size_up=250,
+            step_size_up=100,
             mode='exp_range',
             gamma=0.8
         )
@@ -107,11 +107,18 @@ class OuroborosLife(GameOfLifeBase):
         arithmetic_mean = ( dataset_loss + ouroboros_loss ) / 2.0
         geometric_mean  = ( dataset_loss * ouroboros_loss ) ** (1/2)
         harmonic_mean   = 2.0 / ( 1.0/dataset_loss + 1.0/ouroboros_loss )
-        return arithmetic_mean
+        return harmonic_mean
 
 
     def loss_dataset(self, outputs, timeline, inputs):
-        dataset_loss = torch.mean(torch.mean(( (timeline-outputs)**2 ).flatten(1), dim=1))  # average MSE per timeframe
+        # dataset_loss = torch.mean(torch.mean(( (timeline-outputs)**2 ).flatten(1), dim=1))  # average MSE per timeframe
+
+        # FocalLoss(outputs, target) need to be in correct order
+        dataset_loss = torch.mean(torch.tensor([
+            self.criterion(outputs[b][t], timeline[b][t])
+            for b in range(timeline.shape[0])
+            for t in range(timeline.shape[1])
+        ], requires_grad=True))
         return dataset_loss
 
 
@@ -139,7 +146,8 @@ class OuroborosLife(GameOfLifeBase):
                     t2 = t1 + delta
                     if not ( t2_range[0] <= t2 <= t2_range[1] ): continue  # invalid index
                     ouroboros_loss_per_timeline.append(
-                        pt.mean( (timeline[b][t1] - reoutput[b][t2])**2 )
+                        # pt.mean( (timeline[b][t1] - reoutput[b][t2])**2 )
+                        self.criterion(reoutput[b][t2], timeline[b][t1])
                     )
             ouroboros_losses += ouroboros_loss_per_timeline
 
@@ -156,7 +164,7 @@ class OuroborosLife(GameOfLifeBase):
             for t in range(timeline.shape[1])
         ])
         accuracy = pt.mean(accuracies.to(pt.float))
-        return float(accuracy)
+        return accuracy.detach().item()
 
 
     def fit(self, epochs=10000, batch_size=25, max_delta=10):
@@ -189,7 +197,7 @@ class OuroborosLife(GameOfLifeBase):
 
                     self.optimizer.zero_grad()
                     outputs  = self(inputs)
-                    accuracy = model.accuracy(outputs, timeline, inputs)  # torch.sum( outputs.to(torch.cast_bool) == expected.to(torch.cast_bool) ).cpu().numpy() / np.prod(outputs.shape)
+                    accuracy        = model.accuracy(outputs, timeline, inputs)  # torch.sum( outputs.to(torch.cast_bool) == expected.to(torch.cast_bool) ).cpu().numpy() / np.prod(outputs.shape)
                     dataset_loss    = self.loss_dataset(outputs, timeline, inputs)
                     ouroboros_loss  = self.loss_ouroboros(outputs, timeline, inputs)
                     # loss            = dataset_loss + ouroboros_loss

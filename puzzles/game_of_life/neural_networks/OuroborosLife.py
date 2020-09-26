@@ -34,7 +34,6 @@ class OuroborosLife(GameOfLifeBase):
         self.out_channels = out_channels  # Past, Present and Future
 
         self.relu     = nn.LeakyReLU()
-        self.dropout  = nn.Dropout(p=0.2, inplace=True)
 
         # 2**9 = 512 filters and kernel size of 3x3 to allow for full encoding of game rules
         # https://www.youtube.com/watch?v=H3g26EVADgY&feature=youtu.be&t=1h39m410s&ab_channel=JeremyHoward

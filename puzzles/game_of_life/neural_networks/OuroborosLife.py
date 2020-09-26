@@ -80,6 +80,12 @@ class OuroborosLife(GameOfLifeBase):
         )
 
 
+    @property
+    def filename(self) -> str:
+        """ ./models/OuroborosLife3.pth || ./models/OuroborosLife5.pth """
+        return super().filename.replace('.pth', f'{self.out_channels}.pth')
+
+
     # DOCS: https://towardsdatascience.com/understanding-input-and-output-shapes-in-convolution-network-keras-f143923d56ca
     # pytorch requires:    contiguous_format = (batch_size, channels, height, width)
     # tensorflow requires: channels_last     = (batch_size, height, width, channels)

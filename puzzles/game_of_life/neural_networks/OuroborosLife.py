@@ -26,7 +26,7 @@ class OuroborosLife(GameOfLifeBase):
     The loss function computes the loss against the original training data, but also feeds back in upon itself.
     The output for Future is fed back in and it's Past is compared with the Present, likewise in reverse with the Paspt.
     """
-    def __init__(self, in_channels=1, out_channels=5):
+    def __init__(self, in_channels=1, out_channels=3):
         assert out_channels % 2 == 1, f'{self.__class__.__name__}(out_channels={out_channels}) must be odd'
 
         super().__init__()
@@ -160,7 +160,7 @@ class OuroborosLife(GameOfLifeBase):
         return float(accuracy)
 
 
-    def fit(self, epochs=10000, batch_size=100, max_delta=10):
+    def fit(self, epochs=10000, batch_size=25, max_delta=10):
         gc.collect()
         torch.cuda.empty_cache()
         atexit.register(model.save)
@@ -200,10 +200,11 @@ class OuroborosLife(GameOfLifeBase):
                     self.scheduler.step()
 
                     board_count += 1
-                    losses.append(float(loss))
-                    dataset_losses.append(float(dataset_loss))
-                    ouroboros_losses.append(float(ouroboros_loss))
+                    losses.append(loss.detach().item())
+                    dataset_losses.append(dataset_loss.detach().item())
+                    ouroboros_losses.append(ouroboros_loss.detach().item())
                     accuracies.append(accuracy)
+                    torch.cuda.empty_cache()
 
                 epoch_time = time.perf_counter() - epoch_start
                 print(f'epoch: {epoch:4d} | boards: {board_count:5d} | loss: {np.mean(losses):.8f} | dataset: {np.mean(dataset_losses):.8f} | ouroboros: {np.mean(ouroboros_losses):.8f} | accuracy = {np.mean(accuracies):.8f} | time: {1000*epoch_time/batch_size:.3f}ms/board')

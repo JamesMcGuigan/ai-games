@@ -13,12 +13,13 @@ from utils.game import generate_random_board
 from utils.game import life_step
 
 
-def train(model, batch_size=25, l1=0, l2=0, timeout=0, reverse_input_output=False):
+def train(model, batch_size=1, l1=0, l2=0, timeout=0, reverse_input_output=False):
     print(f'Training: {model.__class__.__name__}')
     time_start = time.perf_counter()
 
     atexit.register(model.save)      # save on exit - BrokenPipeError doesn't trigger finally:
     model.load().train().unfreeze()  # enable training and dropout
+    print(model)
 
     # NOTE: criterion loss function now defined via model.loss()
     optimizer = optim.RMSprop(model.parameters(), lr=0.01, momentum=0.9)
@@ -51,22 +52,32 @@ def train(model, batch_size=25, l1=0, l2=0, timeout=0, reverse_input_output=Fals
     loop_count   = 0
     epoch_losses     = [last_loss]
     epoch_accuracies = [ 0 ]
+
+    inputs_np   = [ generate_random_board(shape=(5,5)) for _     in range(batch_size) ]
+    expected_np = [ life_step(board)        for board in inputs_np         ]
+
     try:
         for epoch in range(1, sys.maxsize):
-            if np.min(epoch_accuracies[-10000//batch_size:]) == 1.0:    break  # multiple epochs of 100% accuracy to pass
+            if np.min(epoch_accuracies[-100_000//batch_size:]) == 1.0:    break  # multiple epochs of 100% accuracy to pass
             if timeout and timeout < time.perf_counter() - time_start:  break
             epoch_start = time.perf_counter()
 
-            inputs_np   = [ generate_random_board() for _     in range(batch_size) ]
-            expected_np = [ life_step(board)        for board in inputs_np         ]
+            # inputs_np   = [ generate_random_board() for _     in range(batch_size) ]
+            # expected_np = [ life_step(board)        for board in inputs_np         ]
             inputs      = model.cast_inputs(inputs_np).to(device)
             expected    = model.cast_inputs(expected_np).to(device)
 
             # This is for GameOfLifeReverseOneStep() function, where we are trying to learn the reverse function
             if reverse_input_output:
-                inputs_np, expected_np = expected_np, inputs_np
+                # inputs_np, expected_np = expected_np, inputs_np
                 inputs,    expected    = expected,    inputs
-                assert np.all( life_step(expected_np[0]) == inputs_np[0] )
+                # assert np.all( life_step(expected_np[0]) == inputs_np[0] )
+
+            # trainloader = DataLoader(list(zip(inputs_np, expected_np)), batch_size=100, shuffle=True)
+            # lr_finder = LRFinder(model, optimizer, model.criterion, device="cuda")
+            # lr_finder.range_test(trainloader, end_lr=100, num_iter=100)
+            # lr_finder.plot() # to inspect the loss-learning rate graph
+            # lr_finder.reset() # to reset the model and optimizer to their initial state
 
 
             optimizer.zero_grad()
@@ -85,7 +96,7 @@ def train(model, batch_size=25, l1=0, l2=0, timeout=0, reverse_input_output=Fals
 
             # noinspection PyTypeChecker
             last_accuracy = model.accuracy(outputs, expected, inputs)  # torch.sum( outputs.to(torch.bool) == expected.to(torch.bool) ).cpu().numpy() / np.prod(outputs.shape)
-            last_loss     = loss.item() / batch_size
+            last_loss     = loss.item() # / batch_size
 
             epoch_losses.append(last_loss)
             epoch_accuracies.append( last_accuracy )
@@ -97,7 +108,8 @@ def train(model, batch_size=25, l1=0, l2=0, timeout=0, reverse_input_output=Fals
             epoch_time   = time.perf_counter() - epoch_start
 
             # Print statistics after each epoch
-            if board_count % 10_000 == 0:
+            # if board_count % 1_000 == 0:
+            if epoch % 1 == 0:
                 print(f'epoch: {epoch:4d} | board_count: {board_count:5d} | loss: {loop_loss/loop_count:.10f} | accuracy = {loop_acc/loop_count:.10f} | time: {1000*epoch_time/batch_size:.3f}ms/board')
                 loop_loss  = 0
                 loop_acc   = 0

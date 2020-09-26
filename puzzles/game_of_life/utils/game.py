@@ -81,28 +81,28 @@ def life_step_delta(board: np.ndarray, delta):
     return board
 
 
-@njit
 def life_step_3d(board: np.ndarray, delta):
-    solution_3d = [ board ]
+    solution_3d = np.array([ board ], dtype=np.int8)
     for t in range(delta):
-        board = life_step(board)
-        solution_3d.append(board)
-    return np.array(solution_3d)
+        board       = life_step(board)
+        solution_3d = np.append( solution_3d, [ board ], axis=0)
+    return solution_3d
 
 
 # RULES: https://www.kaggle.com/c/conway-s-reverse-game-of-life/data
-def generate_random_board():
+def generate_random_board(shape=(25,25)):
     # An initial board was chosen by filling the board with a random density between 1% full (mostly zeros) and 99% full (mostly ones).
     # DOCS: https://cmdlinetips.com/2019/02/how-to-create-random-sparse-matrix-of-specific-density/
     density = np.random.random() * 0.98 + 0.01
-    board   = scipy.sparse.random(25, 25, density=density, data_rvs=np.ones).toarray()
+    board   = scipy.sparse.random(*shape, density=density, data_rvs=np.ones).toarray().astype(np.int8)
 
     # The starting board's state was recorded after the 5 "warmup steps". These are the values in the start variables.
     for t in range(5):
         board = life_step(board)
-        if np.count_nonzero(board) == 0: return generate_random_board()  # exclude empty boards and try again
+        if np.count_nonzero(board) == 0:
+            return generate_random_board(shape)  # exclude empty boards and try again
     return board
 
-def generate_random_boards(count):
-    generated_boards = Parallel(-1)( delayed(generate_random_board)() for _ in range(count) )
+def generate_random_boards(count, shape=(25,25)):
+    generated_boards = Parallel(-1)( delayed(generate_random_board)(shape) for _ in range(count) )
     return generated_boards

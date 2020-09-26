@@ -23,10 +23,9 @@ class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
 
     def __init__(self):
         super().__init__()
+        self.loaded    = False  # can't call sell.load() in constructor, as weights/layers have not been defined yet
         self.device    = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu")
         self.criterion = nn.MSELoss()
-        self.loaded    = False  # can't call sell.load() in constructor, as weights/layers have not been defined yet
-
 
 
     ### Prediction
@@ -38,7 +37,7 @@ class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
     def predict(self, inputs: Union[List[np.ndarray], np.ndarray, torch.Tensor]) -> np.ndarray:
         """ Wrapper function around __call__() that returns a numpy int8 array for external usage """
         outputs = self(inputs)
-        outputs = self.int(outputs).squeeze().cpu().numpy()
+        outputs = self.cast_int(outputs).squeeze().cpu().numpy()
         return outputs
 
 
@@ -50,7 +49,7 @@ class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
 
     def accuracy(self, outputs, expected, inputs) -> float:
         # noinspection PyTypeChecker
-        return torch.sum( self.int(outputs) == self.int(expected) ).cpu().numpy() / np.prod(outputs.shape)
+        return torch.sum(self.cast_int(outputs) == self.cast_int(expected)).cpu().numpy() / np.prod(outputs.shape)
 
 
 
@@ -105,18 +104,20 @@ class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
 
     ### Casting
 
-    def bool(self, x: torch.Tensor) -> torch.Tensor:
+    def cast_bool(self, x: torch.Tensor) -> torch.Tensor:
         # noinspection PyTypeChecker
         return (x > 0.5)
 
+    def cast_int(self, x: torch.Tensor) -> torch.Tensor:
+        return self.cast_bool(x).to(torch.int8)
 
-    def int(self, x: torch.Tensor) -> torch.Tensor:
-        return self.bool(x).to(torch.int8)
+    def cast_int_float(self, x: torch.Tensor) -> torch.Tensor:
+        return self.cast_bool(x).to(torch.float32).requires_grad_(True)
 
 
     def cast_to_tensor(self, x: Union[np.ndarray, torch.Tensor]) -> torch.Tensor:
         if torch.is_tensor(x):
-            return x.to(device)
+            return x.to(torch.float32).to(device)
         if isinstance(x, list):
             x = np.array(x)
         if isinstance(x, np.ndarray):
@@ -131,15 +132,15 @@ class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
     # tensorflow requires: channels_last     = (batch_size, height, width, channels)
     def cast_inputs(self, x: Union[List[np.ndarray], np.ndarray, torch.Tensor]) -> torch.Tensor:
         x = self.cast_to_tensor(x)
-        if len(x.shape) == 1:             # single row from dataframe
+        if x.dim() == 1:             # single row from dataframe
             x = x.view(1, 1, torch.sqrt(x.shape[0]), torch.sqrt(x.shape[0]))
-        elif len(x.shape) == 2:
+        elif x.dim() == 2:
             if x.shape[0] == x.shape[1]:  # single 2d board
                 x = x.view(1, 1, x.shape[0], x.shape[1])
             else: # rows of flattened boards
                 x = x.view(-1, 1, torch.sqrt(x.shape[1]), torch.sqrt(x.shape[1]))
-        elif len(x.shape) == 3:                                 # numpy  == (batch_size, height, width)
+        elif x.dim() == 3:                                 # numpy  == (batch_size, height, width)
             x = x.view(x.shape[0], 1, x.shape[1], x.shape[2])   # x.shape = (batch_size, channels, height, width)
-        elif len(x.shape) == 4:
+        elif x.dim() == 4:
             pass  # already in (batch_size, channels, height, width) format, so do nothing
         return x

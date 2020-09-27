@@ -101,7 +101,7 @@ def solve_dataframe(
         timeouts = ( timeout * 0.99 - (time.perf_counter() - time_start) if timeout else 0  for _ in idxs )  # generator
         # NOTE: Z3 timeouts are inexact, but will hopefully occur just before the signal timeout
 
-        solution_idx_iter = pool.uimap(solve_board_delta1_loop, boards, deltas, idxs, timeouts)
+        solution_idx_iter = pool.uimap(solve_board_deltaN, boards, deltas, idxs, timeouts)
         for solution_3d, idx, time_taken in solution_idx_iter:
             total += 1
             if is_valid_solution_3d(solution_3d):
@@ -186,8 +186,8 @@ if __name__ == '__main__':
         delta    = csv_to_delta(df, idx)
         board    = csv_to_numpy(df, idx, key='stop')
         expected = csv_to_numpy(df, idx, key='start')
-        # solution_3d, idx, time_taken = solve_board_delta1_loop(board, delta, idx, verbose=False)
-        z3_solver, t_cells, solution_3d = game_of_life_solver(board, delta, verbose=False)
+        solution_3d, idx, time_taken = solve_board_delta1_loop(board, delta, idx, verbose=False)
+        # z3_solver, t_cells, solution_3d = game_of_life_solver(board, delta, verbose=False)
         time_taken = time.perf_counter() - time_start
         is_valid   = is_valid_solution_3d(solution_3d)
         print(f'idx = {idx:5d} | delta = {delta} | cells = {np.count_nonzero(board):3d} -> {np.count_nonzero(solution_3d[0]):3d} | valid = {is_valid} | time = {time_taken:4.1f}s')

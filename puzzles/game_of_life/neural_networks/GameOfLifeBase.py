@@ -18,7 +18,7 @@ T = TypeVar('T', bound='GameOfLifeBase')
 class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
     """
     Base class for GameOfLife based NNs
-    Handles casting, save/autoload, and
+    Handles: save/autoload, freeze/unfreeze, casting between data formats, and training loop functions
     """
 
     def __init__(self):
@@ -31,7 +31,7 @@ class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
     ### Prediction
 
     def __call__(self, *args, **kwargs) -> torch.Tensor:
-        if not self.loaded: self.load()
+        if not self.loaded: self.load()  # autoload on first function call
         return super().__call__(*args, **kwargs)
 
     def predict(self, inputs: Union[List[np.ndarray], np.ndarray, torch.Tensor]) -> np.ndarray:

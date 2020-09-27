@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import traceback
 from typing import Tuple
@@ -24,7 +25,7 @@ from utils.util import numpy_to_dict
 
 
 # Parallel(n_jobs=n_jobs)([ delayed(solve_board_deltaN)(board, delta, idx) ])
-def solve_board_deltaN(board: np.ndarray, delta: int, idx: int, timeout=0, verbose=True) -> Tuple[np.ndarray, int, float]:
+def solve_board_idx(board: np.ndarray, delta: int, idx: int, timeout=0, verbose=True) -> Tuple[np.ndarray, int, float]:
     time_start = time.perf_counter()
 
     z3_solver, t_cells, solution_3d = game_of_life_solver(board, delta, timeout=timeout, verbose=False)
@@ -56,10 +57,6 @@ def solve_board_delta1_loop(board: np.ndarray, delta: int, idx: int, timeout=0, 
         message  = "Solved! " if is_valid else "unsolved"
         print(f'{idx:05d} | delta = {delta} | cells = {np.count_nonzero(board):3d} -> {np.count_nonzero(solution_3d):3d} | {message} {time_taken:6.1f}s')
     return solution_3d, idx, time_taken
-
-# alias solve_board_idx() as this is hardcoded into Kaggle notebooks
-solve_board_idx = solve_board_delta1_loop
-
 
 
 def solve_dataframe(
@@ -101,7 +98,7 @@ def solve_dataframe(
         timeouts = ( timeout * 0.99 - (time.perf_counter() - time_start) if timeout else 0  for _ in idxs )  # generator
         # NOTE: Z3 timeouts are inexact, but will hopefully occur just before the signal timeout
 
-        solution_idx_iter = pool.uimap(solve_board_deltaN, boards, deltas, idxs, timeouts)
+        solution_idx_iter = pool.uimap(solve_board_idx, boards, deltas, idxs, timeouts)
         for solution_3d, idx, time_taken in solution_idx_iter:
             total += 1
             if is_valid_solution_3d(solution_3d):
@@ -127,11 +124,8 @@ def solve_dataframe(
             if timeout   and timeout   <= time.perf_counter() - time_start: raise TimeoutError()
     except (KeyboardInterrupt, EOFError, TimeoutError): pass
     except Exception as exception:
-         print('Exception: solve_dataframe()')
-         print(exception)
-         traceback.print_stack()
-         print(repr(traceback.extract_stack()))
-         print(repr(traceback.format_stack()))
+         print('Exception: solve_dataframe(): ', exception)
+         traceback.print_exception(*sys.exc_info())
     finally:
         time_taken = time.perf_counter() - time_start
         percentage = (100 * solved / total) if total else 0
@@ -171,14 +165,14 @@ if __name__ == '__main__':
     #     idx = 58057 | delta = 5 | cells =   4 ->  85 | valid = True | time = 228.9s
     #     idx = 90081 | delta = 1 | cells = 130 -> 213 | valid = True | time = 16.4s
     for df, idx in [
-        (train_df, 0),     # delta = 3
-        (train_df, 4),     # delta = 1
-        (test_df, 50002),  # delta = 1
-        (test_df, 50024),  # delta = 2
-        (test_df, 50022),  # delta = 3
-        (test_df, 98979),  # delta = 4
-        (test_df, 58057),  # delta = 5
-        (test_df, 90081),  # delta = 1  | requires zero_point_distance = 2
+        # (train_df, 0),     # delta = 3
+        # (train_df, 4),     # delta = 1
+        # (test_df, 50002),  # delta = 1
+        # (test_df, 50024),  # delta = 2
+        # (test_df, 50022),  # delta = 3
+        # (test_df, 98979),  # delta = 4
+        # (test_df, 58057),  # delta = 5
+        (test_df, 90081),  # delta = 1 | requires zero_point_distance = 2
         (test_df, 99391),  # delta = 2 | cells = 151 | unsat in 745.9s
         (test_df, 85291),  # delta = 5 | cells = 30  | unsat in 5805.4s
     ]:
@@ -186,8 +180,8 @@ if __name__ == '__main__':
         delta    = csv_to_delta(df, idx)
         board    = csv_to_numpy(df, idx, key='stop')
         expected = csv_to_numpy(df, idx, key='start')
-        solution_3d, idx, time_taken = solve_board_delta1_loop(board, delta, idx, verbose=False)
-        # z3_solver, t_cells, solution_3d = game_of_life_solver(board, delta, verbose=False)
+        # solution_3d, idx, time_taken = solve_board_delta1_loop(board, delta, idx, verbose=False)
+        z3_solver, t_cells, solution_3d = game_of_life_solver(board, delta, verbose=False)
         time_taken = time.perf_counter() - time_start
         is_valid   = is_valid_solution_3d(solution_3d)
         print(f'idx = {idx:5d} | delta = {delta} | cells = {np.count_nonzero(board):3d} -> {np.count_nonzero(solution_3d[0]):3d} | valid = {is_valid} | time = {time_taken:4.1f}s')

@@ -12,4 +12,4 @@ from utils.datasets import submission_file
 from utils.datasets import test_df
 
 if __name__ == '__main__':
-    solve_dataframe(test_df, savefile=submission_file, modulo=(10, 0), sort_cells="reverse")
+    solve_dataframe(test_df, savefile=submission_file, modulo=(10, 0), sort_delta=False)

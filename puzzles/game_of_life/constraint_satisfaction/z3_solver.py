@@ -11,11 +11,11 @@ from fastcache._lrucache import clru_cache
 from constraint_satisfaction.fix_submission import is_valid_solution
 
 
-def game_of_life_ruleset(size=(25,25), delta=1, warmup=0, zero_point_distance=1):
+def game_of_life_ruleset(size=(25,25), delta=1, max_t=0, z3_solver=None, t_cells=None):
 
     # Create a 25x25 board for each timestep we need to solve for
     # T=0 for start_time, T=delta-1 for stop_time
-    max_t = warmup + delta  # BUGFIX: delta not delta-1 | see fix_submission()
+    max_t = max_t or delta  # BUGFIX: delta not delta-1 | see fix_submission()
     size_x, size_y = size
     t_cells = [
         [
@@ -23,15 +23,16 @@ def game_of_life_ruleset(size=(25,25), delta=1, warmup=0, zero_point_distance=1)
             for x in range(size_x)
         ]
         for t in range(0, max_t+1)
-    ]
-    z3_solver = z3.Solver()  # create a solver instance
+    ] if t_cells is None else t_cells
+    z3_solver = z3.Solver() if z3_solver is None else z3_solver  # create a solver instance
 
     # Rules expressed forwards:
     # living + 4-8 neighbours = dies
     # living + 2-3 neighbours = lives
     # living + 0-1 neighbour  = dies
     # dead   +   3 neighbours = lives
-    for t in range(1, max_t+1):
+    for t in range(max_t, max_t-delta, -1):  # loop backwards in time as max_t not always equals delta
+        assert t >= 1
         for x,y in itertools.product(range(size_x), range(size_y)):
             cell            = t_cells[t][x][y]
             past_cell       = t_cells[t-1][x][y]
@@ -76,9 +77,15 @@ def add_zero_point_constraint(z3_solver, t_cells, zero_point_distance: int):
     return z3_solver
 
 
+
+def game_of_life_solver(board: np.ndarray, delta=1, timeout=0, verbose=True):
+    return game_of_life_solver_iterative_delta(board=board, delta=delta, timeout=timeout, verbose=verbose)
+
+
+
 # The true kaggle solution requires warmup=5, but this is very slow to compute
 # noinspection PyUnboundLocalVariable
-def game_of_life_solver(board: np.ndarray, delta=1, warmup=0, timeout=0, verbose=True):
+def game_of_life_solver_full_delta(board: np.ndarray, delta=1, timeout=0, verbose=True):
     time_start = time.perf_counter()
     size       = (size_x, size_y) = board.shape
 
@@ -87,8 +94,7 @@ def game_of_life_solver(board: np.ndarray, delta=1, warmup=0, timeout=0, verbose
     # NOTE:   zero_point_distance=3 results in another 2-6x slowdown (but in rare cases can be quicker)
     z3_solver, t_cells = game_of_life_ruleset(
         size=size,
-        delta=delta,
-        warmup=warmup,
+        delta=1,
     )
     # This is a safety catch to prevent timeouts when running in Kaggle notebooks
     if timeout:
@@ -107,7 +113,7 @@ def game_of_life_solver(board: np.ndarray, delta=1, warmup=0, timeout=0, verbose
         z3_solver.push()
 
         # if z3_solver.check() != z3.sat: print('Unsolvable!')
-        solution_3d = solver_to_numpy_3d(z3_solver, t_cells[warmup:])  # calls z3_solver.check()
+        solution_3d = solver_to_numpy_3d(z3_solver, t_cells)  # calls z3_solver.check()
         time_taken  = time.perf_counter() - time_start
 
         # Validate that forward play matches backwards solution
@@ -118,6 +124,88 @@ def game_of_life_solver(board: np.ndarray, delta=1, warmup=0, timeout=0, verbose
     else:
         if verbose: print(f'game_of_life_solver() - took: {time_taken:6.1f}s | unsolved')
     return z3_solver, t_cells, solution_3d
+
+
+
+def game_of_life_solver_iterative_delta(board: np.ndarray, delta=1, timeout=0, max_backtracks=0, verbose=True):
+    """
+    Here we attempt to ask z3 to solve the board each delta at a time, rather than all in one go
+    Hopefully this should be significantly quicker for large deltas
+    """
+    time_start = time.perf_counter()
+    size       = (size_x, size_y) = board.shape
+
+    # Create an initial solver
+    z3_solver, t_cells = game_of_life_ruleset(size=size, delta=0, max_t=delta)
+
+    # Add constraints for T=delta-1 the problem defined in the input board
+    z3_solver.add([
+        t_cells[-1][x][y] == bool(board[x][y])
+        for x,y in itertools.product(range(size_x), range(size_y))
+    ])
+    z3_solver.push()
+
+    # This is a safety catch to prevent timeouts when running in Kaggle notebooks
+    if timeout: z3_solver.set("timeout", int(timeout * 1000/2.5))  # timeout is in milliseconds, but inexact and ~2.5x slow
+
+    solution_3d     = np.zeros((delta+1, size_x, size_y), dtype=np.int8)
+    backtrack_count = 0     # prevent infinite loops
+    # this is a fancy way to write a for loop, which allows us to repeat deltas if failed
+    deltas = list(range(1, delta+1))
+    while len(deltas):
+        if max_backtracks and max_backtracks < backtrack_count: break  # exit quickly if we have an unsat board
+
+        t = deltas[0]
+        z3_solver, t_cells = game_of_life_ruleset(size=size, delta=t, max_t=delta, z3_solver=z3_solver, t_cells=t_cells)
+        z3_solver.push()
+        for zero_point_distance in [1,2,3]:
+            add_zero_point_constraint(z3_solver, t_cells, zero_point_distance)
+            is_sat = z3_solver.check()
+            z3_solver.pop()  # remove zero point constraints
+
+            if is_sat == z3.sat:
+                solution_3d = solver_to_numpy_3d(z3_solver, t_cells)  # calls z3_solver.check()
+                if is_valid_solution(solution_3d[delta-t], board, t):
+                    # Fix this solution as a constraint
+                    z3_solver.add(z3.And(*[
+                        t_cells[delta-t][x][y] == bool( solution_3d[delta-t][x][y] )
+                        for x in range(size_x)
+                        for y in range(size_y)
+                    ]))
+                    deltas.remove(t)  # move to next iteration of the whilefor loop
+                    break             # exit zero_point_distance for loop
+                else:
+                    # Mark solution as invalid and try again
+                    # BUG: In theory this shouldn't happen, but for some reason it does occasionally
+                    z3_solver.add(z3.Or(*[
+                        t_cells[delta-t][x][y] != bool( solution_3d[delta-t][x][y] )
+                        for x in range(size_x)
+                        for y in range(size_y)
+                    ]))
+        else:
+            # We couldn't find a solution, backup and find a different solution for the previous delta
+            z3_solver.pop()    # remove previous ruleset constraints
+            if t == 1: break   # unsat at top layers -> try zero_point_distance=2
+            z3_solver.add(z3.Or(*[
+                t_cells[delta-(t-1)][x][y] != bool( solution_3d[delta-(t-1)][x][y] )
+                for x in range(size_x)
+                for y in range(size_y)
+            ]))
+            deltas.insert(0, t-1)  # reattempt the previous layer
+            backtrack_count += 1
+            # print('backtrack_count', backtrack_count)
+
+
+    time_taken  = time.perf_counter() - time_start
+    # Validate that forward play matches backwards solution
+    if np.count_nonzero(solution_3d):  # quicker than calling z3_solver.check() again
+        assert is_valid_solution(solution_3d[0], board, delta)
+        if verbose: print(f'game_of_life_solver() - took: {time_taken:6.1f}s | Solved! ')
+    else:
+        if verbose: print(f'game_of_life_solver() - took: {time_taken:6.1f}s | unsolved')
+    return z3_solver, t_cells, solution_3d
+
+
 
 
 def game_of_life_next_solution(z3_solver, t_cells, verbose=True):

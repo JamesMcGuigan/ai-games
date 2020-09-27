@@ -9,7 +9,7 @@ from utils.util import csv_to_delta
 from utils.util import csv_to_numpy
 
 
-def test_game_of_life_solver_delta():
+def test_game_of_life_solver():
     """
     This test validates that all entires in submission.csv, when played forward match the stop state
     see fix_submission() to correct previously generated data
@@ -55,5 +55,5 @@ def test_submission_df():
 
 
 if __name__ == '__main__':
-    test_game_of_life_solver_delta()
+    test_game_of_life_solver()
     test_submission_df()

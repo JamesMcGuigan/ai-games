@@ -149,19 +149,21 @@ def game_of_life_solver_iterative_delta(board: np.ndarray, delta=1, timeout=0, m
     if timeout: z3_solver.set("timeout", int(timeout * 1000/2.5))  # timeout is in milliseconds, but inexact and ~2.5x slow
 
     solution_3d     = np.zeros((delta+1, size_x, size_y), dtype=np.int8)
-    backtrack_count = 0     # prevent infinite loops
-    # this is a fancy way to write a for loop, which allows us to repeat deltas if failed
+    backtrack_count = 0
+
+    # this is a fancy way to write a for loop, which allows us to repeat and insert deltas if failed
     deltas = list(range(1, delta+1))
     while len(deltas):
+        t = deltas[0]
         if max_backtracks and max_backtracks < backtrack_count: break  # exit quickly if we have an unsat board
 
-        t = deltas[0]
         z3_solver, t_cells = game_of_life_ruleset(size=size, delta=t, max_t=delta, z3_solver=z3_solver, t_cells=t_cells)
-        z3_solver.push()
+        z3_solver.push()       # save ruleset constraints
         for zero_point_distance in [1,2,3]:
+            z3_solver.push()   # remove zero point constraints - we need a push for every pop
             add_zero_point_constraint(z3_solver, t_cells, zero_point_distance)
             is_sat = z3_solver.check()
-            z3_solver.pop()  # remove zero point constraints
+            z3_solver.pop()    # remove zero point constraints
 
             if is_sat == z3.sat:
                 solution_3d = solver_to_numpy_3d(z3_solver, t_cells)  # calls z3_solver.check()
@@ -174,14 +176,6 @@ def game_of_life_solver_iterative_delta(board: np.ndarray, delta=1, timeout=0, m
                     ]))
                     deltas.remove(t)  # move to next iteration of the whilefor loop
                     break             # exit zero_point_distance for loop
-                else:
-                    # Mark solution as invalid and try again
-                    # BUG: In theory this shouldn't happen, but for some reason it does occasionally
-                    z3_solver.add(z3.Or(*[
-                        t_cells[delta-t][x][y] != bool( solution_3d[delta-t][x][y] )
-                        for x in range(size_x)
-                        for y in range(size_y)
-                    ]))
         else:
             # We couldn't find a solution, backup and find a different solution for the previous delta
             z3_solver.pop()    # remove previous ruleset constraints
@@ -195,11 +189,10 @@ def game_of_life_solver_iterative_delta(board: np.ndarray, delta=1, timeout=0, m
             backtrack_count += 1
             # print('backtrack_count', backtrack_count)
 
-
     time_taken  = time.perf_counter() - time_start
+
     # Validate that forward play matches backwards solution
-    if np.count_nonzero(solution_3d):  # quicker than calling z3_solver.check() again
-        assert is_valid_solution(solution_3d[0], board, delta)
+    if is_valid_solution(solution_3d[0], board, delta):  # quicker than calling z3_solver.check() again
         if verbose: print(f'game_of_life_solver() - took: {time_taken:6.1f}s | Solved! ')
     else:
         if verbose: print(f'game_of_life_solver() - took: {time_taken:6.1f}s | unsolved')

@@ -96,8 +96,11 @@ class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
                 print(f'{self.__class__.__name__}.load(): {self.filename} = {humanize.naturalsize(os.path.getsize(self.filename))}')
             except Exception as exception:
                 # Ignore errors caused by model size mismatch
-                print(f'{self.__class__.__name__}.load(): model has changed dimensions, discarding saved weights\n')
-                pass
+                print(f'{self.__class__.__name__}.load(): model has changed dimensions, reinitializing weights\n')
+                self.apply(self.weights_init)
+        else:
+            print(f'{self.__class__.__name__}.load(): model file not found, reinitializing weights\n')
+            self.apply(self.weights_init)
 
         self.loaded = True    # prevent any infinite if self.loaded loops
         self.to(self.device)  # ensure all weights, either loaded or untrained are moved to GPU

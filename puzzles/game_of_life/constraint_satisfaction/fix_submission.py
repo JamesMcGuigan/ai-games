@@ -17,9 +17,11 @@ def is_valid_solution(start: np.ndarray, stop: np.ndarray, delta: int) -> bool:
     # we are rewriting data, so lets double check our work
     test_board = start
     is_valid   = np.count_nonzero(test_board) != 0
+    if not is_valid: return False
     for t in range(delta):
         test_board = life_step(test_board)
         is_valid   = is_valid and np.count_nonzero(test_board) != 0
+        if not is_valid: return False
     is_valid = is_valid and np.all(test_board == stop)
     return is_valid
 

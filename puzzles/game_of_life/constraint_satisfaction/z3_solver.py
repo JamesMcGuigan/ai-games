@@ -117,8 +117,7 @@ def game_of_life_solver_full_delta(board: np.ndarray, delta=1, timeout=0, verbos
         time_taken  = time.perf_counter() - time_start
 
         # Validate that forward play matches backwards solution
-        if np.count_nonzero(solution_3d):  # quicker than calling z3_solver.check() again
-            assert is_valid_solution(solution_3d[0], board, delta)
+        if is_valid_solution(solution_3d[0], board, delta):  # quicker than calling z3_solver.check() again
             if verbose: print(f'game_of_life_solver() - took: {time_taken:6.1f}s | Solved! ')
             break
     else:

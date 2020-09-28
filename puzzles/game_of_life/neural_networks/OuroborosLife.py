@@ -27,6 +27,12 @@ class OuroborosLife(GameOfLifeBase):
     The loss function computes the loss against the original training data, but also feeds back in upon itself.
     The output for Future is fed back in and it's Past is compared with the Present, likewise in reverse with the Paspt.
     """
+    @property
+    def filename(self) -> str:
+        """ ./models/OuroborosLife3.pth || ./models/OuroborosLife5.pth """
+        return super().filename.replace('.pth', f'{self.out_channels}.pth')
+
+
     def __init__(self, in_channels=1, out_channels=3):
         assert out_channels % 2 == 1, f'{self.__class__.__name__}(out_channels={out_channels}) must be odd'
 
@@ -34,58 +40,66 @@ class OuroborosLife(GameOfLifeBase):
         self.in_channels  = in_channels
         self.out_channels = out_channels  # Past, Present and Future
 
-        self.relu = nn.LeakyReLU()
+        self.relu    = nn.LeakyReLU()     # combines with nn.init.kaiming_normal_()
+        self.dropout = nn.Dropout(p=0.1)
 
         # 2**9 = 512 filters and kernel size of 3x3 to allow for full encoding of game rules
         # Pixels can see distance 5 neighbours, (hopefully) sufficient for delta=2 timesteps or out_channels=5
         # https://www.youtube.com/watch?v=H3g26EVADgY&feature=youtu.be&t=1h39m410s&ab_channel=JeremyHoward
-        self.cnn_layers = nn.ModuleList([
-            self.conv_block(self.in_channels, 512, kernel_size=(3,3)),
-            self.conv_block(512, 256),
-            self.conv_block(256, 128),
-            self.conv_block(128,  64),
-            self.conv_block( 64,  32),
-            self.conv_block( 32,  16),
-            self.conv_block( 16,  out_channels, output=True),
+        self.layers = nn.ModuleList([
+            # Previous pixel state requires information from distance 2, so we need two 3x3 convolutions
+            nn.Conv2d(in_channels=in_channels, out_channels=512,  kernel_size=(3,3), padding=1, padding_mode='circular'),
+            nn.Conv2d(in_channels=512,   out_channels=128,  kernel_size=(1,1)),
+            nn.Conv2d(in_channels=128,   out_channels=64,   kernel_size=(1,1)),
+
+            nn.Conv2d(in_channels=1+64,  out_channels=512,  kernel_size=(3,3), padding=1, padding_mode='circular'),
+            nn.Conv2d(in_channels=512,   out_channels=128,  kernel_size=(1,1)),
+            nn.Conv2d(in_channels=128,   out_channels=64,   kernel_size=(1,1)),
+
+            # # Deconvolution + Convolution allows neighbouring pixels to share information to simulate forward play
+            # # This creates a 52x52 grid of interspersed cells that can then be downsampled back down to 25x25
+            nn.ConvTranspose2d(in_channels=1+64, out_channels=512,  kernel_size=(3,3), stride=2, dilation=1),
+            nn.Conv2d(in_channels=512,  out_channels=128,   kernel_size=(1,1)),
+            nn.Conv2d(in_channels=128,  out_channels=64,    kernel_size=(1,1)),
+            nn.Conv2d(in_channels=64,   out_channels=64,    kernel_size=(3,3), stride=2),  # undo deconvolution
+
+            nn.Conv2d(in_channels=1+64,  out_channels=16,   kernel_size=(1,1)),
+            nn.Conv2d(in_channels=16,    out_channels=8,    kernel_size=(1,1)),
+            nn.Conv2d(in_channels=8,     out_channels=out_channels, kernel_size=(1,1)),
         ])
+        self.apply(self.weights_init)
+
 
         # self.criterion = nn.BCELoss()
         self.criterion = FocalLoss()
+        # self.criterion = nn.MSELoss()
         self.optimizer = pt.optim.RMSprop(self.parameters(), lr=0.01, momentum=0.9)
         self.scheduler = torch.optim.lr_scheduler.CyclicLR(
             self.optimizer,
-            max_lr=1,
-            base_lr=1e-3,
-            step_size_up=100,
+            max_lr=1e-3,
+            base_lr=1e-5,
+            step_size_up=10,
             mode='exp_range',
             gamma=0.8
         )
 
-
-    def conv_block(self, in_f, out_f, kernel_size=(3,3), padding=1, stride=1, output=False, *args, **kwargs):
-        """
-        3x3 Conv2d + 2 * 1x1 Conv2d with Relu and BatchNorm between each layer
-        Output layer has Sigmoid activation
-        BatchNorm is not applied to input or output layers
-        """
-        mid_f = max(in_f, out_f)
-        return nn.Sequential(
-            nn.Conv2d(in_channels=in_f, out_channels=mid_f, kernel_size=kernel_size, stride=stride, padding=padding, padding_mode='circular', *args, **kwargs),
-                self.relu,
-                nn.BatchNorm2d(mid_f),
-            nn.Conv2d(in_channels=mid_f, out_channels=mid_f, kernel_size=(1,1)),
-                self.relu,
-                nn.BatchNorm2d(mid_f),
-            nn.Conv2d(in_channels=mid_f, out_channels=out_f, kernel_size=(1,1)),
-                self.relu             if not output else nn.Sigmoid(),
-                nn.BatchNorm2d(out_f) if not output else nn.Identity(),
-        )
+    # def load(self):
+    #     super().load()
+    #     self.apply(self.weights_init)
 
 
-    @property
-    def filename(self) -> str:
-        """ ./models/OuroborosLife3.pth || ./models/OuroborosLife5.pth """
-        return super().filename.replace('.pth', f'{self.out_channels}.pth')
+    def forward(self, x):
+        x = input = self.cast_inputs(x)
+        for n, layer in enumerate(self.layers):
+            if layer.in_channels > 1 and layer.in_channels % 2 == 1:   # autodetect 1+in_channels == odd number
+                x = torch.cat([ x, input ], dim=1)                     # passthrough original cell state
+            x = layer(x)
+            if n != len(self.layers)-1:
+                x = self.relu(x)
+                x = self.dropout(x)
+            else:
+                x = torch.sigmoid(x)  # output requires sigmoid activation
+        return x
 
 
     # DOCS: https://towardsdatascience.com/understanding-input-and-output-shapes-in-convolution-network-keras-f143923d56ca
@@ -101,32 +115,25 @@ class OuroborosLife(GameOfLifeBase):
         return x
 
 
-    def forward(self, x):
-        x = self.cast_inputs(x)
-        output_shape = x.shape
-        for n, layer_fn in enumerate(self.cnn_layers):
-            x = layer_fn(x)
-        return x
-
-
     def loss(self, outputs, timeline, inputs):
         dataset_loss    = self.loss_dataset(outputs, timeline, inputs)
         ouroboros_loss  = self.loss_ouroboros(outputs, timeline, inputs)
         arithmetic_mean = ( dataset_loss + ouroboros_loss ) / 2.0
         geometric_mean  = ( dataset_loss * ouroboros_loss ) ** (1/2)
         harmonic_mean   = 2.0 / ( 1.0/dataset_loss + 1.0/ouroboros_loss )
-        return harmonic_mean
+        return arithmetic_mean
 
 
     def loss_dataset(self, outputs, timeline, inputs):
         # dataset_loss = torch.mean(torch.mean(( (timeline-outputs)**2 ).flatten(1), dim=1))  # average MSE per timeframe
 
         # FocalLoss(outputs, target) need to be in correct order
-        dataset_loss = torch.mean(torch.tensor([
-            self.criterion(outputs[b][t], timeline[b][t])
-            for b in range(timeline.shape[0])
-            for t in range(timeline.shape[1])
-        ], requires_grad=True))
+        # dataset_loss = torch.sum(torch.tensor([
+        #     self.criterion(outputs[b][t], timeline[b][t])
+        #     for b in range(timeline.shape[0])
+        #     for t in range(timeline.shape[1])
+        # ], requires_grad=True))
+        dataset_loss = self.criterion(outputs, timeline)
         return dataset_loss
 
 
@@ -150,7 +157,7 @@ class OuroborosLife(GameOfLifeBase):
             t2_range = ( max(0, self.out_channels//2-t1), max(self.out_channels+1-t1, self.out_channels-1) )
             ouroboros_loss_per_timeline = []
             for b in range(timeline.shape[0]):
-                for delta in range(-self.out_channels//2, self.out_channels//2+1):
+                for delta in range(-self.out_channels//2+1, self.out_channels//2+1):
                     t2 = t1 + delta
                     if not ( t2_range[0] <= t2 <= t2_range[1] ): continue  # invalid index
                     ouroboros_loss_per_timeline.append(
@@ -159,7 +166,7 @@ class OuroborosLife(GameOfLifeBase):
                     )
             ouroboros_losses += ouroboros_loss_per_timeline
 
-        ouroboros_loss = pt.mean(pt.tensor(ouroboros_losses)).requires_grad_(True)
+        ouroboros_loss = pt.sum(pt.tensor(ouroboros_losses)).requires_grad_(True)
         return ouroboros_loss
 
 
@@ -167,7 +174,7 @@ class OuroborosLife(GameOfLifeBase):
         """ Count the number of 100% accuracy boards predicted """
         # noinspection PyTypeChecker
         accuracies = pt.tensor([
-            pt.all( outputs[b][t] == timeline[b][t] )
+            pt.all( self.cast_bool(outputs[b][t]) == self.cast_bool(timeline[b][t]) )
             for b in range(timeline.shape[0])
             for t in range(timeline.shape[1])
         ])
@@ -175,25 +182,32 @@ class OuroborosLife(GameOfLifeBase):
         return accuracy.detach().item()
 
 
-    def fit(self, epochs=10000, batch_size=25, max_delta=10):
+    def fit(self, epochs=100_000, batch_size=25, max_delta=25):
         gc.collect()
         torch.cuda.empty_cache()
         atexit.register(model.save)
         self.train()
         self.unfreeze()
         try:
+            # timelines_batch = np.array([
+            #     life_step_3d(generate_random_board(), max_delta)
+            #     for _ in range(batch_size)
+            # ])
             time_start  = time.perf_counter()
             board_count = 0
+            dataset_accuracies = [0]
             for epoch in range(1, epochs+1):
+                if np.min(dataset_accuracies[-10:]) == 1.0: break  # we have reached 100% accuracy
+
                 epoch_start = time.perf_counter()
                 timelines_batch = np.array([
                     life_step_3d(generate_random_board(), max_delta)
                     for _ in range(batch_size)
                 ])
-                losses           = []
+                epoch_losses     = []
                 dataset_losses   = []
-                ouroboros_losses = []
-                accuracies       = []
+                ouroboros_losses = [0]
+                epoch_accuracies = []
                 d = self.out_channels // 2  # In theory this should work for 5 or 7 channels
                 for t in range(d, max_delta - d):
                     inputs_np   = timelines_batch[:, np.newaxis, t,:,:]  # (batch_size=10, channels=1,  width=25, height=25)
@@ -202,26 +216,26 @@ class OuroborosLife(GameOfLifeBase):
                     timeline = pt.tensor(timeline_np).to(self.device).to(pt.float32)
 
                     self.optimizer.zero_grad()
-                    outputs  = self(inputs)
+                    outputs         = self(inputs)
                     accuracy        = model.accuracy(outputs, timeline, inputs)  # torch.sum( outputs.to(torch.cast_bool) == expected.to(torch.cast_bool) ).cpu().numpy() / np.prod(outputs.shape)
                     dataset_loss    = self.loss_dataset(outputs, timeline, inputs)
                     ouroboros_loss  = self.loss_ouroboros(outputs, timeline, inputs)
-                    # loss            = dataset_loss + ouroboros_loss
-                    loss            = 2.0 / ( 1.0/dataset_loss + 1.0/ouroboros_loss )
+                    loss            = dataset_loss + ouroboros_loss
                     loss.backward()
                     self.optimizer.step()
                     self.scheduler.step()
 
-                    board_count += 1
-                    losses.append(loss.detach().item())
+                    board_count += batch_size
+                    epoch_losses.append(loss.detach().item())
                     dataset_losses.append(dataset_loss.detach().item())
                     ouroboros_losses.append(ouroboros_loss.detach().item())
-                    accuracies.append(accuracy)
+                    epoch_accuracies.append(accuracy)
                     torch.cuda.empty_cache()
+                dataset_accuracies.append( min(epoch_accuracies) )
 
                 epoch_time = time.perf_counter() - epoch_start
-                print(f'epoch: {epoch:4d} | boards: {board_count:5d} | loss: {np.mean(losses):.6f} | dataset: {np.mean(dataset_losses):.6f} | ouroboros: {np.mean(ouroboros_losses):.6f} | accuracy = {np.mean(accuracies):.6f} | time: {1000*epoch_time/batch_size:.3f}ms/board')
-            time_taken = time.perf_counter() - time_start
+                time_taken = time.perf_counter() - time_start
+                print(f'epoch: {epoch:4d} | boards: {board_count:5d} | loss: {np.mean(epoch_losses):.6f} | dataset: {np.mean(dataset_losses):.6f} | ouroboros: {np.mean(ouroboros_losses):.6f} | accuracy = {np.mean(epoch_accuracies):.6f} | time: {1000*epoch_time//batch_size}ms/board | {time_taken//60:3.0f}:{time_taken%60:02.0f}')
         except KeyboardInterrupt: pass
         finally:
             model.save()

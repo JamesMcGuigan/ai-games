@@ -53,25 +53,24 @@ def train(model, batch_size=1, l1=0, l2=0, timeout=0, reverse_input_output=False
     epoch_losses     = [last_loss]
     epoch_accuracies = [ 0 ]
 
-    inputs_np   = [ generate_random_board(shape=(5,5)) for _     in range(batch_size) ]
-    expected_np = [ life_step(board)        for board in inputs_np         ]
+    # inputs_np   = [ generate_random_board(shape=(5,5)) for _     in range(batch_size) ]
+    # expected_np = [ life_step(board)                   for board in inputs_np         ]
 
     try:
+        epoch_time = 0
         for epoch in range(1, sys.maxsize):
             if np.min(epoch_accuracies[-100_000//batch_size:]) == 1.0:    break  # multiple epochs of 100% accuracy to pass
             if timeout and timeout < time.perf_counter() - time_start:  break
             epoch_start = time.perf_counter()
 
-            # inputs_np   = [ generate_random_board() for _     in range(batch_size) ]
-            # expected_np = [ life_step(board)        for board in inputs_np         ]
+            inputs_np   = [ generate_random_board() for _     in range(batch_size) ]
+            expected_np = [ life_step(board)        for board in inputs_np         ]
             inputs      = model.cast_inputs(inputs_np).to(device)
             expected    = model.cast_inputs(expected_np).to(device)
 
             # This is for GameOfLifeReverseOneStep() function, where we are trying to learn the reverse function
             if reverse_input_output:
-                # inputs_np, expected_np = expected_np, inputs_np
-                inputs,    expected    = expected,    inputs
-                # assert np.all( life_step(expected_np[0]) == inputs_np[0] )
+                inputs, expected = expected, inputs
 
             # trainloader = DataLoader(list(zip(inputs_np, expected_np)), batch_size=100, shuffle=True)
             # lr_finder = LRFinder(model, optimizer, model.criterion, device="cuda")
@@ -79,38 +78,39 @@ def train(model, batch_size=1, l1=0, l2=0, timeout=0, reverse_input_output=False
             # lr_finder.plot() # to inspect the loss-learning rate graph
             # lr_finder.reset() # to reset the model and optimizer to their initial state
 
+            for _ in range(5):  # repeat each dataset 5 times
+                optimizer.zero_grad()
+                outputs = model(inputs)
+                loss    = model.loss(outputs, expected, inputs)
+                if l1 or l2:
+                    l1_loss = torch.sum(tensor([ torch.sum(torch.abs(param)) for param in model.parameters() ])) / num_params
+                    l2_loss = torch.sum(tensor([ torch.sum(param**2)         for param in model.parameters() ])) / num_params
+                    loss   += ( l1_loss * l1 ) + ( l2_loss * l2 )
 
-            optimizer.zero_grad()
-            outputs = model(inputs)
-            loss    = model.loss(outputs, expected, inputs)
-            if l1 or l2:
-                l1_loss = torch.sum(tensor([ torch.sum(torch.abs(param)) for param in model.parameters() ])) / num_params
-                l2_loss = torch.sum(tensor([ torch.sum(param**2)         for param in model.parameters() ])) / num_params
-                loss   += ( l1_loss * l1 ) + ( l2_loss * l2 )
+                loss.backward()
+                optimizer.step()
+                if scheduler is not None:
+                    # scheduler.step(loss)  # only required for
+                    scheduler.step()
 
-            loss.backward()
-            optimizer.step()
-            if scheduler is not None:
-                # scheduler.step(loss)  # only required for
-                scheduler.step()
+                # noinspection PyTypeChecker
+                last_accuracy = model.accuracy(outputs, expected, inputs)  # torch.sum( outputs.to(torch.bool) == expected.to(torch.bool) ).cpu().numpy() / np.prod(outputs.shape)
+                last_loss     = loss.item() # / batch_size
 
-            # noinspection PyTypeChecker
-            last_accuracy = model.accuracy(outputs, expected, inputs)  # torch.sum( outputs.to(torch.bool) == expected.to(torch.bool) ).cpu().numpy() / np.prod(outputs.shape)
-            last_loss     = loss.item() # / batch_size
+                epoch_losses.append(last_loss)
+                epoch_accuracies.append( last_accuracy )
 
-            epoch_losses.append(last_loss)
-            epoch_accuracies.append( last_accuracy )
-
-            loop_loss   += last_loss
-            loop_acc    += last_accuracy
-            loop_count  += 1
-            board_count += batch_size
-            epoch_time   = time.perf_counter() - epoch_start
+                loop_loss   += last_loss
+                loop_acc    += last_accuracy
+                loop_count  += 1
+                board_count += batch_size
+                epoch_time   = time.perf_counter() - epoch_start
 
             # Print statistics after each epoch
             # if board_count % 1_000 == 0:
-            if epoch % 1 == 0:
-                print(f'epoch: {epoch:4d} | board_count: {board_count:5d} | loss: {loop_loss/loop_count:.10f} | accuracy = {loop_acc/loop_count:.10f} | time: {1000*epoch_time/batch_size:.3f}ms/board')
+            if epoch % 1000 == 0:
+                time_taken = time.perf_counter() - time_start
+                print(f'epoch: {epoch:4d} | board_count: {board_count:5d} | loss: {loop_loss/loop_count:.10f} | accuracy = {loop_acc/loop_count:.10f} | time: {1000*epoch_time/batch_size:.3f}ms/board | {time_taken//60:3.0f}m {time_taken%60:02.0f}s ')
                 loop_loss  = 0
                 loop_acc   = 0
                 loop_count = 0

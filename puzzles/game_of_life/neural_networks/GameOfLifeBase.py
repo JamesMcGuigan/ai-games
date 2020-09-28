@@ -20,13 +20,18 @@ class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
     Base class for GameOfLife based NNs
     Handles: save/autoload, freeze/unfreeze, casting between data formats, and training loop functions
     """
-
     def __init__(self):
         super().__init__()
         self.loaded    = False  # can't call sell.load() in constructor, as weights/layers have not been defined yet
         self.device    = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu")
         self.criterion = nn.MSELoss()
 
+
+    @staticmethod
+    def weights_init(layer):
+        if isinstance(layer, (nn.Conv2d, nn.ConvTranspose2d)):
+            nn.init.kaiming_normal_(layer.weight)
+            nn.init.constant_(layer.bias, 0.1)
 
     ### Prediction
 

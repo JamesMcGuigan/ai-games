@@ -41,7 +41,7 @@ class OuroborosLife(GameOfLifeBase):
         self.out_channels = out_channels  # Past, Present and Future
 
         self.relu    = nn.LeakyReLU()     # combines with nn.init.kaiming_normal_()
-        self.dropout = nn.Dropout(p=0.1)
+        self.dropout = nn.Dropout(p=0.2)
 
         # 2**9 = 512 filters and kernel size of 3x3 to allow for full encoding of game rules
         # Pixels can see distance 5 neighbours, (hopefully) sufficient for delta=2 timesteps or out_channels=5
@@ -49,23 +49,25 @@ class OuroborosLife(GameOfLifeBase):
         self.cnn_layers = nn.ModuleList([
             # Previous pixel state requires information from distance 2, so we need two 3x3 convolutions
             nn.Conv2d(in_channels=in_channels, out_channels=512,  kernel_size=(3,3), padding=1, padding_mode='circular'),
-            nn.Conv2d(in_channels=512,   out_channels=128,  kernel_size=(1,1)),
-            nn.Conv2d(in_channels=128,   out_channels=64,   kernel_size=(1,1)),
+            nn.Conv2d(in_channels=512,   out_channels=256,  kernel_size=(1,1)),
+            nn.Conv2d(in_channels=256,   out_channels=128,  kernel_size=(1,1)),
 
-            nn.Conv2d(in_channels=1+64,  out_channels=512,  kernel_size=(3,3), padding=1, padding_mode='circular'),
-            nn.Conv2d(in_channels=512,   out_channels=128,  kernel_size=(1,1)),
-            nn.Conv2d(in_channels=128,   out_channels=64,   kernel_size=(1,1)),
+            nn.Conv2d(in_channels=1+128, out_channels=128,  kernel_size=(3,3), padding=1, padding_mode='circular'),
+            nn.Conv2d(in_channels=128,   out_channels=512,  kernel_size=(1,1)),
+            nn.Conv2d(in_channels=512,   out_channels=256,  kernel_size=(1,1)),
+            nn.Conv2d(in_channels=256,   out_channels=128,  kernel_size=(1,1)),
 
             # # Deconvolution + Convolution allows neighbouring pixels to share information to simulate forward play
             # # This creates a 52x52 grid of interspersed cells that can then be downsampled back down to 25x25
-            nn.ConvTranspose2d(in_channels=1+64, out_channels=512,  kernel_size=(3,3), stride=2, dilation=1),
-            nn.Conv2d(in_channels=512,  out_channels=128,   kernel_size=(1,1)),
-            nn.Conv2d(in_channels=128,  out_channels=64,    kernel_size=(1,1)),
-            nn.Conv2d(in_channels=64,   out_channels=64,    kernel_size=(3,3), stride=2),  # undo deconvolution
+            nn.ConvTranspose2d(in_channels=1+128, out_channels=128,  kernel_size=(3,3), stride=2, dilation=1),
+            nn.Conv2d(in_channels=128,   out_channels=512,   kernel_size=(1,1)),
+            nn.Conv2d(in_channels=512,   out_channels=256,   kernel_size=(1,1)),
+            nn.Conv2d(in_channels=256,   out_channels=128,   kernel_size=(3,3), stride=2),  # undo deconvolution
 
-            nn.Conv2d(in_channels=1+64,  out_channels=16,   kernel_size=(1,1)),
-            nn.Conv2d(in_channels=16,    out_channels=8,    kernel_size=(1,1)),
-            nn.Conv2d(in_channels=8,     out_channels=out_channels, kernel_size=(1,1)),
+            nn.Conv2d(in_channels=1+128, out_channels=64,    kernel_size=(1,1)),
+            nn.Conv2d(in_channels=64,    out_channels=32,    kernel_size=(1,1)),
+            nn.Conv2d(in_channels=32,    out_channels=16,    kernel_size=(1,1)),
+            nn.Conv2d(in_channels=1+16,  out_channels=out_channels, kernel_size=(1,1)),
         ])
         self.batchnorm_layers = nn.ModuleList([
             nn.BatchNorm2d(cnn_layer.out_channels)
@@ -99,8 +101,9 @@ class OuroborosLife(GameOfLifeBase):
             x = cnn_layer(x)
             if n != len(self.cnn_layers)-1:
                 x = self.relu(x)
-                x = batchnorm_layer(x)  # batchnorm goes after activation
-                # x = self.dropout(x)   # BatchNorm eliminates the need for Dropout in some cases cause BN provides similar regularization benefits as Dropout intuitively"
+                if n != 1:               # Don't apply dropout to the first layer
+                    x = self.dropout(x)  # BatchNorm eliminates the need for Dropout in some cases cause BN provides similar regularization benefits as Dropout intuitively"
+                x = batchnorm_layer(x)   # batchnorm goes after activation
             else:
                 x = torch.sigmoid(x)  # output requires sigmoid activation
         return x

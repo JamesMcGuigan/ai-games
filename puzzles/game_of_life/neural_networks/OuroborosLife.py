@@ -46,7 +46,7 @@ class OuroborosLife(GameOfLifeBase):
         # 2**9 = 512 filters and kernel size of 3x3 to allow for full encoding of game rules
         # Pixels can see distance 5 neighbours, (hopefully) sufficient for delta=2 timesteps or out_channels=5
         # https://www.youtube.com/watch?v=H3g26EVADgY&feature=youtu.be&t=1h39m410s&ab_channel=JeremyHoward
-        self.layers = nn.ModuleList([
+        self.cnn_layers = nn.ModuleList([
             # Previous pixel state requires information from distance 2, so we need two 3x3 convolutions
             nn.Conv2d(in_channels=in_channels, out_channels=512,  kernel_size=(3,3), padding=1, padding_mode='circular'),
             nn.Conv2d(in_channels=512,   out_channels=128,  kernel_size=(1,1)),
@@ -66,6 +66,10 @@ class OuroborosLife(GameOfLifeBase):
             nn.Conv2d(in_channels=1+64,  out_channels=16,   kernel_size=(1,1)),
             nn.Conv2d(in_channels=16,    out_channels=8,    kernel_size=(1,1)),
             nn.Conv2d(in_channels=8,     out_channels=out_channels, kernel_size=(1,1)),
+        ])
+        self.batchnorm_layers = nn.ModuleList([
+            nn.BatchNorm2d(cnn_layer.out_channels)
+            for cnn_layer in self.cnn_layers
         ])
 
 
@@ -89,13 +93,14 @@ class OuroborosLife(GameOfLifeBase):
 
     def forward(self, x):
         x = input = self.cast_inputs(x)
-        for n, layer in enumerate(self.layers):
-            if layer.in_channels > 1 and layer.in_channels % 2 == 1:   # autodetect 1+in_channels == odd number
+        for n, (cnn_layer, batchnorm_layer) in enumerate(zip(self.cnn_layers, self.batchnorm_layers)):
+            if cnn_layer.in_channels > 1 and cnn_layer.in_channels % 2 == 1:   # autodetect 1+in_channels == odd number
                 x = torch.cat([ x, input ], dim=1)                     # passthrough original cell state
-            x = layer(x)
-            if n != len(self.layers)-1:
+            x = cnn_layer(x)
+            if n != len(self.cnn_layers)-1:
                 x = self.relu(x)
-                x = self.dropout(x)
+                x = batchnorm_layer(x)  # batchnorm goes after activation
+                # x = self.dropout(x)   # BatchNorm eliminates the need for Dropout in some cases cause BN provides similar regularization benefits as Dropout intuitively"
             else:
                 x = torch.sigmoid(x)  # output requires sigmoid activation
         return x

@@ -159,7 +159,7 @@ def game_of_life_solver_iterative_delta(board: np.ndarray, delta=1, timeout=0, m
 
         z3_solver, t_cells = game_of_life_ruleset(size=size, delta=t, max_t=delta, z3_solver=z3_solver, t_cells=t_cells)
         z3_solver.push()       # save ruleset constraints
-        for zero_point_distance in [1,2,3]:
+        for zero_point_distance in [1,2]:
             z3_solver.push()   # remove zero point constraints - we need a push for every pop
             add_zero_point_constraint(z3_solver, t_cells, zero_point_distance)
             is_sat = z3_solver.check()

@@ -67,7 +67,6 @@ class OuroborosLife(GameOfLifeBase):
             nn.Conv2d(in_channels=16,    out_channels=8,    kernel_size=(1,1)),
             nn.Conv2d(in_channels=8,     out_channels=out_channels, kernel_size=(1,1)),
         ])
-        self.apply(self.weights_init)
 
 
         # self.criterion = nn.BCELoss()
@@ -166,15 +165,20 @@ class OuroborosLife(GameOfLifeBase):
                     )
             ouroboros_losses += ouroboros_loss_per_timeline
 
-        ouroboros_loss = pt.sum(pt.tensor(ouroboros_losses)).requires_grad_(True)
+        ouroboros_loss = pt.mean(pt.tensor(ouroboros_losses)).requires_grad_(True)
         return ouroboros_loss
 
 
     def accuracy(self, outputs, timeline, inputs) -> float:
-        """ Count the number of 100% accuracy boards predicted """
+        """
+        Count the number of 100% accuracy boards predicted
+        accuracy == 0.666 + output_channels == 3 means:
+            Present and Future boards have been correctly predicted, but Past is still not fully solved
+        """
         # noinspection PyTypeChecker
         accuracies = pt.tensor([
-            pt.all( self.cast_bool(outputs[b][t]) == self.cast_bool(timeline[b][t]) )
+            pt.all( self.cast_bool(outputs[b][t]) == self.cast_bool(timeline[b][t]) )                      # percentage boards correct
+            # pt.mean(( self.cast_bool(outputs[b][t]) == self.cast_bool(timeline[b][t]) ).to(pt.float32))  # percentage pixels correct
             for b in range(timeline.shape[0])
             for t in range(timeline.shape[1])
         ])
@@ -235,7 +239,7 @@ class OuroborosLife(GameOfLifeBase):
 
                 epoch_time = time.perf_counter() - epoch_start
                 time_taken = time.perf_counter() - time_start
-                print(f'epoch: {epoch:4d} | boards: {board_count:5d} | loss: {np.mean(epoch_losses):.6f} | dataset: {np.mean(dataset_losses):.6f} | ouroboros: {np.mean(ouroboros_losses):.6f} | accuracy = {np.mean(epoch_accuracies):.6f} | time: {1000*epoch_time//batch_size}ms/board | {time_taken//60:3.0f}:{time_taken%60:02.0f}')
+                print(f'epoch: {epoch:4d} | boards: {board_count:5d} | loss: {np.mean(epoch_losses):.6f} | ouroboros: {np.mean(ouroboros_losses):.6f} | dataset: {np.mean(dataset_losses):.6f} | accuracy = {np.mean(epoch_accuracies):.6f} | time: {1000*epoch_time//batch_size}ms/board | {time_taken//60:3.0f}:{time_taken%60:02.0f}')
         except KeyboardInterrupt: pass
         finally:
             model.save()

@@ -197,6 +197,7 @@ class OuroborosLife(GameOfLifeBase):
         atexit.register(model.save)
         self.train()
         self.unfreeze()
+        print(self)
         try:
             # timelines_batch = np.array([
             #     life_step_3d(generate_random_board(), max_delta)
@@ -244,7 +245,7 @@ class OuroborosLife(GameOfLifeBase):
 
                 epoch_time = time.perf_counter() - epoch_start
                 time_taken = time.perf_counter() - time_start
-                print(f'epoch: {epoch:4d} | boards: {board_count:5d} | loss: {np.mean(epoch_losses):.6f} | ouroboros: {np.mean(ouroboros_losses):.6f} | dataset: {np.mean(dataset_losses):.6f} | accuracy = {np.mean(epoch_accuracies):.6f} | time: {1000*epoch_time//batch_size}ms/board | {time_taken//60:3.0f}:{time_taken%60:02.0f}')
+                print(f'epoch: {epoch:4d} | boards: {board_count:5d} | loss: {np.mean(epoch_losses):.6f} | ouroboros: {np.mean(ouroboros_losses):.6f} | dataset: {np.mean(dataset_losses):.6f} | accuracy = {np.mean(epoch_accuracies):.6f} | time: {1000*epoch_time//batch_size}ms/board | {time_taken//60:.0f}:{time_taken%60:02.0f}')
         except KeyboardInterrupt: pass
         finally:
             model.save()

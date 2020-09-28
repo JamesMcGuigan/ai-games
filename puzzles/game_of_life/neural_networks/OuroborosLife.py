@@ -220,7 +220,7 @@ class OuroborosLife(GameOfLifeBase):
                     accuracy        = model.accuracy(outputs, timeline, inputs)  # torch.sum( outputs.to(torch.cast_bool) == expected.to(torch.cast_bool) ).cpu().numpy() / np.prod(outputs.shape)
                     dataset_loss    = self.loss_dataset(outputs, timeline, inputs)
                     ouroboros_loss  = self.loss_ouroboros(outputs, timeline, inputs)
-                    loss            = dataset_loss + ouroboros_loss
+                    loss            = ouroboros_loss + dataset_loss / (epoch ** 0.5)  # fade out dataset_loss heuristic
                     loss.backward()
                     self.optimizer.step()
                     self.scheduler.step()

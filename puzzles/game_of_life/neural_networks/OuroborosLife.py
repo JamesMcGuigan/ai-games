@@ -35,6 +35,13 @@ class OuroborosLife(GameOfLifeBase):
 
 
     def __init__(self, in_channels=1, out_channels=3):
+        """
+        TODO:
+        - Create split blocks that return: [identity, avgpool, maxpool ]  # do we need 3x3 convolution with fixed weights
+        - Basically find a way to count neighbours
+        - reduce model size
+        - add in dense layer at end + middle (as opposed to deconvolution???)
+        """
         assert out_channels % 2 == 1, f'{self.__class__.__name__}(out_channels={out_channels}) must be odd'
 
         super().__init__()
@@ -288,8 +295,12 @@ class OuroborosLife(GameOfLifeBase):
 
                 epoch_time = time.perf_counter() - epoch_start
                 time_taken = time.perf_counter() - time_start
-                print(f'epoch: {epoch:4d} | boards: {board_count:5d} | loss: {epoch_loss} | pixels = {epoch_acc_pixel} | boards = {epoch_acc_board} | time: {time_taken//60:.0f}:{time_taken%60:02.0f} @ {1000*epoch_time//batch_size:3.0f}ms')
-                # print(f'epoch: {epoch:4d} | boards: {board_count:5d} | loss: {np.mean(epoch_losses):.6f} | ouroboros: {np.mean(ouroboros_losses):.6f} | dataset: {np.mean(dataset_losses):.6f} | accuracy = {np.mean(epoch_accuracies):.6f} | time: {1000*epoch_time//batch_size}ms/board | {time_taken//60:.0f}:{time_taken%60:02.0f}')
+                if epoch <= 10 or epoch <= 100 and epoch % 10 == 0 or epoch % 100 == 0:
+                    print(f'epoch: {epoch:4d} | boards: {board_count:5d} | loss: {epoch_loss} | pixels = {epoch_acc_pixel} | boards = {epoch_acc_board} | time: {time_taken//60:.0f}:{time_taken%60:02.0f} @ {1000*epoch_time//batch_size:3.0f}ms')
+                    # print(f'epoch: {epoch:4d} | boards: {board_count:5d} | loss: {np.mean(epoch_losses):.6f} | ouroboros: {np.mean(ouroboros_losses):.6f} | dataset: {np.mean(dataset_losses):.6f} | accuracy = {np.mean(epoch_accuracies):.6f} | time: {1000*epoch_time//batch_size}ms/board | {time_taken//60:.0f}:{time_taken%60:02.0f}')
+                if epoch % 100 == 0:
+                    model.save()
+
         except KeyboardInterrupt: pass
         finally:
             model.save()

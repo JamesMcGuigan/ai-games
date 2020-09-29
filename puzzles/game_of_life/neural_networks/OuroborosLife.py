@@ -48,7 +48,7 @@ class OuroborosLife(GameOfLifeBase):
         # https://www.youtube.com/watch?v=H3g26EVADgY&feature=youtu.be&t=1h39m410s&ab_channel=JeremyHoward
         self.cnn_layers = nn.ModuleList([
             # Previous pixel state requires information from distance 2, so we need two 3x3 convolutions
-            nn.Conv2d(in_channels=in_channels, out_channels=512,  kernel_size=(3,3), padding=1, padding_mode='circular'),
+            nn.Conv2d(in_channels=in_channels, out_channels=512,  kernel_size=(5,5), padding=2, padding_mode='circular'),
             nn.Conv2d(in_channels=512,   out_channels=256,  kernel_size=(1,1)),
             nn.Conv2d(in_channels=256,   out_channels=128,  kernel_size=(1,1)),
 
@@ -59,10 +59,10 @@ class OuroborosLife(GameOfLifeBase):
 
             # # Deconvolution + Convolution allows neighbouring pixels to share information to simulate forward play
             # # This creates a 52x52 grid of interspersed cells that can then be downsampled back down to 25x25
-            nn.ConvTranspose2d(in_channels=1+128, out_channels=128,  kernel_size=(3,3), stride=2, dilation=1),
-            nn.Conv2d(in_channels=128,   out_channels=512,   kernel_size=(1,1)),
+            nn.ConvTranspose2d(in_channels=1+128, out_channels=512,  kernel_size=(3,3), stride=2, dilation=1),
             nn.Conv2d(in_channels=512,   out_channels=256,   kernel_size=(1,1)),
-            nn.Conv2d(in_channels=256,   out_channels=128,   kernel_size=(3,3), stride=2),  # undo deconvolution
+            nn.Conv2d(in_channels=256,   out_channels=64,    kernel_size=(1,1)),
+            nn.Conv2d(in_channels=64,    out_channels=128,   kernel_size=(3,3), stride=2),  # undo deconvolution
 
             nn.Conv2d(in_channels=1+128, out_channels=64,    kernel_size=(1,1)),
             nn.Conv2d(in_channels=64,    out_channels=32,    kernel_size=(1,1)),

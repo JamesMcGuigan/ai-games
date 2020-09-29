@@ -194,7 +194,7 @@ class OuroborosLife(GameOfLifeBase):
         return accuracy.detach().item()
 
 
-    def fit(self, epochs=100_000, batch_size=25, max_delta=25):
+    def fit(self, epochs=100_000, batch_size=25, max_delta=25, timeout=0):
         gc.collect()
         torch.cuda.empty_cache()
         atexit.register(model.save)
@@ -211,6 +211,7 @@ class OuroborosLife(GameOfLifeBase):
             dataset_accuracies = [0]
             for epoch in range(1, epochs+1):
                 if np.min(dataset_accuracies[-10:]) == 1.0: break  # we have reached 100% accuracy
+                if timeout and timeout < time.perf_counter() - time_start: break
 
                 epoch_start = time.perf_counter()
                 timelines_batch = np.array([

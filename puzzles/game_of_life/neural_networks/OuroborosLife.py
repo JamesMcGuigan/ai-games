@@ -2,6 +2,7 @@ import atexit
 import gc
 import time
 from typing import List
+from typing import Tuple
 from typing import Union
 
 import numpy as np
@@ -122,76 +123,111 @@ class OuroborosLife(GameOfLifeBase):
         return x
 
 
-    def loss(self, outputs, timeline, inputs):
-        dataset_loss    = self.loss_dataset(outputs, timeline, inputs)
-        ouroboros_loss  = self.loss_ouroboros(outputs, timeline, inputs)
-        arithmetic_mean = ( dataset_loss + ouroboros_loss ) / 2.0
-        geometric_mean  = ( dataset_loss * ouroboros_loss ) ** (1/2)
-        harmonic_mean   = 2.0 / ( 1.0/dataset_loss + 1.0/ouroboros_loss )
-        return arithmetic_mean
+    # def loss(self, outputs, timeline, inputs):
+    #     dataset_loss    = self.loss_dataset(outputs, timeline, inputs)
+    #     ouroboros_loss  = self.loss_ouroboros(outputs, timeline, inputs)
+    #     arithmetic_mean = ( dataset_loss + ouroboros_loss ) / 2.0
+    #     geometric_mean  = ( dataset_loss * ouroboros_loss ) ** (1/2)
+    #     harmonic_mean   = 2.0 / ( 1.0/dataset_loss + 1.0/ouroboros_loss )
+    #     return arithmetic_mean
+    #
+    #
+    # def loss_ouroboros(self, outputs, timeline, inputs):
+    #     """
+    #     Now we feed the output back into the input and compare second order losses
+    #     t1=0 -> t2 = {2,3,4} | t1=1 -> t2 = {1,2,3,4} | t1=2 -> t2 = {0,1,2,3,4} | t1=3 -> t2 = {0,1,2,3} | t1=4 -> t2 = {0,1,2}
+    #     outputs = [ Past2, Past1, Present, Future1, Future2 ]
+    #     at t1=0: reinput == Past2   | reoutput = [ _,       _,       Past2,   Past1,   Present ]
+    #     at t1=1: reinput == Past1   | reoutput = [ _,       Past2,   Past1,   Present, Future1 ]
+    #     at t1=2: reinput == Present | reoutput = [ Past2,   Past1,   Present, Future1, Future2 ]
+    #     at t1=3: reinput == Future1 | reoutput = [ Past1,   Present, Future1, Future2, _       ]
+    #     at t1=4: reinput == Future2 | reoutput = [ Present, Future1, Future2, _,       _       ]
+    #     """
+    #     ouroboros_losses = []
+    #     for t1 in range(self.out_channels):
+    #         # reinput.shape = (batch_size, 1,            width, height)
+    #         # reinput.shape = (batch_size, out_channels, width, height)
+    #         reinput  = outputs[:,t1,:,:].unsqueeze(1)
+    #         reoutput = self(reinput)
+    #         t2_range = ( max(0, self.out_channels//2-t1), max(self.out_channels+1-t1, self.out_channels-1) )
+    #         ouroboros_loss_per_timeline = []
+    #         for b in range(timeline.shape[0]):
+    #             for delta in range(-self.out_channels//2+1, self.out_channels//2+1):
+    #                 t2 = t1 + delta
+    #                 if not ( t2_range[0] <= t2 <= t2_range[1] ): continue  # invalid index
+    #                 ouroboros_loss_per_timeline.append(
+    #                     # pt.mean( (timeline[b][t1] - reoutput[b][t2])**2 )
+    #                     self.criterion(reoutput[b][t2], timeline[b][t1])
+    #                 )
+    #         ouroboros_losses += ouroboros_loss_per_timeline
+    #
+    #     ouroboros_loss = pt.mean(pt.tensor(ouroboros_losses)).requires_grad_(True)
+    #     return ouroboros_loss
+    #
+    #
+    # def accuracy_dataset(self, outputs, timeline, inputs) -> float:
+    #     """
+    #     Count the number of 100% accuracy boards predicted
+    #     accuracy == 0.666 + output_channels == 3 means:
+    #         Present and Future boards have been correctly predicted, but Past is still not fully solved
+    #     """
+    #     # noinspection PyTypeChecker
+    #     accuracies = pt.tensor([
+    #         pt.all( self.cast_bool(outputs[b][t]) == self.cast_bool(timeline[b][t]) )                      # percentage boards correct
+    #         # pt.mean(( self.cast_bool(outputs[b][t]) == self.cast_bool(timeline[b][t]) ).to(pt.float32))  # percentage pixels correct
+    #         for b in range(timeline.shape[0])
+    #         for t in range(timeline.shape[1])
+    #     ])
+    #     accuracy = pt.mean(accuracies.to(pt.float))
+    #     return accuracy.detach().item()
 
 
-    def loss_dataset(self, outputs, timeline, inputs):
-        # dataset_loss = torch.mean(torch.mean(( (timeline-outputs)**2 ).flatten(1), dim=1))  # average MSE per timeframe
+    def loss_dataset(self, outputs, timeline, inputs, exclude_past=True):
+        # Exclude past losses to avoid the many-pasts to one-future problem
+        if exclude_past:
+            t_present = self.out_channels//2
+            outputs   = outputs[  :, t_present:, :, : ]
+            timeline  = timeline[ :, t_present:, :, : ]
 
-        # FocalLoss(outputs, target) need to be in correct order
+        ### Other ways of computing dataset loss
+        # dataset_loss = torch.mean(torch.mean(( (timeline-outputs)**2 ).flatten(1), dim=1)) # average MSE per timeframe
         # dataset_loss = torch.sum(torch.tensor([
-        #     self.criterion(outputs[b][t], timeline[b][t])
+        #     self.criterion(outputs[b][t], timeline[b][t])  # NOTE: FocalLoss(outputs, target) needed in correct order
         #     for b in range(timeline.shape[0])
         #     for t in range(timeline.shape[1])
         # ], requires_grad=True))
+
         dataset_loss = self.criterion(outputs, timeline)
         return dataset_loss
 
 
-    def loss_ouroboros(self, outputs, timeline, inputs):
+    def loss_accuracy_ouroboros(self, outputs, timeline, inputs) -> Tuple[pt.Tensor, pt.Tensor, pt.Tensor]:
         """
-        Now we feed the output back into the input and compare second order losses
-        t1=0 -> t2 = {2,3,4} | t1=1 -> t2 = {1,2,3,4} | t1=2 -> t2 = {0,1,2,3,4} | t1=3 -> t2 = {0,1,2,3} | t1=4 -> t2 = {0,1,2}
-        outputs = [ Past2, Past1, Present, Future1, Future2 ]
-        at t1=0: reinput == Past2   | reoutput = [ _,       _,       Past2,   Past1,   Present ]
-        at t1=1: reinput == Past1   | reoutput = [ _,       Past2,   Past1,   Present, Future1 ]
-        at t1=2: reinput == Present | reoutput = [ Past2,   Past1,   Present, Future1, Future2 ]
-        at t1=3: reinput == Future1 | reoutput = [ Past1,   Present, Future1, Future2, _       ]
-        at t1=4: reinput == Future2 | reoutput = [ Present, Future1, Future2, _,       _       ]
+        Compute simplified losses for each head, only comparing reoutputs with timeline[t_present]
+        reinput    = t1=0 = Past | t1=1 = Present | t1=2 = Future
+        reoutput   = [ Past2, Past, Present ]@t=0, [ Past, Present, Future ]@t=1, [ Present, Future, Future2 ]@t=2
         """
-        ouroboros_losses = []
-        for t1 in range(self.out_channels):
-            # reinput.shape = (batch_size, 1,            width, height)
-            # reinput.shape = (batch_size, out_channels, width, height)
-            reinput  = outputs[:,t1,:,:].unsqueeze(1)
-            reoutput = self(reinput)
-            t2_range = ( max(0, self.out_channels//2-t1), max(self.out_channels+1-t1, self.out_channels-1) )
-            ouroboros_loss_per_timeline = []
-            for b in range(timeline.shape[0]):
-                for delta in range(-self.out_channels//2+1, self.out_channels//2+1):
-                    t2 = t1 + delta
-                    if not ( t2_range[0] <= t2 <= t2_range[1] ): continue  # invalid index
-                    ouroboros_loss_per_timeline.append(
-                        # pt.mean( (timeline[b][t1] - reoutput[b][t2])**2 )
-                        self.criterion(reoutput[b][t2], timeline[b][t1])
-                    )
-            ouroboros_losses += ouroboros_loss_per_timeline
+        losses     = pt.zeros(self.out_channels, dtype=pt.float32, requires_grad=True).to(self.device)
+        acc_boards = pt.zeros(self.out_channels, dtype=pt.float32, requires_grad=False).to(self.device)
+        acc_pixels = pt.zeros(self.out_channels, dtype=pt.float32, requires_grad=False).to(self.device)
+        for t_input in range(self.out_channels):
+            t_present = self.out_channels//2 - t_input
+            reinput   = outputs[:,t_input,:,:].unsqueeze(1)
+            reoutputs = self(reinput)
 
-        ouroboros_loss = pt.mean(pt.tensor(ouroboros_losses)).requires_grad_(True)
-        return ouroboros_loss
+            # Losses get calculated for present and all future datapoints
+            for d in range(self.out_channels):
+                if reoutputs.shape[1] <= t_present + d: break
+                if timeline.shape[1]  <= t_input   + d: break
+                losses[t_input] += self.criterion(reoutputs[:,t_present+d,:,:], timeline[:,t_input+d,:,:])
+
+            # Accuracy is based only on the self-referential present
+            pixels_correct       = ((reoutputs[:,t_present,:,:] > 0.5) == (timeline[:,t_input,:,:] > 0.5)).to(pt.float).detach()
+            acc_pixels[t_input] +=  pixels_correct.mean()
+            acc_boards[t_input] += (pixels_correct.mean(dim=1) == 1.0).to(pt.float).mean()
+        return losses, acc_pixels, acc_boards
 
 
-    def accuracy(self, outputs, timeline, inputs) -> float:
-        """
-        Count the number of 100% accuracy boards predicted
-        accuracy == 0.666 + output_channels == 3 means:
-            Present and Future boards have been correctly predicted, but Past is still not fully solved
-        """
-        # noinspection PyTypeChecker
-        accuracies = pt.tensor([
-            pt.all( self.cast_bool(outputs[b][t]) == self.cast_bool(timeline[b][t]) )                      # percentage boards correct
-            # pt.mean(( self.cast_bool(outputs[b][t]) == self.cast_bool(timeline[b][t]) ).to(pt.float32))  # percentage pixels correct
-            for b in range(timeline.shape[0])
-            for t in range(timeline.shape[1])
-        ])
-        accuracy = pt.mean(accuracies.to(pt.float))
-        return accuracy.detach().item()
 
 
     def fit(self, epochs=100_000, batch_size=25, max_delta=25, timeout=0):
@@ -218,38 +254,42 @@ class OuroborosLife(GameOfLifeBase):
                     life_step_3d(generate_random_board(), max_delta)
                     for _ in range(batch_size)
                 ])
+                epoch_ds_losses  = []
                 epoch_losses     = []
-                dataset_losses   = []
-                ouroboros_losses = [0]
-                epoch_accuracies = []
+                epoch_acc_pixels = []
+                epoch_acc_boards = []
                 d = self.out_channels // 2  # In theory this should work for 5 or 7 channels
                 for t in range(d, max_delta - d):
                     inputs_np   = timelines_batch[:, np.newaxis, t,:,:]  # (batch_size=10, channels=1,  width=25, height=25)
                     timeline_np = timelines_batch[:, t-d:t+d+1,    :,:]  # (batch_size=10, channels=10, width=25, height=25)
-                    inputs   = pt.tensor(inputs_np).to(self.device).to(pt.float32)
-                    timeline = pt.tensor(timeline_np).to(self.device).to(pt.float32)
+                    inputs      = pt.tensor(inputs_np).to(self.device).to(pt.float32)
+                    timeline    = pt.tensor(timeline_np).to(self.device).to(pt.float32)
 
                     self.optimizer.zero_grad()
-                    outputs         = self(inputs)
-                    accuracy        = model.accuracy(outputs, timeline, inputs)  # torch.sum( outputs.to(torch.cast_bool) == expected.to(torch.cast_bool) ).cpu().numpy() / np.prod(outputs.shape)
-                    dataset_loss    = self.loss_dataset(outputs, timeline, inputs)
-                    ouroboros_loss  = self.loss_ouroboros(outputs, timeline, inputs)
-                    loss            = ouroboros_loss + dataset_loss / (epoch ** 0.5)  # fade out dataset_loss heuristic
+                    outputs      = self(inputs)
+                    dataset_loss = self.loss_dataset(outputs, timeline, inputs, exclude_past=True)
+                    orb_losses, acc_pixels, acc_boards = model.loss_accuracy_ouroboros(outputs, timeline, inputs)
+                    loss = pt.mean(orb_losses) + dataset_loss
                     loss.backward()
                     self.optimizer.step()
                     self.scheduler.step()
 
                     board_count += batch_size
-                    epoch_losses.append(loss.detach().item())
-                    dataset_losses.append(dataset_loss.detach().item())
-                    ouroboros_losses.append(ouroboros_loss.detach().item())
-                    epoch_accuracies.append(accuracy)
+                    epoch_ds_losses.append(dataset_loss.detach().item())
+                    epoch_losses.append(orb_losses.detach())
+                    epoch_acc_pixels.append(acc_pixels.detach())
+                    epoch_acc_boards.append(acc_boards.detach())
                     torch.cuda.empty_cache()
-                dataset_accuracies.append( min(epoch_accuracies) )
+
+                dataset_accuracies.append( pt.stack(epoch_acc_boards).min() )
+                epoch_loss      = f"{100*np.mean(epoch_ds_losses):.6f} : " + " ".join([ f'{100*n:.6f}' for n in pt.stack(epoch_losses).mean(dim=0).tolist()     ])
+                epoch_acc_pixel = " ".join([ f'{n:.3f}'     for n in pt.stack(epoch_acc_pixels).mean(dim=0).tolist() ])
+                epoch_acc_board = " ".join([ f'{n:.3f}'     for n in pt.stack(epoch_acc_boards).mean(dim=0).tolist() ])
 
                 epoch_time = time.perf_counter() - epoch_start
                 time_taken = time.perf_counter() - time_start
-                print(f'epoch: {epoch:4d} | boards: {board_count:5d} | loss: {np.mean(epoch_losses):.6f} | ouroboros: {np.mean(ouroboros_losses):.6f} | dataset: {np.mean(dataset_losses):.6f} | accuracy = {np.mean(epoch_accuracies):.6f} | time: {1000*epoch_time//batch_size}ms/board | {time_taken//60:.0f}:{time_taken%60:02.0f}')
+                print(f'epoch: {epoch:4d} | boards: {board_count:5d} | loss: {epoch_loss} | pixels = {epoch_acc_pixel} | boards = {epoch_acc_board} | time: {time_taken//60:.0f}:{time_taken%60:02.0f} @ {1000*epoch_time//batch_size:3.0f}ms')
+                # print(f'epoch: {epoch:4d} | boards: {board_count:5d} | loss: {np.mean(epoch_losses):.6f} | ouroboros: {np.mean(ouroboros_losses):.6f} | dataset: {np.mean(dataset_losses):.6f} | accuracy = {np.mean(epoch_accuracies):.6f} | time: {1000*epoch_time//batch_size}ms/board | {time_taken//60:.0f}:{time_taken%60:02.0f}')
         except KeyboardInterrupt: pass
         finally:
             model.save()

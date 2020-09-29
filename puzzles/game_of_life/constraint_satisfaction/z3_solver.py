@@ -47,9 +47,11 @@ def game_of_life_ruleset(size=(25,25), delta=1, max_t=0, z3_solver=None, t_cells
             ])
 
     # Add constraint that there can be no empty boards
-    for t in range(1, max_t+1):
+    # At least three cells in every board, as that is the minimum required to persist
+    # Don't add constraint to input t_cells[delta] layer
+    for t in range(0, max_t):
         layer = pydash.flatten_deep(t_cells[t])
-        z3_solver.add([ z3.AtLeast( *layer, 1 ) ])
+        z3_solver.add([ z3.AtLeast( *layer, 3 ) ])
 
     z3_solver.push()  # Create checkpoint before dataset constraints
     return z3_solver, t_cells
@@ -75,6 +77,16 @@ def add_zero_point_constraint(z3_solver, t_cells, zero_point_distance: int):
                     )
                 ])
     return z3_solver
+
+
+def add_cell_count_minimization(z3_solver, t_cells, delta):
+    cost = z3.Sum([
+        z3.If(cell,1,0)
+        for cell in pydash.flatten_deep(t_cells[-delta-1:-1])
+    ])
+    z3_solver.minimize(cost)
+    return z3_solver
+
 
 
 
@@ -126,7 +138,7 @@ def game_of_life_solver_full_delta(board: np.ndarray, delta=1, timeout=0, verbos
 
 
 
-def game_of_life_solver_iterative_delta(board: np.ndarray, delta=1, timeout=0, max_backtracks=0, verbose=True):
+def game_of_life_solver_iterative_delta(board: np.ndarray, delta=1, timeout=0, max_backtracks=0, minimize=True, verbose=True):
     """
     Here we attempt to ask z3 to solve the board each delta at a time, rather than all in one go
     Hopefully this should be significantly quicker for large deltas
@@ -135,7 +147,8 @@ def game_of_life_solver_iterative_delta(board: np.ndarray, delta=1, timeout=0, m
     size       = (size_x, size_y) = board.shape
 
     # Create an initial solver
-    z3_solver, t_cells = game_of_life_ruleset(size=size, delta=0, max_t=delta)
+    z3_solver = z3.Optimize()
+    z3_solver, t_cells = game_of_life_ruleset(size=size, delta=0, max_t=delta, z3_solver=z3_solver)
 
     # Add constraints for T=delta-1 the problem defined in the input board
     z3_solver.add([
@@ -157,6 +170,8 @@ def game_of_life_solver_iterative_delta(board: np.ndarray, delta=1, timeout=0, m
         if max_backtracks and max_backtracks < backtrack_count: break  # exit quickly if we have an unsat board
 
         z3_solver, t_cells = game_of_life_ruleset(size=size, delta=t, max_t=delta, z3_solver=z3_solver, t_cells=t_cells)
+        if minimize:
+            add_cell_count_minimization(z3_solver, t_cells, t)
         z3_solver.push()       # save ruleset constraints
         for zero_point_distance in [1,2]:
             z3_solver.push()   # remove zero point constraints - we need a push for every pop

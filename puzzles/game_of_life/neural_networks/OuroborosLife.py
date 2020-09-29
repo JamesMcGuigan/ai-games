@@ -89,9 +89,9 @@ class OuroborosLife(GameOfLifeBase):
         self.optimizer = pt.optim.RMSprop(self.parameters(), lr=0.01, momentum=0.9)
         self.scheduler = torch.optim.lr_scheduler.CyclicLR(
             self.optimizer,
-            max_lr=1e-3,
-            base_lr=1e-5,
-            step_size_up=10,
+            max_lr=1e-4,
+            base_lr=1e-6,
+            step_size_up=100,
             mode='exp_range',
             gamma=0.8
         )

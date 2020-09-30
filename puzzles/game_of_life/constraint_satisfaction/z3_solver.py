@@ -91,7 +91,7 @@ def add_cell_count_minimization(z3_solver, t_cells, delta):
 
 
 def game_of_life_solver(board: np.ndarray, delta=1, timeout=0, verbose=True):
-    return game_of_life_solver_iterative_delta(board=board, delta=delta, timeout=timeout, verbose=verbose)
+    return game_of_life_solver_full_delta(board=board, delta=delta, timeout=timeout, verbose=verbose)
 
 
 

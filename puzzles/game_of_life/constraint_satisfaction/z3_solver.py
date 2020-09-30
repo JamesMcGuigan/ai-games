@@ -138,7 +138,7 @@ def game_of_life_solver_full_delta(board: np.ndarray, delta=1, timeout=0, verbos
 
 
 
-def game_of_life_solver_iterative_delta(board: np.ndarray, delta=1, timeout=0, max_backtracks=0, minimize=True, verbose=True):
+def game_of_life_solver_iterative_delta(board: np.ndarray, delta=1, timeout=0, max_backtracks=0, minimize=False, verbose=True):
     """
     Here we attempt to ask z3 to solve the board each delta at a time, rather than all in one go
     Hopefully this should be significantly quicker for large deltas

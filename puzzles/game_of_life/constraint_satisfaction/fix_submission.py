@@ -3,6 +3,7 @@ import time
 import numpy as np
 from numba import njit
 
+from utils.datasets import sample_submission_df
 from utils.datasets import submission_df
 from utils.datasets import submission_file
 from utils.datasets import test_df
@@ -40,7 +41,7 @@ def fix_submission(max_offset=5):
     """
     time_start = time.perf_counter()
 
-    invalid_idxs = set(submission_df.index) - set(test_df.index)
+    invalid_idxs = set(sample_submission_df.index) - set(test_df.index)
     if len(invalid_idxs):
         submission_df.drop(invalid_idxs, inplace=True)
         print( f'fix_submission() invalid idxs: {invalid_idxs}' )

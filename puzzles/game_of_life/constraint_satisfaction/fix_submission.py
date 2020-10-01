@@ -56,7 +56,7 @@ def fix_submission(max_offset=5):
     stats = {
         "time":    time.perf_counter() - time_start,
         "empty":   len(submission_df.index) - len(idxs),
-        "total":   len(idxs),
+        "total":   len(submission_df.index),
         "valid":   0,
         "fixed":   len(missing_idxs),
         "invalid": len(invalid_idxs),

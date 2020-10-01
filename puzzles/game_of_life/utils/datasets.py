@@ -3,6 +3,7 @@
 
 import os
 
+import numpy as np
 import pandas as pd
 
 if os.environ.get('KAGGLE_KERNEL_RUN_TYPE'):
@@ -36,10 +37,10 @@ def copy_sample_submission_file():
 copy_sample_submission_file()
 
 
-train_df             = pd.read_csv(train_file, index_col='id')
-test_df              = pd.read_csv(test_file,  index_col='id')
-submission_df        = pd.read_csv(submission_file,  index_col='id')
-sample_submission_df = pd.read_csv(sample_submission_file,  index_col='id')
+train_df             = pd.read_csv(train_file, index_col='id').astype(np.int)
+test_df              = pd.read_csv(test_file,  index_col='id').astype(np.int)
+submission_df        = pd.read_csv(submission_file,  index_col='id').astype(np.int)
+sample_submission_df = pd.read_csv(sample_submission_file,  index_col='id').astype(np.int)
 timeout_df           = pd.read_csv(timeout_file,  index_col='id')
 
 # Ensure submission.csv contains all required indices and is in sorted order

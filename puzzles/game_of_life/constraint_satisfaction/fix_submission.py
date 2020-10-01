@@ -86,10 +86,9 @@ def fix_submission(max_offset=5):
             pass
     # assert stats['total'] == stats['valid'] + stats['fixed'] + stats['invalid']
 
-    if stats['fixed'] + stats['invalid'] > 0:
-        submission_df.sort_index().astype(np.int).to_csv(submission_file)
-        print( f'fix_submission() wrote: {submission_file}' )
-        pass
+    # if stats['fixed'] + stats['invalid'] > 0:
+    submission_df.sort_index().astype(np.int).to_csv(submission_file)
+    print( f'fix_submission() wrote: {submission_file}' )
 
     time_taken = time.perf_counter() - time_start
     stats['time'] = f'{time_taken:.1f}'

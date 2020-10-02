@@ -24,6 +24,8 @@ class GameOfLifeHardcoded(GameOfLifeBase):
         ])
         self.output     = nn.Conv2d(in_channels=2, out_channels=1, kernel_size=(1,1))
         self.activation = nn.Identity()
+        self.trainable_layers = [ 'input' ]  # we need at least one trainable layer
+        self.criterion  = nn.MSELoss()
 
 
     def forward(self, x):
@@ -54,9 +56,10 @@ class GameOfLifeHardcoded(GameOfLifeBase):
     def unfreeze(self: T) -> T:
         super().unfreeze()
         self.freeze()
-        for name, parameter in self.named_parameters():
-            if name.split('.')[0] in [ 'input' ]:
-                parameter.requires_grad = True
+        for trainable_layer_name in self.trainable_layers:
+            for name, parameter in self.named_parameters():
+                if name.startswith( trainable_layer_name ):
+                    parameter.requires_grad = True
         return self
 
 

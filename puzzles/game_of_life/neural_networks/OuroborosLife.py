@@ -10,8 +10,8 @@ import torch
 import torch as pt
 import torch.nn as nn
 
-from neural_networks.FocalLoss import FocalLoss
 from neural_networks.GameOfLifeBase import GameOfLifeBase
+from neural_networks.modules.FocalLoss import FocalLoss
 from utils.game import generate_random_board
 from utils.game import life_step_3d
 

@@ -41,19 +41,19 @@ def fix_submission(max_offset=5):
     """
     time_start = time.perf_counter()
 
-    invalid_idxs = set(sample_submission_df.index) - set(test_df.index)
+    invalid_idxs = set(sample_submission_df.index) - set(submission_df.index)
     if len(invalid_idxs):
         submission_df.drop(invalid_idxs, inplace=True)
         print( f'fix_submission() invalid idxs: {invalid_idxs}' )
 
-    missing_idxs = set(test_df.index) - set(submission_df.index)
+    missing_idxs = set(submission_df.index) - set(sample_submission_df.index)
     if len(missing_idxs):
         print( f'fix_submission() missing idxs: {missing_idxs}' )
         for idx in missing_idxs:
             stop  = csv_to_numpy(test_df, idx, key='stop')
             submission_df.loc[idx] = numpy_to_series(np.zeros(stop.shape, dtype=np.int), key='start')  # zero out the entry and retry
 
-    idxs  = [ idx for idx in submission_df.index if np.count_nonzero(submission_df.loc[idx]) ]
+    idxs  = [ idx for idx in submission_df.index if np.count_nonzero(submission_df.loc[idx]) if idx in test_df.index ]
     stats = {
         "time":    time.perf_counter() - time_start,
         "empty":   len(submission_df.index) - len(idxs),
@@ -63,26 +63,31 @@ def fix_submission(max_offset=5):
         "invalid": len(invalid_idxs),
     }
     for idx in idxs:
-        delta = csv_to_delta(test_df, idx)
-        start = csv_to_numpy(submission_df, idx, key='start')
-        stop  = csv_to_numpy(test_df,       idx, key='stop')
-        assert np.count_nonzero(start), idx
-        assert np.count_nonzero(stop),  idx
+        try:
+            delta = csv_to_delta(test_df, idx)
+            start = csv_to_numpy(submission_df, idx, key='start')
+            stop  = csv_to_numpy(test_df,       idx, key='stop')
+            assert np.count_nonzero(start), idx
+            assert np.count_nonzero(stop),  idx
 
-        if is_valid_solution(start, stop, delta):
-            stats['valid'] += 1
-            continue  # submission.csv is valid for idx, so skip
+            if is_valid_solution(start, stop, delta):
+                stats['valid'] += 1
+                continue  # submission.csv is valid for idx, so skip
 
-        solution = start
-        for t in range(1, max_offset+1):
-            solution = life_step(solution)
-            if is_valid_solution(solution, stop, delta):
-                submission_df.loc[idx] = numpy_to_series(solution, key='start')
-                stats['fixed'] += 1
-                break
-        else:
-            submission_df.loc[idx] = numpy_to_series(np.zeros(stop.shape), key='start')  # zero out the entry and retry
-            print( f'fix_submission() invalid idx: {idx} | delta: {delta} | cells: {np.count_nonzero(solution != stop)}' )
+            solution = start
+            for t in range(1, max_offset+1):
+                solution = life_step(solution)
+                if is_valid_solution(solution, stop, delta):
+                    submission_df.loc[idx] = numpy_to_series(solution, key='start')
+                    stats['fixed'] += 1
+                    break
+            else:
+                submission_df.loc[idx] = numpy_to_series(np.zeros(stop.shape), key='start')  # zero out the entry and retry
+                print( f'fix_submission() invalid idx: {idx} | delta: {delta} | cells: {np.count_nonzero(solution != stop)}' )
+                stats['invalid'] += 1
+                pass
+        except:
+            print( f'fix_submission() exception idx: {idx}' )
             stats['invalid'] += 1
             pass
     # assert stats['total'] == stats['valid'] + stats['fixed'] + stats['invalid']

@@ -30,12 +30,16 @@ class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
 
     @staticmethod
     def weights_init(layer):
-        if isinstance(layer, (nn.Conv2d, nn.ConvTranspose2d)):
-            # kaiming corrects for mean and std of the relu function
-            nn.init.kaiming_normal_(layer.weight)
-            if layer.bias is not None:
-                # small positive bias so that all nodes are initialized
-                nn.init.constant_(layer.bias, 0.1)
+        ### Default initialization seems to work best, at least for Z shaped ReLU1 - see GameOfLifeHardcodedReLU1_21.py
+        # if isinstance(layer, (nn.Conv2d, nn.ConvTranspose2d)):
+        #     ### kaiming_normal_ corrects for mean and std of the relu function
+        #     ### xavier_normal_ works better for ReLU6 and Z shaped activations
+        #     # nn.init.kaiming_normal_(layer.weight)
+        #     nn.init.xavier_normal_(layer.weight)
+        #     if layer.bias is not None:
+        #         # small positive bias so that all nodes are initialized
+        #         nn.init.constant_(layer.bias, 0.1)
+        pass
 
     ### Prediction
 

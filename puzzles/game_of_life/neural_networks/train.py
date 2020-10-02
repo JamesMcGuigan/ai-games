@@ -13,7 +13,7 @@ from utils.game import generate_random_board
 from utils.game import life_step
 
 
-def train(model, batch_size=1, l1=0, l2=0, timeout=0, reverse_input_output=False):
+def train(model, batch_size=100, l1=0, l2=0, timeout=0, reverse_input_output=False):
     print(f'Training: {model.__class__.__name__}')
     time_start = time.perf_counter()
 
@@ -31,9 +31,9 @@ def train(model, batch_size=1, l1=0, l2=0, timeout=0, reverse_input_output=False
     # Finished Training: GameOfLifeForward - 240995 epochs in 3569.1s
     scheduler = torch.optim.lr_scheduler.CyclicLR(
         optimizer,
-        max_lr=1,
-        base_lr=1e-3,
-        step_size_up=250,
+        max_lr=1e-3,
+        base_lr=1e-4,
+        step_size_up=100,
         mode='exp_range',
         gamma=0.8
     )

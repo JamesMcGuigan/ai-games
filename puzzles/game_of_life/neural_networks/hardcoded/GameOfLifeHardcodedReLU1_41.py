@@ -26,14 +26,16 @@ class GameOfLifeHardcodedReLU1_41(GameOfLifeHardcoded):
     def __init__(self):
         super().__init__()
 
+        self.trainable_layers  = [ 'input', 'output' ]
         self.input   = nn.Conv2d(in_channels=1, out_channels=1, kernel_size=(1, 1), bias=False)  # no-op trainable layer
-        self.counter = nn.Conv2d(in_channels=1, out_channels=4, kernel_size=(3,3),
+        self.counter = nn.Conv2d(in_channels=1, out_channels=2, kernel_size=(3,3),
                                   padding=1, padding_mode='circular', bias=False)
         self.logics  = nn.ModuleList([
-            nn.Conv2d(in_channels=4, out_channels=4, kernel_size=(1,1))
+            nn.Conv2d(in_channels=2, out_channels=4, kernel_size=(1,1))
         ])
         self.output  = nn.Conv2d(in_channels=4, out_channels=1, kernel_size=(1,1))
         self.activation = ReLU1()
+
 
 
     def load(self):
@@ -57,10 +59,10 @@ class GameOfLifeHardcodedReLU1_41(GameOfLifeHardcoded):
             [[[ -10.0 ]], [[ -1.0 ]]],  # Dead  + neighbours <  4
         ])
         self.logics[0].bias.data = torch.tensor([
-            -(10 +  (2)   -1)*1.0,      # Alive + neighbours >= 2
-            -(10 -  (9-4) +1)*1.0,      # Alive + neighbours <  4
-            -( 0 +  (3)   -1)*1.0,      # Dead  + neighbours >= 3
-            -( 0  - (9-4) +1)*1.0,      # Dead  + neighbours <  4
+            -10.0 - 2.0 + 1.0,  # Alive +  neighbours >= 2
+            -10.0 + 3.0 + 1.0,  # Alive + -neighbours <= 3
+              0.0 - 3.0 + 1.0,  # Dead  +  neighbours >= 3
+              0.0 + 3.0 + 1.0,  # Dead  + -neighbours <= 3
         ])
 
         # Both of the Alive or Dead statements need to be true
@@ -86,6 +88,8 @@ if __name__ == '__main__':
 
     model = GameOfLifeHardcodedReLU1_41()
 
+    train(model)
+
     board = np.array([
         [0,0,0,0,0],
         [0,0,0,0,0],
@@ -95,9 +99,7 @@ if __name__ == '__main__':
     ])
     result1 = model.predict(board)
     result2 = model.predict(result1)
-    # assert np.array_equal(board, result2)
-
-    train(model)
+    assert np.array_equal(board, result2)
 
     print('-' * 20)
     print(model.__class__.__name__)

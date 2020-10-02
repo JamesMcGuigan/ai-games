@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import os
 from abc import ABCMeta
 from typing import List
@@ -30,8 +31,11 @@ class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
     @staticmethod
     def weights_init(layer):
         if isinstance(layer, (nn.Conv2d, nn.ConvTranspose2d)):
+            # kaiming corrects for mean and std of the relu function
             nn.init.kaiming_normal_(layer.weight)
-            nn.init.constant_(layer.bias, 0.1)
+            if layer.bias is not None:
+                # small positive bias so that all nodes are initialized
+                nn.init.constant_(layer.bias, 0.1)
 
     ### Prediction
 
@@ -141,14 +145,14 @@ class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
     def cast_inputs(self, x: Union[List[np.ndarray], np.ndarray, torch.Tensor]) -> torch.Tensor:
         x = self.cast_to_tensor(x)
         if x.dim() == 1:             # single row from dataframe
-            x = x.view(1, 1, torch.sqrt(x.shape[0]), torch.sqrt(x.shape[0]))
+            x = x.view(1, 1, math.isqrt(x.shape[0]), math.isqrt(x.shape[0]))
         elif x.dim() == 2:
             if x.shape[0] == x.shape[1]:  # single 2d board
-                x = x.view(1, 1, x.shape[0], x.shape[1])
+                x = x.view((1, 1, x.shape[0], x.shape[1]))
             else: # rows of flattened boards
-                x = x.view(-1, 1, torch.sqrt(x.shape[1]), torch.sqrt(x.shape[1]))
-        elif x.dim() == 3:                                 # numpy  == (batch_size, height, width)
-            x = x.view(x.shape[0], 1, x.shape[1], x.shape[2])   # x.shape = (batch_size, channels, height, width)
+                x = x.view((-1, 1, math.isqrt(x.shape[1]), math.isqrt(x.shape[1])))
+        elif x.dim() == 3:                                        # numpy  == (batch_size, height, width)
+            x = x.view((x.shape[0], 1, x.shape[1], x.shape[2]))   # x.shape = (batch_size, channels, height, width)
         elif x.dim() == 4:
             pass  # already in (batch_size, channels, height, width) format, so do nothing
         return x

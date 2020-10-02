@@ -12,7 +12,7 @@ T = TypeVar('T', bound='GameOfLifeHardcoded')
 class GameOfLifeHardcoded(GameOfLifeBase):
     """
     This implements the life_step() function as a minimalist Neural Network function with hardcoded weights
-    Subclasses implement the effect of different activations
+    Subclasses implement the effect of different activation_fns
     """
 
     # def load_state_dict(self):
@@ -28,6 +28,35 @@ class GameOfLifeHardcoded(GameOfLifeBase):
             if name.split('.')[0] in [ 'identity' ]:
                 parameter.requires_grad = True
         return self
+
+
+    def __init__(self):
+        super().__init__()
+
+        self.identity   = nn.Conv2d(in_channels=1, out_channels=1, kernel_size=(1, 1), bias=False)  # We need at least one trainable layer
+        self.counter    = nn.Conv2d(in_channels=1, out_channels=2, kernel_size=(3,3),
+                                  padding=1, padding_mode='circular', bias=False)
+        self.logics     = nn.ModuleList([
+            nn.Conv2d(in_channels=2, out_channels=2, kernel_size=(1,1))
+        ])
+        self.output     = nn.Conv2d(in_channels=2, out_channels=1, kernel_size=(1,1))
+        self.activation = nn.Identity()
+
+
+    def forward(self, x):
+        x = input = self.cast_inputs(x)
+
+        x = self.identity(x)  # noop - a single node linear layer - torch needs at least one trainable layer
+        x = self.counter(x)   # counter counts above 6, so no ReLU6
+
+        for logic in self.logics:
+            x = logic(x)
+            x = self.activation(x)
+
+        x = self.output(x)
+        x = torch.sigmoid(x)
+
+        return x
 
 
 
@@ -46,23 +75,11 @@ class GameOfLifeHardcodedLeakyReLU(GameOfLifeHardcoded):
         self.identity = nn.Conv2d(in_channels=1, out_channels=1, kernel_size=(1, 1), bias=False)  # We need at least one trainable layer
         self.counter  = nn.Conv2d(in_channels=1, out_channels=2, kernel_size=(3,3),
                                   padding=1, padding_mode='circular', bias=False)
-        self.logic    = nn.Conv2d(in_channels=2, out_channels=2, kernel_size=(1,1))
+        self.logics   = nn.ModuleList([
+            nn.Conv2d(in_channels=2, out_channels=2, kernel_size=(1,1))
+        ])
         self.output   = nn.Conv2d(in_channels=2, out_channels=1, kernel_size=(1,1))
-
-
-    def forward(self, x):
-        x = input = self.cast_inputs(x)
-
-        x = self.identity(x)  # noop - a single node linear layer - torch needs at least one trainable layer
-        x = self.counter(x)   # counter counts above 6, so no ReLU6
-
-        x = self.logic(x)
-        x = F.leaky_relu(x)
-
-        x = self.output(x)
-        x = torch.sigmoid(x)
-
-        return x
+        self.activation = nn.LeakyReLU()
 
 
     def load(self):
@@ -79,11 +96,11 @@ class GameOfLifeHardcodedLeakyReLU(GameOfLifeHardcoded):
               [ 1.0, 1.0, 1.0 ]]]
         ])
 
-        self.logic.weight.data = torch.tensor([
+        self.logics[0].weight.data = torch.tensor([
             [ [[-2.8648230e-03]], [[ 1.0946677e+00]] ],
             [ [[-1.7410564e+01]], [[-1.4649882e+01]] ],
         ])
-        self.logic.bias.data = torch.tensor([
+        self.logics[0].bias.data = torch.tensor([
             -3.3558989,
              9.621474
         ])
@@ -99,6 +116,19 @@ class GameOfLifeHardcodedLeakyReLU(GameOfLifeHardcoded):
 
 
 
+class ReLU1(nn.Module):
+    def forward(self, x):
+        return F.relu6(x * 6.0) / 6.0
+
+class ReLUX(nn.Module):
+    def __init__(self, scale=1.0):
+        super(ReLUX, self).__init__()
+        self.scale = float(scale)
+
+    def forward(self, x):
+        return F.relu6(x * 6.0/self.scale) / (6.0/self.scale)
+
+
 class GameOfLifeHardcodedReLU6(GameOfLifeHardcoded):
 
     def __init__(self):
@@ -107,23 +137,11 @@ class GameOfLifeHardcodedReLU6(GameOfLifeHardcoded):
         self.identity = nn.Conv2d(in_channels=1, out_channels=1, kernel_size=(1, 1), bias=False)  # We need at least one trainable layer
         self.counter  = nn.Conv2d(in_channels=1, out_channels=4, kernel_size=(3,3),
                                  padding=1, padding_mode='circular', bias=False)
-        self.logic    = nn.Conv2d(in_channels=4, out_channels=4, kernel_size=(1,1))
-        self.output   = nn.Conv2d(in_channels=4, out_channels=1, kernel_size=(1,1))
-
-
-    def forward(self, x):
-        x = input = self.cast_inputs(x)
-
-        x = self.identity(x)  # noop - a single node linear layer - torch needs at least one trainable layer
-        x = self.counter(x)   # counter counts above 6, so no ReLU6
-
-        x = self.logic(x)
-        x = F.relu6(x * 6.0) / 6.0   # ReLU1 but capped at a maximum value of 1
-
-        x = self.output(x)
-        x = torch.sigmoid(x)
-
-        return x
+        self.logics   = nn.ModuleList([
+            nn.Conv2d(in_channels=4, out_channels=4, kernel_size=(1,1))
+        ])
+        self.output     = nn.Conv2d(in_channels=4, out_channels=1, kernel_size=(1,1))
+        self.activation = ReLUX(1)
 
 
     def load(self):
@@ -140,13 +158,13 @@ class GameOfLifeHardcodedReLU6(GameOfLifeHardcoded):
               [ 1.0, 1.0, 1.0 ]]]
         ])
 
-        self.logic.weight.data = torch.tensor([
+        self.logics[0].weight.data = torch.tensor([
             [[[   10.0 ]], [[   1.0 ]]],   # z3.AtMost(             *past_neighbours, 3 ),
             [[[   10.0 ]], [[  -1.0 ]]],   # z3.AtMost(             *past_neighbours, 3 ),
             [[[  -10.0 ]], [[   1.0 ]]],   # z3.AtLeast( past_cell, *past_neighbours, 3 ),
             [[[  -10.0 ]], [[  -1.0 ]]],   # z3.AtLeast( past_cell, *past_neighbours, 3 ),
         ])
-        self.logic.bias.data = torch.tensor([
+        self.logics[0].bias.data = torch.tensor([
              -(10 +  (2)   -1)*1.0,  # Alive + n >= 2   # z3.AtLeast( past_cell, *past_neighbours, 3 ),
              -(10 -  (9-4) +1)*1.0,  # Alive + n <  4   # z3.AtLeast( past_cell, *past_neighbours, 3 ),
              -( 0 +  (3)   -1)*1.0,  # Dead  + n >= 3   # z3.AtMost(             *past_neighbours, 3 ),
@@ -185,7 +203,7 @@ if __name__ == '__main__':
         ])
         result1 = model.predict(board)
         result2 = model.predict(result1)
-        assert np.array_equal(board, result2)
+        assert np.array_equal(board, result2), (board, result2)
 
     for model in models:
         train(model)

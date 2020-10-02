@@ -16,7 +16,7 @@ class GameOfLifeHardcoded(GameOfLifeBase):
     def __init__(self):
         super().__init__()
 
-        self.identity   = nn.Conv2d(in_channels=1, out_channels=1, kernel_size=(1, 1), bias=False)  # We need at least one trainable layer
+        self.input      = nn.Conv2d(in_channels=1, out_channels=1, kernel_size=(1, 1), bias=False)
         self.counter    = nn.Conv2d(in_channels=1, out_channels=2, kernel_size=(3,3),
                                     padding=1, padding_mode='circular', bias=False)
         self.logics     = nn.ModuleList([
@@ -29,7 +29,7 @@ class GameOfLifeHardcoded(GameOfLifeBase):
     def forward(self, x):
         x = input = self.cast_inputs(x)
 
-        x = self.identity(x)  # noop - a single node linear layer - torch needs at least one trainable layer
+        x = self.input(x)     # noop - a single node linear layer - torch needs at least one trainable layer
         x = self.counter(x)   # counter counts above 6, so no ReLU6
 
         for logic in self.logics:
@@ -55,7 +55,7 @@ class GameOfLifeHardcoded(GameOfLifeBase):
         super().unfreeze()
         self.freeze()
         for name, parameter in self.named_parameters():
-            if name.split('.')[0] in [ 'identity' ]:
+            if name.split('.')[0] in [ 'input' ]:
                 parameter.requires_grad = True
         return self
 

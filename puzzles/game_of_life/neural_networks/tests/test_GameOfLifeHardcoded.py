@@ -2,11 +2,13 @@ import numpy as np
 import pytest
 
 from neural_networks.hardcoded.GameOfLifeHardcodedLeakyReLU import GameOfLifeHardcodedLeakyReLU
-from neural_networks.hardcoded.GameOfLifeHardcodedReLU1 import GameOfLifeHardcodedReLU1
+from neural_networks.hardcoded.GameOfLifeHardcodedReLU1_21 import GameOfLifeHardcodedReLU1_21
+from neural_networks.hardcoded.GameOfLifeHardcodedReLU1_41 import GameOfLifeHardcodedReLU1_41
 
 models = [
     GameOfLifeHardcodedLeakyReLU(),
-    GameOfLifeHardcodedReLU1(),
+    GameOfLifeHardcodedReLU1_41(),
+    GameOfLifeHardcodedReLU1_21(),
 ]
 
 @pytest.mark.parametrize("boards", [

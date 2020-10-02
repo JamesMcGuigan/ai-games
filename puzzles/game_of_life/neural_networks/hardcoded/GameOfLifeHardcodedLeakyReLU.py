@@ -18,20 +18,20 @@ class GameOfLifeHardcodedLeakyReLU(GameOfLifeHardcoded):
     def __init__(self):
         super().__init__()
 
-        self.identity = nn.Conv2d(in_channels=1, out_channels=1, kernel_size=(1, 1), bias=False)  # We need at least one trainable layer
-        self.counter  = nn.Conv2d(in_channels=1, out_channels=2, kernel_size=(3,3),
+        self.input   = nn.Conv2d(in_channels=1, out_channels=1, kernel_size=(1, 1), bias=False)  # no-op trainable layer
+        self.counter = nn.Conv2d(in_channels=1, out_channels=2, kernel_size=(3,3),
                                   padding=1, padding_mode='circular', bias=False)
-        self.logics   = nn.ModuleList([
+        self.logics  = nn.ModuleList([
             nn.Conv2d(in_channels=2, out_channels=2, kernel_size=(1,1))
         ])
-        self.output   = nn.Conv2d(in_channels=2, out_channels=1, kernel_size=(1,1))
+        self.output  = nn.Conv2d(in_channels=2, out_channels=1, kernel_size=(1,1))
         self.activation = nn.LeakyReLU()
 
 
     def load(self):
         super().load()
 
-        self.identity.weight.data   = torch.tensor([[[[1.0]]]])
+        self.input.weight.data   = torch.tensor([[[[1.0]]]])
         self.counter.weight.data = torch.tensor([
             [[[ 0.0, 0.0, 0.0 ],
               [ 0.0, 1.0, 0.0 ],

@@ -1,5 +1,3 @@
-# The purpose of this neural network is to predict the previous T=-1 state from a game of life board
-
 import torch
 import torch.nn as nn
 

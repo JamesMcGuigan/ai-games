@@ -41,12 +41,12 @@ def fix_submission(max_offset=5):
     """
     time_start = time.perf_counter()
 
-    invalid_idxs = set(sample_submission_df.index) - set(submission_df.index)
+    invalid_idxs = set(submission_df.index) - set(sample_submission_df.index)
     if len(invalid_idxs):
         submission_df.drop(invalid_idxs, inplace=True)
         print( f'fix_submission() invalid idxs: {invalid_idxs}' )
 
-    missing_idxs = set(submission_df.index) - set(sample_submission_df.index)
+    missing_idxs = set(sample_submission_df.index) - set(submission_df.index)
     if len(missing_idxs):
         print( f'fix_submission() missing idxs: {missing_idxs}' )
         for idx in missing_idxs:
@@ -75,17 +75,18 @@ def fix_submission(max_offset=5):
                 continue  # submission.csv is valid for idx, so skip
 
             solution = start
-            for t in range(1, max_offset+1):
+            for t in range(1, max_offset+3):
                 solution = life_step(solution)
                 if is_valid_solution(solution, stop, delta):
                     submission_df.loc[idx] = numpy_to_series(solution, key='start')
                     stats['fixed'] += 1
                     break
-            else:
-                submission_df.loc[idx] = numpy_to_series(np.zeros(stop.shape), key='start')  # zero out the entry and retry
-                print( f'fix_submission() invalid idx: {idx} | delta: {delta} | cells: {np.count_nonzero(solution != stop)}' )
-                stats['invalid'] += 1
-                pass
+            # BUGFIX: this seems to be causing problems in Kaggle Notebooks at the moment
+            # else:
+            #     submission_df.loc[idx] = numpy_to_series(np.zeros(stop.shape), key='start')  # zero out the entry and retry
+            #     print( f'fix_submission() invalid idx: {idx} | delta: {delta} | cells: {np.count_nonzero(solution != stop)}' )
+            #     stats['invalid'] += 1
+            #     pass
         except:
             print( f'fix_submission() exception idx: {idx}' )
             stats['invalid'] += 1

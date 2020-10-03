@@ -1,6 +1,6 @@
 import numpy as np
 
-from neural_networks.GameOfLifeForward import GameOfLifeForward
+from neural_networks.hardcoded.GameOfLifeForward_128 import GameOfLifeForward_128
 from utils.game import generate_random_board
 from utils.game import generate_random_boards
 from utils.game import life_step
@@ -8,7 +8,7 @@ from utils.game import life_steps
 
 
 def test_GameOfLifeForward_single():
-    model = GameOfLifeForward()
+    model = GameOfLifeForward_128()
 
     # Test this works for a single board
     input    = generate_random_board()
@@ -19,7 +19,7 @@ def test_GameOfLifeForward_single():
 
 
 def test_GameOfLifeForward_batch(count=1000):
-    model = GameOfLifeForward()
+    model = GameOfLifeForward_128()
 
     # As well as in batch mode
     for _ in range(max(1,count//1000)):
@@ -31,7 +31,7 @@ def test_GameOfLifeForward_batch(count=1000):
 
 
 if __name__ == '__main__':
-    # GameOfLifeForward can successfully predict a million boards in a row correctly
+    # GameOfLifeForward_128 can successfully predict a million boards in a row correctly
     test_GameOfLifeForward_single()
     test_GameOfLifeForward_batch(1_000_000)
     print('All tests passed!')

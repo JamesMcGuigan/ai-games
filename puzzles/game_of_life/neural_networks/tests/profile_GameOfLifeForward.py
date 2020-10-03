@@ -15,15 +15,15 @@
 # life_step() - njit          =  42.8µs
 # life_step() - numpy         = 180.8µs
 # gameOfLifeForward() - loop  = 618.3µs  # much slower, but still fast compared to an expensive function
+from neural_networks.hardcoded.GameOfLifeForward_128 import GameOfLifeForward_128
 
-from neural_networks.GameOfLifeForward import GameOfLifeForward
 
 def profile_GameOfLifeForward():
     import timeit
     import operator
     from utils.game import generate_random_boards, life_step, life_step_1, life_step_2
 
-    model  = GameOfLifeForward()
+    model  = GameOfLifeForward_128()
     boards = generate_random_boards(1_000)
     for number in [1,10,100]:
         timings = {

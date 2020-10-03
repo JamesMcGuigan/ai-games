@@ -13,7 +13,9 @@ from utils.game import generate_random_board
 from utils.game import life_step
 
 
-def train(model, batch_size=100, l1=0, l2=0, timeout=0, reverse_input_output=False):
+def train(model, batch_size=100, grid_size=25, accuracy_count=100_000, l1=0, l2=0, timeout=0, reverse_input_output=False):
+    assert 1 <= grid_size <= 25
+
     print(f'Training: {model.__class__.__name__}')
     time_start = time.perf_counter()
 
@@ -28,7 +30,7 @@ def train(model, batch_size=100, l1=0, l2=0, timeout=0, reverse_input_output=Fal
     scheduler = None
 
     # epoch: 240961 | board_count: 6024000 | loss: 0.0000000000 | accuracy = 1.0000000000 | time: 0.611ms/board
-    # Finished Training: GameOfLifeForward - 240995 epochs in 3569.1s
+    # Finished Training: GameOfLifeForward_128 - 240995 epochs in 3569.1s
     scheduler = torch.optim.lr_scheduler.CyclicLR(
         optimizer,
         max_lr=1e-3,
@@ -59,7 +61,7 @@ def train(model, batch_size=100, l1=0, l2=0, timeout=0, reverse_input_output=Fal
     try:
         epoch_time = 0
         for epoch in range(1, sys.maxsize):
-            if np.min(epoch_accuracies[-100_000//batch_size:]) == 1.0:    break  # multiple epochs of 100% accuracy to pass
+            if np.min(epoch_accuracies[-accuracy_count//batch_size:]) == 1.0:    break  # multiple epochs of 100% accuracy to pass
             if timeout and timeout < time.perf_counter() - time_start:  break
             epoch_start = time.perf_counter()
 

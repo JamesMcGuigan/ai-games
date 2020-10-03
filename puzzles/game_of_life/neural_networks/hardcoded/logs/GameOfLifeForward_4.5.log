@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "./neural_networks/hardcoded/GameOfLifeForward_4.py", line 72, in <module>
+    model = GameOfLifeForward_4().load()
+  File "./neural_networks/hardcoded/GameOfLifeForward_4.py", line 45, in load
+    self.to(self.device)  # ensure all weights, either loaded or untrained are moved to GPU
+  File "/usr/local/lib/python3.8/dist-packages/torch/nn/modules/module.py", line 607, in to
+    return self._apply(convert)
+  File "/usr/local/lib/python3.8/dist-packages/torch/nn/modules/module.py", line 354, in _apply
+    module._apply(fn)
+  File "/usr/local/lib/python3.8/dist-packages/torch/nn/modules/module.py", line 354, in _apply
+    module._apply(fn)
+  File "/usr/local/lib/python3.8/dist-packages/torch/nn/modules/module.py", line 376, in _apply
+    param_applied = fn(param)
+  File "/usr/local/lib/python3.8/dist-packages/torch/nn/modules/module.py", line 605, in convert
+    return t.to(device, dtype if t.is_floating_point() else None, non_blocking)
+RuntimeError: CUDA error: out of memory

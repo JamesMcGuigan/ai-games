@@ -13,6 +13,14 @@ models = [
     GameOfLifeHardcodedReLU1_41(),
     GameOfLifeHardcodedReLU1_21(),
     GameOfLifeHardcodedTanh(),
+
+    ### These no longer reload saved weights
+    # GameOfLifeForward_128(),
+    # GameOfLifeForward_2N(),
+    # GameOfLifeForward_1N(),
+    # GameOfLifeForward_4(),
+    # GameOfLifeForward_2(),
+    # GameOfLifeForward_1(),
 ]
 
 @pytest.mark.parametrize("boards", [

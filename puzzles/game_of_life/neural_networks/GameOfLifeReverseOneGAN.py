@@ -1,16 +1,18 @@
 import numpy as np
-import torch as t
+import torch
+import torch as pt
+import torch.nn.functional as F
 from torch import nn
 
-from neural_networks.GameOfLifeForward import GameOfLifeForward
 from neural_networks.GameOfLifeReverseOneStep import GameOfLifeReverseOneStep
+from neural_networks.hardcoded.GameOfLifeHardcodedTanh import GameOfLifeHardcodedTanh
 
 
 class GameOfLifeReverseOneGAN(GameOfLifeReverseOneStep):
     """
     This implements the life_step() inverse function as a Neural Network function
     Whereas GameOfLifeReverseOneStep achieves 84% accuracy when trained to find the original starting conditions
-    GameOfLifeReverseOneGAN uses GameOfLifeForward as a discriminator, to predict any valid input board
+    GameOfLifeReverseOneGAN uses GameOfLifeForward_128 as a discriminator, to predict any valid input board
 
     BUG: this still does not train above 84%
     """
@@ -33,7 +35,7 @@ class GameOfLifeReverseOneGAN(GameOfLifeReverseOneStep):
     def loss(self, outputs, expected, inputs):
         """
         GameOfLifeReverseOneGAN() computes the backwards timestep
-        discriminator GameOfLifeForward() replays the board again forwards
+        discriminator GameOfLifeForward_128() replays the board again forwards
         gan_loss is the MSE difference between the backwards prediction and forward play
         classic_loss biases the network towards the exact solution, but reduces to zero as gan_loss approaches zero
         """

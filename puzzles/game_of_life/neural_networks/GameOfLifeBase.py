@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import math
 import os
+import re
 from abc import ABCMeta
 from typing import List
 from typing import TypeVar
@@ -33,7 +34,7 @@ class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
         if isinstance(layer, (nn.Conv2d, nn.ConvTranspose2d)):
             ### kaiming_normal_ corrects for mean and std of the relu function
             ### xavier_normal_ works better for ReLU6 and Z shaped activations
-            if isinstance(self.activation, (nn.ReLU, nn.LeakyReLU)):
+            if isinstance(self.activation, (nn.ReLU, nn.LeakyReLU, nn.PReLU)):
                 nn.init.kaiming_normal_(layer.weight)
                 # nn.init.xavier_normal_(layer.weight)
                 if layer.bias is not None:
@@ -118,7 +119,13 @@ class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
         self.freeze()         # default to production mode - disable training
         return self
 
-
+    def print_params(self):
+        print(self.__class__.__name__)
+        print(self)
+        for name, parameter in sorted(self.named_parameters(), key=lambda pair: pair[0].split('.')[0] ):
+            print(name)
+            print(re.sub(r'\n( *\n)+', '\n', str(parameter.data.cpu().numpy())))  # remove extranious newlines
+            print()
 
     ### Casting
 

@@ -15,7 +15,7 @@ class GameOfLifeHardcodedReLU1_21(GameOfLifeHardcoded):
         z3.AtMost(             *past_neighbours, 3 ): n <  4
     )
 
-    A network trained from random weights:
+    This network trained from random weights:
     - is capable of: learning weights for the output layer after 400-600 epochs (occasionally much less)
     - has trouble learning the self.logic[0] AND gate weights (without lottery ticket initialization)
 
@@ -68,25 +68,20 @@ class GameOfLifeHardcodedReLU1_21(GameOfLifeHardcoded):
         ]])
         self.output.bias.data = torch.tensor([ -2.0 + 1.0 ])  # sum() >= 2
 
-
         self.to(self.device)
         return self
 
 
-    @staticmethod
-    def weights_init(layer):
+    ### kaiming corrects for mean and std of the ReLU function (V shaped), but we are using ReLU1 (Z shaped)
+    ### normal distribution seems to perform slightly better than uniform
+    ### default initialization actually seems to perform better than both kaiming and xavier
+    # nn.init.xavier_uniform_(layer.weight)   # 600, 141, 577, 581, 583, epochs for output to train
+    # nn.init.kaiming_uniform_(layer.weight)  # 664, 559, 570, 592, 533
+    # nn.init.kaiming_normal_(layer.weight)   # 450, 562, 456, 164, 557
+    # nn.init.xavier_normal_(layer.weight)    # 497, 492, 583, 461, 475
+    # default (pass) initialization:          # 232, 488,  43, 333,  412
+    def weights_init(self, layer):
         if isinstance(layer, (nn.Conv2d, nn.ConvTranspose2d)):
-            ### kaiming corrects for mean and std of the ReLU function (V shaped), but we are using ReLU1 (Z shaped)
-            ### normal distribution seems to perform slightly better than uniform
-            ### default initialization actually seems to perform better than both kaiming and xavier
-            # nn.init.xavier_uniform_(layer.weight)   # 600, 141, 577, 581, 583, epochs for output to train
-            # nn.init.kaiming_uniform_(layer.weight)  # 664, 559, 570, 592, 533
-            # nn.init.kaiming_normal_(layer.weight)   # 450, 562, 456, 164, 557
-            # nn.init.xavier_normal_(layer.weight)    # 497, 492, 583, 461, 475
-            # default (pass) initialization:          # 232, 488,  43, 333,  412
-            # if layer.bias is not None:
-            #     # small positive bias so that all nodes are initialized
-            #     nn.init.constant_(layer.bias, 0.1)
             pass
 
 
@@ -97,8 +92,6 @@ if __name__ == '__main__':
 
     model = GameOfLifeHardcodedReLU1_21()
 
-    train(model, batch_size=100, l1=0)
-
     board = np.array([
         [0,0,0,0,0],
         [0,0,0,0,0],
@@ -108,7 +101,12 @@ if __name__ == '__main__':
     ])
     result1 = model.predict(board)
     result2 = model.predict(result1)
-    assert np.array_equal(board, result2)
+
+    train(model)
+
+    result3 = model.predict(board)
+    result4 = model.predict(result3)
+    assert np.array_equal(board, result4)
 
     print('-' * 20)
     print(model.__class__.__name__)

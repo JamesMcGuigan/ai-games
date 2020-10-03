@@ -1,14 +1,15 @@
 # The purpose of this neural network is to predict the previous T=-1 state from a game of life board
+from abc import ABCMeta
 from typing import TypeVar
 
-import torch
 import torch.nn as nn
 
 from neural_networks.GameOfLifeBase import GameOfLifeBase
+from neural_networks.modules.ReLUX import ReLU1
 
 # noinspection PyTypeChecker
 T = TypeVar('T', bound='GameOfLifeHardcoded')
-class GameOfLifeHardcoded(GameOfLifeBase):
+class GameOfLifeHardcoded(GameOfLifeBase, metaclass=ABCMeta):
     """
     This implements the life_step() function as a minimalist Neural Network function with hardcoded weights
     Subclasses implement the effect of different activation functions and weights
@@ -39,7 +40,8 @@ class GameOfLifeHardcoded(GameOfLifeBase):
             x = self.activation(x)
 
         x = self.output(x)
-        x = torch.sigmoid(x)
+        # x = torch.sigmoid(x)
+        x = ReLU1()(x)  # we actually want a ReLU1 activation for binary outputs
 
         return x
 

@@ -32,7 +32,7 @@ def train(model, batch_size=100, l1=0, l2=0, timeout=0, reverse_input_output=Fal
     scheduler = torch.optim.lr_scheduler.CyclicLR(
         optimizer,
         max_lr=1e-3,
-        base_lr=1e-4,
+        base_lr=1e-5,
         step_size_up=100,
         mode='exp_range',
         gamma=0.8
@@ -110,7 +110,7 @@ def train(model, batch_size=100, l1=0, l2=0, timeout=0, reverse_input_output=Fal
             # if board_count % 1_000 == 0:
             if epoch % 1000 == 0:
                 time_taken = time.perf_counter() - time_start
-                print(f'epoch: {epoch:4d} | board_count: {board_count:5d} | loss: {loop_loss/loop_count:.10f} | accuracy = {loop_acc/loop_count:.10f} | time: {1000*epoch_time/batch_size:.3f}ms/board | {time_taken//60:3.0f}m {time_taken%60:02.0f}s ')
+                print(f'epoch: {epoch:4d} | board_count: {board_count:7d} | loss: {loop_loss/loop_count:.10f} | accuracy = {loop_acc/loop_count:.10f} | time: {1000*epoch_time/batch_size:.3f}ms/board | {time_taken//60:3.0f}m {time_taken%60:02.0f}s ')
                 loop_loss  = 0
                 loop_acc   = 0
                 loop_count = 0

@@ -8,16 +8,33 @@ from neural_networks.hardcoded.GameOfLifeHardcoded import GameOfLifeHardcoded
 
 class GameOfLifeHardcodedLeakyReLU(GameOfLifeHardcoded):
     """
-    Leaky ReLU trained solution
-    logic.weight [[-2.8648230e-03  1.0946677e+00]
-                  [-1.7410564e+01 -1.4649882e+01]]
-    logic.bias    [-3.3558989  9.621474 ]
-    output.weight [-3.8011343 -6.304538 ]
-    output.bias   -2.0243912
+    LeakyReLU can see in both directions, thus can (sometimes) solve both the logic and output layers
+    ReLU1 and tanh has problems with this, however the LeakyReLU solution is less easy for a human to understand
+    All activation functions have a hard time solving the counter layer
+
+
+    LeakyReLU trained solution:
+    with sigmoid output:
+        logic.weight     [[  -0.002864,   1.094667 ]
+                          [ -17.410564, -14.649882 ]]
+        logic.bias        [  -3.355898,   9.621474 ]
+        output.weight     [  -3.801134,  -6.304538 ]
+        output.bias          -2.024391,
+
+    with ReLU1 output (starting with sigmoid weights):
+        logics.0.weight  [[   0.029851,   1.03208 ]
+                          [ -17.687109, -14.95262 ]]
+        logics.0.bias:    [  -3.499570,   9.46179 ]
+        output.weight:    [  -3.968801,  -6.47038 ]
+        output.bias          -1.865675
+
+
+
     """
     def __init__(self):
         super().__init__()
 
+        self.trainable_layers  = [ 'logics', 'output' ]
         self.input   = nn.Conv2d(in_channels=1, out_channels=1, kernel_size=(1, 1), bias=False)  # no-op trainable layer
         self.counter = nn.Conv2d(in_channels=1, out_channels=2, kernel_size=(3,3),
                                   padding=1, padding_mode='circular', bias=False)
@@ -43,19 +60,19 @@ class GameOfLifeHardcodedLeakyReLU(GameOfLifeHardcoded):
         ])
 
         self.logics[0].weight.data = torch.tensor([
-            [ [[-2.8648230e-03]], [[ 1.0946677e+00]] ],
-            [ [[-1.7410564e+01]], [[-1.4649882e+01]] ],
+            [ [[   0.2 ]], [[   1.0  ]] ],
+            [ [[ -17.9 ]], [[ -15.1  ]] ],
         ])
         self.logics[0].bias.data = torch.tensor([
-            -3.3558989,
-            9.621474
+            -3.6,
+             9.1
         ])
 
         # AND == Both sides need to be positive
         self.output.weight.data = torch.tensor([
-            [ [[-3.8011343]], [[-6.304538]] ],
+            [ [[-4.0 ]], [[-6.5 ]] ],
         ])
-        self.output.bias.data = torch.tensor([ -2.0243912 ])  # Either both Alive or both Dead statements must be true
+        self.output.bias.data = torch.tensor([ -1.8 ])  # Either both Alive or both Dead statements must be true
 
         self.to(self.device)
         return self
@@ -76,9 +93,12 @@ if __name__ == '__main__':
     ])
     result1 = model.predict(board)
     result2 = model.predict(result1)
-    assert np.array_equal(board, result2)
 
     train(model)
+
+    result3 = model.predict(board)
+    result4 = model.predict(result1)
+    assert np.array_equal(board, result4)
 
     print('-' * 20)
     print(model.__class__.__name__)

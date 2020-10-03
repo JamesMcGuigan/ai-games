@@ -4,11 +4,15 @@ import pytest
 from neural_networks.hardcoded.GameOfLifeHardcodedLeakyReLU import GameOfLifeHardcodedLeakyReLU
 from neural_networks.hardcoded.GameOfLifeHardcodedReLU1_21 import GameOfLifeHardcodedReLU1_21
 from neural_networks.hardcoded.GameOfLifeHardcodedReLU1_41 import GameOfLifeHardcodedReLU1_41
+from neural_networks.hardcoded.GameOfLifeHardcodedTanh import GameOfLifeHardcodedTanh
+from utils.game import generate_random_boards
+from utils.game import life_steps
 
 models = [
     GameOfLifeHardcodedLeakyReLU(),
     GameOfLifeHardcodedReLU1_41(),
     GameOfLifeHardcodedReLU1_21(),
+    GameOfLifeHardcodedTanh(),
 ]
 
 @pytest.mark.parametrize("boards", [
@@ -61,4 +65,13 @@ def test_GameOfLifeHardcoded_repeating_patterns(model, board, delta):
     output   = board
     for n in range(delta):
         output = model.predict(output)
+    assert np.array_equal( output, expected )  # assert 100% accuracy
+
+
+
+@pytest.mark.parametrize("model", models)
+def test_GameOfLifeHardcoded_generated_boards(model):
+    inputs   = generate_random_boards(10_000)
+    expected = life_steps(inputs)
+    output   = model.predict(inputs)
     assert np.array_equal( output, expected )  # assert 100% accuracy

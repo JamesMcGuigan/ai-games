@@ -88,8 +88,6 @@ if __name__ == '__main__':
 
     model = GameOfLifeHardcodedReLU1_41()
 
-    train(model)
-
     board = np.array([
         [0,0,0,0,0],
         [0,0,0,0,0],
@@ -99,7 +97,12 @@ if __name__ == '__main__':
     ])
     result1 = model.predict(board)
     result2 = model.predict(result1)
-    assert np.array_equal(board, result2)
+
+    train(model, batch_size=1000)
+
+    result3 = model.predict(board)
+    result4 = model.predict(result3)
+    assert np.array_equal(board, result4)
 
     print('-' * 20)
     print(model.__class__.__name__)

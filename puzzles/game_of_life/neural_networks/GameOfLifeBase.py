@@ -28,18 +28,20 @@ class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
         self.criterion = nn.MSELoss()
 
 
-    @staticmethod
-    def weights_init(layer):
+    def weights_init(self, layer):
         ### Default initialization seems to work best, at least for Z shaped ReLU1 - see GameOfLifeHardcodedReLU1_21.py
-        # if isinstance(layer, (nn.Conv2d, nn.ConvTranspose2d)):
-        #     ### kaiming_normal_ corrects for mean and std of the relu function
-        #     ### xavier_normal_ works better for ReLU6 and Z shaped activations
-        #     # nn.init.kaiming_normal_(layer.weight)
-        #     nn.init.xavier_normal_(layer.weight)
-        #     if layer.bias is not None:
-        #         # small positive bias so that all nodes are initialized
-        #         nn.init.constant_(layer.bias, 0.1)
-        pass
+        if isinstance(layer, (nn.Conv2d, nn.ConvTranspose2d)):
+            ### kaiming_normal_ corrects for mean and std of the relu function
+            ### xavier_normal_ works better for ReLU6 and Z shaped activations
+            if isinstance(self.activation, (nn.ReLU, nn.LeakyReLU)):
+                nn.init.kaiming_normal_(layer.weight)
+                # nn.init.xavier_normal_(layer.weight)
+                if layer.bias is not None:
+                    # small positive bias so that all nodes are initialized
+                    nn.init.constant_(layer.bias, 0.1)
+        else:
+            # Use default initialization
+            pass
 
     ### Prediction
 
@@ -66,7 +68,7 @@ class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
 
 
 
-    ### Freee / Unfreeze
+    ### Freeze / Unfreeze
 
     def freeze(self: T) -> T:
         if not self.loaded: self.load()

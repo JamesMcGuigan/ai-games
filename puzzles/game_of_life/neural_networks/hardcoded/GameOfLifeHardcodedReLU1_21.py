@@ -1,3 +1,5 @@
+from abc import ABCMeta
+
 import torch
 import torch.nn as nn
 
@@ -5,7 +7,7 @@ from neural_networks.hardcoded.GameOfLifeHardcoded import GameOfLifeHardcoded
 from neural_networks.modules.ReLUX import ReLU1
 
 
-class GameOfLifeHardcodedReLU1_21(GameOfLifeHardcoded):
+class GameOfLifeHardcodedReLU1_21(GameOfLifeHardcoded, metaclass=ABCMeta):
     """
     This uses ReLU1 as binary true/false activation layer to implement the game of life rules using 2 nodes:
     AND(
@@ -36,8 +38,8 @@ class GameOfLifeHardcodedReLU1_21(GameOfLifeHardcoded):
         self.activation = ReLU1()
 
 
-    def load(self):
-        super().load()
+    def load(self, load_weights=False):
+        super().load(load_weights=load_weights)
 
         self.input.weight.data   = torch.tensor([[[[1.0]]]])
         self.counter.weight.data = torch.tensor([
@@ -59,7 +61,7 @@ class GameOfLifeHardcodedReLU1_21(GameOfLifeHardcoded):
             +3.0 + 1.0,               # n <= 3   # z3.AtMost(             *past_neighbours, 3 ),
         ])
 
-        # # Both of the statements need to be true, and ReLU enforces we can't go above 1
+        # Both of the statements need to be true, and ReLU1 enforces we can't go above 1
         self.output.weight.data = torch.tensor([[
             [[  1.0 ]],
             [[  1.0 ]],

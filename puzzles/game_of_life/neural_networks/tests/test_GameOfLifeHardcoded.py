@@ -1,6 +1,12 @@
 import numpy as np
 import pytest
 
+from neural_networks.hardcoded.GameOfLifeForward_1 import GameOfLifeForward_1
+from neural_networks.hardcoded.GameOfLifeForward_128 import GameOfLifeForward_128
+from neural_networks.hardcoded.GameOfLifeForward_1N import GameOfLifeForward_1N
+from neural_networks.hardcoded.GameOfLifeForward_2 import GameOfLifeForward_2
+from neural_networks.hardcoded.GameOfLifeForward_2N import GameOfLifeForward_2N
+from neural_networks.hardcoded.GameOfLifeForward_4 import GameOfLifeForward_4
 from neural_networks.hardcoded.GameOfLifeHardcodedLeakyReLU import GameOfLifeHardcodedLeakyReLU
 from neural_networks.hardcoded.GameOfLifeHardcodedReLU1_21 import GameOfLifeHardcodedReLU1_21
 from neural_networks.hardcoded.GameOfLifeHardcodedReLU1_41 import GameOfLifeHardcodedReLU1_41
@@ -14,14 +20,17 @@ models = [
     GameOfLifeHardcodedReLU1_21(),
     GameOfLifeHardcodedTanh(),
 
-    ### These no longer reload saved weights
-    # GameOfLifeForward_128(),
-    # GameOfLifeForward_2N(),
-    # GameOfLifeForward_1N(),
-    # GameOfLifeForward_4(),
-    # GameOfLifeForward_2(),
-    # GameOfLifeForward_1(),
+    GameOfLifeForward_128(),
+    GameOfLifeForward_2N(),
+    GameOfLifeForward_1N(),
+    GameOfLifeForward_4(),
+    GameOfLifeForward_2(),
+    GameOfLifeForward_1(),
 ]
+boards_t0  = generate_random_boards(10_000)
+boards_t1 = life_steps(boards_t0)
+
+
 
 @pytest.mark.parametrize("boards", [
     [[ 0,0,0,0,0,
@@ -76,10 +85,9 @@ def test_GameOfLifeHardcoded_repeating_patterns(model, board, delta):
     assert np.array_equal( output, expected )  # assert 100% accuracy
 
 
-
 @pytest.mark.parametrize("model", models)
 def test_GameOfLifeHardcoded_generated_boards(model):
-    inputs   = generate_random_boards(10_000)
-    expected = life_steps(inputs)
-    output   = model.predict(inputs)
-    assert np.array_equal( output, expected )  # assert 100% accuracy
+    inputs   = boards_t0
+    expected = boards_t1
+    outputs  = model.predict(inputs)
+    assert np.array_equal( outputs, expected )  # assert 100% accuracy

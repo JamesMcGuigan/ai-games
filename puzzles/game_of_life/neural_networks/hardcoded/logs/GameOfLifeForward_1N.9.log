@@ -1,0 +1,146 @@
+removed './neural_networks/models/GameOfLifeForward_1N.pth'
+GameOfLifeForward_1N.load(): reinitializing weights
+
+GameOfLifeForward_1N
+GameOfLifeForward_1N(
+  (criterion): MSELoss()
+  (layers): ModuleList(
+    (0): Conv2d(1, 1, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), padding_mode=circular)
+    (1): Conv2d(1, 2, kernel_size=(1, 1), stride=(1, 1))
+    (2): Conv2d(2, 1, kernel_size=(1, 1), stride=(1, 1))
+  )
+  (dropout): Dropout(p=0.0, inplace=False)
+  (activation): PReLU(num_parameters=1)
+)
+activation.weight
+[0.25]
+
+layers.0.weight
+[[[[-0.03093998  0.36395374  0.10054364]
+   [ 0.39515096  0.5340687   0.96453166]
+   [ 0.54140675 -0.7991953  -0.06731635]]]]
+
+layers.0.bias
+[0.1]
+
+layers.1.weight
+[[[[-0.34827802]]]
+ [[[ 0.9404512 ]]]]
+
+layers.1.bias
+[0.1 0.1]
+
+layers.2.weight
+[[[[-0.691052  ]]
+  [[ 0.71558386]]]]
+
+layers.2.bias
+[0.1]
+
+--------------------
+Training: GameOfLifeForward_1N
+GameOfLifeForward_1N.load(): model file not found, reinitializing weights
+
+GameOfLifeForward_1N(
+  (criterion): MSELoss()
+  (layers): ModuleList(
+    (0): Conv2d(1, 1, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), padding_mode=circular)
+    (1): Conv2d(1, 2, kernel_size=(1, 1), stride=(1, 1))
+    (2): Conv2d(2, 1, kernel_size=(1, 1), stride=(1, 1))
+  )
+  (dropout): Dropout(p=0.0, inplace=False)
+  (activation): PReLU(num_parameters=1)
+)
+epoch:    1 | board_count:     500 | loss: 0.2028753161 | accuracy = 0.8448000000 | time: 11.185ms/board |   0m 01s 
+epoch:    2 | board_count:    1000 | loss: 0.2060743511 | accuracy = 0.8461600000 | time: 0.878ms/board |   0m 01s 
+epoch:    3 | board_count:    1500 | loss: 0.2205172122 | accuracy = 0.8112000000 | time: 0.921ms/board |   0m 01s 
+epoch:    4 | board_count:    2000 | loss: 0.2028407454 | accuracy = 0.8444000000 | time: 0.903ms/board |   0m 01s 
+epoch:    5 | board_count:    2500 | loss: 0.1941061050 | accuracy = 0.8592000000 | time: 0.721ms/board |   0m 01s 
+epoch:    6 | board_count:    3000 | loss: 0.1972887993 | accuracy = 0.8484000000 | time: 0.823ms/board |   0m 02s 
+epoch:    7 | board_count:    3500 | loss: 0.1954890847 | accuracy = 0.8504000000 | time: 0.670ms/board |   0m 02s 
+epoch:    8 | board_count:    4000 | loss: 0.1963303447 | accuracy = 0.8408000000 | time: 0.639ms/board |   0m 02s 
+epoch:    9 | board_count:    4500 | loss: 0.1972798586 | accuracy = 0.8388000000 | time: 0.868ms/board |   0m 02s 
+epoch:   10 | board_count:    5000 | loss: 0.1942363113 | accuracy = 0.8496000000 | time: 0.861ms/board |   0m 02s 
+epoch:   20 | board_count:   10000 | loss: 0.1948404422 | accuracy = 0.8435760000 | time: 0.616ms/board |   0m 03s 
+epoch:   30 | board_count:   15000 | loss: 0.1902937484 | accuracy = 0.8473200000 | time: 0.848ms/board |   0m 03s 
+epoch:   40 | board_count:   20000 | loss: 0.1849244210 | accuracy = 0.8502000000 | time: 0.635ms/board |   0m 04s 
+epoch:   50 | board_count:   25000 | loss: 0.1828383273 | accuracy = 0.8503200000 | time: 0.875ms/board |   0m 05s 
+epoch:   60 | board_count:   30000 | loss: 0.1894541362 | accuracy = 0.8328400000 | time: 0.882ms/board |   0m 06s 
+epoch:   70 | board_count:   35000 | loss: 0.1741627645 | accuracy = 0.8568800000 | time: 0.854ms/board |   0m 06s 
+epoch:   80 | board_count:   40000 | loss: 0.1804029506 | accuracy = 0.8406800000 | time: 0.634ms/board |   0m 07s 
+epoch:   90 | board_count:   45000 | loss: 0.1701899108 | accuracy = 0.8540800000 | time: 0.872ms/board |   0m 08s 
+epoch:  100 | board_count:   50000 | loss: 0.1704877853 | accuracy = 0.8500800000 | time: 0.897ms/board |   0m 09s 
+epoch:  200 | board_count:  100000 | loss: 0.1565772090 | accuracy = 0.8529760000 | time: 0.598ms/board |   0m 17s 
+epoch:  300 | board_count:  150000 | loss: 0.1434150107 | accuracy = 0.8479520000 | time: 0.641ms/board |   0m 24s 
+epoch:  400 | board_count:  200000 | loss: 0.1323036986 | accuracy = 0.8489560000 | time: 0.699ms/board |   0m 32s 
+epoch:  500 | board_count:  250000 | loss: 0.1263029180 | accuracy = 0.8488240000 | time: 0.862ms/board |   0m 40s 
+epoch:  600 | board_count:  300000 | loss: 0.1216220401 | accuracy = 0.8494800000 | time: 0.875ms/board |   0m 48s 
+epoch:  700 | board_count:  350000 | loss: 0.1172563240 | accuracy = 0.8513800000 | time: 0.562ms/board |   0m 55s 
+epoch:  800 | board_count:  400000 | loss: 0.1134192951 | accuracy = 0.8512280000 | time: 0.853ms/board |   1m 03s 
+epoch:  900 | board_count:  450000 | loss: 0.1098100679 | accuracy = 0.8493280000 | time: 0.844ms/board |   1m 11s 
+epoch: 1000 | board_count:  500000 | loss: 0.1042489603 | accuracy = 0.8501120000 | time: 0.725ms/board |   1m 19s 
+epoch: 1100 | board_count:  550000 | loss: 0.1029534879 | accuracy = 0.8453800000 | time: 0.895ms/board |   1m 26s 
+epoch: 1200 | board_count:  600000 | loss: 0.0981015211 | accuracy = 0.8493520000 | time: 0.590ms/board |   1m 34s 
+epoch: 1300 | board_count:  650000 | loss: 0.0952931694 | accuracy = 0.8482400000 | time: 0.873ms/board |   1m 42s 
+epoch: 1400 | board_count:  700000 | loss: 0.0912593963 | accuracy = 0.8478240000 | time: 0.831ms/board |   1m 49s 
+epoch: 1500 | board_count:  750000 | loss: 0.0853605668 | accuracy = 0.8481360000 | time: 0.853ms/board |   1m 57s 
+epoch: 1600 | board_count:  800000 | loss: 0.0771583961 | accuracy = 0.8480000000 | time: 0.878ms/board |   2m 05s 
+epoch: 1700 | board_count:  850000 | loss: 0.0664386397 | accuracy = 0.9035424000 | time: 0.743ms/board |   2m 13s 
+epoch: 1800 | board_count:  900000 | loss: 0.0590387991 | accuracy = 0.9607960000 | time: 0.875ms/board |   2m 21s 
+epoch: 1900 | board_count:  950000 | loss: 0.0511928583 | accuracy = 0.9623960000 | time: 0.900ms/board |   2m 28s 
+epoch: 2000 | board_count: 1000000 | loss: 0.0476411528 | accuracy = 0.9609960000 | time: 0.850ms/board |   2m 36s 
+epoch: 2100 | board_count: 1050000 | loss: 0.0443767935 | accuracy = 0.9619400000 | time: 0.761ms/board |   2m 44s 
+epoch: 2200 | board_count: 1100000 | loss: 0.0415655526 | accuracy = 0.9620120000 | time: 0.897ms/board |   2m 52s 
+epoch: 2300 | board_count: 1150000 | loss: 0.0390688667 | accuracy = 0.9620560000 | time: 0.861ms/board |   2m 59s 
+epoch: 2400 | board_count: 1200000 | loss: 0.0378095129 | accuracy = 0.9612320000 | time: 0.636ms/board |   3m 07s 
+epoch: 2500 | board_count: 1250000 | loss: 0.0365524596 | accuracy = 0.9609960000 | time: 0.638ms/board |   3m 15s 
+epoch: 2600 | board_count: 1300000 | loss: 0.0343389321 | accuracy = 0.9615040000 | time: 0.865ms/board |   3m 22s 
+epoch: 2700 | board_count: 1350000 | loss: 0.0319000703 | accuracy = 0.9628640000 | time: 0.858ms/board |   3m 30s 
+epoch: 2800 | board_count: 1400000 | loss: 0.0307044565 | accuracy = 0.9622840000 | time: 0.861ms/board |   3m 38s 
+epoch: 2900 | board_count: 1450000 | loss: 0.0296713836 | accuracy = 0.9616680000 | time: 0.814ms/board |   3m 46s 
+epoch: 3000 | board_count: 1500000 | loss: 0.0281639075 | accuracy = 0.9621280000 | time: 0.908ms/board |   3m 53s 
+epoch: 3100 | board_count: 1550000 | loss: 0.0267113850 | accuracy = 0.9611880000 | time: 0.877ms/board |   4m 01s 
+epoch: 3200 | board_count: 1600000 | loss: 0.0252377610 | accuracy = 0.9791416000 | time: 0.881ms/board |   4m 09s 
+epoch: 3300 | board_count: 1650000 | loss: 0.0238405698 | accuracy = 1.0000000000 | time: 0.831ms/board |   4m 17s 
+Finished Training: GameOfLifeForward_1N - 3376 epochs in 262.6s
+GameOfLifeForward_1N.savefile(): /home/jamie/code/ai-games/puzzles/game_of_life/neural_networks/models/GameOfLifeForward_1N.pth = 2.8 kB
+--------------------
+GameOfLifeForward_1N
+GameOfLifeForward_1N(
+  (criterion): MSELoss()
+  (layers): ModuleList(
+    (0): Conv2d(1, 1, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), padding_mode=circular)
+    (1): Conv2d(1, 2, kernel_size=(1, 1), stride=(1, 1))
+    (2): Conv2d(2, 1, kernel_size=(1, 1), stride=(1, 1))
+  )
+  (dropout): Dropout(p=0.0, inplace=False)
+  (activation): PReLU(num_parameters=1)
+)
+activation.weight
+[-0.3797831]
+
+layers.0.weight
+[[[[-0.42567685 -0.42558202 -0.42560977]
+   [-0.42536333 -0.2199644  -0.42550504]
+   [-0.42574704 -0.42568907 -0.4256487 ]]]]
+
+layers.0.bias
+[1.1423173]
+
+layers.1.weight
+[[[[1.9316779]]]
+ [[[2.4583795]]]]
+
+layers.1.bias
+[-0.13716476 -0.1745166 ]
+
+layers.2.weight
+[[[[-2.9618266]]
+  [[-3.1847205]]]]
+
+layers.2.bias
+[1.0238613]
+
+real 266.42
+user 265.70
+sys 1.50

@@ -1,3 +1,5 @@
+from abc import ABCMeta
+
 import torch
 import torch.nn as nn
 
@@ -5,14 +7,14 @@ from neural_networks.hardcoded.GameOfLifeHardcoded import GameOfLifeHardcoded
 from neural_networks.modules.ReLUX import ReLU1
 
 
-class GameOfLifeHardcodedReLU1_41(GameOfLifeHardcoded):
+class GameOfLifeHardcodedReLU1_41(GameOfLifeHardcoded, metaclass=ABCMeta):
     """
     This uses ReLU1 as binary true/false activation layer to implement the game of life rules using 4 nodes:
     SUM(
-        Alive + neighbours >= 2
-        Alive + neighbours <  4
-        Dead  + neighbours >= 3
-        Dead  + neighbours <  4
+        Alive && neighbours >= 2
+        Alive && neighbours <= 3
+        Dead  && neighbours >= 3
+        Dead  && neighbours <= 3
     ) >= 2
 
     Alive! is implemented as -10 weight, which is greater than maximum value of the 3x3-1=8 counter convolution
@@ -36,8 +38,8 @@ class GameOfLifeHardcodedReLU1_41(GameOfLifeHardcoded):
 
 
 
-    def load(self):
-        super().load()
+    def load(self, load_weights=False):
+        super().load(load_weights=load_weights)
 
         self.input.weight.data   = torch.tensor([[[[1.0]]]])
         self.counter.weight.data = torch.tensor([
@@ -51,10 +53,10 @@ class GameOfLifeHardcodedReLU1_41(GameOfLifeHardcoded):
         ])
 
         self.logics[0].weight.data = torch.tensor([
-            [[[  10.0 ]], [[  1.0 ]]],  # Alive + neighbours >= 2
-            [[[  10.0 ]], [[ -1.0 ]]],  # Alive + neighbours <  4
-            [[[ -10.0 ]], [[  1.0 ]]],  # Dead  + neighbours >= 3
-            [[[ -10.0 ]], [[ -1.0 ]]],  # Dead  + neighbours <  4
+            [[[  10.0 ]], [[  1.0 ]]],  # Alive && neighbours >= 2
+            [[[  10.0 ]], [[ -1.0 ]]],  # Alive && neighbours <= 3
+            [[[ -10.0 ]], [[  1.0 ]]],  # Dead  && neighbours >= 3
+            [[[ -10.0 ]], [[ -1.0 ]]],  # Dead  && neighbours <= 3
         ])
         self.logics[0].bias.data = torch.tensor([
             -10.0 - 2.0 + 1.0,  # Alive +  neighbours >= 2

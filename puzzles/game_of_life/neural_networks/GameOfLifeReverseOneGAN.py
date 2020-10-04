@@ -1,3 +1,5 @@
+from abc import ABCMeta
+
 import numpy as np
 import torch
 import torch as pt
@@ -8,7 +10,7 @@ from neural_networks.GameOfLifeReverseOneStep import GameOfLifeReverseOneStep
 from neural_networks.hardcoded.GameOfLifeHardcodedTanh import GameOfLifeHardcodedTanh
 
 
-class GameOfLifeReverseOneGAN(GameOfLifeReverseOneStep):
+class GameOfLifeReverseOneGAN(GameOfLifeReverseOneStep, metaclass=ABCMeta):
     """
     This implements the life_step() inverse function as a Neural Network function
     Whereas GameOfLifeReverseOneStep achieves 84% accuracy when trained to find the original starting conditions

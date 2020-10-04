@@ -1,16 +1,170 @@
-Traceback (most recent call last):
-  File "./neural_networks/hardcoded/GameOfLifeForward_2.py", line 74, in <module>
-    model = GameOfLifeForward_2().load()
-  File "./neural_networks/hardcoded/GameOfLifeForward_2.py", line 47, in load
-    self.to(self.device)  # ensure all weights, either loaded or untrained are moved to GPU
-  File "/usr/local/lib/python3.8/dist-packages/torch/nn/modules/module.py", line 607, in to
-    return self._apply(convert)
-  File "/usr/local/lib/python3.8/dist-packages/torch/nn/modules/module.py", line 354, in _apply
-    module._apply(fn)
-  File "/usr/local/lib/python3.8/dist-packages/torch/nn/modules/module.py", line 354, in _apply
-    module._apply(fn)
-  File "/usr/local/lib/python3.8/dist-packages/torch/nn/modules/module.py", line 376, in _apply
-    param_applied = fn(param)
-  File "/usr/local/lib/python3.8/dist-packages/torch/nn/modules/module.py", line 605, in convert
-    return t.to(device, dtype if t.is_floating_point() else None, non_blocking)
-RuntimeError: CUDA error: out of memory
+GameOfLifeForward_2.load(): reinitializing weights
+
+GameOfLifeForward_2
+GameOfLifeForward_2(
+  (criterion): MSELoss()
+  (layers): ModuleList(
+    (0): Conv2d(1, 2, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), padding_mode=circular)
+    (1): Conv2d(3, 2, kernel_size=(1, 1), stride=(1, 1))
+    (2): Conv2d(2, 1, kernel_size=(1, 1), stride=(1, 1))
+  )
+  (dropout): Dropout(p=0.0, inplace=False)
+  (activation): PReLU(num_parameters=1)
+)
+activation.weight
+[0.25]
+
+layers.0.weight
+[[[[ 0.29563153  0.8481899   0.32878095]
+   [ 0.14822784  0.16059597  0.43974346]
+   [ 0.0699039  -0.08475506 -0.08598334]]]
+ [[[-0.0103048  -0.12938733 -0.40535843]
+   [ 0.06238246  0.3371182   0.02306874]
+   [-0.06259739  0.05902578  0.38992545]]]]
+
+layers.0.bias
+[0.1 0.1]
+
+layers.1.weight
+[[[[ 0.32656568]]
+  [[-0.00510981]]
+  [[-1.0081253 ]]]
+ [[[-0.94876325]]
+  [[-1.658578  ]]
+  [[ 1.2319165 ]]]]
+
+layers.1.bias
+[0.1 0.1]
+
+layers.2.weight
+[[[[ 1.2571466 ]]
+  [[-0.13642046]]]]
+
+layers.2.bias
+[0.1]
+
+--------------------
+Training: GameOfLifeForward_2
+GameOfLifeForward_2.load(): model file not found, reinitializing weights
+
+GameOfLifeForward_2(
+  (criterion): MSELoss()
+  (layers): ModuleList(
+    (0): Conv2d(1, 2, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), padding_mode=circular)
+    (1): Conv2d(3, 2, kernel_size=(1, 1), stride=(1, 1))
+    (2): Conv2d(2, 1, kernel_size=(1, 1), stride=(1, 1))
+  )
+  (dropout): Dropout(p=0.0, inplace=False)
+  (activation): PReLU(num_parameters=1)
+)
+epoch:    1 | board_count:     500 | loss: 0.2146595120 | accuracy = 0.7925600000 | time: 11.088ms/board |   0m 01s 
+epoch:    2 | board_count:    1000 | loss: 0.2144959956 | accuracy = 0.7988000000 | time: 0.871ms/board |   0m 01s 
+epoch:    3 | board_count:    1500 | loss: 0.2149258822 | accuracy = 0.8096000000 | time: 0.893ms/board |   0m 01s 
+epoch:    4 | board_count:    2000 | loss: 0.2079614401 | accuracy = 0.8404000000 | time: 0.896ms/board |   0m 01s 
+epoch:    5 | board_count:    2500 | loss: 0.2096144587 | accuracy = 0.8138400000 | time: 0.858ms/board |   0m 01s 
+epoch:    6 | board_count:    3000 | loss: 0.2122697771 | accuracy = 0.8056800000 | time: 0.895ms/board |   0m 02s 
+epoch:    7 | board_count:    3500 | loss: 0.2131350785 | accuracy = 0.7964000000 | time: 0.893ms/board |   0m 02s 
+epoch:    8 | board_count:    4000 | loss: 0.2149387807 | accuracy = 0.8224000000 | time: 0.867ms/board |   0m 02s 
+epoch:    9 | board_count:    4500 | loss: 0.2132428735 | accuracy = 0.8044000000 | time: 0.740ms/board |   0m 02s 
+epoch:   10 | board_count:    5000 | loss: 0.2069271505 | accuracy = 0.8176000000 | time: 0.690ms/board |   0m 02s 
+epoch:   20 | board_count:   10000 | loss: 0.2050183913 | accuracy = 0.8106880000 | time: 0.867ms/board |   0m 03s 
+epoch:   30 | board_count:   15000 | loss: 0.1993167922 | accuracy = 0.8429040000 | time: 0.618ms/board |   0m 04s 
+epoch:   40 | board_count:   20000 | loss: 0.1967605931 | accuracy = 0.8373280000 | time: 0.629ms/board |   0m 04s 
+epoch:   50 | board_count:   25000 | loss: 0.1930044898 | accuracy = 0.8393680000 | time: 0.769ms/board |   0m 05s 
+epoch:   60 | board_count:   30000 | loss: 0.1936805701 | accuracy = 0.8444720000 | time: 0.628ms/board |   0m 06s 
+epoch:   70 | board_count:   35000 | loss: 0.1879006296 | accuracy = 0.8561040000 | time: 0.680ms/board |   0m 07s 
+epoch:   80 | board_count:   40000 | loss: 0.1850065592 | accuracy = 0.8589120000 | time: 0.580ms/board |   0m 07s 
+epoch:   90 | board_count:   45000 | loss: 0.1861944842 | accuracy = 0.8427920000 | time: 0.571ms/board |   0m 08s 
+epoch:  100 | board_count:   50000 | loss: 0.1802693373 | accuracy = 0.8504960000 | time: 0.927ms/board |   0m 09s 
+epoch:  200 | board_count:  100000 | loss: 0.1682212214 | accuracy = 0.8476952000 | time: 0.605ms/board |   0m 17s 
+epoch:  300 | board_count:  150000 | loss: 0.1469492261 | accuracy = 0.8439248000 | time: 0.663ms/board |   0m 25s 
+epoch:  400 | board_count:  200000 | loss: 0.1290640809 | accuracy = 0.8441256000 | time: 0.855ms/board |   0m 32s 
+epoch:  500 | board_count:  250000 | loss: 0.1178573398 | accuracy = 0.8444176000 | time: 0.867ms/board |   0m 40s 
+epoch:  600 | board_count:  300000 | loss: 0.1098535964 | accuracy = 0.8446184000 | time: 0.609ms/board |   0m 48s 
+epoch:  700 | board_count:  350000 | loss: 0.1031565164 | accuracy = 0.8466152000 | time: 0.617ms/board |   0m 55s 
+epoch:  800 | board_count:  400000 | loss: 0.1029212706 | accuracy = 0.8408720000 | time: 0.922ms/board |   1m 03s 
+epoch:  900 | board_count:  450000 | loss: 0.0997712981 | accuracy = 0.8491848000 | time: 0.894ms/board |   1m 11s 
+epoch: 1000 | board_count:  500000 | loss: 0.0961660899 | accuracy = 0.8557392000 | time: 0.613ms/board |   1m 19s 
+epoch: 1100 | board_count:  550000 | loss: 0.0962912631 | accuracy = 0.8539368000 | time: 0.684ms/board |   1m 26s 
+epoch: 1200 | board_count:  600000 | loss: 0.0931769944 | accuracy = 0.8580008000 | time: 0.571ms/board |   1m 34s 
+epoch: 1300 | board_count:  650000 | loss: 0.0906469062 | accuracy = 0.8602616000 | time: 0.845ms/board |   1m 41s 
+epoch: 1400 | board_count:  700000 | loss: 0.0879969780 | accuracy = 0.8591184000 | time: 0.884ms/board |   1m 49s 
+epoch: 1500 | board_count:  750000 | loss: 0.0874921793 | accuracy = 0.8358216000 | time: 0.888ms/board |   1m 57s 
+epoch: 1600 | board_count:  800000 | loss: 0.0859182807 | accuracy = 0.8489656000 | time: 0.590ms/board |   2m 05s 
+epoch: 1700 | board_count:  850000 | loss: 0.0836678085 | accuracy = 0.8483360000 | time: 0.862ms/board |   2m 12s 
+epoch: 1800 | board_count:  900000 | loss: 0.0815199302 | accuracy = 0.8495000000 | time: 0.881ms/board |   2m 20s 
+epoch: 1900 | board_count:  950000 | loss: 0.0806201453 | accuracy = 0.8482520000 | time: 0.564ms/board |   2m 28s 
+epoch: 2000 | board_count: 1000000 | loss: 0.0787679064 | accuracy = 0.8483560000 | time: 0.872ms/board |   2m 36s 
+epoch: 2100 | board_count: 1050000 | loss: 0.0773184256 | accuracy = 0.8487776000 | time: 0.625ms/board |   2m 43s 
+epoch: 2200 | board_count: 1100000 | loss: 0.0766027399 | accuracy = 0.8462472000 | time: 0.892ms/board |   2m 51s 
+epoch: 2300 | board_count: 1150000 | loss: 0.0748506164 | accuracy = 0.8490656000 | time: 0.894ms/board |   2m 59s 
+epoch: 2400 | board_count: 1200000 | loss: 0.0743447353 | accuracy = 0.8674904000 | time: 0.828ms/board |   3m 07s 
+epoch: 2500 | board_count: 1250000 | loss: 0.0690121484 | accuracy = 0.8670856000 | time: 0.693ms/board |   3m 14s 
+epoch: 2600 | board_count: 1300000 | loss: 0.0633217851 | accuracy = 0.9059976000 | time: 0.582ms/board |   3m 22s 
+epoch: 2700 | board_count: 1350000 | loss: 0.0589815523 | accuracy = 0.9207096000 | time: 0.628ms/board |   3m 30s 
+epoch: 2800 | board_count: 1400000 | loss: 0.0559206275 | accuracy = 0.9473808000 | time: 0.856ms/board |   3m 38s 
+epoch: 2900 | board_count: 1450000 | loss: 0.0521990538 | accuracy = 0.9663240000 | time: 0.750ms/board |   3m 45s 
+epoch: 3000 | board_count: 1500000 | loss: 0.0451631214 | accuracy = 0.9882304000 | time: 0.852ms/board |   3m 53s 
+epoch: 3100 | board_count: 1550000 | loss: 0.0405294467 | accuracy = 0.9940272000 | time: 0.610ms/board |   4m 01s 
+epoch: 3200 | board_count: 1600000 | loss: 0.0374552332 | accuracy = 0.9987952000 | time: 0.931ms/board |   4m 08s 
+epoch: 3300 | board_count: 1650000 | loss: 0.0350209996 | accuracy = 0.9790264000 | time: 0.876ms/board |   4m 16s 
+epoch: 3400 | board_count: 1700000 | loss: 0.0330259171 | accuracy = 0.9650000000 | time: 0.916ms/board |   4m 24s 
+epoch: 3500 | board_count: 1750000 | loss: 0.0316522883 | accuracy = 0.9648120000 | time: 0.560ms/board |   4m 32s 
+epoch: 3600 | board_count: 1800000 | loss: 0.0300291445 | accuracy = 0.9643640000 | time: 0.811ms/board |   4m 40s 
+epoch: 3700 | board_count: 1850000 | loss: 0.0283310571 | accuracy = 0.9648640000 | time: 0.856ms/board |   4m 47s 
+epoch: 3800 | board_count: 1900000 | loss: 0.0269591081 | accuracy = 0.9844792000 | time: 0.800ms/board |   4m 55s 
+epoch: 3900 | board_count: 1950000 | loss: 0.0248069457 | accuracy = 0.9974280000 | time: 0.759ms/board |   5m 03s 
+epoch: 4000 | board_count: 2000000 | loss: 0.0240097684 | accuracy = 0.9972880000 | time: 0.901ms/board |   5m 10s 
+epoch: 4100 | board_count: 2050000 | loss: 0.0228048362 | accuracy = 0.9973400000 | time: 0.578ms/board |   5m 18s 
+epoch: 4200 | board_count: 2100000 | loss: 0.0215799465 | accuracy = 0.9972960000 | time: 0.859ms/board |   5m 26s 
+epoch: 4300 | board_count: 2150000 | loss: 0.0206629607 | accuracy = 0.9987704000 | time: 0.888ms/board |   5m 34s 
+epoch: 4400 | board_count: 2200000 | loss: 0.0196096606 | accuracy = 1.0000000000 | time: 0.584ms/board |   5m 42s 
+Finished Training: GameOfLifeForward_2 - 4460 epochs in 346.3s
+GameOfLifeForward_2.savefile(): /home/jamie/code/ai-games/puzzles/game_of_life/neural_networks/models/GameOfLifeForward_2.pth = 2.8 kB
+--------------------
+GameOfLifeForward_2
+GameOfLifeForward_2(
+  (criterion): MSELoss()
+  (layers): ModuleList(
+    (0): Conv2d(1, 2, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), padding_mode=circular)
+    (1): Conv2d(3, 2, kernel_size=(1, 1), stride=(1, 1))
+    (2): Conv2d(2, 1, kernel_size=(1, 1), stride=(1, 1))
+  )
+  (dropout): Dropout(p=0.0, inplace=False)
+  (activation): PReLU(num_parameters=1)
+)
+activation.weight
+[-0.34658742]
+
+layers.0.weight
+[[[[-0.4529974  -0.452914   -0.45299572]
+   [-0.45289952 -1.3589381  -0.4530323 ]
+   [-0.4529913  -0.45304877 -0.79389566]]]
+ [[[-0.49160075 -0.4915705  -0.49159864]
+   [-0.49156544 -0.16970025 -0.49177176]
+   [-0.49169904 -0.49179733  0.376969  ]]]]
+
+layers.0.bias
+[1.3589481 0.6613752]
+
+layers.1.weight
+[[[[ 2.4305706]]
+  [[ 1.2651688]]
+  [[-1.1702752]]]
+ [[[ 2.9703436]]
+  [[ 1.5461489]]
+  [[-1.4301981]]]]
+
+layers.1.bias
+[-0.3569234 -0.4361384]
+
+layers.2.weight
+[[[[-2.2156596]]
+  [[-2.8065724]]]]
+
+layers.2.bias
+[1.1999377]
+
+real 349.95
+user 348.98
+sys 1.62

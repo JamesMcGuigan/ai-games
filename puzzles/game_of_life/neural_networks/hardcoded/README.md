@@ -2,7 +2,7 @@
 
 This is a response to the paper: 
 
-**Why neural networks struggle with the Game of Life**
+**It's Hard for Neural Networks To Learn the Game of Life**
 by Jacob M. Springer, Garrett T. Kenyon
 - https://arxiv.org/abs/2009.01398 
 

@@ -14,6 +14,7 @@ import torch
 import torch.nn as nn
 
 from neural_networks.device import device
+from utils.util import batch
 
 # noinspection PyTypeChecker
 T = TypeVar('T', bound='GameOfLifeBase')
@@ -44,6 +45,8 @@ class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
             # Use default initialization
             pass
 
+
+
     ### Prediction
 
     def __call__(self, *args, **kwargs) -> torch.Tensor:
@@ -51,10 +54,26 @@ class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
         return super().__call__(*args, **kwargs)
 
     def predict(self, inputs: Union[List[np.ndarray], np.ndarray, torch.Tensor]) -> np.ndarray:
-        """ Wrapper function around __call__() that returns a numpy int8 array for external usage """
-        outputs = self(inputs)
-        outputs = self.cast_int(outputs).squeeze().cpu().numpy()
-        return outputs
+        """
+        Wrapper function around __call__() that returns a numpy int8 array for external usage
+        Will auto-detect the largest batch size capable of fitting into GPU memory
+        Output is squeezed, so will work both for single board, as well as a batch
+        """
+        inputs     = self.cast_inputs(inputs)  # cast to 4D tensor
+        batch_size = len(inputs)               # keep halving batch_size until it is small enough to fit in CUDA memory
+        while True:
+            try:
+                outputs = []
+                for input in batch(inputs, batch_size):
+                    output = self(input)
+                    output = self.cast_int(output).detach().cpu().numpy()
+                    outputs.append(output)
+                outputs = np.concatenate(outputs).squeeze()
+                return outputs
+            except RuntimeError as exception:  # CUDA out of memory exception
+                torch.cuda.empty_cache()
+                if batch_size == 1: raise exception
+                batch_size = math.ceil( batch_size / 2 )
 
 
 
@@ -100,8 +119,8 @@ class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
         return self
 
 
-    def load(self: T) -> T:
-        if os.path.exists(self.filename):
+    def load(self: T, load_weights=True) -> T:
+        if load_weights and os.path.exists(self.filename):
             try:
                 self.load_state_dict(torch.load(self.filename))
                 print(f'{self.__class__.__name__}.load(): {self.filename} = {humanize.naturalsize(os.path.getsize(self.filename))}')
@@ -110,7 +129,8 @@ class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
                 print(f'{self.__class__.__name__}.load(): model has changed dimensions, reinitializing weights\n')
                 self.apply(self.weights_init)
         else:
-            print(f'{self.__class__.__name__}.load(): model file not found, reinitializing weights\n')
+            if load_weights: print(f'{self.__class__.__name__}.load(): model file not found, reinitializing weights\n')
+            else:            print(f'{self.__class__.__name__}.load(): reinitializing weights\n')
             self.apply(self.weights_init)
 
         self.loaded = True    # prevent any infinite if self.loaded loops
@@ -126,6 +146,8 @@ class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
             print(name)
             print(re.sub(r'\n( *\n)+', '\n', str(parameter.data.cpu().numpy())))  # remove extranious newlines
             print()
+
+
 
     ### Casting
 

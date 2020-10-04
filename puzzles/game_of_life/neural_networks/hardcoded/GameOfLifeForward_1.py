@@ -41,15 +41,6 @@ class GameOfLifeForward_1(GameOfLifeBase):
         return x
 
 
-    def load(self: T) -> T:
-        self.loaded = True    # prevent any infinite if self.loaded loops
-        self.apply(self.weights_init)
-        self.to(self.device)  # ensure all weights, either loaded or untrained are moved to GPU
-        # self.eval()           # default to production mode - disable dropout
-        # self.freeze()         # default to production mode - disable training
-        return self
-
-
     def weights_init(self, layer):
         ### Default initialization seems to work best, at least for Z shaped ReLU1 - see GameOfLifeHardcodedReLU1_21.py
         if isinstance(layer, (nn.Conv2d, nn.ConvTranspose2d)):
@@ -71,7 +62,7 @@ if __name__ == '__main__':
     from neural_networks.train import train
     import numpy as np
 
-    model = GameOfLifeForward_1().load()
+    model = GameOfLifeForward_1().load(load_weights=False)
     model.print_params()
     print('-' * 20)
 

@@ -46,8 +46,7 @@ if __name__ == '__main__':
     from neural_networks.train import train
     import numpy as np
 
-    model = GameOfLifeForward_128().load()
-    model.apply(model.weights_init)
+    model = GameOfLifeForward_128().load(load_weights=False)
     model.print_params()
     print('-' * 20)
 

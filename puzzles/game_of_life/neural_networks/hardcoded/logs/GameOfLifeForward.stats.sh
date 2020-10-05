@@ -14,8 +14,10 @@ for N in 1 1N 2 2N 4 128; do
     { avg_epochs += $5; avg_time += $8; count += 1; }
     END { avg_epochs = int(avg_epochs / count) }
     END { avg_time   = int(avg_time   / count) }
-    END { printf "%-21s | %2d/%2d successes | epochs = %4d / %4d / %5d | time seconds = %3d / %3d / %3d (min/avg/max)\n",
-                  name,   count, total,       min_epochs, avg_epochs, max_epochs,   min_time, avg_time, max_time }
+    END { if ( count > 0 ) {
+        printf "%-21s | %2d/%2d successes | epochs = %4d / %4d / %5d | time seconds = %4d / %4d / %4d (min/avg/max)\n",
+                name,   count, total,       min_epochs, avg_epochs, max_epochs,   min_time, avg_time, max_time
+    }}
   ';
 done
 

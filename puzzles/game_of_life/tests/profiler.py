@@ -13,8 +13,8 @@ from hashmaps.hash_functions import hash_geometric
 from hashmaps.hash_functions import hash_translations
 from utils.datasets import train_df
 from utils.game import life_step
-from utils.game import life_step_1
-from utils.game import life_step_2
+from utils.game import life_step_numpy
+from utils.game import life_step_scipy
 
 dataset = np.array( train_df[ train_df.columns[-624:] ] ).reshape((-1, 25, 25))
 dataset = dataset[:1000]
@@ -32,12 +32,12 @@ def profile_commands(commands: List[Union[Callable, str]], number=3):
 
 def profile_life_step():
     #  42.7µs - lambda: [ life_step(x)    for x in dataset ],  # 2882.0µs without numba
-    # 200.1µs - lambda: [ life_step_1(x)  for x in dataset ],
-    #  38.7µs - lambda: [ life_step_2(x)  for x in dataset ],
+    # 200.1µs - lambda: [ life_step_numpy(x)  for x in dataset ],
+    #  38.7µs - lambda: [ life_step_scipy(x)  for x in dataset ],
     return profile_commands([
         lambda: [ life_step(x)    for x in dataset ],
-        lambda: [ life_step_1(x)  for x in dataset ],
-        lambda: [ life_step_2(x)  for x in dataset ],
+        lambda: [life_step_numpy(x) for x in dataset],
+        lambda: [life_step_scipy(x) for x in dataset],
     ])
 
 def profile_hash():

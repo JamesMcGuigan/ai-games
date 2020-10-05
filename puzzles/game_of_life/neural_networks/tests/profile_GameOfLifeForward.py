@@ -15,23 +15,27 @@
 # life_step() - njit          =  42.8µs
 # life_step() - numpy         = 180.8µs
 # gameOfLifeForward() - loop  = 618.3µs  # much slower, but still fast compared to an expensive function
+import operator
+import timeit
+
 from neural_networks.hardcoded.GameOfLifeForward_128 import GameOfLifeForward_128
+from utils.game import generate_random_boards
+from utils.game import life_step_njit
+from utils.game import life_step_numpy
+from utils.game import life_step_scipy
 
 
 def profile_GameOfLifeForward():
-    import timeit
-    import operator
-    from utils.game import generate_random_boards, life_step, life_step_1, life_step_2
 
     model  = GameOfLifeForward_128()
     boards = generate_random_boards(1_000)
     for number in [1,10,100]:
         timings = {
-            'gameOfLifeForward() - batch': timeit.timeit(lambda: model(boards),                        number=number),
-            'gameOfLifeForward() - loop':  timeit.timeit(lambda: [ model(board) for board in boards ], number=number),
-            'life_step() - njit':          timeit.timeit(lambda: [ life_step(board)         for board in boards ], number=number),
-            'life_step() - numpy':         timeit.timeit(lambda: [ life_step_1(board)       for board in boards ], number=number),
-            'life_step() - scipy':         timeit.timeit(lambda: [ life_step_2(board)       for board in boards ], number=number),
+            'gameOfLifeForward() - batch': timeit.timeit(lambda:   model(boards),                                number=number),
+            'gameOfLifeForward() - loop':  timeit.timeit(lambda: [ model(board)           for board in boards ], number=number),
+            'life_step() - njit':          timeit.timeit(lambda: [ life_step_njit(board)  for board in boards ], number=number),
+            'life_step() - numpy':         timeit.timeit(lambda: [ life_step_numpy(board) for board in boards ], number=number),
+            'life_step() - scipy':         timeit.timeit(lambda: [ life_step_scipy(board) for board in boards ], number=number),
         }
         print(f'number: {number} | batch_size = {len(boards)}')
         for key, value in sorted(timings.items(), key=operator.itemgetter(1)):

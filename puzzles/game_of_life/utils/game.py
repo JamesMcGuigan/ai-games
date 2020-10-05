@@ -9,7 +9,7 @@ from numba import njit
 
 
 # Source: https://www.kaggle.com/ianmoone0617/reversing-conways-game-of-life-tutorial
-def life_step_1(X: np.ndarray):
+def life_step_numpy(X: np.ndarray):
     """Game of life step using generator expressions"""
     nbrs_count = sum(np.roll(np.roll(X, i, 0), j, 1)
                      for i in (-1, 0, 1) for j in (-1, 0, 1)
@@ -18,7 +18,7 @@ def life_step_1(X: np.ndarray):
 
 
 # Source: https://www.kaggle.com/ianmoone0617/reversing-conways-game-of-life-tutorial
-def life_step_2(X: np.ndarray):
+def life_step_scipy(X: np.ndarray):
     """Game of life step using scipy tools"""
     from scipy.signal import convolve2d
     nbrs_count = convolve2d(X, np.ones((3, 3)), mode='same', boundary='wrap') - X
@@ -55,7 +55,7 @@ def life_neighbours(board: np.ndarray, max_value=3):
 
 
 @njit
-def life_step(board: np.ndarray) -> np.ndarray:
+def life_step_njit(board: np.ndarray) -> np.ndarray:
     """Game of life step using generator expressions"""
     size_x = board.shape[0]
     size_y = board.shape[1]
@@ -70,6 +70,7 @@ def life_step(board: np.ndarray) -> np.ndarray:
                 output[x, y] = 1
     return output
 
+life_step = life_step_njit  # create global alias
 def life_steps(boards: List[np.ndarray]) -> List[np.ndarray]:
     """ Parallel version of life_step() but for an array of boards """
     return Parallel(-1)( delayed(life_step)(board) for board in boards )

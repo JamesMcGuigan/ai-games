@@ -31,7 +31,7 @@ def is_valid_solution_3d(solution_3d: np.ndarray) -> bool:
     return is_valid_solution(solution_3d[0], solution_3d[-1], delta=len(solution_3d)-1)
 
 
-def fix_submission(max_offset=5):
+def fix_submission(max_offset=1):
     """
     There was a bug in game_of_life_solver() that was solving to T=-(delta+1) rather than delta.
     The result of this was seemingly random scores on the leaderboard, and extra compute time for an additional delta
@@ -75,18 +75,17 @@ def fix_submission(max_offset=5):
                 continue  # submission.csv is valid for idx, so skip
 
             solution = start
-            for t in range(1, max_offset+3):
+            for t in range(1, max_offset+1):
                 solution = life_step(solution)
                 if is_valid_solution(solution, stop, delta):
                     submission_df.loc[idx] = numpy_to_series(solution, key='start')
                     stats['fixed'] += 1
                     break
-            # BUGFIX: this seems to be causing problems in Kaggle Notebooks at the moment
-            # else:
-            #     submission_df.loc[idx] = numpy_to_series(np.zeros(stop.shape), key='start')  # zero out the entry and retry
-            #     print( f'fix_submission() invalid idx: {idx} | delta: {delta} | cells: {np.count_nonzero(solution != stop)}' )
-            #     stats['invalid'] += 1
-            #     pass
+            else:
+                submission_df.loc[idx] = numpy_to_series(np.zeros(stop.shape), key='start')  # zero out the entry and retry
+                print( f'fix_submission() invalid idx: {idx} | delta: {delta} | cells: {np.count_nonzero(solution != stop)}' )
+                stats['invalid'] += 1
+                pass
         except:
             print( f'fix_submission() exception idx: {idx}' )
             stats['invalid'] += 1

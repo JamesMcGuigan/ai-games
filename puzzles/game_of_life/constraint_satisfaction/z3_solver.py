@@ -99,12 +99,12 @@ def game_of_life_solver(board: np.ndarray, delta=1, warmup=0, timeout=0, verbose
         t_cells[-1][x][y] == bool(board[x][y])
         for x,y in itertools.product(range(size_x), range(size_y))
     ])
-    z3_solver.push()
 
+    z3_solver.push()
     for zero_point_distance in [1,2]:
-        z3_solver.pop()
-        add_zero_point_constraint(z3_solver, t_cells, zero_point_distance)
+        z3_solver.pop()    # remove previous zero_point_constraints
         z3_solver.push()
+        add_zero_point_constraint(z3_solver, t_cells, zero_point_distance)
 
         # if z3_solver.check() != z3.sat: print('Unsolvable!')
         solution_3d = solver_to_numpy_3d(z3_solver, t_cells[warmup:])  # calls z3_solver.check()

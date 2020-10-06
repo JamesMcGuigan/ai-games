@@ -59,13 +59,14 @@ def get_no_empty_boards_constraint(t_cells):
 
 
 
-def get_zero_point_constraint(t_cells, zero_point_distance: int):
+def get_zero_point_constraint(t_cells, zero_point_distance: int, delta=0):
     # Ignore any currently dead cell with 0 neighbours,
     # This considerably reduces the state space and prevents zero-point energy solutions
     # BUGFIX: distance=1 breaks test_df[90081]
     size_x, size_y = ( len(t_cells[0]), len(t_cells[0][0]) )
+    delta = delta or len(t_cells)-1
     constraints = []
-    for t in range(1, len(t_cells)):
+    for t in range(len(t_cells)-delta, len(t_cells)):
         for x,y in itertools.product(range(size_x), range(size_y)):
             cell      = t_cells[t][x][y]
             past_cell = t_cells[t-1][x][y]

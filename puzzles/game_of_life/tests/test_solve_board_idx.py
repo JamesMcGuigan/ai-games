@@ -3,14 +3,14 @@
 # from joblib import Parallel
 #
 # from constraint_satisfaction.solve_dataframe import solve_board_idx
+# from hashmaps.hash_functions import hash_translations
 # from utils.datasets import train_df
-# from utils.hashmaps import hash_translations
 # from utils.idx_lookup import get_invarient_idxs
 # from utils.util import csv_to_delta
 # from utils.util import csv_to_numpy
 #
 #
-# def test_solve_dataframe():
+# def test_solve_board_idx():
 #     df       = train_df
 #     all_idxs = get_invarient_idxs(train_df)  # len(invarient_idxs) == 2961
 #     print('len(invarient_idxs)', len(all_idxs), all_idxs)

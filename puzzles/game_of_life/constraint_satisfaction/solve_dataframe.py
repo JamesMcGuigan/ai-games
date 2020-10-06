@@ -9,13 +9,11 @@ import numpy as np
 import pandas as pd
 from pathos.multiprocessing import ProcessPool
 
-from constraint_satisfaction.fix_submission import is_valid_solution
 from constraint_satisfaction.fix_submission import is_valid_solution_3d
 from constraint_satisfaction.z3_solver import game_of_life_solver
 from utils.datasets import submission_file
 from utils.datasets import test_df
 from utils.datasets import timeout_file
-from utils.datasets import train_df
 from utils.idx_lookup import get_unsolved_idxs
 from utils.plot import plot_3d
 from utils.plot import plot_idx
@@ -134,61 +132,3 @@ def solve_dataframe(
         pool.terminate()
         pool.clear()
     return submission_df
-
-
-
-if __name__ == '__main__':
-    game_of_life_solver(csv_to_numpy(train_df, 0, key='stop'), 1, verbose=False)  # Warmup and @njit compile
-
-    # With boolean logic gives 2-4x speedup over integer logic
-    #   (train_df, 0), delta = 3+1 - solved  4.2s (boolean logic) | 16.1s (integer logic)
-    #   (train_df, 4), delta = 1+1 - solved  7.6s (boolean logic) | 57.6s (integer logic)
-    #   (train_df, 0), delta = 3+1 - solved  4.0s (boolean logic) | 17.3s (integer logic)
-    # After fixing delta+=1 bug:
-    # zero_point_distance=1 -> baseline
-    #     idx =     0 | delta = 3 | cells =   4 ->   9 | valid = True | time =  2.9s
-    #     idx =     4 | delta = 1 | cells =  65 ->  72 | valid = True | time =  1.0s
-    #     idx = 50002 | delta = 1 | cells = 152 -> 149 | valid = True | time = 11.8s
-    #     idx = 50024 | delta = 2 | cells =  28 ->  43 | valid = True | time =  3.0s
-    #     idx = 50022 | delta = 3 | cells =   6 ->   9 | valid = True | time =  3.2s
-    #     idx = 98979 | delta = 4 | cells =   4 ->  15 | valid = True | time =  5.0s
-    #     idx = 58057 | delta = 5 | cells =   4 ->  15 | valid = True | time = 11.5s
-    #     idx = 90081 | delta = 1 | cells = 130 ->   0 | valid = False | time =  6.2s
-    # zero_point_distance=2 -> 2*delta slowdown
-    #     idx =     0 | delta = 3 | cells =   4 ->  11 | valid = True | time =  5.4s
-    #     idx =     4 | delta = 1 | cells =  65 -> 144 | valid = True | time =  3.1s
-    #     idx = 50002 | delta = 1 | cells = 152 -> 255 | valid = True | time = 21.7s
-    #     idx = 50024 | delta = 2 | cells =  28 ->  89 | valid = True | time = 13.8s
-    #     idx = 50022 | delta = 3 | cells =   6 ->  27 | valid = True | time = 10.5s
-    #     idx = 98979 | delta = 4 | cells =   4 ->  42 | valid = True | time = 34.8s
-    #     idx = 58057 | delta = 5 | cells =   4 ->  85 | valid = True | time = 228.9s
-    #     idx = 90081 | delta = 1 | cells = 130 -> 213 | valid = True | time = 16.4s
-    for df, idx in [
-        # (train_df, 0),     # delta = 3
-        # (train_df, 4),     # delta = 1
-        # (test_df, 50002),  # delta = 1
-        # (test_df, 50024),  # delta = 2
-        # (test_df, 50022),  # delta = 3
-        # (test_df, 98979),  # delta = 4
-        # (test_df, 58057),  # delta = 5
-        (test_df, 90081),  # delta = 1 | requires zero_point_distance = 2
-        (test_df, 99391),  # delta = 2 | cells = 151 | unsat in 745.9s
-        (test_df, 85291),  # delta = 5 | cells = 30  | unsat in 5805.4s
-    ]:
-        time_start = time.perf_counter()
-        delta    = csv_to_delta(df, idx)
-        board    = csv_to_numpy(df, idx, key='stop')
-        expected = csv_to_numpy(df, idx, key='start')
-        # solution_3d, idx, time_taken = solve_board_delta1_loop(board, delta, idx, verbose=False)
-        z3_solver, t_cells, solution_3d = game_of_life_solver(board, delta, verbose=False)
-        time_taken = time.perf_counter() - time_start
-        is_valid   = is_valid_solution_3d(solution_3d)
-        print(f'idx = {idx:5d} | delta = {delta} | cells = {np.count_nonzero(board):3d} -> {np.count_nonzero(solution_3d[0]):3d} | valid = {is_valid} | time = {time_taken:4.1f}s')
-
-        assert is_valid == is_valid_solution(solution_3d[0], solution_3d[-1], delta)
-        assert len(solution_3d) == delta + 1
-
-        # plot_3d(solution_3d)
-
-    # solve_dataframe(train_df, savefile=None)
-    # solve_dataframe(test_df, savefile='submission.csv')

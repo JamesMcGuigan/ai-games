@@ -16,7 +16,7 @@ from hashmaps.hash_functions import hash_translations
 from utils.datasets import test_df
 from utils.datasets import train_df
 from utils.game import life_step
-from utils.util import csv_to_numpy
+from utils.util import csv_to_numpy_list
 
 
 def find_repeating_patterns(start_board: np.ndarray, delta=16, geometric=False) -> Union[np.ndarray, None]:
@@ -40,22 +40,22 @@ def find_repeating_patterns(start_board: np.ndarray, delta=16, geometric=False) 
             return np.array(solution_3d)
 
     if symmetric and len(solution_3d) > 5:
-        return np.array(solution_3d)
+        return np.array(solution_3d, dtype=np.int8)
     return None
 
 
 def dataset_patterns() -> List[np.ndarray]:
-    boards = [
-        *[ csv_to_numpy(train_df, idx, key='start') for idx in train_df.index ],
-        *[ csv_to_numpy(train_df, idx, key='stop')  for idx in train_df.index ],
-        *[ csv_to_numpy(test_df,  idx, key='stop')  for idx in test_df.index  ],
-    ]
-    boards = [ filter_crop_and_center(board, max_size=6, shape=(25,25)) for board in boards ]
-    boards = [ board for board in boards if board is not None ]
-    hashes = Parallel(-1)([ delayed(hash_geometric)(board) for board in boards ])
-    boards = list({ hashed: board for hashed, board in zip(hashes, boards) }.values())  # deduplicate
+    boards = np.concatenate([
+        csv_to_numpy_list(train_df, key='start'),
+        csv_to_numpy_list(train_df, key='stop'),
+        csv_to_numpy_list(test_df,  key='stop'),
+    ]).astype(np.int8)
+    boards   = Parallel(-1)([ delayed(filter_crop_and_center)(board, max_size=6, shape=(25,25)) for board in boards ])
+    boards   = [ board for board in boards if board is not None ]
+    hashes   = Parallel(-1)([ delayed(hash_geometric)(board) for board in boards ])
+    boards   = list({ hashed: board for hashed, board in zip(hashes, boards) }.values())  # deduplicate
     patterns = Parallel(-1)([ delayed(find_repeating_patterns)(board, delta=16, geometric=False) for board in boards ])
-    patterns = [ pattern for pattern in patterns if pattern is not None ]
+    patterns = [ pattern.astype(np.int8) for pattern in patterns if pattern is not None ]
     return patterns
 
 
@@ -93,10 +93,11 @@ def grouped_patterns(patterns: List[np.ndarray]) -> Dict[bytes, np.ndarray]:
         if t1_key not in index:
             dedup[t0_key] = pattern_3d
 
-            # Group by last frame
+    # Group by last frame
     grouped  = defaultdict(list)
     for pattern_3d in dedup.values():
         order_key = hash_geometric(pattern_3d[-1])
         grouped[order_key].append(pattern_3d)
     grouped = { **grouped }  # remove defaultdict
     return grouped
+

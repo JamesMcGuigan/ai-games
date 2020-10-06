@@ -11,7 +11,7 @@ from constraint_satisfaction.fix_submission import is_valid_solution
 from constraint_satisfaction.z3_constraints import get_game_of_life_ruleset
 from constraint_satisfaction.z3_constraints import get_initial_board_constraint
 from constraint_satisfaction.z3_constraints import get_no_empty_boards_constraint
-from constraint_satisfaction.z3_constraints import get_z3_solver
+from constraint_satisfaction.z3_constraints import get_t_cells
 from constraint_satisfaction.z3_constraints import get_zero_point_constraint
 from constraint_satisfaction.z3_utils import get_neighbourhood_cells
 from constraint_satisfaction.z3_utils import solver_to_numpy_3d
@@ -61,10 +61,9 @@ def game_of_life_solver_patterns(board: np.ndarray, delta=1, warmup=0, timeout=0
     # BUGFIX: zero_point_distance=1 breaks test_df[90081]
     # NOTE:   zero_point_distance=2 results in: 2*delta slowdown
     # NOTE:   zero_point_distance=3 results in another 2-6x slowdown (but in rare cases can be quicker)
-    z3_solver, t_cells = get_z3_solver(
-        size=board.shape,
-        delta=delta,
-    )
+
+    z3_solver = z3.Solver()
+    t_cells   = get_t_cells( size=board.shape, delta=delta )
     z3_solver.add( get_no_empty_boards_constraint(t_cells) )
     z3_solver.add( get_game_of_life_ruleset(t_cells) )
     z3_solver.add( get_initial_board_constraint(t_cells, board) )

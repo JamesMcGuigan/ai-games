@@ -8,19 +8,16 @@ from constraint_satisfaction.z3_constraints import get_exclude_solution_constrai
 from constraint_satisfaction.z3_constraints import get_game_of_life_ruleset
 from constraint_satisfaction.z3_constraints import get_initial_board_constraint
 from constraint_satisfaction.z3_constraints import get_no_empty_boards_constraint
-from constraint_satisfaction.z3_constraints import get_z3_solver
+from constraint_satisfaction.z3_constraints import get_t_cells
 from constraint_satisfaction.z3_constraints import get_zero_point_constraint
 from constraint_satisfaction.z3_solver_patterns import solver_to_numpy_3d
 
 
 def game_of_life_solver(board: np.ndarray, delta=1, timeout=0, verbose=True):
     time_start = time.perf_counter()
-    size       = (size_x, size_y) = board.shape
 
-    z3_solver, t_cells = get_z3_solver(
-        size=size,
-        delta=delta,
-    )
+    z3_solver = z3.Solver()
+    t_cells   = get_t_cells( delta=delta, size=board.shape )
     z3_solver.add( get_no_empty_boards_constraint(t_cells) )
     z3_solver.add( get_initial_board_constraint(t_cells, board) )
     z3_solver.push()

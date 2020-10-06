@@ -6,8 +6,7 @@ import z3
 from constraint_satisfaction.z3_utils import get_neighbourhood_cells
 
 
-def get_z3_solver(delta=1, size=(25,25)):
-    z3_solver = z3.Solver()
+def get_t_cells(delta=1, size=(25,25)):
     t_cells = [
         [
             [ z3.Bool(f"({x:02d},{y:02d})@t={t}") for y in range(size[1]) ]
@@ -15,8 +14,7 @@ def get_z3_solver(delta=1, size=(25,25)):
         ]
         for t in range(0, delta+1)
     ]
-    z3_solver.push()
-    return z3_solver, t_cells
+    return t_cells
 
 
 
@@ -99,3 +97,16 @@ def get_exclude_solution_constraint(t_cells, z3_solver):
         cell != z3_solver.model()[cell]
         for cell in pydash.flatten_deep(t_cells[0])
     ])
+
+
+
+### Optimization Cost Functions
+
+def get_cell_count_minimization_costs(t_cells):
+    return [
+        z3.Sum([
+            z3.If(cell,1,0)
+            for cell in pydash.flatten_deep(t_cells[t])
+        ])
+        for t in range(len(t_cells))
+    ]

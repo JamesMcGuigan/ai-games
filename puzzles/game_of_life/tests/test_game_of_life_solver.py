@@ -9,6 +9,7 @@ from constraint_satisfaction.z3_solver import game_of_life_solver
 from utils.datasets import test_df
 from utils.datasets import train_df
 from utils.game import life_step
+from utils.plot import plot_idx
 from utils.util import csv_to_delta
 from utils.util import csv_to_numpy
 
@@ -43,6 +44,41 @@ from utils.util import csv_to_numpy
     # game_of_life_solver_patterns,
 ])
 @pytest.mark.parametrize("idx", [
+    90081,  # requires zero_point_distance=2 - this one doesn't always solve
+    50002,
+    50024,
+    50022,
+])
+def test_game_of_life_solver_test_df(idx, game_of_life_solver):
+    time_start  = time.perf_counter()
+
+    df          = test_df
+    delta       = csv_to_delta(df, idx)
+    board       = csv_to_numpy(df, idx, key='stop')
+
+    z3_solver, t_cells, solution_3d = game_of_life_solver(board, delta, verbose=False)
+    is_valid    = is_valid_solution_3d(solution_3d)
+
+    time_taken  = time.perf_counter() - time_start
+    print(f'idx = {idx:5d} | delta = {delta} | cells = {np.count_nonzero(board):3d} -> {np.count_nonzero(solution_3d[0]):3d} | valid = {is_valid} | time = {time_taken:4.1f}s')
+    if not is_valid:
+        plot_idx(df, idx)
+
+    assert is_valid == is_valid_solution(solution_3d[0], solution_3d[-1], delta)
+    assert is_valid == is_valid_solution(solution_3d[0], board,           delta)
+    assert len(solution_3d) == delta + 1
+
+    # if idx not in [90081] or np.count_nonzero(solution_3d[-1]):  # 90081 doesn't always solve
+    assert is_valid == True
+    assert np.all( board == solution_3d[-1] )
+
+
+
+@pytest.mark.parametrize("game_of_life_solver", [
+    game_of_life_solver,
+    # game_of_life_solver_patterns,
+])
+@pytest.mark.parametrize("idx", [
     0,      # 2x2 square
     43612,  # pretty
 ])
@@ -61,33 +97,3 @@ def test_game_of_life_solver_train_df(game_of_life_solver, idx):
 
     assert np.all( board == stop ), idx
 
-
-@pytest.mark.parametrize("game_of_life_solver", [
-    game_of_life_solver,
-    # game_of_life_solver_patterns,
-])
-@pytest.mark.parametrize("idx", [
-    50002,
-    50024,
-    50022,
-    90081,  # requires zero_point_distance=2 - this one doesn't always solve
-])
-def test_game_of_life_solver_test_df(idx, game_of_life_solver):
-    time_start  = time.perf_counter()
-
-    df          = test_df
-    delta       = csv_to_delta(df, idx)
-    board       = csv_to_numpy(df, idx, key='stop')
-
-    z3_solver, t_cells, solution_3d = game_of_life_solver(board, delta, verbose=False)
-    is_valid    = is_valid_solution_3d(solution_3d)
-
-    time_taken  = time.perf_counter() - time_start
-    print(f'idx = {idx:5d} | delta = {delta} | cells = {np.count_nonzero(board):3d} -> {np.count_nonzero(solution_3d[0]):3d} | valid = {is_valid} | time = {time_taken:4.1f}s')
-    assert is_valid == is_valid_solution(solution_3d[0], solution_3d[-1], delta)
-    assert is_valid == is_valid_solution(solution_3d[0], board,           delta)
-    assert len(solution_3d) == delta + 1
-
-    # if idx not in [90081] or np.count_nonzero(solution_3d[-1]):  # 90081 doesn't always solve
-    assert is_valid == True
-    assert np.all( board == solution_3d[-1] )

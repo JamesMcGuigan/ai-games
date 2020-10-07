@@ -16,7 +16,6 @@ def crop_outer(grid,tol=0):
     row_start,row_end = mask1.argmax(),m-mask1[::-1].argmax()
     return grid[row_start:row_end,col_start:col_end]
 
-
 def crop_outer_3d(solution_3d: np.ndarray, tol=0) -> np.ndarray:
     assert len(solution_3d.shape) == 3
     size_t,size_x,size_y = solution_3d.shape
@@ -31,12 +30,22 @@ def crop_outer_3d(solution_3d: np.ndarray, tol=0) -> np.ndarray:
     output = solution_3d[ t_start:t_end, col_start:col_end, row_start:row_end ]
     return output
 
+
+
 def crop_and_center(board: np.ndarray, shape=(25,25)) -> Union[np.ndarray, None]:
     cropped = crop_outer(board)
     offset  = ( (shape[0]-cropped.shape[0])//2, (shape[1]-cropped.shape[1])//2 )
     zeros   = np.zeros(shape, dtype=np.int8)
     zeros[ offset[0]:offset[0]+cropped.shape[0], offset[1]:offset[1]+cropped.shape[1] ] = cropped
     return zeros
+
+def crop_and_center_3d(solution_3d: np.ndarray, shape=(25,25)) -> Union[np.ndarray, None]:
+    cropped = crop_outer_3d(solution_3d)
+    offset  = ( (shape[0]-cropped[0].shape[0])//2, (shape[1]-cropped[0].shape[1])//2 )
+    zeros   = np.zeros((cropped.shape[0], *shape), dtype=np.int8)
+    zeros[ :, offset[0]:offset[0]+cropped[0].shape[0], offset[1]:offset[1]+cropped[0].shape[1] ] = cropped
+    return zeros
+
 
 
 def filter_crop_and_center(board: np.ndarray, max_size=6, shape=(25,25)) -> Union[np.ndarray, None]:
@@ -59,6 +68,7 @@ def pad_board(board: np.ndarray, padding=1):
     zeros       = np.zeros(padded_size, dtype=np.int8)
     zeros[ padding:-padding, padding:-padding ] = board
     return zeros
+
 
 def roll_2d(board: np.array, shift: int = 25//2) -> np.array:
     return np.roll( np.roll(board, shift, axis=0), shift, axis=1 )

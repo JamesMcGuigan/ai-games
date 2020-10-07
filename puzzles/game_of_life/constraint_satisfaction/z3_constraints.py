@@ -81,10 +81,19 @@ def get_zero_point_constraint(t_cells, zero_point_distance: int, delta=0):
 
 
 
-def get_initial_board_constraint(t_cells, board):
+def get_initial_board_constraint(t_cells, board, delta=0):
     """ assert all( t_cells[-1] == board ) """
     constraints = [
-        t_cells[-1][x][y] == bool(board[x][y])
+        t_cells[-1-delta][x][y] == bool(board[x][y])
+        for x,y in itertools.product(range(board.shape[0]), range(board.shape[1]))
+    ]
+    return constraints
+
+
+def get_static_board_constraint(t_cells, board):
+    constraints = [
+        t_cells[t][x][y] == bool(board[x][y])
+        for t in range(len(t_cells)-1)
         for x,y in itertools.product(range(board.shape[0]), range(board.shape[1]))
     ]
     return constraints
@@ -97,16 +106,3 @@ def get_exclude_solution_constraint(t_cells, z3_solver):
         cell != z3_solver.model()[cell]
         for cell in pydash.flatten_deep(t_cells[0])
     ])
-
-
-
-### Optimization Cost Functions
-
-def get_cell_count_minimization_costs(t_cells):
-    return [
-        z3.Sum([
-            z3.If(cell,1,0)
-            for cell in pydash.flatten_deep(t_cells[t])
-        ])
-        for t in range(len(t_cells))
-    ]

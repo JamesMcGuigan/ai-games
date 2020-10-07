@@ -51,8 +51,9 @@ def crop_and_center_3d(solution_3d: np.ndarray, shape=(25,25)) -> Union[np.ndarr
 def filter_crop_and_center(board: np.ndarray, max_size=6, shape=(25,25)) -> Union[np.ndarray, None]:
     for _ in range(2):
         cropped = crop_outer(board)
-        if cropped.shape != crop_inner(cropped).shape: continue  # exclude multi-piece shapes
-        if cropped.shape[0] <= max_size and cropped.shape[1] <= max_size:
+        if ( cropped.shape    == crop_inner(cropped).shape  # exclude multi-piece shapes
+         and cropped.shape[0] <= max_size and cropped.shape[1] <= max_size
+        ):
             offset = ( (shape[0]-cropped.shape[0])//2, (shape[1]-cropped.shape[1])//2 )
             zeros  = np.zeros(shape, dtype=np.int)
             zeros[ offset[0]:offset[0]+cropped.shape[0], offset[1]:offset[1]+cropped.shape[1] ] = cropped

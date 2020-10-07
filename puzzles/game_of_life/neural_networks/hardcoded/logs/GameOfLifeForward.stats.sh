@@ -1,7 +1,15 @@
 #!/usr/bin/env bash
 cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" || exit
 
-for N in 1 1N 2 2N 4 128; do
+#GameOfLifeForward_11N |  9/10 successes | epochs =  201 / 6284 /  9248 | time seconds =   20 /  563 /  762 (min/avg/max)
+#GameOfLifeForward_1N  |  6/10 successes | epochs = 3376 / 4771 /  7097 | time seconds =  262 /  370 /  552 (min/avg/max)
+#GameOfLifeForward_1   |  9/10 successes | epochs = 2254 / 5313 / 10318 | time seconds =  183 /  420 /  807 (min/avg/max)
+#GameOfLifeForward_2N  |  8/10 successes | epochs = 3245 / 4604 /  6924 | time seconds =  252 /  356 /  533 (min/avg/max)
+#GameOfLifeForward_2   |  9/10 successes | epochs = 3047 / 4878 /  8587 | time seconds =  239 /  379 /  669 (min/avg/max)
+#GameOfLifeForward_4   | 10/10 successes | epochs = 2027 / 3308 /  5061 | time seconds =  160 /  263 /  420 (min/avg/max)
+#GameOfLifeForward_128 | 10/10 successes | epochs =  441 /  508 /   570 | time seconds =   52 /   80 /   93 (min/avg/max)
+
+for N in 11N 1N 1 2N 2 4 128; do
   TOTAL=$(find ./ -name "GameOfLifeForward_$N.*.log" | wc -l)
   find ./ -name "GameOfLifeForward_$N.*.log" | grep "^Finished Training: GameOfLifeForward_$N " ./*.log |
   awk '
@@ -20,11 +28,3 @@ for N in 1 1N 2 2N 4 128; do
     }}
   ';
 done
-
-
-# GameOfLifeForward_1   |  9/10 successes | epochs = 2254 / 5313 / 10318 | time seconds = 183 / 420 / 807 (min/avg/max)
-# GameOfLifeForward_1N  |  6/10 successes | epochs = 3376 / 4771 /  7097 | time seconds = 262 / 370 / 552 (min/avg/max)
-# GameOfLifeForward_2   |  9/10 successes | epochs = 3047 / 4878 /  8587 | time seconds = 239 / 379 / 669 (min/avg/max)
-# GameOfLifeForward_2N  |  8/10 successes | epochs = 3245 / 4604 /  6924 | time seconds = 252 / 356 / 533 (min/avg/max)
-# GameOfLifeForward_4   | 10/10 successes | epochs = 2027 / 3308 /  5061 | time seconds = 160 / 263 / 420 (min/avg/max)
-# GameOfLifeForward_128 | 10/10 successes | epochs =  441 /  508 /   570 | time seconds =  52 /  80 /  93 (min/avg/max)

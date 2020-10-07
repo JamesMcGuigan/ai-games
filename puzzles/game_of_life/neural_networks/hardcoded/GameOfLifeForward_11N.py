@@ -22,7 +22,6 @@ class GameOfLifeForward_11N(GameOfLifeBase):
         self.layers = nn.ModuleList([
             # Previous pixel state requires information from distance 2, so we need two 3x3 convolutions
             nn.Conv2d(in_channels=1,    out_channels=1,    kernel_size=(3,3), padding=1, padding_mode='circular'),
-            # nn.Conv2d(in_channels=1,    out_channels=2,    kernel_size=(1,1)),
             nn.Conv2d(in_channels=1,    out_channels=1,    kernel_size=(1,1)),
         ])
         self.dropout    = nn.Dropout(p=0.0)

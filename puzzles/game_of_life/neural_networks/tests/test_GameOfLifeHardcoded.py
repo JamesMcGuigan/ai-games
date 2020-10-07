@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 
 from neural_networks.hardcoded.GameOfLifeForward_1 import GameOfLifeForward_1
+from neural_networks.hardcoded.GameOfLifeForward_11N import GameOfLifeForward_11N
 from neural_networks.hardcoded.GameOfLifeForward_128 import GameOfLifeForward_128
 from neural_networks.hardcoded.GameOfLifeForward_1N import GameOfLifeForward_1N
 from neural_networks.hardcoded.GameOfLifeForward_2 import GameOfLifeForward_2
@@ -21,11 +22,12 @@ models = [
     GameOfLifeHardcodedTanh(),
 
     GameOfLifeForward_128(),
-    GameOfLifeForward_2N(),
-    GameOfLifeForward_1N(),
     GameOfLifeForward_4(),
     GameOfLifeForward_2(),
+    GameOfLifeForward_2N(),
     GameOfLifeForward_1(),
+    GameOfLifeForward_1N(),
+    GameOfLifeForward_11N(),
 ]
 boards_t0  = generate_random_boards(10_000)
 boards_t1 = life_steps(boards_t0)

@@ -1,0 +1,95 @@
+removed './neural_networks/models/GameOfLifeForward_11N.pth'
+GameOfLifeForward_11N.load(): reinitializing weights
+
+GameOfLifeForward_11N
+GameOfLifeForward_11N(
+  (criterion): MSELoss()
+  (layers): ModuleList(
+    (0): Conv2d(1, 1, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), padding_mode=circular)
+    (1): Conv2d(1, 1, kernel_size=(1, 1), stride=(1, 1))
+  )
+  (dropout): Dropout(p=0.0, inplace=False)
+  (activation): PReLU(num_parameters=1)
+)
+activation.weight
+[0.25]
+
+layers.0.weight
+[[[[-0.6750647  -0.49979377 -0.59318346]
+   [-0.11620112  0.56852365 -0.67077166]
+   [ 0.12328605 -0.0951442  -0.29019704]]]]
+
+layers.0.bias
+[0.1]
+
+layers.1.weight
+[[[[0.52877957]]]]
+
+layers.1.bias
+[0.1]
+
+--------------------
+Training: GameOfLifeForward_11N
+GameOfLifeForward_11N.load(): /home/jamie/code/ai-games/puzzles/game_of_life/neural_networks/models/GameOfLifeForward_11N.pth = 2.2 kB
+GameOfLifeForward_11N(
+  (criterion): MSELoss()
+  (layers): ModuleList(
+    (0): Conv2d(1, 1, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), padding_mode=circular)
+    (1): Conv2d(1, 1, kernel_size=(1, 1), stride=(1, 1))
+  )
+  (dropout): Dropout(p=0.0, inplace=False)
+  (activation): PReLU(num_parameters=1)
+)
+epoch:    1 | board_count:     500 | loss: 0.0183587752 | accuracy = 1.0000000000 | time: 13.237ms/board |   0m 01s 
+epoch:    2 | board_count:    1000 | loss: 0.0174979456 | accuracy = 1.0000000000 | time: 0.678ms/board |   0m 01s 
+epoch:    3 | board_count:    1500 | loss: 0.0214581542 | accuracy = 1.0000000000 | time: 0.604ms/board |   0m 01s 
+epoch:    4 | board_count:    2000 | loss: 0.0229021598 | accuracy = 1.0000000000 | time: 0.739ms/board |   0m 02s 
+epoch:    5 | board_count:    2500 | loss: 0.0243440658 | accuracy = 1.0000000000 | time: 0.805ms/board |   0m 02s 
+epoch:    6 | board_count:    3000 | loss: 0.0221230920 | accuracy = 1.0000000000 | time: 0.664ms/board |   0m 02s 
+epoch:    7 | board_count:    3500 | loss: 0.0251791522 | accuracy = 1.0000000000 | time: 0.829ms/board |   0m 02s 
+epoch:    8 | board_count:    4000 | loss: 0.0198203195 | accuracy = 1.0000000000 | time: 0.868ms/board |   0m 02s 
+epoch:    9 | board_count:    4500 | loss: 0.0270821050 | accuracy = 1.0000000000 | time: 1.023ms/board |   0m 02s 
+epoch:   10 | board_count:    5000 | loss: 0.0248429954 | accuracy = 1.0000000000 | time: 0.833ms/board |   0m 02s 
+epoch:   20 | board_count:   10000 | loss: 0.0230765170 | accuracy = 1.0000000000 | time: 0.900ms/board |   0m 03s 
+epoch:   30 | board_count:   15000 | loss: 0.0224603425 | accuracy = 1.0000000000 | time: 1.137ms/board |   0m 04s 
+epoch:   40 | board_count:   20000 | loss: 0.0226745240 | accuracy = 1.0000000000 | time: 0.901ms/board |   0m 05s 
+epoch:   50 | board_count:   25000 | loss: 0.0238009539 | accuracy = 1.0000000000 | time: 0.915ms/board |   0m 06s 
+epoch:   60 | board_count:   30000 | loss: 0.0226371770 | accuracy = 1.0000000000 | time: 1.018ms/board |   0m 07s 
+epoch:   70 | board_count:   35000 | loss: 0.0244133509 | accuracy = 1.0000000000 | time: 1.343ms/board |   0m 09s 
+epoch:   80 | board_count:   40000 | loss: 0.0230761561 | accuracy = 1.0000000000 | time: 0.895ms/board |   0m 10s 
+epoch:   90 | board_count:   45000 | loss: 0.0233466013 | accuracy = 1.0000000000 | time: 2.901ms/board |   0m 11s 
+epoch:  100 | board_count:   50000 | loss: 0.0225552325 | accuracy = 1.0000000000 | time: 0.871ms/board |   0m 12s 
+epoch:  200 | board_count:  100000 | loss: 0.0223272040 | accuracy = 1.0000000000 | time: 0.813ms/board |   0m 21s 
+Finished Training: GameOfLifeForward_11N - 201 epochs in 20.9s
+GameOfLifeForward_11N.savefile(): /home/jamie/code/ai-games/puzzles/game_of_life/neural_networks/models/GameOfLifeForward_11N.pth = 2.2 kB
+--------------------
+GameOfLifeForward_11N
+GameOfLifeForward_11N(
+  (criterion): MSELoss()
+  (layers): ModuleList(
+    (0): Conv2d(1, 1, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), padding_mode=circular)
+    (1): Conv2d(1, 1, kernel_size=(1, 1), stride=(1, 1))
+  )
+  (dropout): Dropout(p=0.0, inplace=False)
+  (activation): PReLU(num_parameters=1)
+)
+activation.weight
+[-0.681541]
+
+layers.0.weight
+[[[[-0.8152944  -0.8150207  -0.81554395]
+   [-0.81539243 -0.5683009  -0.81558293]
+   [-0.8153756  -0.81482655 -0.8151309 ]]]]
+
+layers.0.bias
+[2.4458227]
+
+layers.1.weight
+[[[[-4.2933493]]]]
+
+layers.1.bias
+[1.7625526]
+
+real 28.05
+user 23.64
+sys 1.70

@@ -44,7 +44,7 @@ def fix_submission(max_offset=1):
     invalid_idxs = set(submission_df.index) - set(sample_submission_df.index)
     if len(invalid_idxs):
         submission_df.drop(invalid_idxs, inplace=True)
-        print( f'fix_submission() invalid idxs: {invalid_idxs}' )
+        print( f'fix_submission() non-submission idxs: {invalid_idxs}' )
 
     missing_idxs = set(sample_submission_df.index) - set(submission_df.index)
     if len(missing_idxs):
@@ -83,7 +83,7 @@ def fix_submission(max_offset=1):
                     break
             else:
                 submission_df.loc[idx] = numpy_to_series(np.zeros(stop.shape), key='start')  # zero out the entry and retry
-                print( f'fix_submission() invalid idx: {idx} | delta: {delta} | cells: {np.count_nonzero(solution != stop)}' )
+                print( f'fix_submission() invalid solution | idx: {idx} | delta: {delta} | cells: {np.count_nonzero(solution != stop)}' )
                 stats['invalid'] += 1
                 pass
         except:

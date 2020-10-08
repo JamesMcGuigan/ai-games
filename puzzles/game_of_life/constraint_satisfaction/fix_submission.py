@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import time
 
 import numpy as np
@@ -8,8 +9,9 @@ from utils.datasets import submission_df
 from utils.datasets import submission_file
 from utils.datasets import test_df
 from utils.game import life_step
-from utils.util import csv_to_delta
+from utils.util import csv_to_delta_list
 from utils.util import csv_to_numpy
+from utils.util import csv_to_numpy_list
 from utils.util import numpy_to_series
 
 
@@ -50,11 +52,14 @@ def fix_submission(max_offset=1):
     if len(missing_idxs):
         print( f'fix_submission() missing idxs: {missing_idxs}' )
         for idx in missing_idxs:
-            stop  = csv_to_numpy(test_df, idx, key='stop')
+            stop = csv_to_numpy(test_df, idx, key='stop')
             submission_df.loc[idx] = numpy_to_series(np.zeros(stop.shape, dtype=np.int), key='start')  # zero out the entry and retry
 
-    idxs  = [ idx for idx in submission_df.index if np.count_nonzero(submission_df.loc[idx]) if idx in test_df.index ]
-    stats = {
+    idxs   = [ idx for idx in submission_df.index if np.count_nonzero(submission_df.loc[idx]) if idx in test_df.index ]
+    deltas = csv_to_delta_list(test_df.loc[idxs])
+    starts = csv_to_numpy_list(submission_df.loc[idxs], key='start')
+    stops  = csv_to_numpy_list(test_df.loc[idxs],       key='stop')
+    stats  = {
         "time":    time.perf_counter() - time_start,
         "empty":   len(submission_df.index) - len(idxs),
         "total":   len(submission_df.index),
@@ -62,11 +67,8 @@ def fix_submission(max_offset=1):
         "fixed":   len(missing_idxs),
         "invalid": len(invalid_idxs),
     }
-    for idx in idxs:
+    for idx, delta, start, stop in zip(idxs, deltas, starts, stops):
         try:
-            delta = csv_to_delta(test_df, idx)
-            start = csv_to_numpy(submission_df, idx, key='start')
-            stop  = csv_to_numpy(test_df,       idx, key='stop')
             assert np.count_nonzero(start), idx
             assert np.count_nonzero(stop),  idx
 
@@ -86,8 +88,8 @@ def fix_submission(max_offset=1):
                 print( f'fix_submission() invalid solution | idx: {idx} | delta: {delta} | cells: {np.count_nonzero(solution != stop)}' )
                 stats['invalid'] += 1
                 pass
-        except:
-            print( f'fix_submission() exception idx: {idx}' )
+        except Exception as exception:
+            print( f'fix_submission() idx: {idx} | exception: {exception}' )
             stats['invalid'] += 1
             pass
     # assert stats['total'] == stats['valid'] + stats['fixed'] + stats['invalid']

@@ -22,9 +22,9 @@ def csv_to_numpy(df, idx, key='start') -> np.ndarray:
         columns = csv_column_names(key)
         board   = df.loc[idx][columns].values
     except:
-        board = np.zeros((25, 25))
-    board = board.reshape((25,25)).astype(np.int8)
-    return board
+        board = np.zeros((25, 25), dtype=np.int8)
+    board = board.reshape((25,25))
+    return board.astype(np.int8)
 
 
 def csv_to_numpy_list(df, key='start') -> np.ndarray:
@@ -32,8 +32,8 @@ def csv_to_numpy_list(df, key='start') -> np.ndarray:
         columns = csv_column_names(key)
         output  = df[columns].values.reshape(-1,25,25)
     except:
-        output  = np.zeros((0,25,25))
-    return output
+        output  = np.zeros((0,25,25), dtype=np.int8)
+    return output.astype(np.int8)
 
 
 # noinspection PyTypeChecker,PyUnresolvedReferences

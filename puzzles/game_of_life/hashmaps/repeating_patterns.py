@@ -45,18 +45,18 @@ def find_repeating_patterns(start_board: np.ndarray, delta=16, geometric=False) 
 
 
 def dataset_patterns() -> List[np.ndarray]:
-    boards = np.concatenate([
-        csv_to_numpy_list(train_df, key='start'),
-        csv_to_numpy_list(train_df, key='stop'),
-        csv_to_numpy_list(test_df,  key='stop'),
-    ]).astype(np.int8)
-    boards   = Parallel(-1)([ delayed(filter_crop_and_center)(board, max_size=6, shape=(25,25)) for board in boards ])
-    boards   = [ board for board in boards if board is not None ]
-    hashes   = Parallel(-1)([ delayed(hash_geometric)(board) for board in boards ])
-    boards   = list({ hashed: board for hashed, board in zip(hashes, boards) }.values())  # deduplicate
-    patterns = Parallel(-1)([ delayed(find_repeating_patterns)(board, delta=16, geometric=False) for board in boards ])
-    patterns = [ pattern.astype(np.int8) for pattern in patterns if pattern is not None ]
-    return patterns
+    # Processing 150,000 boards at once can cause memory problems on Kaggle
+    output = []
+    for df, key in [ (train_df, 'start'), (train_df, 'stop'), (test_df, 'stop') ]:
+        boards   = csv_to_numpy_list(df, key=key)
+        boards   = Parallel(-1)([ delayed(filter_crop_and_center)(board, max_size=6, shape=(25,25)) for board in boards ])
+        boards   = [ board for board in boards if board is not None ]
+        hashes   = Parallel(-1)([ delayed(hash_geometric)(board) for board in boards ])
+        boards   = list({ hashed: board for hashed, board in zip(hashes, boards) }.values())  # deduplicate
+        patterns = Parallel(-1)([ delayed(find_repeating_patterns)(board, delta=16, geometric=False) for board in boards ])
+        patterns = [ pattern.astype(np.int8) for pattern in patterns if pattern is not None ]
+        output  += patterns
+    return output
 
 
 def generate_boards(shape=(4,4)) -> List[np.ndarray]:

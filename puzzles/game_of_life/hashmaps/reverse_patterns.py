@@ -1,6 +1,4 @@
 # Source: https://www.kaggle.com/jamesmcguigan/game-of-life-repeating-patterns
-import os
-import pickle
 from collections import defaultdict
 
 import numpy as np
@@ -11,7 +9,6 @@ from hashmaps.crop import crop_outer_3d
 from hashmaps.crop import pad_board
 from hashmaps.repeating_patterns import dataset_patterns
 from hashmaps.translation_solver import geometric_transforms
-from utils.datasets import output_directory
 from utils.tuplize import tuplize
 
 
@@ -66,15 +63,3 @@ def generate_reverse_pattern_lookup(reverse_pattern_counts, freq=0.5):
 
 
 
-
-# Caching reduces runtime down to 10s
-reverse_patterns_cachefile = f'{output_directory}/reverse_patterns.pickle'
-try:
-    if not os.path.exists(reverse_patterns_cachefile): raise FileNotFoundError
-    with open(reverse_patterns_cachefile, 'rb') as file:
-        (reverse_pattern_counts, reverse_pattern_lookup) = pickle.load( file )
-except (FileNotFoundError, EOFError) as exception:
-    reverse_pattern_counts = generate_reverse_pattern_counts()
-    reverse_pattern_lookup = generate_reverse_pattern_lookup(reverse_pattern_counts)
-    with open(reverse_patterns_cachefile, 'wb') as file:
-        pickle.dump( (reverse_pattern_counts, reverse_pattern_lookup), file )

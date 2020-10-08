@@ -15,10 +15,13 @@ from constraint_satisfaction.z3_constraints import get_t_cells
 from constraint_satisfaction.z3_constraints import get_zero_point_constraint
 from constraint_satisfaction.z3_utils import get_neighbourhood_cells
 from constraint_satisfaction.z3_utils import solver_to_numpy_3d
-from hashmaps.reverse_patterns import reverse_pattern_lookup
 
 
 def get_reverse_pattern_constraints(t_cells):
+    # reverse_patterns_cache requires a cache file lookup or expensive function call, so only import if function is run
+    try:    from hashmaps.reverse_patterns_cache import reverse_pattern_lookup
+    except: return []
+
     ### reverse_pattern_lookup[ tuplize(current) ] = [ np.array(previous), np.array(previous) ]
     size_x, size_y = len(t_cells[0]), len(t_cells[0][0])
     constraints = []

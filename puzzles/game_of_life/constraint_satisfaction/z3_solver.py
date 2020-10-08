@@ -10,7 +10,7 @@ from constraint_satisfaction.z3_constraints import get_initial_board_constraint
 from constraint_satisfaction.z3_constraints import get_no_empty_boards_constraint
 from constraint_satisfaction.z3_constraints import get_t_cells
 from constraint_satisfaction.z3_constraints import get_zero_point_constraint
-from constraint_satisfaction.z3_solver_patterns import solver_to_numpy_3d
+from constraint_satisfaction.z3_utils import solver_to_numpy_3d
 from utils.game import life_step_delta
 
 

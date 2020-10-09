@@ -16,3 +16,4 @@ humanize
 mergedeep
 torch-lr-finder
 pytest
+scikit-image

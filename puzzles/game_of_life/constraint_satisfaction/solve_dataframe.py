@@ -26,7 +26,7 @@ from utils.util import numpy_to_dict
 def solve_board_idx(board: np.ndarray, delta: int, idx: int, timeout=0, verbose=True) -> Tuple[np.ndarray, int, float]:
     time_start = time.perf_counter()
 
-    z3_solver, t_cells, solution_3d = game_of_life_solver(board, delta, timeout=timeout, verbose=False)
+    z3_solver, t_cells, solution_3d = game_of_life_solver(board, delta=delta, idx=idx, timeout=timeout, verbose=False)
 
     time_taken = time.perf_counter() - time_start
     if verbose:
@@ -44,7 +44,7 @@ def solve_board_delta1_loop(board: np.ndarray, delta: int, idx: int, timeout=0, 
 
     output = [ board ]
     for t in range(delta):
-        z3_solver, t_cells, solution_3d = game_of_life_solver(board, delta=1, timeout=timeout, verbose=False)
+        z3_solver, t_cells, solution_3d = game_of_life_solver(board, delta=1, idx=idx, timeout=timeout, verbose=False)
         board = solution_3d[0]
         output.insert(0, board)
     solution_3d = np.array(output)

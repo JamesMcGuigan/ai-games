@@ -57,7 +57,7 @@ def test_game_of_life_solver_test_df(idx, game_of_life_solver):
     delta       = csv_to_delta(df, idx)
     board       = csv_to_numpy(df, idx, key='stop')
 
-    z3_solver, t_cells, solution_3d = game_of_life_solver(board, delta, verbose=False)
+    z3_solver, t_cells, solution_3d = game_of_life_solver(board, delta=delta, idx=idx, verbose=False)
     is_valid    = is_valid_solution_3d(solution_3d)
 
     time_taken  = time.perf_counter() - time_start
@@ -90,7 +90,7 @@ def test_game_of_life_solver_train_df(game_of_life_solver, idx):
     assert np.count_nonzero(stop),  idx
 
     # Solve backwards then play the board forward again
-    z3_solver, t_cells, solution_3d = game_of_life_solver(stop, delta)
+    z3_solver, t_cells, solution_3d = game_of_life_solver(stop, delta=delta, idx=idx)
     board = solution_3d[0]
     for t in range(delta):
         board = life_step(board)

@@ -4,6 +4,8 @@ import pydash
 import z3
 
 from constraint_satisfaction.z3_utils import get_neighbourhood_cells
+from utils.game import life_step_3d
+from utils.util import csv_to_numpy
 
 
 def get_t_cells(delta=1, size=(25,25)):
@@ -106,3 +108,33 @@ def get_exclude_solution_constraint(t_cells, z3_solver):
         cell != z3_solver.model()[cell]
         for cell in pydash.flatten_deep(t_cells[0])
     ])
+
+
+def get_image_segmentation_solver_constraint(t_cells, stop_board, delta):
+    from image_segmentation.image_segmentation_solver import image_segmentation_solver
+
+    start_board = image_segmentation_solver(stop_board, delta)
+    timeline    = life_step_3d(start_board, delta)
+    assert len(timeline) == len(t_cells)
+    constraints = [
+        t_cells[t][x][y] == bool(timeline[t][x][y])
+        for t in range(len(timeline))
+        for x,y in itertools.product(range(start_board.shape[0]), range(start_board.shape[1]))
+        if bool(timeline[t][x][y])  # only set constraint for alive cells
+    ]
+    return constraints
+
+
+def get_image_segmentation_csv(t_cells, idx):
+    from utils.datasets import image_segmentation_df
+
+    if idx in image_segmentation_df.index:
+        start_board = csv_to_numpy( image_segmentation_df, idx, key='start' )
+        constraints = [
+            t_cells[0][x][y] == bool(start_board[x][y])
+            for x,y in itertools.product(range(start_board.shape[0]), range(start_board.shape[1]))
+            if bool(start_board[x][y])  # only set constraint for alive cells
+        ]
+        return constraints
+    else:
+        return []

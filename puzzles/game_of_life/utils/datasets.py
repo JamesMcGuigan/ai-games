@@ -21,7 +21,7 @@ test_file               = f'{input_directory}/test.csv'
 sample_submission_file  = f'{input_directory}/sample_submission.csv'
 submission_file         = f'{output_directory}/submission.csv'
 timeout_file            = f'{output_directory}/timeouts.csv'
-image_segmentation_file = f'{output_directory}/image_segmentation_solutions.csv'
+image_segmentation_file = f'output/image_segmentation_solutions.csv'  # hardcode directory
 
 assert os.path.exists(train_file)
 assert os.path.exists(test_file)

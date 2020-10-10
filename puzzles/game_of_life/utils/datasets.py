@@ -21,7 +21,7 @@ test_file               = f'{input_directory}/test.csv'
 sample_submission_file  = f'{input_directory}/sample_submission.csv'
 submission_file         = f'{output_directory}/submission.csv'
 timeout_file            = f'{output_directory}/timeouts.csv'
-image_segmentation_file = f'output/image_segmentation_solutions.csv'  # hardcode directory
+image_segmentation_file = f'{root_directory}/output/image_segmentation_solutions.csv'
 
 assert os.path.exists(train_file)
 assert os.path.exists(test_file)
@@ -50,8 +50,8 @@ image_segmentation_df = pd.read_csv(image_segmentation_file,  index_col='id').as
 def copy_sample_submission_missing_indexes():
     global submission_df
     idxs          = set(sample_submission_df.index) - set(submission_df.index)
-    submission_df = pd.concat([ submission_df, sample_submission_df.loc[idxs] ])
     if len(idxs):
-        print(f'copy_sample_submission_missing_indexes(): copied {len(idxs)} missing indexes from {sample_submission_file} to {submission_file}')
+        submission_df = pd.concat([ submission_df, sample_submission_df.loc[idxs] ])
         submission_df.sort_index().to_csv(submission_file)
+        print(f'copy_sample_submission_missing_indexes(): copied {len(idxs)} missing indexes from {sample_submission_file} to {submission_file}')
 copy_sample_submission_missing_indexes()

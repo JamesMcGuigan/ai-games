@@ -52,10 +52,10 @@ def get_cluster_history_lookup(boards, forward_play=10):
                 for delta,     d2 in d1.items()      }
                 for now_hash,  d1 in history.items() }
 
-    # Remove any past boards with less than half the frequency of the most common board
+    # Remove any past boards with less than a quarter of the frequency of the most common board
     for now_hash, d1 in history.items():
         for delta, d2 in d1.items():
             max_count = max([ values['count'] for values in d2.values() ])
             for past_hash, values in list(d2.items()):
-                if values['count'] < max_count/2: del history[now_hash][delta][past_hash]
+                if values['count'] < max_count/4: del history[now_hash][delta][past_hash]
     return history

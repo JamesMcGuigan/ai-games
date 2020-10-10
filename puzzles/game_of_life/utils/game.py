@@ -104,6 +104,6 @@ def generate_random_board(shape=(25,25)):
             return generate_random_board(shape)  # exclude empty boards and try again
     return board
 
-def generate_random_boards(count, shape=(25,25)):
+def generate_random_boards(count: int, shape=(25,25)) -> np.ndarray:
     generated_boards = Parallel(-1)( delayed(generate_random_board)(shape) for _ in range(count) )
-    return generated_boards
+    return np.array(generated_boards, dtype=np.int8).reshape((-1, *shape))

@@ -92,7 +92,7 @@ def solve_dataframe(
         idxs     = [ idx for idx in idxs if idx not in timeout_df.index ]  # exclude timeouts
         deltas   = ( csv_to_delta(df, idx)             for idx in idxs )   # generator
         boards   = ( csv_to_numpy(df, idx, key='stop') for idx in idxs )   # generator
-        timeouts = ( timeout * 0.99 - (time.perf_counter() - time_start) if timeout else 0  for _ in idxs )  # generator
+        timeouts = ( min(60*60, timeout * 0.99 - (time.perf_counter() - time_start) if timeout else 0)  for _ in idxs )  # generator
         # NOTE: Z3 timeouts are inexact, but will hopefully occur just before the signal timeout
 
         solution_idx_iter = pool.uimap(solve_board_idx, boards, deltas, idxs, timeouts)

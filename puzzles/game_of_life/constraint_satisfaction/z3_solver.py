@@ -6,7 +6,7 @@ import z3
 from constraint_satisfaction.fix_submission import is_valid_solution
 from constraint_satisfaction.z3_constraints import get_exclude_solution_constraint
 from constraint_satisfaction.z3_constraints import get_game_of_life_ruleset
-from constraint_satisfaction.z3_constraints import get_image_segmentation_csv
+from constraint_satisfaction.z3_constraints import get_image_segmentation_solver_constraint
 from constraint_satisfaction.z3_constraints import get_initial_board_constraint
 from constraint_satisfaction.z3_constraints import get_no_empty_boards_constraint
 from constraint_satisfaction.z3_constraints import get_static_board_constraint
@@ -36,8 +36,8 @@ def game_of_life_solver(board: np.ndarray, delta: int, idx: int, timeout=0, verb
 
     for constraint in [
         lambda: get_static_board_constraint(t_cells, board),
-        # lambda: get_image_segmentation_solver_constraint(t_cells, board, delta), # pickle file is too large for github
-        lambda: get_image_segmentation_csv(t_cells, idx),
+        lambda: get_image_segmentation_solver_constraint(t_cells, board, delta), # pickle file now 9.3Mb zipped
+        # lambda: get_image_segmentation_csv(t_cells, idx),                      # prefer solver to precached
         lambda: [],
     ]:
         z3_solver.push()

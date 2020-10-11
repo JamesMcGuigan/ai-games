@@ -5,6 +5,7 @@ import pydash
 import z3
 
 from constraint_satisfaction.z3_utils import get_neighbourhood_cells
+from image_segmentation.image_segmentation_solver import image_segmentation_solver  # expensive filesystem import
 from utils.game import life_step_3d
 from utils.util import csv_to_numpy
 
@@ -123,8 +124,6 @@ def get_exclude_solution_constraint(t_cells, z3_solver):
 
 
 def get_image_segmentation_solver_constraint(t_cells, stop_board, delta):
-    from image_segmentation.image_segmentation_solver import image_segmentation_solver  # expensive filesystem import
-
     constraints  = []
     start_boards = image_segmentation_solver(stop_board, delta)
     for start_board in start_boards:

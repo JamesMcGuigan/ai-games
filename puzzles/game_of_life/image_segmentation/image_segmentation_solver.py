@@ -12,7 +12,6 @@ from hashmaps.hash_functions import hash_geometric
 from hashmaps.translation_solver import solve_translation
 from image_segmentation.clusters import extract_clusters_from_labels
 from image_segmentation.clusters import label_board
-from image_segmentation.history_lookup_cache import cluster_history_lookup
 from utils.datasets import sample_submission_df
 from utils.util import csv_to_delta_list
 from utils.util import csv_to_numpy_list
@@ -56,6 +55,8 @@ def image_segmentation_dataframe_solver( df, history, submission_df=None, exact=
 
 
 def image_segmentation_solver(stop_board, delta, history=None, blank_missing=True, labels=None, clusters=None) -> List[np.ndarray]:
+    from image_segmentation.history_lookup_cache import cluster_history_lookup  # 9Mb file, don't import unless required
+
     history  = history  if history  is not None else cluster_history_lookup
     labels   = labels   if labels   is not None else label_board(stop_board)
     clusters = clusters if clusters is not None else extract_clusters_from_labels(stop_board, labels)

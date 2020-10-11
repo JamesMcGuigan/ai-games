@@ -4,7 +4,7 @@ import time
 import numpy as np
 
 from image_segmentation.history_lookup import get_cluster_history_lookup
-from utils.datasets import output_directory
+from utils.datasets import root_directory
 from utils.datasets import test_df
 from utils.datasets import train_df
 from utils.game import generate_random_boards
@@ -30,7 +30,7 @@ def generate_cluster_history_lookup(dataset_size=250_000, verbose=True):
 
 
 
-cluster_history_lookup_cachefile = f'{output_directory}/cluster_history_lookup.pickle'
+cluster_history_lookup_cachefile = f'{root_directory}/output/cluster_history_lookup.pickle'
 cluster_history_lookup = read_gzip_pickle_file(cluster_history_lookup_cachefile)
 
 if __name__ == '__main__':

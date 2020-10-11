@@ -1,5 +1,6 @@
 import itertools
 
+import numpy as np
 import pydash
 import z3
 
@@ -101,6 +102,17 @@ def get_static_board_constraint(t_cells, board):
     return constraints
 
 
+def get_repeating_board_constraint(t_cells, board, frequency=2):
+    if frequency <= len(t_cells)-1: frequency = 1   # ensure we don't constrain to a blank board
+    constraints = [
+        t_cells[t][x][y] == bool(board[x][y])
+        for t in range(len(t_cells)-1)
+        for x,y in itertools.product(range(board.shape[0]), range(board.shape[1]))
+        if len(t_cells)-t % frequency == 0
+    ]
+    return constraints
+
+
 
 def get_exclude_solution_constraint(t_cells, z3_solver):
     """ assert any( t_cells[0] != z3_solver[0] ) """
@@ -111,22 +123,25 @@ def get_exclude_solution_constraint(t_cells, z3_solver):
 
 
 def get_image_segmentation_solver_constraint(t_cells, stop_board, delta):
-    from image_segmentation.image_segmentation_solver import image_segmentation_solver
+    from image_segmentation.image_segmentation_solver import image_segmentation_solver  # expensive filesystem import
 
-    start_board = image_segmentation_solver(stop_board, delta)
-    timeline    = life_step_3d(start_board, delta)
-    assert len(timeline) == len(t_cells)
-    constraints = [
-        t_cells[t][x][y] == bool(timeline[t][x][y])
-        for t in range(len(timeline))
-        for x,y in itertools.product(range(start_board.shape[0]), range(start_board.shape[1]))
-        if bool(timeline[t][x][y])  # only set constraint for alive cells
-    ]
-    return constraints
+    constraints  = []
+    start_boards = image_segmentation_solver(stop_board, delta)
+    for start_board in start_boards:
+        if np.count_nonzero(start_board) == 0: continue  # ignore empty boards
+        timeline = life_step_3d(start_board, delta)
+        solution = [
+            t_cells[t][x][y] == bool(timeline[t][x][y])
+            for t in range(len(timeline))
+            for x,y in itertools.product(range(start_board.shape[0]), range(start_board.shape[1]))
+            if bool(timeline[t][x][y])  # only set constraint for alive cells
+        ]
+        if len(solution): constraints.append( z3.And(solution) )
+    return z3.Or( constraints ) if len(constraints) else []  # return empty list if nothing is found
 
 
 def get_image_segmentation_csv(t_cells, idx):
-    from utils.datasets import image_segmentation_df
+    from utils.datasets import image_segmentation_df  # expensive filesystem import
 
     if idx in image_segmentation_df.index:
         start_board = csv_to_numpy( image_segmentation_df, idx, key='start' )

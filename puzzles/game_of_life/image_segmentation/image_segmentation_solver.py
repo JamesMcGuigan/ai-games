@@ -1,4 +1,7 @@
+import itertools
 import time
+from collections import defaultdict
+from typing import List
 
 import numpy as np
 from joblib import delayed
@@ -28,12 +31,14 @@ def image_segmentation_dataframe_solver( df, history, submission_df=None, exact=
     clustereds = Parallel(-1)( delayed(extract_clusters_from_labels)(board, labels) for board, labels in zip(boards, labeleds) )
 
     for idx, delta, stop_board, labels, clusters in zip(idxs, deltas, boards, labeleds, clustereds):
-        start_board = image_segmentation_solver(
+        # image_segmentation_solver() returns multiple solutions, if any are valid, then all returned will be valid
+        start_boards = image_segmentation_solver(
             stop_board, delta, history=history, blank_missing=blank_missing,
             labels=labels, clusters=clusters
         )
-
-        is_valid = is_valid_solution( start_board, stop_board, delta )
+        if len(start_boards) == 0: continue
+        start_board = start_boards[0]   # pick first solution
+        is_valid    = is_valid_solution( start_board, stop_board, delta )
         if   is_valid:                         stats['exact']   += 1
         elif np.count_nonzero( start_board ):  stats['partial'] += 1
         stats['total'] += 1
@@ -50,15 +55,15 @@ def image_segmentation_dataframe_solver( df, history, submission_df=None, exact=
 
 
 
-def image_segmentation_solver(stop_board, delta, history=None, blank_missing=True, labels=None, clusters=None):
+def image_segmentation_solver(stop_board, delta, history=None, blank_missing=True, labels=None, clusters=None) -> List[np.ndarray]:
     history  = history  if history  is not None else cluster_history_lookup
     labels   = labels   if labels   is not None else label_board(stop_board)
     clusters = clusters if clusters is not None else extract_clusters_from_labels(stop_board, labels)
 
-    labels       = np.unique(labels)
-    now_hashes   = Parallel(-1)( delayed(hash_geometric)(cluster) for cluster in clusters )
-    new_clusters = {}
-    for label, now_cluster, now_hash in zip(labels, clusters, now_hashes):
+    unique_labels = np.unique(labels)
+    now_hashes    = Parallel(-1)( delayed(hash_geometric)(cluster) for cluster in clusters )
+    new_clusters  = defaultdict(list)
+    for label, now_cluster, now_hash in zip(unique_labels, clusters, now_hashes):
         if label == 0: continue
         if np.count_nonzero(now_cluster) == 0: continue
         if history.get(now_hash,{}).get(delta,None):
@@ -68,17 +73,24 @@ def image_segmentation_solver(stop_board, delta, history=None, blank_missing=Tru
                     stop_cluster  = history[now_hash][delta][past_hash]['stop']
                     transform_fn  = solve_translation(stop_cluster, now_cluster) # assert np.all( transform_fn(train_board) == test_board )
                     past_cluster  = transform_fn(start_cluster)
-                    new_clusters[label] = past_cluster
+                    new_clusters[label] += [ past_cluster ]
                     break
                 except Exception as exception:
                     pass
-        if not label in new_clusters:
-            if blank_missing: new_clusters[label] = np.zeros(now_cluster.shape, dtype=np.int8)
-            else:             new_clusters[label] = now_cluster
+        if not label in new_clusters and not blank_missing:
+            new_clusters[label] = now_cluster
 
-    # TODO: return list of all possible cluster permutations
-    start_board = np.zeros( stop_board.shape, dtype=np.int8 )
-    for cluster in new_clusters.values():
-        start_board += cluster
-    start_board = start_board.astype(np.bool).astype(np.int8)
-    return start_board
+
+    # return list of all valid cluster permutations
+    valid_outputs   = []
+    partial_outputs = []
+    for cluster_combination in itertools.product( *new_clusters.values() ):
+        if len(cluster_combination) == 0: continue  # return empty list if no solutions
+        start_board = np.zeros( stop_board.shape, dtype=np.int8 )
+        for cluster in cluster_combination:
+            start_board += cluster
+        if np.any( start_board >= 2 ): continue  # reject combinations with overlaps
+        if is_valid_solution(start_board, stop_board, delta):  valid_outputs   += [ start_board ]
+        else:                                                  partial_outputs += [ start_board ]
+
+    return valid_outputs if len(valid_outputs) else partial_outputs

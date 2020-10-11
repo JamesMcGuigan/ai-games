@@ -12,7 +12,10 @@ from hashmaps.hash_functions import hash_geometric
 from hashmaps.translation_solver import solve_translation
 from image_segmentation.clusters import extract_clusters_from_labels
 from image_segmentation.clusters import label_board
+from image_segmentation.history_lookup_cache import cluster_history_lookup
+from utils.datasets import image_segmentation_file
 from utils.datasets import sample_submission_df
+from utils.datasets import test_df
 from utils.util import csv_to_delta_list
 from utils.util import csv_to_numpy_list
 from utils.util import numpy_to_series
@@ -95,3 +98,8 @@ def image_segmentation_solver(stop_board, delta, history=None, blank_missing=Tru
         else:                                                  partial_outputs += [ start_board ]
 
     return valid_outputs if len(valid_outputs) else partial_outputs
+
+
+if __name__ == '__main__':
+    image_segmentation_df = image_segmentation_dataframe_solver( test_df, cluster_history_lookup, exact=False, blank_missing=True, verbose=True )
+    image_segmentation_df.to_csv(image_segmentation_file)

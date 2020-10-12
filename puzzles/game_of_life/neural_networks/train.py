@@ -13,10 +13,10 @@ from utils.game import generate_random_board
 from utils.game import life_step
 
 
-def train(model, batch_size=100, grid_size=25, accuracy_count=100_000, l1=0, l2=0, timeout=0, reverse_input_output=False):
+def train(model, batch_size=100, grid_size=25, accuracy_count=100_000, l1=0, l2=0, timeout=0, reverse_input_output=False, epochs=0):
     assert 1 <= grid_size <= 25
 
-    print(f'Training: {model.__class__.__name__}')
+    print(f'{model.device} Training: {model.__class__.__name__}')
     time_start = time.perf_counter()
 
     atexit.register(model.save)      # save on exit - BrokenPipeError doesn't trigger finally:
@@ -61,12 +61,13 @@ def train(model, batch_size=100, grid_size=25, accuracy_count=100_000, l1=0, l2=
     try:
         epoch_time = 0
         for epoch in range(1, sys.maxsize):
-            if np.min(epoch_accuracies[-accuracy_count//batch_size:]) == 1.0:    break  # multiple epochs of 100% accuracy to pass
-            if timeout and timeout < time.perf_counter() - time_start:  break
+            if epochs and epochs < epoch:                                      break
+            if np.min(epoch_accuracies[-accuracy_count//batch_size:]) == 1.0:  break  # multiple epochs of 100% accuracy to pass
+            if timeout and timeout < time.perf_counter() - time_start:         break
             epoch_start = time.perf_counter()
 
             inputs_np   = [ generate_random_board()[:grid_size,:grid_size] for _     in range(batch_size) ]
-            expected_np = [ life_step(board)        for board in inputs_np         ]
+            expected_np = [ life_step(board)        for board in inputs_np ]
             inputs      = model.cast_inputs(inputs_np).to(device)
             expected    = model.cast_inputs(expected_np).to(device)
 

@@ -112,10 +112,10 @@ class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
 
 
     # DOCS: https://pytorch.org/tutorials/beginner/saving_loading_models.html
-    def save(self: T) -> T:
+    def save(self: T, verbose=True) -> T:
         os.makedirs(os.path.dirname(self.filename), exist_ok=True)
         torch.save(self.state_dict(), self.filename)
-        print(f'{self.__class__.__name__}.savefile(): {self.filename} = {humanize.naturalsize(os.path.getsize(self.filename))}')
+        if verbose: print(f'{self.__class__.__name__}.savefile(): {self.filename} = {humanize.naturalsize(os.path.getsize(self.filename))}')
         return self
 
 

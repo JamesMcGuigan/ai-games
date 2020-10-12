@@ -136,6 +136,6 @@ def train(model,
     finally:
         time_taken = time.perf_counter() - time_start
         if verbose: print(f'Finished Training: {model.__class__.__name__} - {epoch} epochs in {time_taken:.1f}s')
-        model.save()
+        model.save(verbose=verbose)
         atexit.unregister(model.save)   # model now saved, so cancel atexit handler
         # model.eval()                  # disable dropout

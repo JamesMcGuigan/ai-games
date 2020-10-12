@@ -31,7 +31,7 @@ def train(model,
 
     atexit.register(model.save)      # save on exit - BrokenPipeError doesn't trigger finally:
     model.load().train().unfreeze()  # enable training and dropout
-    print(model)
+    if verbose: print(model)
 
     # NOTE: criterion loss function now defined via model.loss()
     optimizer = optim.RMSprop(model.parameters(), lr=0.01, momentum=0.9)

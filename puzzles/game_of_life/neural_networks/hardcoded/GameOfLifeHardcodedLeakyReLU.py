@@ -43,7 +43,7 @@ class GameOfLifeHardcodedLeakyReLU(GameOfLifeHardcoded):
         self.activation = nn.LeakyReLU()
 
 
-    def load(self):
+    def load(self, **kwargs):
         super().load()
 
         self.input.weight.data   = torch.tensor([[[[1.0]]]])

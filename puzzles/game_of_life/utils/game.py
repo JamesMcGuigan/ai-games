@@ -1,5 +1,6 @@
 # Functions for implementing Game of Life Forward Play
 from typing import List
+from typing import Union
 
 import numpy as np
 import scipy.sparse
@@ -71,7 +72,7 @@ def life_step_njit(board: np.ndarray) -> np.ndarray:
     return output
 
 life_step = life_step_njit  # create global alias
-def life_steps(boards: List[np.ndarray]) -> List[np.ndarray]:
+def life_steps(boards: Union[List[np.ndarray],np.ndarray]) -> List[np.ndarray]:
     """ Parallel version of life_step() but for an array of boards """
     return Parallel(-1)( delayed(life_step)(board) for board in boards )
 

@@ -119,18 +119,19 @@ class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
         return self
 
 
-    def load(self: T, load_weights=True) -> T:
+    def load(self: T, load_weights=True, verbose=True) -> T:
         if load_weights and os.path.exists(self.filename):
             try:
                 self.load_state_dict(torch.load(self.filename))
-                print(f'{self.__class__.__name__}.load(): {self.filename} = {humanize.naturalsize(os.path.getsize(self.filename))}')
+                if verbose: print(f'{self.__class__.__name__}.load(): {self.filename} = {humanize.naturalsize(os.path.getsize(self.filename))}')
             except Exception as exception:
                 # Ignore errors caused by model size mismatch
-                print(f'{self.__class__.__name__}.load(): model has changed dimensions, reinitializing weights\n')
+                if verbose: print(f'{self.__class__.__name__}.load(): model has changed dimensions, reinitializing weights\n')
                 self.apply(self.weights_init)
         else:
-            if load_weights: print(f'{self.__class__.__name__}.load(): model file not found, reinitializing weights\n')
-            # else:          print(f'{self.__class__.__name__}.load(): reinitializing weights\n')
+            if verbose:
+                if load_weights: print(f'{self.__class__.__name__}.load(): model file not found, reinitializing weights\n')
+                # else:          print(f'{self.__class__.__name__}.load(): reinitializing weights\n')
             self.apply(self.weights_init)
 
         self.loaded = True    # prevent any infinite if self.loaded loops

@@ -13,10 +13,20 @@ from utils.game import generate_random_board
 from utils.game import life_step
 
 
-def train(model, batch_size=100, grid_size=25, accuracy_count=100_000, l1=0, l2=0, timeout=0, reverse_input_output=False, epochs=0):
+def train(model,
+          batch_size=100,
+          grid_size=25,
+          accuracy_count=100_000,
+          l1=0,
+          l2=0,
+          timeout=0,
+          reverse_input_output=False,
+          epochs=0,
+          verbose=True,
+):
     assert 1 <= grid_size <= 25
 
-    print(f'{model.device} Training: {model.__class__.__name__}')
+    if verbose: print(f'{model.device} Training: {model.__class__.__name__}')
     time_start = time.perf_counter()
 
     atexit.register(model.save)      # save on exit - BrokenPipeError doesn't trigger finally:
@@ -113,7 +123,7 @@ def train(model, batch_size=100, grid_size=25, accuracy_count=100_000, l1=0, l2=
             # if board_count % 1_000 == 0:
             if (epoch <= 10) or (epoch <= 100 and epoch % 10 == 0) or epoch % 100 == 0:
                 time_taken = time.perf_counter() - time_start
-                print(f'epoch: {epoch:4d} | board_count: {board_count:7d} | loss: {loop_loss/loop_count:.10f} | accuracy = {loop_acc/loop_count:.10f} | time: {1000*epoch_time/batch_size:.3f}ms/board | {time_taken//60:3.0f}m {time_taken%60:02.0f}s ')
+                if verbose: print(f'epoch: {epoch:4d} | board_count: {board_count:7d} | loss: {loop_loss/loop_count:.10f} | accuracy = {loop_acc/loop_count:.10f} | time: {1000*epoch_time/batch_size:.3f}ms/board | {time_taken//60:3.0f}m {time_taken%60:02.0f}s ')
                 loop_loss  = 0
                 loop_acc   = 0
                 loop_count = 0
@@ -125,7 +135,7 @@ def train(model, batch_size=100, grid_size=25, accuracy_count=100_000, l1=0, l2=
         raise exception
     finally:
         time_taken = time.perf_counter() - time_start
-        print(f'Finished Training: {model.__class__.__name__} - {epoch} epochs in {time_taken:.1f}s')
+        if verbose: print(f'Finished Training: {model.__class__.__name__} - {epoch} epochs in {time_taken:.1f}s')
         model.save()
         atexit.unregister(model.save)   # model now saved, so cancel atexit handler
         # model.eval()                  # disable dropout

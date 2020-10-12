@@ -5,6 +5,7 @@ import torch.nn as nn
 from torch import tensor
 
 from neural_networks.hardcoded.GameOfLifeHardcoded import GameOfLifeHardcoded
+from neural_networks.modules.ReLUX import ReLU1
 
 # noinspection PyTypeChecker
 T = TypeVar('T', bound='GameOfLifeHardcodedTanh')
@@ -67,11 +68,12 @@ class GameOfLifeHardcodedTanh(GameOfLifeHardcoded):
 
         x = self.output(x)
         x = torch.tanh(x)
+        x = ReLU1()(x)
 
         return x
 
 
-    def load(self: T) -> T:
+    def load(self: T, **kwargs) -> T:
         super().load()
         # self.input.weight.data   = tensor([[[[ 1.0498226 ]]]])
         self.input.weight.data   = tensor([[[[ 1.0 ]]]])

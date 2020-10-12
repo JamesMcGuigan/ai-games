@@ -130,7 +130,7 @@ class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
                 self.apply(self.weights_init)
         else:
             if load_weights: print(f'{self.__class__.__name__}.load(): model file not found, reinitializing weights\n')
-            else:            print(f'{self.__class__.__name__}.load(): reinitializing weights\n')
+            # else:          print(f'{self.__class__.__name__}.load(): reinitializing weights\n')
             self.apply(self.weights_init)
 
         self.loaded = True    # prevent any infinite if self.loaded loops

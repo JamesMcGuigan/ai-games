@@ -11,62 +11,48 @@ from neural_networks.GameOfLifeBase import GameOfLifeBase
 from neural_networks.hardcoded.GameOfLifeHardcodedReLU1_21 import GameOfLifeHardcodedReLU1_21
 from neural_networks.modules.ReLUX import ReLU1
 
-
-class Counter2D(nn.Module):
-    """ Count the number of neighbouring cells (including self) """
-    def __init__(self, channels=1):
-        super().__init__()
-        self.counter = nn.Conv2d(in_channels=channels, out_channels=channels, kernel_size=(3,3),
-                                 padding=1, padding_mode='circular', bias=False)
-        self.counter.weight.data = torch.tensor([
-            [[[ 1.0, 1.0, 1.0 ],
-              [ 1.0, 1.0, 1.0 ],
-              [ 1.0, 1.0, 1.0 ]]]
-        ])
-        self.counter.weight.requires_grad = False
-
-    def forward(self, x):
-        return self.counter(x)
-
-
-class CountNeighbours2D(nn.Module):
-    """ Count the number of neighbouring cells (excluding self)"""
-    def __init__(self, channels=1):
-        super().__init__()
-        self.counter = nn.Conv2d(in_channels=channels, out_channels=channels,
-                                 kernel_size=(3,3), padding=1, padding_mode='circular', bias=False)
-        self.counter.weight.data = torch.tensor([
-            [[[ 1.0, 1.0, 1.0 ],
-              [ 1.0, 0.0, 1.0 ],
-              [ 1.0, 1.0, 1.0 ]]]
-        ])
-        self.counter.weight.requires_grad = False
-
-    def forward(self, x):
-        return self.counter(x)
-
-
 # noinspection PyTypeChecker
 T = TypeVar('T', bound='GameOfLifeFeatures')
 class GameOfLifeFeatures(nn.Module):
     """ Count the number of neighbouring cells (excluding self)"""
     def __init__(self):
         super().__init__()
-        self.layers = nn.ModuleList([
-            nn.Identity(),
-            GameOfLifeHardcodedReLU1_21(),
-            Counter2D(),
-            CountNeighbours2D(),
+        self.forward_play = GameOfLifeHardcodedReLU1_21()
+        self.conv2d       = nn.Conv2d(in_channels=1, out_channels=4, bias=False,
+                                      kernel_size=(3,3), padding=1, padding_mode='circular')
+        self.conv2d.weight.data = torch.tensor([
+            # 11N Solution
+            [[[ -1.0, -1.0, -1.0 ],
+              [ -1.0, -0.7, -1.0 ],
+              [ -1.0, -1.0, -1.0 ]]],
+            # neighbours
+            [[[  1.0,  1.0,  1.0 ],
+              [  1.0,  0.0,  1.0 ],
+              [  1.0,  1.0,  1.0 ]]],
+            # corners
+            [[[  1.0,  0.0,  1.0 ],
+              [  0.0,  0.0,  0.0 ],
+              [  1.0,  0.0,  1.0 ]]],
+            # edges
+            [[[  0.0,  1.0,  0.0 ],
+              [  1.0,  0.0,  1.0 ],
+              [  0.0,  1.0,  0.0 ]]],
         ])
-        for name, parameter in self.named_parameters(): parameter.requires_grad = False
+        self.conv2d.weight.requires_grad_(False)  # Weights are hardcoded
+
 
     def forward(self, x):
-        output = torch.cat([
-            layer(x[:,n:n+1,:,:])
-            for n in range(x.shape[1])
-            for layer in self.layers
+        shape = x.shape
+        x = x.reshape(-1, 1, x.shape[2], x.shape[3])
+        features = self.conv2d(x)
+        # features = torch.cat([ self.activations[n](features[:,n:n+1,:,:]) for n in range(features.shape[1]) ], dim=1)
+        x = torch.cat([
+            x,                     # +1 channels
+            self.forward_play(x),  # +1 channels
+            features,              # +4 channels
         ], dim=1)
-        return output
+        x = x.reshape(shape[0], -1, shape[2], shape[3])
+        return x
 
 
 
@@ -93,34 +79,42 @@ class GameOfLifeReverseInception(GameOfLifeBase, metaclass=ABCMeta):
 
             # self.features,
             nn.ModuleList([
-                nn.Conv2d(in_channels=4, out_channels=32, kernel_size=(1,1), padding=0, padding_mode='circular'),
-                nn.Conv2d(in_channels=4, out_channels=32, kernel_size=(3,3), padding=1, padding_mode='circular'),
-                nn.Conv2d(in_channels=4, out_channels=32, kernel_size=(5,5), padding=2, padding_mode='circular'),
-                nn.Conv2d(in_channels=4, out_channels=32, kernel_size=(7,7), padding=3, padding_mode='circular'),
-                nn.Conv2d(in_channels=4, out_channels=32, kernel_size=(9,9), padding=4, padding_mode='circular'),
+                nn.Conv2d(in_channels=6, out_channels=9, kernel_size=(1,1), padding=0, padding_mode='circular'),
+                nn.Conv2d(in_channels=6, out_channels=9, kernel_size=(3,3), padding=1, padding_mode='circular'),
+                nn.Conv2d(in_channels=6, out_channels=9, kernel_size=(5,5), padding=2, padding_mode='circular'),
+                nn.Conv2d(in_channels=6, out_channels=9, kernel_size=(7,7), padding=3, padding_mode='circular'),
+                nn.Conv2d(in_channels=6, out_channels=9, kernel_size=(9,9), padding=4, padding_mode='circular'),
             ]),
-            nn.Conv2d(in_channels=32*5, out_channels=32, kernel_size=(1,1), padding=0, padding_mode='circular'),
-            nn.Conv2d(in_channels=32,   out_channels=16, kernel_size=(1,1), padding=0, padding_mode='circular'),
+            nn.Conv2d(in_channels=9*5, out_channels=9, kernel_size=(1,1), padding=0, padding_mode='circular'),
+            nn.Conv2d(in_channels=9,   out_channels=9, kernel_size=(1,1), padding=0, padding_mode='circular'),
 
-            # self.features,
+            # self.features()
             nn.ModuleList([
-                nn.Conv2d(in_channels=16*4+4, out_channels=32, kernel_size=(1,1), padding=0, padding_mode='circular'),
-                nn.Conv2d(in_channels=16*4+4, out_channels=32, kernel_size=(3,3), padding=1, padding_mode='circular'),
-                nn.Conv2d(in_channels=16*4+4, out_channels=32, kernel_size=(5,5), padding=2, padding_mode='circular'),
-                nn.Conv2d(in_channels=16*4+4, out_channels=32, kernel_size=(7,7), padding=3, padding_mode='circular'),
-                nn.Conv2d(in_channels=16*4+4, out_channels=32, kernel_size=(9,9), padding=4, padding_mode='circular'),
+                nn.Conv2d(in_channels=(9+1)*6, out_channels=9, kernel_size=(1,1), padding=0, padding_mode='circular'),
+                nn.Conv2d(in_channels=(9+1)*6, out_channels=9, kernel_size=(3,3), padding=1, padding_mode='circular'),
+                nn.Conv2d(in_channels=(9+1)*6, out_channels=9, kernel_size=(5,5), padding=2, padding_mode='circular'),
+                nn.Conv2d(in_channels=(9+1)*6, out_channels=9, kernel_size=(7,7), padding=3, padding_mode='circular'),
             ]),
-            nn.Conv2d(in_channels=32*5, out_channels=32, kernel_size=(1,1), padding=0, padding_mode='circular'),
-            nn.Conv2d(in_channels=32,   out_channels=16, kernel_size=(1,1), padding=0, padding_mode='circular'),
+            nn.Conv2d(in_channels=9*4, out_channels=9, kernel_size=(1,1), padding=0, padding_mode='circular'),
+            nn.Conv2d(in_channels=9,   out_channels=9, kernel_size=(1,1), padding=0, padding_mode='circular'),
 
+            # self.features()
             nn.ModuleList([
-                nn.Conv2d(in_channels=16*4+4, out_channels=32, kernel_size=(1,1), padding=0, padding_mode='circular'),
-                nn.Conv2d(in_channels=16*4+4, out_channels=32, kernel_size=(3,3), padding=1, padding_mode='circular'),
-                nn.Conv2d(in_channels=16*4+4, out_channels=32, kernel_size=(5,5), padding=2, padding_mode='circular'),
+                nn.Conv2d(in_channels=(9+1)*6, out_channels=9*2, kernel_size=(1,1), padding=0, padding_mode='circular'),
+                nn.Conv2d(in_channels=(9+1)*6, out_channels=9*2, kernel_size=(3,3), padding=1, padding_mode='circular'),
+                nn.Conv2d(in_channels=(9+1)*6, out_channels=9*2, kernel_size=(5,5), padding=2, padding_mode='circular'),
             ]),
-            nn.Conv2d(in_channels=32*3, out_channels=32, kernel_size=(1,1), padding=0, padding_mode='circular'),
-            nn.Conv2d(in_channels=32,   out_channels=16, kernel_size=(1,1), padding=0, padding_mode='circular'),
-            nn.Conv2d(in_channels=16,   out_channels=1,  kernel_size=(1,1), padding=0, padding_mode='circular'),
+            nn.Conv2d(in_channels=9*6, out_channels=9, kernel_size=(1,1), padding=0, padding_mode='circular'),
+            nn.Conv2d(in_channels=9,   out_channels=9, kernel_size=(1,1), padding=0, padding_mode='circular'),
+
+            # self.features()
+            nn.ModuleList([
+                nn.Conv2d(in_channels=(9+1)*6, out_channels=9*3, kernel_size=(1,1), padding=0, padding_mode='circular'),
+                nn.Conv2d(in_channels=(9+1)*6, out_channels=9*3, kernel_size=(3,3), padding=1, padding_mode='circular'),
+            ]),
+            nn.Conv2d(in_channels=9*6, out_channels=9, kernel_size=(1,1), padding=0, padding_mode='circular'),
+            nn.Conv2d(in_channels=9,   out_channels=9, kernel_size=(1,1), padding=0, padding_mode='circular'),
+            nn.Conv2d(in_channels=9,   out_channels=1, kernel_size=(1,1), padding=0, padding_mode='circular'),
         ])
 
 
@@ -167,7 +161,7 @@ class GameOfLifeReverseInception(GameOfLifeBase, metaclass=ABCMeta):
     def accuracy(self, outputs, expected, inputs):
         """ Accuracy here is based upon if the output matches the input after forward play """
         # return super().accuracy(outputs, expected, inputs)
-        forwards = self.discriminator(outputs)
+        forwards = self.discriminator(self.cast_int(outputs))
         return pt.sum( self.cast_bool(forwards) == self.cast_bool(inputs) ).cpu().numpy() / np.prod(outputs.shape)
 
 
@@ -183,4 +177,5 @@ class GameOfLifeReverseInception(GameOfLifeBase, metaclass=ABCMeta):
 if __name__ == '__main__':
     from neural_networks.train import train
     model = GameOfLifeReverseInception()
-    train(model, grid_size=5, reverse_input_output=True)
+    train(model, grid_size=10, reverse_input_output=True)
+    model.print_params()

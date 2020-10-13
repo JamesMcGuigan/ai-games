@@ -30,7 +30,7 @@ def train(model,
     time_start = time.perf_counter()
 
     atexit.register(model.save)      # save on exit - BrokenPipeError doesn't trigger finally:
-    model.load().train().unfreeze()  # enable training and dropout
+    model.load(verbose=verbose).train().unfreeze()  # enable training and dropout
     if verbose: print(model)
 
     # NOTE: criterion loss function now defined via model.loss()

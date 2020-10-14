@@ -53,7 +53,7 @@ class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
         if not self.loaded: self.load()  # autoload on first function call
         return super().__call__(*args, **kwargs)
 
-    def predict(self, inputs: Union[List[np.ndarray], np.ndarray, torch.Tensor]) -> np.ndarray:
+    def predict(self, inputs: Union[List[np.ndarray], np.ndarray, torch.Tensor], **kwargs) -> np.ndarray:
         """
         Wrapper function around __call__() that returns a numpy int8 array for external usage
         Will auto-detect the largest batch size capable of fitting into GPU memory
@@ -65,7 +65,7 @@ class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
             try:
                 outputs = []
                 for input in batch(inputs, batch_size):
-                    output = self(input)
+                    output = self(input, **kwargs)
                     output = self.cast_int(output).detach().cpu().numpy()
                     outputs.append(output)
                 outputs = np.concatenate(outputs).squeeze()

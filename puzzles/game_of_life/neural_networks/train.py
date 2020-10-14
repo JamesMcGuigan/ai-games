@@ -76,8 +76,8 @@ def train(model,
             if timeout and timeout < time.perf_counter() - time_start:         break
             epoch_start = time.perf_counter()
 
-            inputs_np   = [ generate_random_board()[:grid_size,:grid_size] for _     in range(batch_size) ]
-            expected_np = [ life_step(board)        for board in inputs_np ]
+            inputs_np   = [ generate_random_board(shape=(grid_size,grid_size)) for _     in range(batch_size) ]
+            expected_np = [ life_step(board)                                   for board in inputs_np ]
             inputs      = model.cast_inputs(inputs_np).to(device)
             expected    = model.cast_inputs(expected_np).to(device)
 
@@ -123,7 +123,7 @@ def train(model,
             # if board_count % 1_000 == 0:
             if (epoch <= 10) or (epoch <= 100 and epoch % 10 == 0) or epoch % 100 == 0:
                 time_taken = time.perf_counter() - time_start
-                if verbose: print(f'epoch: {epoch:4d} | board_count: {board_count:7d} | loss: {loop_loss/loop_count:.10f} | accuracy = {loop_acc/loop_count:.10f} | time: {1000*epoch_time/batch_size:.3f}ms/board | {time_taken//60:3.0f}m {time_taken%60:02.0f}s ')
+                if verbose: print(f'epoch: {epoch:4d} | board_count: {board_count:7d} | loss: {loop_loss/loop_count:.10f} | accuracy = {loop_acc/loop_count:.10f} | time: {1000*epoch_time/batch_size:6.3f}ms/board | {time_taken//60:3.0f}m {time_taken%60:02.0f}s ')
                 loop_loss  = 0
                 loop_acc   = 0
                 loop_count = 0

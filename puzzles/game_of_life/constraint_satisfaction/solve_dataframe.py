@@ -62,7 +62,7 @@ def solve_dataframe(
         timeout=0,
         max_count=0,
         sort_cells=True,
-        sort_delta=True,
+        sort_delta=False,
         modulo=(1,0),
         plot=False,
 ) -> pd.DataFrame:

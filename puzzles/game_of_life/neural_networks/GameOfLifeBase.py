@@ -109,7 +109,7 @@ class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
     @property
     def filename(self) -> str:
         if os.environ.get('KAGGLE_KERNEL_RUN_TYPE'):
-            return f'{self.__class__.__name__}.pth'
+            return f'./{self.__class__.__name__}.pth'
         else:
             return os.path.join( os.path.dirname(__file__), 'models', f'{self.__class__.__name__}.pth' )
 

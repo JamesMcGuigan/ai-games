@@ -4,6 +4,7 @@ from typing import TypeVar
 import numpy as np
 import torch
 import torch as pt
+import torch.nn.functional as F
 from torch import nn
 
 from neural_networks.GameOfLifeBase import GameOfLifeBase
@@ -47,7 +48,7 @@ class GameOfLifeFeatures(nn.Module):
 class GameOfLifeReverseRNN(GameOfLifeBase, metaclass=ABCMeta):
     """
     """
-    def __init__(self, grid_size=25, state_size=1):
+    def __init__(self, grid_size=25, state_size=9):
         super().__init__()
         self.grid_size  = grid_size
         self.state_size = state_size
@@ -55,9 +56,9 @@ class GameOfLifeReverseRNN(GameOfLifeBase, metaclass=ABCMeta):
         # self.criterion = FocalLoss()
         self.criterion    = nn.BCELoss()
         # self.criterion  = nn.MSELoss()
-        self.activation   = nn.PReLU()
+        self.activation   = nn.ReLU()
         # self.activation.weight.data = torch.tensor([-0.5])  # 11N Solution
-        self.relu1       = ReLU1()
+        self.relu1        = ReLU1()
 
         # discriminator must be at top-level for autograd to work, its weights are added to the savefile
         self.discriminator = GameOfLifeHardcodedReLU1_21()
@@ -69,12 +70,12 @@ class GameOfLifeReverseRNN(GameOfLifeBase, metaclass=ABCMeta):
         out_channels = self.state_size+1
         self.cnn_layers = nn.ModuleList([
             # Input, Prediction, State
-            nn.Conv2d( in_channels,        out_channels=9,            kernel_size=(3,3), padding=1, padding_mode='circular'),
-            nn.Conv2d( in_channels=9+1,    out_channels=9,            kernel_size=(1,1)),
-            nn.Conv2d( in_channels=9*3+1,  out_channels=9,            kernel_size=(3,3), padding=1, padding_mode='circular'),
-            nn.Conv2d( in_channels=9+1,    out_channels=9,            kernel_size=(1,1)),
-            nn.Conv2d( in_channels=9+1,    out_channels=9,            kernel_size=(1,1)),
-            nn.Conv2d( in_channels=9+1,    out_channels=out_channels, kernel_size=(1,1)),  # Prediction + State
+            nn.Conv2d( in_channels,         out_channels=81,           kernel_size=(3,3), padding=1, padding_mode='circular'),
+            nn.Conv2d( in_channels=81+1,    out_channels=81,           kernel_size=(1,1)),
+            nn.Conv2d( in_channels=81*3+1,  out_channels=81,           kernel_size=(3,3), padding=1, padding_mode='circular'),
+            nn.Conv2d( in_channels=81+1,    out_channels=81,           kernel_size=(1,1)),
+            nn.Conv2d( in_channels=81+1,    out_channels=81,           kernel_size=(1,1)),
+            nn.Conv2d( in_channels=81+1,    out_channels=out_channels, kernel_size=(1,1)),  # Prediction + State
         ])
         self.dense_layers = nn.ModuleList([
             # nn.Linear(in_features=grid_size*grid_size*(3+1), out_features=grid_size*grid_size*2),
@@ -101,8 +102,7 @@ class GameOfLifeReverseRNN(GameOfLifeBase, metaclass=ABCMeta):
                 torch.zeros((x.shape[0], self.state_size, x.shape[2], x.shape[3])).to(self.device),  # State
             ], dim=1)
 
-        # x[:,0:2,:,:] = self.relu1(x[:,0:2,:,:])  # ReLU1 on input and prediction
-        x = self.relu1(x)
+        x[:,0:2,:,:] = self.relu1(x[:,0:2,:,:])  # ReLU1 on input and prediction
         for n in range(max_steps):
             for layer in self.cnn_layers:
                 if x.shape[1] == layer.in_channels // 3:
@@ -123,8 +123,8 @@ class GameOfLifeReverseRNN(GameOfLifeBase, metaclass=ABCMeta):
                 x = self.activation(x)
             x = x.reshape((shape[0], -1, shape[2], shape[3]))
 
-            x = torch.cat([ inputs, x ], dim=1)  # append input to output
-            x = self.relu1(x)                    # ReLU1 on input and prediction
+            x = torch.cat([ inputs, x ], dim=1)      # append input to output
+            x[:,0:2,:,:] = self.relu1(x[:,0:2,:,:])  # ReLU1 on input and prediction
 
             if early_stopping and n != max_steps-1:
                 reinputs, prediction, state = x[:,0:1,:,:], x[:,1:2,:,:], x[:,2:,:,:]
@@ -164,21 +164,21 @@ class GameOfLifeReverseRNN(GameOfLifeBase, metaclass=ABCMeta):
             forwards = self.discriminator(prediction)
 
             forward_loss  = self.criterion(forwards, inputs)   # loss==0 if forward play matches input
-            # identity_loss = self.criterion(reinputs, inputs)   # loss==0 if forward play matches input
+            identity_loss = self.criterion(reinputs, inputs)   # loss==0 if forward play matches input
 
-            # cell_count_loss_forwards   = self.cell_count_loss(forwards,   inputs)
-            # cell_count_loss_reinputs   = self.cell_count_loss(reinputs,   inputs)
-            # cell_count_loss_prediction = self.cell_count_loss(prediction, expected)
-            # cell_count_loss = (cell_count_loss_forwards + cell_count_loss_reinputs + cell_count_loss_prediction) / 3
+            cell_count_loss_forwards   = self.cell_count_loss(forwards,   inputs)
+            cell_count_loss_reinputs   = self.cell_count_loss(reinputs,   inputs)
+            cell_count_loss_prediction = self.cell_count_loss(prediction, expected)
+            cell_count_loss = (cell_count_loss_forwards + cell_count_loss_reinputs + cell_count_loss_prediction) / 3
 
-            # binary_loss_prediction = self.binary_loss(prediction)
-            # binary_loss_reinputs   = self.binary_loss(reinputs)
-            # binary_loss = (binary_loss_prediction + binary_loss_reinputs) / 2
+            binary_loss_prediction = self.binary_loss(prediction)
+            binary_loss_reinputs   = self.binary_loss(reinputs)
+            binary_loss = (binary_loss_prediction + binary_loss_reinputs) / 2
 
-            # dataset_loss = self.criterion(prediction, expected)       # loss==0 if output matches dataset
-            # dataset_loss = F.relu( dataset_loss * (torch.tanh(forward_loss) - 0.01) )  # fade out classic loss
+            dataset_loss = self.criterion(prediction, expected)       # loss==0 if output matches dataset
+            dataset_loss = F.relu( dataset_loss * (torch.tanh(forward_loss) - 0.01) )  # fade out classic loss
 
-            losses[t] = forward_loss # + identity_loss + ( cell_count_loss + binary_loss + dataset_loss ) / 3
+            losses[t] = forward_loss + identity_loss + ( cell_count_loss + binary_loss + dataset_loss ) / 3
             losses[t] = losses[t] * (t+1)  # end of sequence outputs are most important
 
         loss = torch.sum( losses ) / np.sum(np.arange(1,max_steps+1))
@@ -206,5 +206,5 @@ class GameOfLifeReverseRNN(GameOfLifeBase, metaclass=ABCMeta):
 if __name__ == '__main__':
     from neural_networks.train import train
     model = GameOfLifeReverseRNN(grid_size=25)
-    train(model, batch_size=25, grid_size=5, reverse_input_output=True)
+    train(model, batch_size=25, grid_size=25, reverse_input_output=True)
     # model.print_params()

@@ -108,7 +108,10 @@ class GameOfLifeBase(nn.Module, metaclass=ABCMeta):
 
     @property
     def filename(self) -> str:
-        return os.path.join( os.path.dirname(__file__), 'models', f'{self.__class__.__name__}.pth')
+        if os.environ.get('KAGGLE_KERNEL_RUN_TYPE'):
+            return f'{self.__class__.__name__}.pth'
+        else:
+            return os.path.join( os.path.dirname(__file__), 'models', f'{self.__class__.__name__}.pth' )
 
 
     # DOCS: https://pytorch.org/tutorials/beginner/saving_loading_models.html

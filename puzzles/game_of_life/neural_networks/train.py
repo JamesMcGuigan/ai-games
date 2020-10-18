@@ -34,21 +34,22 @@ def train(model,
     if verbose: print(model)
 
     # NOTE: criterion loss function now defined via model.loss()
-    optimizer = optim.RMSprop(model.parameters(), lr=0.01, momentum=0.9)
+    # optimizer = optim.RMSprop(model.parameters(), lr=0.01, momentum=0.9)
+    optimizer = optim.Adam(model.parameters(), lr=0.0001)
 
     # epoch: 14481 | board_count: 362000 | loss: 0.0000385726 | accuracy = 0.9990336000 | time: 0.965ms/board
     scheduler = None
 
-    # epoch: 240961 | board_count: 6024000 | loss: 0.0000000000 | accuracy = 1.0000000000 | time: 0.611ms/board
-    # Finished Training: GameOfLifeForward_128 - 240995 epochs in 3569.1s
-    scheduler = torch.optim.lr_scheduler.CyclicLR(
-        optimizer,
-        max_lr=1e-3,
-        base_lr=1e-5,
-        step_size_up=100,
-        mode='exp_range',
-        gamma=0.8
-    )
+    # # epoch: 240961 | board_count: 6024000 | loss: 0.0000000000 | accuracy = 1.0000000000 | time: 0.611ms/board
+    # # Finished Training: GameOfLifeForward_128 - 240995 epochs in 3569.1s
+    # scheduler = torch.optim.lr_scheduler.CyclicLR(
+    #     optimizer,
+    #     max_lr=1e-3,
+    #     base_lr=1e-5,
+    #     step_size_up=100,
+    #     mode='exp_range',
+    #     gamma=0.8
+    # )
 
 
     num_params = torch.sum(torch.tensor([

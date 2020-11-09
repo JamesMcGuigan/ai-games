@@ -11,15 +11,10 @@ from pathos.multiprocessing import ProcessPool
 
 from constraint_satisfaction.fix_submission import is_valid_solution_3d
 from constraint_satisfaction.z3_solver import game_of_life_solver
-from utils.datasets import submission_file
-from utils.datasets import test_df
-from utils.datasets import timeout_file
+from utils.datasets import submission_file, test_df, timeout_file
 from utils.idx_lookup import get_unsolved_idxs
-from utils.plot import plot_3d
-from utils.plot import plot_idx
-from utils.util import csv_to_delta
-from utils.util import csv_to_numpy
-from utils.util import numpy_to_dict
+from utils.plot import plot_3d, plot_idx
+from utils.util import csv_to_delta, csv_to_numpy, numpy_to_dict
 
 
 # Parallel(n_jobs=n_jobs)([ delayed(solve_board_deltaN)(board, delta, idx) ])
@@ -93,7 +88,7 @@ def solve_dataframe(
         idxs     = [ idx for idx in idxs if idx not in timeout_df.index ]  # exclude timeouts
         deltas   = ( csv_to_delta(df, idx)             for idx in idxs )   # generator
         boards   = ( csv_to_numpy(df, idx, key='stop') for idx in idxs )   # generator
-        timeouts = ( min(3*60*60, timeout * 0.99 - (time.perf_counter() - time_start) if timeout else 0)  for _ in idxs )  # generator
+        timeouts = ( min(8*60*60, timeout * 0.99 - (time.perf_counter() - time_start) if timeout else 0)  for _ in idxs )  # generator
         # NOTE: Z3 timeouts are inexact, but will hopefully occur just before the signal timeout
 
         solution_idx_iter = pool.uimap(solve_board_idx, boards, deltas, idxs, timeouts)

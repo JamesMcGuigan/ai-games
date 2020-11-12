@@ -4,14 +4,9 @@ import numpy as np
 import z3
 
 from constraint_satisfaction.fix_submission import is_valid_solution
-from constraint_satisfaction.z3_constraints import get_exclude_solution_constraint
-from constraint_satisfaction.z3_constraints import get_game_of_life_ruleset
-from constraint_satisfaction.z3_constraints import get_initial_board_constraint
-from constraint_satisfaction.z3_constraints import get_no_empty_boards_constraint
-from constraint_satisfaction.z3_constraints import get_repeating_board_constraint
-from constraint_satisfaction.z3_constraints import get_static_board_constraint
-from constraint_satisfaction.z3_constraints import get_t_cells
-from constraint_satisfaction.z3_constraints import get_zero_point_constraint
+from constraint_satisfaction.z3_constraints import get_exclude_solution_constraint, get_game_of_life_ruleset, \
+    get_image_segmentation_csv, get_initial_board_constraint, get_no_empty_boards_constraint, \
+    get_static_board_constraint, get_t_cells, get_zero_point_constraint
 from constraint_satisfaction.z3_utils import solver_to_numpy_3d
 
 
@@ -36,10 +31,10 @@ def game_of_life_solver(board: np.ndarray, delta: int, idx: int, timeout=0, verb
 
     # cluster_history_lookup.pickle file is now now 9.3Mb zipped
     for constraint in [
-        lambda: get_static_board_constraint(t_cells, board),                      # should be quick to evaluate
-        lambda: get_repeating_board_constraint(t_cells, board, frequency=2),      # should be quick to evaluate
+        lambda: get_static_board_constraint(t_cells, board),                        # should be quick to evaluate
+        # lambda: get_repeating_board_constraint(t_cells, board, frequency=2),      # should be quick to evaluate
         # lambda: get_image_segmentation_solver_constraint(t_cells, board, delta),  # makes debugger slow + causes Kaggle memory issues
-        # lambda: get_image_segmentation_csv(t_cells, idx),       # uses less memory than solver
+        lambda: get_image_segmentation_csv(t_cells, idx),       # uses less memory than solver
         lambda: z3.And([]),                                     # included in get_image_segmentation_solver_constraint()
     ]:
         constraint = constraint()

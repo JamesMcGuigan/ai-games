@@ -76,7 +76,7 @@ def solve_dataframe(
 
     # Pathos multiprocessing allows iterator semantics, whilst joblib has reduced CPU usage at the end of each batch
     # 75% CPU load to optimize for localhost CPU cache + solve memory leaks on Kaggle
-    cpus = int( os.cpu_count() * (3/4 if os.environ.get('KAGGLE_KERNEL_RUN_TYPE') else 3/4) )
+    cpus = int( os.cpu_count() * (1 if os.environ.get('KAGGLE_KERNEL_RUN_TYPE') else 3/4) )
     pool = ProcessPool(ncpus=cpus)
     try:
         # # timeouts for kaggle submissions

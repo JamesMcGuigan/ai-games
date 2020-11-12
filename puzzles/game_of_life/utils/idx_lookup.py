@@ -6,9 +6,9 @@ import pandas as pd
 from utils.util import csv_to_numpy
 
 
-def get_unsolved_idxs(df: pd.DataFrame, submision_df: pd.DataFrame, modulo=(1,0),
+def get_unsolved_idxs(df: pd.DataFrame, submission_df: pd.DataFrame, modulo=(1,0),
                       sort_cells=False, sort_delta=False, max_cells=0, max_delta=0) -> List[int]:
-    """ Compare test_df with submision_df and return any idxs without a matching non-zero entry in submision_df """
+    """ Compare test_df with submission_df and return any idxs without a matching non-zero entry in submission_df """
     # Process in assumed order of difficulty, easiest first | smaller grids are easier, smaller deltas are easier
     if modulo:                    df = df[ df.index % modulo[0] == modulo[1] ]
     if max_cells:                 df = df[ df.apply(np.count_nonzero, axis=1) <= max_cells ]
@@ -22,7 +22,7 @@ def get_unsolved_idxs(df: pd.DataFrame, submision_df: pd.DataFrame, modulo=(1,0)
     idxs   = [
         idx
         for idx in df.index
-        if np.count_nonzero( csv_to_numpy(submision_df, idx, key='start') ) == 0
+        if np.count_nonzero( csv_to_numpy(submission_df, idx, key='start') ) == 0
     ]
     assert isinstance(idxs, list)  # BUGFIX: must return list (not generator), else invalid csv entries occur
     return list(idxs)

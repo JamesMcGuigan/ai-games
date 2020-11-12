@@ -56,7 +56,8 @@ def solve_dataframe(
         savefile=submission_file,
         timeout=0,
         max_count=0,
-        max_cells=100,
+        max_cells=0,
+        max_delta=4,
         sort_cells=True,
         sort_delta=False,
         modulo=(1,0),
@@ -84,7 +85,9 @@ def solve_dataframe(
         #     signal.signal(signal.SIGALRM, raise_timeout)            # Register a function to raise a TimeoutError on the signal.
         #     signal.alarm(timeout)                                   # Schedule the signal to be sent after ``time``.
 
-        idxs     = get_unsolved_idxs(df, submission_df, modulo=modulo, sort_cells=sort_cells, sort_delta=sort_delta, max_cells=max_cells)
+        idxs     = get_unsolved_idxs(df, submission_df, modulo=modulo,
+                                     sort_cells=sort_cells, sort_delta=sort_delta,
+                                     max_cells=max_cells,   max_delta=max_delta)
         idxs     = [ idx for idx in idxs if idx not in timeout_df.index ]  # exclude timeouts
         deltas   = ( csv_to_delta(df, idx)             for idx in idxs )   # generator
         boards   = ( csv_to_numpy(df, idx, key='stop') for idx in idxs )   # generator

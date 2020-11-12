@@ -1,6 +1,4 @@
-from typing import Any
-from typing import Callable
-from typing import List
+from typing import Any, Callable, List
 
 import numpy as np
 import pandas as pd
@@ -8,15 +6,18 @@ import pandas as pd
 from utils.util import csv_to_numpy
 
 
-def get_unsolved_idxs(df: pd.DataFrame, submision_df: pd.DataFrame, modulo=(1,0), sort_cells=False, sort_delta=False, max_cells=0) -> List[int]:
+def get_unsolved_idxs(df: pd.DataFrame, submision_df: pd.DataFrame, modulo=(1,0),
+                      sort_cells=False, sort_delta=False, max_cells=0, max_delta=0) -> List[int]:
     """ Compare test_df with submision_df and return any idxs without a matching non-zero entry in submision_df """
     # Process in assumed order of difficulty, easiest first | smaller grids are easier, smaller deltas are easier
     if modulo:                    df = df[ df.index % modulo[0] == modulo[1] ]
+    if max_cells:                 df = df[ df.apply(np.count_nonzero, axis=1) <= max_cells ]
+    if max_delta:                 df = df[ df['delta'] <= max_delta ]
+
     if   sort_cells == 'random':  df = df.sample(frac=1)
     elif sort_cells == 'reverse': df = df.iloc[::-1]
     elif sort_cells:              df = df.iloc[ df.apply(np.count_nonzero, axis=1).argsort() ]
-    if sort_delta:                df = df.sort_values(by='delta', kind='mergesort')  # mergesort is stable sort
-    if max_cells:                 df = df[ df.apply(np.count_nonzero, axis=1) <= max_cells ]
+    if   sort_delta:              df = df.sort_values(by='delta', kind='mergesort')  # mergesort is stable sort
 
     idxs   = [
         idx

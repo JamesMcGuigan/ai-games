@@ -1,14 +1,14 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from utils.util import csv_to_delta
-from utils.util import csv_to_numpy
+from utils.util import csv_to_delta, csv_to_numpy
 
 
-def plot_3d(solution_3d: np.ndarray, size=4, max_cols=6):
+def plot_3d(solution_3d: np.ndarray, size=4, max_cols=6, title=''):
     cols = np.min([ len(solution_3d), max_cols ])
     rows = len(solution_3d) // cols + 1
     plt.figure(figsize=(cols*size, rows*size))
+    plt.title(title)
     for t in range(len(solution_3d)):
         board = solution_3d[t]
         plt.subplot(rows, cols, t + 1)

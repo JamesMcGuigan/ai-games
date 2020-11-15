@@ -7,6 +7,7 @@ from typing import Tuple
 import humanize
 import numpy as np
 import pandas as pd
+from humanize import precisedelta
 from pathos.multiprocessing import ProcessPool
 
 from constraint_satisfaction.fix_submission import is_valid_solution_3d
@@ -122,9 +123,12 @@ def solve_dataframe(
                 submission_df.sort_index().to_csv(savefile)
 
                 if plot:
+                    board = csv_to_numpy(df, idx, key='stop')
+                    delta = csv_to_delta(df, idx)
+                    score = solver_score(solution_3d, board, delta)
+                    plot_3d(solution_3d, title=f'idx {idx} | {100*score:.1f}% | {precisedelta(time_taken)}')
                     if not is_valid_solution_3d(solution_3d):
                         plot_idx(df, idx)
-                    plot_3d(solution_3d)
             else:
                 if plot: plot_idx(df, idx)  # plot failures
                 # Record unsat and timeout failures to prevent kaggle getting stuck on unsolved items

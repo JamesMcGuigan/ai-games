@@ -1,10 +1,20 @@
 ### Optimization Cost Functions
 ### These
+import itertools
 
 import pydash
 import z3
 
 from constraint_satisfaction.z3_utils import get_neighbourhood_cells
+
+
+def get_initial_board_accuracy(t_cells, board, delta=0):
+    """ Reward = +1 for each correct cell """
+    reward = z3.Sum([
+        z3.If(t_cells[-1-delta][x][y] == bool(board[x][y]), 1, 0 )
+        for x,y in itertools.product(range(board.shape[0]), range(board.shape[1]))
+    ])
+    return reward
 
 
 def get_cell_count(t_cells):

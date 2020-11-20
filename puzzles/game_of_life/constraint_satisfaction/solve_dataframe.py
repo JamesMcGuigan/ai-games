@@ -30,7 +30,7 @@ def solve_board_idx(board: np.ndarray, delta: int, idx: int, exact=True, timeout
         score = solver_score(solution_3d, board, delta)
         message = (
                  f"Solved! " if is_valid_solution_3d(solution_3d)
-            else f"Partial " if score
+            else f"Partial " if np.count_nonzero(solution_3d[0])
             else f"unsolved"
         )
         print(f'{idx:05d} | delta = {delta} | cells = {np.count_nonzero(board):3d} -> {np.count_nonzero(solution_3d):3d} | {100*score:5.1f}% {message} {time_taken:6.1f}s')
@@ -56,7 +56,7 @@ def solve_board_delta1_loop(board: np.ndarray, delta: int, idx: int, exact=True,
         score = solver_score(solution_3d, board, delta)
         message = (
                  f"Solved! " if is_valid_solution_3d(solution_3d)
-            else f"Partial " if score
+            else f"Partial " if np.count_nonzero(solution_3d[0])
             else f"unsolved"
         )
         print(f'{idx:05d} | delta = {delta} | cells = {np.count_nonzero(board):3d} -> {np.count_nonzero(solution_3d):3d} | {100*score:5.1f}% {message} {time_taken:6.1f}s')

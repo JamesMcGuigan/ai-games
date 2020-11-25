@@ -70,7 +70,7 @@ def solve_dataframe(
         max_timeout=6*60*60,
         max_count=0,
         max_cells=0,
-        max_delta=5,
+        max_delta=4,
         sort_cells=True,
         sort_delta=False,
         exact=True,

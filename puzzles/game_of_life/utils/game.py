@@ -27,7 +27,7 @@ def life_step_scipy(X: np.ndarray):
 
 
 
-# NOTE: @njit doesn't like np.roll(axis=) so reimplement explictly
+# NOTE: @njit doesn't like np.roll(axis=) so reimplement explicitly
 @njit
 def life_neighbours_xy(board: np.ndarray, x, y, max_value=3):
     size_x = board.shape[0]
@@ -81,6 +81,12 @@ def life_steps(boards: Union[List[np.ndarray],np.ndarray]) -> List[np.ndarray]:
 def life_step_delta(board: np.ndarray, delta):
     for t in range(delta): board = life_step(board)
     return board
+
+
+def life_steps_delta(boards: np.ndarray, deltas: Union[np.ndarray,int]) -> np.ndarray:
+    """ Parallel version of life_step() but for an array of boards """
+    if isinstance(deltas, int): deltas = np.ones((len(boards),)) * deltas
+    return np.array( Parallel(-1)( delayed(life_step_delta)(board, delta) for (board, delta) in zip(boards, deltas) ) )
 
 
 def life_step_3d(board: np.ndarray, delta):

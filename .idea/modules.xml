@@ -8,6 +8,7 @@
       <module fileurl="file://$PROJECT_DIR$/puzzles/game_of_life/game_of_life.iml" filepath="$PROJECT_DIR$/puzzles/game_of_life/game_of_life.iml" />
       <module fileurl="file://$PROJECT_DIR$/games/knights-isolation/knights-isolation.iml" filepath="$PROJECT_DIR$/games/knights-isolation/knights-isolation.iml" />
       <module fileurl="file://$PROJECT_DIR$/search/pacman/pacman.iml" filepath="$PROJECT_DIR$/search/pacman/pacman.iml" />
+      <module fileurl="file://$PROJECT_DIR$/games/rock-paper-scissors/rock-paper-scissors.iml" filepath="$PROJECT_DIR$/games/rock-paper-scissors/rock-paper-scissors.iml" />
     </modules>
   </component>
 </project>

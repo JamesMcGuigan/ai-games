@@ -1,6 +1,6 @@
 # %%writefile submission.py
-from collections import defaultdict
 import random
+from collections import defaultdict
 from typing import *
 
 import numpy as np
@@ -110,6 +110,6 @@ class RPSNaiveBayes():
         return log_likelihoods
 
 
-instance = RPSNaiveBayes()
-def kaggle_agent(obs, conf):
-    return instance.agent(obs, conf)
+naive_bayes_instance = RPSNaiveBayes()
+def naive_bayes_agent(obs, conf):
+    return naive_bayes_instance.agent(obs, conf)

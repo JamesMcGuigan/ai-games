@@ -4,7 +4,7 @@ import sys
 import numpy as np
 from kaggle_environments import evaluate, make
 
-from random_agent import random_agent
+from rng.random_agent import random_agent
 from RPSNaiveBayes import RPSNaiveBayes
 
 agent1 = RPSNaiveBayes()

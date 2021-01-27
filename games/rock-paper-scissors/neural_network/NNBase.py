@@ -30,6 +30,23 @@ class NNBase(nn.Module, metaclass=ABCMeta):
 
 
 
+    ### Initialization
+
+    def weights_init(self, layer):
+        ### Default initialization seems to work best, at least for Z shaped ReLU1 - see GameOfLifeHardcodedReLU1_21.py
+        if isinstance(layer, (nn.Conv2d, nn.ConvTranspose2d)):
+            ### kaiming_normal_ corrects for mean and std of the relu function
+            ### xavier_normal_ works better for ReLU6 and Z shaped activations
+            if isinstance(self.activation, (nn.ReLU, nn.LeakyReLU, nn.PReLU)):
+                nn.init.kaiming_normal_(layer.weight)
+                # nn.init.xavier_normal_(layer.weight)
+                if layer.bias is not None:
+                    # small positive bias so that all nodes are initialized
+                    nn.init.constant_(layer.bias, 0.1)
+        else:
+            # Use default initialization
+            pass
+
     ### Freeze / Unfreeze
 
     def freeze(self: T) -> T:
@@ -78,7 +95,7 @@ class NNBase(nn.Module, metaclass=ABCMeta):
             if verbose:
                 if load_weights: print(f'{self.__class__.__name__}.load(): model file not found, reinitializing weights\n')
                 # else:          print(f'{self.__class__.__name__}.load(): reinitializing weights\n')
-            # self.apply(self.weights_init)
+            self.apply(self.weights_init)
 
         self.loaded = True    # prevent any infinite if self.loaded loops
         self.to(self.device)  # ensure all weights, either loaded or untrained are moved to GPU

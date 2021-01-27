@@ -6,3 +6,4 @@ sklearn
 tensorflow
 torch
 xgboost
+humanize

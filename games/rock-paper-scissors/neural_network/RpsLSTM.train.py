@@ -9,7 +9,7 @@ if __name__ == '__main__':
 
     n_epochs  = 10_000
     n_rounds  = 100
-    model     = RpsLSTM(hidden_size=16, num_layers=2)
+    model     = RpsLSTM(hidden_size=16, num_layers=2).train()
     optimizer = torch.optim.RMSprop(model.parameters(), lr=1e-3)
     scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=100, verbose=True)
 
@@ -40,3 +40,5 @@ if __name__ == '__main__':
         if epoch % 10 == 0:
             print(f'epoch = {epoch:6d} | accuracy = {accuracy*100:3.0f}% | loss = {loss.detach().item()}')
             if accuracy >= 0.99: break
+
+    model.save()

@@ -5,7 +5,11 @@ import torch.nn as nn
 # DOCS: https://pytorch.org/tutorials/beginner/nlp/sequence_models_tutorial.html
 # DOCS: https://blog.floydhub.com/long-short-term-memory-from-zero-to-hero-with-pytorch/
 # DOCS: https://github.com/MagaliDrumare/How-to-learn-PyTorch-NN-CNN-RNN-LSTM/blob/master/10-LSTM.ipynb
-class RpsLSTM(nn.Module):
+from neural_network.NNBase import NNBase
+
+
+class RpsLSTM(NNBase):
+# class RpsLSTM(nn.Module):
 
     def __init__(self, hidden_size=16, num_layers=2, dropout=0.25, input_size=6):
         super().__init__()

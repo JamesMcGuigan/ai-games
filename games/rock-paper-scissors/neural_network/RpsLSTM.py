@@ -40,11 +40,11 @@ class RpsLSTM(nn.Module):
 
     @staticmethod
     def cast_inputs(action: int, opponent: int) -> torch.Tensor:
-        x = torch.zeros((3,2), dtype=torch.float)
+        x = torch.zeros((2,3), dtype=torch.float)
         if action is not None:
-            x[action % 3, 0] = 1.0
+            x[0, (action % 3)]   = 1.0
         if opponent is not None:
-            x[opponent % 3, 0] = 1.0
+            x[1, (opponent % 3)] = 1.0
         x = torch.reshape(x, (1,1,6))  # (seq_len, batch, input_size)
         return x.to(device)
 

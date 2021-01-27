@@ -1,7 +1,3 @@
-# DOCS: https://pytorch.org/tutorials/beginner/nlp/sequence_models_tutorial.html
-# DOCS: https://blog.floydhub.com/long-short-term-memory-from-zero-to-hero-with-pytorch/
-# DOCS: https://github.com/MagaliDrumare/How-to-learn-PyTorch-NN-CNN-RNN-LSTM/blob/master/10-LSTM.ipynb
-
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
@@ -10,7 +6,11 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu")
 
 
+# DOCS: https://pytorch.org/tutorials/beginner/nlp/sequence_models_tutorial.html
+# DOCS: https://blog.floydhub.com/long-short-term-memory-from-zero-to-hero-with-pytorch/
+# DOCS: https://github.com/MagaliDrumare/How-to-learn-PyTorch-NN-CNN-RNN-LSTM/blob/master/10-LSTM.ipynb
 class RpsLSTM(nn.Module):
+
     def __init__(self, hidden_size=16, num_layers=2, dropout=0.25, input_size=6):
         super().__init__()
         self.device      = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu")
@@ -30,6 +30,7 @@ class RpsLSTM(nn.Module):
         self.softmax = nn.Softmax(dim=2)
         self.reset()
 
+
     def reset(self):
         self.hidden = (
             torch.zeros(self.num_layers, self.batch_size, self.hidden_size),
@@ -47,21 +48,30 @@ class RpsLSTM(nn.Module):
         x = torch.reshape(x, (1,1,6))  # (seq_len, batch, input_size)
         return x.to(device)
 
-    @staticmethod
-    def loss(probs: torch.Tensor, opponent: int) -> torch.Tensor:
-        ev = torch.zeros((3,), dtype=torch.float).to(device)
-        ev[(opponent + 0) % 3] = 1.0   # expect rock, play paper + opponent rock     = win
-        ev[(opponent + 1) % 3] = 0.75  # expect rock, play paper + opponent paper    = draw
-        ev[(opponent + 2) % 3] = 0.0   # expect rock, play paper + opponent scissors = loss
-        loss = -torch.sum(probs * (ev-1))
-        return loss
-
 
     @staticmethod
     def cast_action(probs: torch.Tensor) -> int:
         expected = torch.argmax(probs, dim=2).detach().item()
         action   = int(expected + 1) % 3
         return action
+
+
+    @staticmethod
+    def reward(action: int, opponent: int) -> float:
+        if action == (opponent + 1) % 3: return  1.0  # win
+        if action == (opponent + 0) % 3: return  0.5  # draw
+        if action == (opponent - 1) % 3: return  0.0  # loss
+        return 0.0
+
+
+    @staticmethod
+    def loss(probs: torch.Tensor, opponent: int) -> torch.Tensor:
+        ev = torch.zeros((3,), dtype=torch.float).to(device)
+        ev[(opponent + 0) % 3] = 1.0   # expect rock, play paper + opponent rock     = win
+        ev[(opponent + 1) % 3] = 0.5   # expect rock, play paper + opponent paper    = draw
+        ev[(opponent + 2) % 3] = 0.0   # expect rock, play paper + opponent scissors = loss
+        loss = -torch.sum(probs * (ev-1))
+        return loss
 
 
     def forward(self, action: int, opponent: int):
@@ -74,24 +84,18 @@ class RpsLSTM(nn.Module):
         return action, expected_probs
 
 
-def get_reward(action: int, opponent: int) -> float:
-    if action == (opponent + 1) % 3: return  1.0  # win
-    if action == (opponent + 0) % 3: return  0.5  # draw
-    if action == (opponent - 1) % 3: return  0.0  # loss
-    return 0.0
-
-
 
 if __name__ == '__main__':
     torch.autograd.set_detect_anomaly(True)
 
+    n_epochs  = 10_000
     n_rounds  = 100
     model     = RpsLSTM(hidden_size=16, num_layers=2).to(device)
     optimizer = torch.optim.RMSprop(model.parameters(), lr=1e-3)
     scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=100, verbose=True)
 
 
-    for epoch in range(1_000):
+    for epoch in range(n_epochs):
         score    = 0
         count    = 0
         action   = None
@@ -106,7 +110,7 @@ if __name__ == '__main__':
             action, probs = model(action=action, opponent=opponent)
             opponent  = n % 3  # sequential agent
             loss     += model.loss(probs, opponent) / n_rounds
-            score    += get_reward(action, opponent)
+            score    += model.reward(action, opponent)
             count    += 1
 
         accuracy = score / count
@@ -115,5 +119,5 @@ if __name__ == '__main__':
         scheduler.step(loss)
 
         if epoch % 10 == 0:
-            print(f'{epoch:6d} | {accuracy*100:3.0f}% | loss = {loss.detach().item()}')
-            if score == count: break
+            print(f'epoch = {epoch:6d} | accuracy = {accuracy*100:3.0f}% | loss = {loss.detach().item()}')
+            if accuracy == 1.0: break

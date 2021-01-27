@@ -6,4 +6,8 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
+  <component name="PackageRequirementsSettings">
+    <option name="requirementsPath" value="requirements.in" />
+    <option name="versionSpecifier" value="Don't specify version" />
+  </component>
 </module>

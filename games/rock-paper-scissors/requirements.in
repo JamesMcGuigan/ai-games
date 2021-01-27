@@ -1,6 +1,8 @@
 mpmath
 numpy
 pydash
+scikit-learn
 sklearn
 tensorflow
+torch
 xgboost

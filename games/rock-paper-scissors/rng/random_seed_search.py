@@ -1,5 +1,6 @@
 # %%writefile main.py
-# Source: https://www.kaggle.com/jamesmcguigan/rock-paper-scissors-random-seed-search/edit/run/52963254
+# Source: https://www.kaggle.com/jamesmcguigan/rock-paper-scissors-random-seed-search/
+# Source: https://github.com/JamesMcGuigan/ai-games/blob/master/games/rock-paper-scissors/rng/random_seed_search.py
 
 import os
 import random

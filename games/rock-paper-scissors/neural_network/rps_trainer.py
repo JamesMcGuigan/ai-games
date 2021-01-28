@@ -26,7 +26,8 @@ def rps_trainer(model, agents: Dict, steps=100, max_epochs=10_000, lr=1e-3, log_
         scheduler = None
         scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=100)
 
-        accuracies = { agent_name: 0.0 for agent_name in agents.keys()}
+        accuracies     = { agent_name: 0.0 for agent_name in agents.keys()}
+        running_losses = torch.zeros((1,)).to(model.device)
         for epoch in range(max_epochs):
             # skip high-accuracy agents more often, but train at least 10% of the time
             selected_agents = {
@@ -62,11 +63,13 @@ def rps_trainer(model, agents: Dict, steps=100, max_epochs=10_000, lr=1e-3, log_
                 losses[0][agent_index] /= step  # NOTE: steps = 2 * step
                 losses[1][agent_index] /= step
                 scores[agent_index]    /= step
-                accuracies[agent_name]  = scores[agent_index].item()
+                accuracies[agent_name]  = ( (accuracies[agent_name] + scores[agent_index].item())
+                                            / (2 if sum(accuracies.values()) else 1) )
 
             # print(env.render(mode='ansi'))
-            losses = torch.mean(losses, dim=1)
-            loss   = torch.mean(losses)
+            running_losses = ( (running_losses + torch.mean(losses, dim=1))
+                               / (2 if torch.sum(running_losses) else 1) )
+            loss = torch.mean(losses)
             loss.backward()
             optimizer.step()
             if scheduler is not None: scheduler.step(loss)
@@ -76,7 +79,7 @@ def rps_trainer(model, agents: Dict, steps=100, max_epochs=10_000, lr=1e-3, log_
                     f'{round(value * 100):3d} {name}'
                     for name, value in accuracies.items()
                 ])
-                print(f'{epoch:6d} | losses = {losses[0].item():.6f} {losses[1].item():.6f} | {accuracy_log}')
+                print(f'{epoch:6d} | losses = {running_losses[0].item():.6f} {running_losses[1].item():.6f} | {accuracy_log}')
                 if torch.mean(scores).item() >= (1 - 2/steps): break  # allowed first 2 moves wrong
 
     except KeyboardInterrupt: pass

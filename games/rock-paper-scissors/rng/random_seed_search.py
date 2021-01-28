@@ -70,19 +70,26 @@ def get_random(length, seed, method='random', use_cache=True) -> List[int]:
     # Use cached results to avoid interfering with opponents RNG
     # Avoid using the RNG during runtime, to prevent affecting opponents RNG
     guess = []
-    if use_cache:
-        if method in cache.keys() and seed < cache[method].shape[0] and length < cache[method].shape[1]:
-            guess = cache[method][seed][:length]
-    else:
+    # if use_cache:
+    #     if method in cache.keys() and seed < cache[method].shape[0] and length < cache[method].shape[1]:
+    #         guess = cache[method][seed][:length]
+
+    # If the results are not in the cache
+    # then ensure we save and restore the random seed state to avoid affecting opponent's RNG
+    if len(guess) == 0:
         if method == 'random':
+            seed_state = random.getstate()
             random.seed(seed)
             guess = [ random.randint(0,2) for n in range(length) ]
+            random.setstate(seed_state)
         elif method == 'np':
+            seed_state = np.random.get_state()
             np.random.seed(seed)
             guess = np.random.randint(0,2, length)
+            np.random.set_state(seed_state)
         elif method == 'tf':
-            tf.random.set_seed(seed)
-            guess = tf.random.uniform((length,), minval=0, maxval=3, dtype=tf.dtypes.int32).numpy()
+            generator = tf.random.Generator.from_seed(seed)
+            guess = generator.uniform((length,), minval=0, maxval=3, dtype=tf.dtypes.int32).numpy()
     return list(guess)
 
 
@@ -99,7 +106,7 @@ min_seed      = 0
 # configuration =  {'episodeSteps': 10, 'agentTimeout': 60, 'actTimeout': 1, 'runTimeout': 1200, 'isProduction': False, 'signs': 3}
 def random_seed_search_agent(observation, configuration, warmup=0, seeds_per_turn=200_000):
     # print(observation)
-    global min_seed, best_solution, solutions
+    global history, solutions, best_solution, min_seed
     safety_time   = 0.1
     time_start    = time.perf_counter()
     time_end      = time_start + configuration.actTimeout - safety_time
@@ -117,7 +124,7 @@ def random_seed_search_agent(observation, configuration, warmup=0, seeds_per_tur
         # Search through list of irrational sequences
         for method, irrational in irrationals.items():
             for offset in [0,1,2]:    # Check for off by one sequences  
-                if irrational[:len(history)] == history[offset:]:
+                if irrational[:len(history)-offset] == history[offset:]:
                     prediction = irrational[len(history)+1]
                     action     = (prediction + 1) % configuration.signs
                     print(f'Found Irrational: {method} | prediction = {prediction} | action = {action}')
@@ -128,7 +135,7 @@ def random_seed_search_agent(observation, configuration, warmup=0, seeds_per_tur
         if best_solution is not None:
             if observation.step > cache_steps:
                 seed, method, offset, spin = best_solution
-                guess      = get_random(length=len(history)+1-offset, seed=seed, method=method)
+                guess      = get_random(length=len(history)+1-offset, seed=seed, method=method, use_cache=False)
                 guess      = [ (n + spin) % configuration.signs for n in guess ]
                 prediction = guess[-1]
                 action     = (prediction + 1) % configuration.signs

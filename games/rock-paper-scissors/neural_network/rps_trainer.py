@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import random
 import sys
 from typing import Dict
@@ -24,7 +26,7 @@ def rps_trainer(model, agents: Dict, steps=100, max_epochs=10_000, lr=1e-3, log_
         env   = make("rps", { "episodeSteps": steps }, debug=False)
         optimizer = torch.optim.RMSprop(model.parameters(), lr=lr)
         scheduler = None
-        scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=100)
+        # scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=100)
 
         accuracies     = { agent_name: 0.0 for agent_name in agents.keys()}
         running_losses = torch.zeros((1,)).to(model.device)

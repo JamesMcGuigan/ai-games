@@ -53,7 +53,7 @@ def get_statistics(values) -> List[float]:
 
 # observation   =  {'step': 1, 'lastOpponentAction': 1}
 # configuration =  {'episodeSteps': 10, 'agentTimeout': 60, 'actTimeout': 1, 'runTimeout': 1200, 'isProduction': False, 'signs': 3}
-def decision_tree_agent(observation, configuration, window=10, stages=3, random_freq=0.66, warmup_period=10, max_samples=1000):
+def decision_tree_agent(observation, configuration, window=10, stages=2, random_freq=0, warmup_period=5, max_samples=1000):
     global history
     warmup_period   = warmup_period  # if os.environ.get('KAGGLE_KERNEL_RUN_TYPE','') != 'Interactive' else 0
     models          = [ None ] + [ DecisionTreeClassifier() ] * stages

@@ -1,3 +1,4 @@
+humanize
 mpmath
 numpy
 pydash
@@ -6,4 +7,4 @@ sklearn
 tensorflow
 torch
 xgboost
-humanize
+xxhash

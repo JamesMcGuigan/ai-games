@@ -8,7 +8,7 @@ rotn_stats = [ 0, 0, 0 ]
 
 # observation   =  {'step': 1, 'lastOpponentAction': 1}
 # configuration =  {'episodeSteps': 10, 'agentTimeout': 60, 'actTimeout': 1, 'runTimeout': 1200, 'isProduction': False, 'signs': 3}
-def anti_rotn(observation, configuration, warmup=25):
+def anti_rotn(observation, configuration, warmup=1):
     global history
     global rotn_stats
 

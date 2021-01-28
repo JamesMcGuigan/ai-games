@@ -35,7 +35,7 @@ def rps_trainer(model, agents: Dict, steps=100, max_epochs=10_000, lr=1e-3, log_
                 action   = None
                 opponent = None
                 for step in range(1,sys.maxsize):
-                    action, probs = model(action=action, opponent=opponent)
+                    action, probs = model.forward(action=action, opponent=opponent)
 
                     observation, reward, done, info = trainer.step(action)
                     opponent = observation.lastOpponentAction
@@ -76,4 +76,4 @@ if __name__ == '__main__':
         'seq':  sequential_agent,
         'rotn': anti_rotn
     }
-    rps_trainer(model, agents, lr=1e-4)
+    rps_trainer(model, agents, steps=100, lr=1e-4)

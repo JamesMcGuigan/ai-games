@@ -70,9 +70,9 @@ def get_random(length, seed, method='random', use_cache=True) -> List[int]:
     # Use cached results to avoid interfering with opponents RNG
     # Avoid using the RNG during runtime, to prevent affecting opponents RNG
     guess = []
-    # if use_cache:
-    #     if method in cache.keys() and seed < cache[method].shape[0] and length < cache[method].shape[1]:
-    #         guess = cache[method][seed][:length]
+    if use_cache:
+        if method in cache.keys() and seed < cache[method].shape[0] and length < cache[method].shape[1]:
+            guess = cache[method][seed][:length]
 
     # If the results are not in the cache
     # then ensure we save and restore the random seed state to avoid affecting opponent's RNG

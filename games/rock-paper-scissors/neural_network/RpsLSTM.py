@@ -71,7 +71,7 @@ class RpsLSTM(NNBase):
 
     def loss_probs(self, probs: torch.Tensor, opponent: int) -> torch.Tensor:
         """
-        Loss based on softmax probability vs EV score of opponent move
+        Loss based on softmax probability vs EV score of opponent move prediction
         """
         ev = torch.zeros((3,), dtype=torch.float).to(self.device)
         ev[(opponent + 0) % 3] = 1.0   # expect rock, play paper + opponent rock     = win
@@ -85,7 +85,7 @@ class RpsLSTM(NNBase):
 
     def loss_hash(self, hash_id: torch.Tensor, agent_name: str) -> torch.Tensor:
         """
-        Categorical Cross Entropy loss for agent prediction using Locality-sensitive hashing
+        Categorical Cross Entropy loss for agent identity prediction using Locality-sensitive hashing
         """
         hash_id    = hash_id.flatten()
         hash_pred  = torch.argmax(hash_id)

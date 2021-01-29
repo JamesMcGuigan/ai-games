@@ -173,7 +173,7 @@ class Simulations():
             reward = self.reward_prediction(prediction, actual) * (self.decay ** n)
             total += (self.decay ** n)
             rewards.append(reward)
-        return sum(rewards) / total
+        return sum(rewards) / total if len(rewards) else 0.0
 
     def reward_prediction(self, prediction: int, actual: int) -> float:
         action   = (prediction + 1) % 3

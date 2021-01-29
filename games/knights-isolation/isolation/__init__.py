@@ -32,7 +32,7 @@ Initial state: {}
 First agent: {!s}
 Second agent: {!s}
 Final state: {}
-Action history: {!s}
+Action statistical_prediction_history: {!s}
 """
 RESULT_INFO = """\
 Status: {}

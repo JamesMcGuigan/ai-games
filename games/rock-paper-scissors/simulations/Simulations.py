@@ -102,8 +102,9 @@ class Simulations():
 
         self.history['action'].insert(0, action)
         if self.verbose:
+            best_score = self.prediction_best_score()
             time_taken = time.perf_counter() - time_start
-            print(f'time = {time_taken:0.2f} | step = {obs.step:4d} | action = {expected} -> {action} | {best_agent}')
+            print(f'time = {time_taken:0.2f} | step = {obs.step:4d} | action = {expected} -> {action} | {best_score:.3f} {best_agent}')
         return int(action) % conf.signs
 
 
@@ -134,12 +135,12 @@ class Simulations():
     ### Scoring and Agent Selection
 
     def pick_best_agent(self) -> str:
-        scores     = self.prediction_scores()
-        best_score = max(scores.values()) if len(scores) else 0.0
         # If we are not confident in our prediction, default to random
+        best_score = self.prediction_best_score()
         if not best_score or best_score < self.confidence:
             best_agent = 'random'
         else:
+            scores = self.prediction_scores()
             best_agents = [
                 agent_name
                 for agent_name, agent_score in scores.items()
@@ -147,6 +148,12 @@ class Simulations():
             ]
             best_agent = random.choice(best_agents)
         return best_agent
+
+
+    def prediction_best_score(self) -> float:
+        scores     = self.prediction_scores()
+        best_score = max(scores.values()) if len(scores) else 0.0
+        return best_score
 
     def prediction_scores(self) -> Dict[str, float]:
         scores = {

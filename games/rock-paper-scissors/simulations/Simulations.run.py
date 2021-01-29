@@ -2,12 +2,12 @@ import pprint
 import time
 
 from humanize import precisedelta
+from joblib import delayed, Parallel
 from kaggle_environments import evaluate
 
 from simulations.Simulations import Simulations
 
 time_start = time.perf_counter()
-results    = {}
 opponents  = Simulations.agents
 # opponents  = {
 #     'random':        random_agent,
@@ -16,7 +16,7 @@ opponents  = Simulations.agents
 #     'naive_bayes':   naive_bayes_agent,
 # }
 
-for agent_name, agent in opponents.items():
+def simulate(agent_name, agent):
     simulations_agent = Simulations()
     result = evaluate(
         "rps",
@@ -28,8 +28,12 @@ for agent_name, agent in opponents.items():
         num_episodes=1,
         debug=False
     )
-    results[agent_name] = result[0]
+    return agent_name, result[0]
 
+results = dict(Parallel(-1)(
+    delayed(simulate)(agent_name, agent)
+    for agent_name, agent in opponents.items()
+))
 pp = pprint.PrettyPrinter(width=80, compact=True)
 pp.pprint(results)
 

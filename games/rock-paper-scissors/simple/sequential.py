@@ -1,2 +1,4 @@
 def sequential_agent(observation, configuration):
-    return observation.step % configuration.signs
+    action = observation.step % configuration.signs
+    print(f'sequential_agent() = {action}')
+    return int(action)

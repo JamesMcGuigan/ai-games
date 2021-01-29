@@ -196,17 +196,17 @@ def player(my_moves, opp_moves):
 
 # observation   =  {'step': 1, 'lastOpponentAction': 1}
 # configuration =  {'episodeSteps': 10, 'agentTimeout': 60, 'actTimeout': 1, 'runTimeout': 1200, 'isProduction': False, 'signs': 3}
-my_moves    = []
-opp_moves   = []
+greenberg_my_moves    = []
+greenberg_opp_moves   = []
 def greenberg_agent(observation, configuration):
-    global my_moves
-    global opp_moves
+    global greenberg_my_moves
+    global greenberg_opp_moves
     if observation.step > 0:
         opp_move = rps_to_text[ observation.lastOpponentAction ]
-        opp_moves.append( opp_move )
+        greenberg_opp_moves.append(opp_move)
 
-    action_text = player(my_moves, opp_moves)
+    action_text = player(greenberg_my_moves, greenberg_opp_moves)
     action      = rps_to_num[action_text]
 
-    my_moves.append(action_text)
+    greenberg_my_moves.append(action_text)
     return int(action)

@@ -4,21 +4,21 @@
 import random
 import numpy as np
 
-history    = []
-rotn_stats = np.array([ 0, 0, 0 ], dtype=np.float)
+rotn_history    = []
+rotn_stats = np.array([0, 0, 0], dtype=np.float)
 
 # observation   =  {'step': 1, 'lastOpponentAction': 1}
 # configuration =  {'episodeSteps': 10, 'agentTimeout': 60, 'actTimeout': 1, 'runTimeout': 1200, 'isProduction': False, 'signs': 3}
 def anti_rotn(observation, configuration, warmup=10, average='mean', min_weight=2, decay=0.95 ):
     assert average in ['running', 'mean']
-    global history
+    global rotn_history
     global rotn_stats
 
     if observation.step > 0:
-        history.append( observation.lastOpponentAction )
+        rotn_history.append( observation.lastOpponentAction )
 
-    if len(history) >= 2:
-        rotn = (history[-1] - history[-2]) % configuration.signs
+    if len(rotn_history) >= 2:
+        rotn = (rotn_history[-1] - rotn_history[-2]) % configuration.signs
         if average == 'running':
             rotn_stats[ rotn ] += observation.step
         else:

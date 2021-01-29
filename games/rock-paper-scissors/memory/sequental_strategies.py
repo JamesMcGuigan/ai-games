@@ -7,28 +7,28 @@ import random
 
 def get_last_time_result(results=[-1]):
     if isinstance(results, int): results = [ results ]
-    for n in range(len(history['reward'])):
-        if history['reward'][-n] in results: return n
+    for n in range(len(ss_history['reward'])):
+        if ss_history['reward'][-n] in results: return n
     else: return 0
 
 
 def get_streak(results=[-1]):
     if isinstance(results, int): results = [ results ]
-    for n in range(len(history['reward'])):
-        if history['reward'][-n] not in results: return n
+    for n in range(len(ss_history['reward'])):
+        if ss_history['reward'][-n] not in results: return n
     else:
-        return len(history['reward'])
+        return len(ss_history['reward'])
 
 
 def get_previous_streak(results=[-1]):
     if isinstance(results, int): results = [ results ]
-    for n in range(len(history['reward'])):
-        if history['reward'][-n] not in results:
-            for n in range(n+1, len(history['reward'])):
-                if history['reward'][-n] not in results:
+    for n in range(len(ss_history['reward'])):
+        if ss_history['reward'][-n] not in results:
+            for n in range(n+1, len(ss_history['reward'])):
+                if ss_history['reward'][-n] not in results:
                     return n
             else:
-                return len(history['reward'])
+                return len(ss_history['reward'])
     else:
         return 0
 
@@ -36,7 +36,7 @@ def get_previous_streak(results=[-1]):
 action            = 0
 increment_on_lose = 1
 increment_on_turn = 1
-history   = {
+ss_history   = {
     "action":   [],
     "opponent": [],
     "reward":   [],
@@ -48,15 +48,15 @@ def sequential_strategies(observation, configuration, nstreak=2):
     global action
     global increment_on_lose
     global increment_on_turn
-    global history
+    global ss_history
     if observation.step > 0:
-        history['opponent'].append(observation.lastOpponentAction)
+        ss_history['opponent'].append(observation.lastOpponentAction)
         reward = (
-            0 if history['action'][-1] == (history['opponent'][-1]) else
-            1 if history['action'][-1] == (history['opponent'][-1] + 1) % configuration.signs else
+            0 if ss_history['action'][-1] == (ss_history['opponent'][-1]) else
+            1 if ss_history['action'][-1] == (ss_history['opponent'][-1] + 1) % configuration.signs else
             -1
         )
-        history['reward'].append(reward)
+        ss_history['reward'].append(reward)
         lose_streak     = get_streak([-1])
         draw_streak     = get_streak([0, -1])
         previous_streak = get_previous_streak([-1])
@@ -65,9 +65,9 @@ def sequential_strategies(observation, configuration, nstreak=2):
         # print('previous_streak', previous_streak)
 
         # Counter static agent
-        if observation.step > 3 and len(set(history['opponent'])) == 1:
+        if observation.step > 3 and len(set(ss_history['opponent'])) == 1:
             increment_on_turn = 0
-            action = list(set(history['opponent']))[0] + 1
+            action = list(set(ss_history['opponent']))[0] + 1
 
         elif (
                 lose_streak >= nstreak
@@ -76,17 +76,17 @@ def sequential_strategies(observation, configuration, nstreak=2):
             increment_on_turn = random.choice([0,1,2])
             if lose_streak >= nstreak*2:
                 increment_on_lose += 1
-                history['streaks'].append(0)
+                ss_history['streaks'].append(0)
             else:
-                history['streaks'].append(previous_streak)
+                ss_history['streaks'].append(previous_streak)
 
             action += increment_on_lose
 
-            if len(history['streaks']) and previous_streak >= history['streaks'][-1] - 1:
+            if len(ss_history['streaks']) and previous_streak >= ss_history['streaks'][-1] - 1:
                 action += 1
 
 
     action += increment_on_turn
 
-    history['action'].append(action)
+    ss_history['action'].append(action)
     return int(action) % configuration.signs

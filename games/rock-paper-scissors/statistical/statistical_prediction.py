@@ -5,7 +5,7 @@ import random
 from collections import Counter
 
 # Create a small amount of starting history
-history = {
+stat_pred_history = {
     "guess":      [0,1,2],
     "prediction": [0,1,2],
     "expected":   [0,1,2],
@@ -17,32 +17,32 @@ history = {
 # observation   =  {'step': 1, 'lastOpponentAction': 1}
 # configuration =  {'episodeSteps': 1000, 'agentTimeout': 60, 'actTimeout': 1, 'runTimeout': 1200, 'isProduction': False, 'signs': 3}
 def statistical_prediction_agent(observation, configuration, verbose=True):
-    global history
+    global stat_pred_history
     actions          = list(range(configuration.signs))  # [0,1,2]
-    last_action      = history['action'][-1]
-    prev_opp_action  = history['opponent'][-1]
+    last_action      = stat_pred_history['action'][-1]
+    prev_opp_action  = stat_pred_history['opponent'][-1]
     opponent_action  = observation.lastOpponentAction if observation.step > 0 else 2
     rotn             = (opponent_action - prev_opp_action) % configuration.signs
 
-    history['opponent'].append(opponent_action)
-    history['rotn'].append(rotn)
+    stat_pred_history['opponent'].append(opponent_action)
+    stat_pred_history['rotn'].append(rotn)
 
-    # Make weighted random guess based on the complete move history, weighted towards relative moves based on our last action
-    move_frequency   = Counter(history['rotn'])
-    action_frequency = Counter(zip(history['action'], history['rotn']))
+    # Make weighted random guess based on the complete move stat_pred_history, weighted towards relative moves based on our last action
+    move_frequency   = Counter(stat_pred_history['rotn'])
+    action_frequency = Counter(zip(stat_pred_history['action'], stat_pred_history['rotn']))
     move_weights     = [ move_frequency.get(n, 1)
                          + action_frequency.get((last_action,n), 1)
                          for n in range(configuration.signs) ]
     guess            = random.choices( population=actions, weights=move_weights, k=1 )[0]
 
     # Compare our guess to how our opponent actually played
-    guess_frequency  = Counter(zip(history['guess'], history['rotn']))
+    guess_frequency  = Counter(zip(stat_pred_history['guess'], stat_pred_history['rotn']))
     guess_weights    = [ guess_frequency.get((guess,n), 1)
                          for n in range(configuration.signs) ]
     prediction       = random.choices( population=actions, weights=guess_weights, k=1 )[0]
 
     # Repeat, but based on how many times our prediction was correct
-    pred_frequency   = Counter(zip(history['prediction'], history['rotn']))
+    pred_frequency   = Counter(zip(stat_pred_history['prediction'], stat_pred_history['rotn']))
     pred_weights     = [ pred_frequency.get((prediction,n), 1)
                          for n in range(configuration.signs) ]
     expected         = random.choices( population=actions, weights=pred_weights, k=1 )[0]
@@ -60,10 +60,10 @@ def statistical_prediction_agent(observation, configuration, verbose=True):
         is_pure_random_chance = False
 
     # Persist state
-    history['guess'].append(guess)
-    history['prediction'].append(prediction)
-    history['expected'].append(expected)
-    history['action'].append(action)
+    stat_pred_history['guess'].append(guess)
+    stat_pred_history['prediction'].append(prediction)
+    stat_pred_history['expected'].append(expected)
+    stat_pred_history['action'].append(action)
 
     # Print debug information
     if verbose:

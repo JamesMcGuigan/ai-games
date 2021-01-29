@@ -100,11 +100,14 @@ class Simulations():
             expected   = self.predictions[best_agent][0]
             action     = int(expected + 1) % conf.signs
 
-        self.history['action'].insert(0, action)
         if self.verbose:
-            best_score = self.prediction_best_score()
-            time_taken = time.perf_counter() - time_start
-            print(f'time = {time_taken:0.2f} | step = {obs.step:4d} | action = {expected} -> {action} | {best_score:.3f} {best_agent}')
+            best_score    = self.prediction_best_score()
+            last_opponent = (self.history['opponent'] or [self.first_action])[0]
+            win_symbol    = self.win_symbol()
+            time_taken    = time.perf_counter() - time_start
+            print(f'{obs.step:4d} | {time_taken:0.2f}s | {last_opponent}{win_symbol} -> action = {expected} -> {action} | {best_score*100:3.0f}% {best_agent}')
+
+        self.history['action'].insert(0, action)
         return int(action) % conf.signs
 
 
@@ -182,6 +185,19 @@ class Simulations():
         if (action - 0) % 3 == opponent % 3: return  0.5  # draw
         if (action + 1) % 3 == opponent % 3: return  0.0  # loss
         return 0.0
+
+    def last_reward(self):
+        last_action   = (self.history['action']   or [self.first_action])[0]
+        last_opponent = (self.history['opponent'] or [self.first_action])[0]
+        reward        = self.reward_prediction(last_action-1, last_opponent)
+        return reward
+
+    def win_symbol(self):
+        reward = self.last_reward()
+        if reward == 1.0: return '+'
+        if reward == 0.5: return '|'
+        if reward == 0.0: return '-'
+        return '?'
 
 
 simulations_instance = Simulations()

@@ -103,6 +103,7 @@ if __name__ == '__main__':
     }
 
     model = RpsLSTM(hidden_size=128, num_layers=3, dropout=0.25).train()
+    print(model)
     model.load()
     rps_trainer(model, agents, steps=100, lr=1e-4)
     model.save()

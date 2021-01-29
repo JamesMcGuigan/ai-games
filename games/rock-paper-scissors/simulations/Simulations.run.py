@@ -1,3 +1,4 @@
+import contextlib
 import pprint
 import time
 
@@ -16,21 +17,28 @@ opponents  = Simulations.agents
 #     'naive_bayes':   naive_bayes_agent,
 # }
 
+def silent_agent(agent):
+    def inner_agent(obs, conf):
+        with contextlib.redirect_stdout(None):  # disable stdout for child agents
+            return agent(obs, conf)
+    return inner_agent
+
 def simulate(agent_name, agent):
+    print('#'*10 + f' {agent_name} ' + '#'*10)
     simulations_agent = Simulations()
     result = evaluate(
         "rps",
-        [simulations_agent, agent],
+        [simulations_agent, silent_agent(agent)],
         configuration={
             "episodeSteps": 100,
             # "actTimeout":   1000,
         },
         num_episodes=1,
-        debug=False
+        debug=True
     )
     return agent_name, result[0]
 
-results = dict(Parallel(-1)(
+results = dict(Parallel(1)(
     delayed(simulate)(agent_name, agent)
     for agent_name, agent in opponents.items()
 ))

@@ -18,7 +18,7 @@ grpcio==1.32.0            # via tensorboard, tensorflow
 h5py==2.10.0              # via tensorflow
 humanize==3.2.0           # via -r requirements.in
 idna==2.10                # via requests
-joblib==1.0.0             # via scikit-learn
+joblib==1.0.0             # via -r requirements.in, scikit-learn
 kaggle==1.5.10            # via -r requirements.in
 keras-preprocessing==1.1.2  # via tensorflow
 markdown==3.3.3           # via tensorboard

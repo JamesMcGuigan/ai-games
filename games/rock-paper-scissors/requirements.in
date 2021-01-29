@@ -9,3 +9,5 @@ tensorflow
 torch
 xgboost
 xxhash
+
+joblib

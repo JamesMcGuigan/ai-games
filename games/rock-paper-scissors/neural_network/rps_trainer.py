@@ -31,12 +31,14 @@ def rps_trainer(model, agents: Dict, steps=100, max_epochs=10_000, lr=1e-3, log_
         accuracies     = { agent_name: 0.0 for agent_name in agents.keys()}
         running_losses = torch.zeros((1,)).to(model.device)
         for epoch in range(max_epochs):
-            # skip high-accuracy agents more often, but train at least 10% of the time
-            selected_agents = {
-                agent_name: agent
-                for (agent_name, agent) in agents.items()
-                if random.random() + 0.1 >= accuracies[agent_name]
-            }
+            ### skip high-accuracy agents more often, but train at least 10% of the time
+            ### this seems to cause more problems than it solves
+            # selected_agents = {
+            #     agent_name: agent
+            #     for (agent_name, agent) in agents.items()
+            #     if random.random() + 0.1 >= accuracies[agent_name]
+            # }
+            selected_agents = agents
             if len(selected_agents) == 0: continue
 
             scores = Variable(torch.zeros((   len(selected_agents),), requires_grad=True)).to(model.device)

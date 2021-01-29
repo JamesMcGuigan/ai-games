@@ -1,9 +1,15 @@
+# %%writefile RpsLSTM.py
+# Source: https://www.kaggle.com/jamesmcguigan/rock-paper-scissors-lstm/
+# Source: https://github.com/JamesMcGuigan/ai-games/blob/master/games/rock-paper-scissors/neural_network/RpsLSTM.py
+
 import math
 
 import torch
 import torch.nn as nn
-from neural_network.NNBase import NNBase
 import xxhash
+
+from neural_network.NNBase import NNBase
+
 
 # DOCS: https://pytorch.org/tutorials/beginner/nlp/sequence_models_tutorial.html
 # DOCS: https://blog.floydhub.com/long-short-term-memory-from-zero-to-hero-with-pytorch/
@@ -172,10 +178,10 @@ class RpsLSTM(NNBase):
         history = self.encode_history()
 
         x = torch.cat([
-            noise.flatten(),    # noise to simulate randomness
-            step.flatten(),     # predict warmup periods
-            stats.flatten(),    # for statistical bots
-            history.flatten(),  # timeseries history
+            noise.flatten(),    # tensor (3,)            random noise for probablistic moves
+            step.flatten(),     # tensor (7,)            round(log(step)) one-hot encoded - to predict warmup periods
+            stats.flatten(),    # tensor (2,3)           with move frequency percentages
+            history.flatten(),  # tensor (2,3,window=10) one-hot encoded timeseries history
         ])
         x = torch.reshape(x, (1,1,-1))    # (seq_len, batch, input_size)
         return x

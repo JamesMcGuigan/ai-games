@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
+# %%writefile rps_trainer.py
+# Source: https://www.kaggle.com/jamesmcguigan/rock-paper-scissors-lstm/
+# Source: https://github.com/JamesMcGuigan/ai-games/blob/master/games/rock-paper-scissors/neural_network/rps_trainer.py
 
 import random
 import sys
+import time
 from typing import Dict
 
 import torch
@@ -21,7 +25,8 @@ from statistical.statistical_prediction import statistical_prediction_agent
 from tree.multi_stage_decision_tree import decision_tree_agent
 
 
-def rps_trainer(model, agents: Dict, steps=100, max_epochs=10_000, lr=1e-3, log_freq=10):
+def rps_trainer(model, agents: Dict, steps=100, max_epochs=10_000, lr=1e-3, log_freq=10, timeout=0):
+    time_start = time.perf_counter()
     try:
         env   = make("rps", { "episodeSteps": steps }, debug=False)
         optimizer = torch.optim.RMSprop(model.parameters(), lr=lr)
@@ -85,6 +90,9 @@ def rps_trainer(model, agents: Dict, steps=100, max_epochs=10_000, lr=1e-3, log_
                 ])
                 print(f'{epoch:6d} | losses = {running_losses[0].item():.6f} {running_losses[1].item():.6f} | {accuracy_log}')
                 if torch.mean(scores).item() >= (1 - 2/steps): break  # allowed first 2 moves wrong
+
+            if timeout and time.perf_counter() > time_start + timeout:
+                break
 
     except KeyboardInterrupt: pass
 

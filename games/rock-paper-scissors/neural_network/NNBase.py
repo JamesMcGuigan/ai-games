@@ -1,3 +1,7 @@
+# %%writefile NNBase.py
+# Source: https://www.kaggle.com/jamesmcguigan/rock-paper-scissors-lstm/
+# Source: https://github.com/JamesMcGuigan/ai-games/blob/master/games/rock-paper-scissors/neural_network/NNBase.py
+
 from __future__ import annotations
 
 import os

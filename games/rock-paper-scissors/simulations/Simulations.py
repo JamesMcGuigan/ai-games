@@ -1,3 +1,4 @@
+import random
 import time
 from collections import defaultdict
 from operator import itemgetter
@@ -134,12 +135,17 @@ class Simulations():
 
     def pick_best_agent(self) -> str:
         scores     = self.prediction_scores()
-        best_score = float(sorted(scores.items(), key=itemgetter(1), reverse=True)[0][1])
+        best_score = max(scores.values()) if len(scores) else 0.0
         # If we are not confident in our prediction, default to random
-        if best_score < self.confidence:
+        if not best_score or best_score < self.confidence:
             best_agent = 'random'
         else:
-            best_agent = list(scores.items())[0][0]
+            best_agents = [
+                agent_name
+                for agent_name, agent_score in scores.items()
+                if agent_score == best_score
+            ]
+            best_agent = random.choice(best_agents)
         return best_agent
 
     def prediction_scores(self) -> Dict[str, float]:

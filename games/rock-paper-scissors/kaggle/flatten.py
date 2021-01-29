@@ -1,3 +1,4 @@
+# %writefile flatten.py
 # Source: https://www.kaggle.com/tonyrobinson/flatten
 import math
 import random
@@ -61,12 +62,12 @@ class FlattenAgent:
         return(agentAction)
 
 
-flatten_agent = None
-def main(observation, configuration):
-    global flatten_agent
+flatten_instance = None
+def flatten_agent(observation, configuration):
+    global flatten_instance
 
-    if flatten_agent == None:
-        flatten_agent = FlattenAgent()
-        return flatten_agent.move(None, observation.step)
+    if flatten_instance == None:
+        flatten_instance = FlattenAgent()
+        return flatten_instance.move(None, observation.step)
     else:
-        return flatten_agent.move(observation.lastOpponentAction, observation.step)
+        return flatten_instance.move(observation.lastOpponentAction, observation.step)

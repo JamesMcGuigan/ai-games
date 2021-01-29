@@ -3,7 +3,7 @@ import time
 from collections import defaultdict
 from operator import itemgetter
 from typing import Dict, List
-
+import numpy as np
 from kaggle_environments import make
 
 from memory.RPSNaiveBayes import naive_bayes_agent
@@ -48,16 +48,19 @@ class Simulations():
         'naive_bayes':   naive_bayes_agent,
     }
 
-    def __init__(self, decay=0.95, confidence=0.33, first_action=1, verbose=True):
+    def __init__(self, decay=0.95, warmup=10, confidence=0.33, first_action=1, verbose=True):
         self.verbose      = bool(verbose)
         self.decay        = float(decay)
         self.confidence   = float(confidence)
         self.first_action = int(first_action)
+        self.warmup       = int(warmup)
 
         self.step    = 0
         self.history = {
             "opponent": [],
             "action":   [],
+            "agents":   [],
+            "rewards":  [],
         }
         self.envs = {
             agent_name: make("rps", debug=False)
@@ -107,7 +110,9 @@ class Simulations():
             time_taken    = time.perf_counter() - time_start
             print(f'{obs.step:4d} | {time_taken:0.2f}s | {last_opponent}{win_symbol} -> action = {expected} -> {action} | {best_score*100:3.0f}% {best_agent}')
 
+        # ignore the first few moves, as agents may have a random warmup
         self.history['action'].insert(0, action)
+        self.history['agents'].insert(0, best_agent)
         return int(action) % conf.signs
 
 
@@ -118,6 +123,7 @@ class Simulations():
         self.step = obs.step
         if obs.step > 0:
             self.history['opponent'].insert(0, obs.lastOpponentAction % conf.signs)
+            self.history['rewards' ].insert(0, self.last_reward())
 
 
     def update_trainers(self):
@@ -139,11 +145,12 @@ class Simulations():
 
     def pick_best_agent(self) -> str:
         # If we are not confident in our prediction, default to random
-        best_score = self.prediction_best_score()
+        scores       = self.prediction_scores()
+        best_score   = self.prediction_best_score()
+
         if not best_score or best_score < self.confidence:
             best_agent = 'random'
         else:
-            scores = self.prediction_scores()
             best_agents = [
                 agent_name
                 for agent_name, agent_score in scores.items()
@@ -159,8 +166,12 @@ class Simulations():
         return best_score
 
     def prediction_scores(self) -> Dict[str, float]:
-        scores = {
-            agent_name: self.prediction_score(predictions, agent_name)
+        agent_scores = self.agent_scores()  # TODO: question if this helps
+        scores  = {
+            agent_name: (
+                self.prediction_score(predictions, agent_name)
+                * agent_scores.get(agent_name, 1.0)
+            )
             for agent_name, predictions in self.predictions.items()
             if not self.done[agent_name]
         }
@@ -168,15 +179,41 @@ class Simulations():
         return scores
 
     def prediction_score(self, predictions: List[int], agent_name=None) -> float:
+        """
+        Score for how many times an agent predicted the next move correctly
+        Decay means we pay more attention to recent moves
+        in_a_row gives a bonus for predicting multiple moves in a row over 1 in 3 random chance
+        """
         # NOTE: step == 1 | predictions == [1,0] | self.history['opponent'] == [0]
-        rewards = []
-        total   = 0.0
+        rewards  = []
+        total    = 0.0
         for n, prediction in enumerate(predictions[1:]):
-            actual = self.history['opponent'][n]
-            reward = self.reward_prediction(prediction, actual) * (self.decay ** n)
-            total += (self.decay ** n)
+            actual   = self.history['opponent'][n]
+            reward   = self.reward_prediction(prediction, actual)
+            reward  *= (self.decay ** n)
+            total   += (self.decay ** n)
             rewards.append(reward)
-        return sum(rewards) / total if len(rewards) else 0.0
+        reward = sum(rewards) / total if len(rewards) else 0.0
+        return reward
+
+    def agent_scores(self) -> Dict[str, float]:
+        """
+        This reports how many times each agent was correct when actually used
+        agents scores are potentially questionable, and reduce the average confidence score downwards
+        """
+        rewards = defaultdict(list)
+        totals  = defaultdict(float)
+        for n, (agent_name, reward) in enumerate(zip(self.history['agents'], self.history['rewards'])):
+            reward             *= (self.decay ** n)
+            totals[agent_name] += (self.decay ** n)
+            rewards[agent_name].insert(0, reward)
+
+        # Always give a minimum 50% chance for any agent
+        rewards = { agent_name: (np.mean(reward) / totals[agent_name]) / 2 + 0.5
+                    for agent_name, reward in rewards.items() }
+        rewards = { agent_name: reward / max(rewards.values())
+                    for agent_name, reward in rewards.items() }
+        return rewards
 
     def reward_prediction(self, prediction: int, actual: int) -> float:
         action   = (prediction + 1) % 3

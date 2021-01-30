@@ -1,5 +1,6 @@
 # %%writefile multi_armed_bandit.py
 # Source: https://www.kaggle.com/jamesmcguigan/rock-paper-scissors-multi-armed-bandit/
+import contextlib
 import os
 from collections import defaultdict
 import numpy as np
@@ -8,47 +9,57 @@ from operator import itemgetter
 
 from memory.memory_patterns import memory_patterns_agent
 from memory.RPSNaiveBayes import naive_bayes_agent
-from rng.random_seed_search import random_agent
+from rng.random_agent import random_agent
+from roshambo_competition.anti_rotn import anti_rotn
 from roshambo_competition.greenberg import greenberg_agent
 from roshambo_competition.iocaine_powder import iocaine_agent
+from simple.anti_pi import anti_pi_agent
 from statistical.statistical_prediction import statistical_prediction_agent
 # from simple.anti_pi import anti_pi_agent
 # from simple.pi import pi_agent
 
-mlb_opponent = []
+mlb_history  = {
+    'actions':  [],
+    'opponent': []
+}
 mlb_expected = defaultdict(list)
 mlb_agents   = {
-    # 'random':               (lambda obs, conf: random_agent(obs, conf)),
-    # 'pi':                   (lambda obs, conf: pi_agent(obs, conf)),
-    # 'anti_pi':              (lambda obs, conf: anti_pi_agent(obs, conf)),
-    # 'anti_anti_pi':         (lambda obs, conf: anti_anti_pi_agent(obs, conf)),
-    # 'reactionary':          (lambda obs, conf: reactionary(obs, conf)),
-    # 'anti_rotn':            (lambda obs, conf: anti_rotn(obs, conf, warmup=1)),
+    #     'random':               (lambda obs, conf: random_agent(obs, conf)),
+    #     'pi':                   (lambda obs, conf: pi_agent(obs, conf)),
+    'anti_pi':               (lambda obs, conf: anti_pi_agent(obs, conf)),
+    #     'anti_anti_pi':         (lambda obs, conf: anti_anti_pi_agent(obs, conf)),
+    #     'reactionary':          (lambda obs, conf: reactionary(obs, conf)),
+    'anti_rotn':            (lambda obs, conf: anti_rotn(obs, conf, warmup=1)),
 
-    # 'iou2':                  (lambda obs, conf: iou2_agent(obs, conf)),
-    # 'geometry':              (lambda obs, conf: geometry_agent(obs, conf)),
-    # 'memory_patterns_v20':   (lambda obs, conf: memory_patterns_v20(obs, conf)),
-    # 'testing_please_ignore': (lambda obs, conf: testing_please_ignore(obs, conf)),
-    # 'bumblepuppy':           (lambda obs, conf: centrifugal_bumblepuppy(obs, conf)),
-    # 'dllu1_agent':           (lambda obs, conf: dllu1_agent(obs, conf)),
+    'iou2':                  (lambda obs, conf: iou2_agent(obs, conf)),
+    'geometry':              (lambda obs, conf: geometry_agent(obs, conf)),
+    'memory_patterns_v20':   (lambda obs, conf: memory_patterns_v20(obs, conf)),
+    'testing_please_ignore': (lambda obs, conf: testing_please_ignore(obs, conf)),
+    'bumblepuppy':           (lambda obs, conf: centrifugal_bumblepuppy(obs, conf)),
+    'dllu1_agent':           (lambda obs, conf: dllu1_agent(obs, conf)),
 
-    'memory_patterns':       (lambda obs, conf: memory_patterns_agent(obs, conf)),
-    'naive_bayes':           (lambda obs, conf: naive_bayes_agent(obs, conf)),
+    'genetics':              (lambda obs, conf: genetics_choice(obs, conf)),
+    'flatten':               (lambda obs, conf: flatten_agent(obs, conf)),
+    'transition':            (lambda obs, conf: transition_agent(obs, conf)),
+    # 'kumoko':                (lambda obs, conf: kumoko_agent(obs, conf)), # broken    
+
+    'memory_patterns':       (lambda obs, conf: memory_patterns(obs, conf)),
+    'naive_bayes':           (lambda obs, conf: naive_bayes(obs, conf)),
     'iocaine':               (lambda obs, conf: iocaine_agent(obs, conf)),
     'greenberg':             (lambda obs, conf: greenberg_agent(obs, conf)),
     'statistical':           (lambda obs, conf: statistical_prediction_agent(obs, conf)),
-    # 'statistical_expected':  (lambda obs, conf: statistical_history['expected'][-1] + 1),
+    'statistical_expected':  (lambda obs, conf: statistical_history['expected'][-1] + 1),
     # 'decision_tree_1':       (lambda obs, conf: decision_tree_agent_1(obs, conf, stages=1, window=20)),
-    # 'decision_tree_2':       (lambda obs, conf: decision_tree_agent_2(obs, conf, stages=2, window=6)),
-    # 'decision_tree_3':       (lambda obs, conf: decision_tree_agent_3(obs, conf, stages=3, window=10)),
-    # 'random_seed_search':    (lambda obs, conf: random_seed_search_agent(obs, conf)),
+    'decision_tree_2':       (lambda obs, conf: decision_tree_agent_2(obs, conf, stages=2, window=6)),
+    'decision_tree_3':       (lambda obs, conf: decision_tree_agent_3(obs, conf, stages=3, window=10)),
+    #'random_seed_search':    (lambda obs, conf: random_seed_search_agent(obs, conf)),
 }
 
 # observation   = {'step': 1, 'lastOpponentAction': 1}
 # configuration = {'episodeSteps': 10, 'agentTimeout': 60, 'actTimeout': 1, 'runTimeout': 1200, 'isProduction': False, 'signs': 3}
-def multi_armed_bandit_agent(observation, configuration, warmup=1, step_reward=3, decay_rate=0.95 ):
+def multi_armed_bandit_agent(observation, configuration, warmup=1, step_reward=3, decay_rate=0.95, verbose=True ):
     global mlb_expected
-    global mlb_opponent
+    global mlb_history
     global mlb_agents
     time_start = time.perf_counter()
     if os.environ.get('KAGGLE_KERNEL_RUN_TYPE', 'Localhost') == 'Interactive':
@@ -56,38 +67,39 @@ def multi_armed_bandit_agent(observation, configuration, warmup=1, step_reward=3
 
 
     if observation.step != 0:
-        mlb_opponent += [ observation.lastOpponentAction ]
+        mlb_history['opponent'] += [ observation.lastOpponentAction ]
     # else:
-    #     mlb_opponent += [ random_agent(observation, configuration) ]
+    #     mlb_history['opponent'] += [ random_agent(observation, configuration) ]
 
 
     # Implement Multi Armed Bandit Logic
     win_loss_scores = defaultdict(lambda: [0.0, 0.0])
     for name, values in list(mlb_expected.items()):
-        for n in range(min(len(values), len(mlb_opponent))):
+        for n in range(min(len(values), len(mlb_history['opponent']))):
             win_loss_scores[name][1] = (win_loss_scores[name][1] - 1) * decay_rate + 1
             win_loss_scores[name][0] = (win_loss_scores[name][0] - 1) * decay_rate + 1
 
             # win | expect rock, play paper -> opponent plays rock
-            if   mlb_expected[name][n] == (mlb_opponent[n] + 0) % configuration.signs:
+            if   mlb_expected[name][n] == (mlb_history['opponent'][n] + 0) % configuration.signs:
                 win_loss_scores[name][0] += step_reward
 
                 # draw | expect rock, play paper -> opponent plays paper
-            elif mlb_expected[name][n] == (mlb_opponent[n] + 1) % configuration.signs:
+            elif mlb_expected[name][n] == (mlb_history['opponent'][n] + 1) % configuration.signs:
                 win_loss_scores[name][0] += step_reward
                 win_loss_scores[name][1] += step_reward
 
                 # win | expect rock, play paper -> opponent plays scissors
-            elif mlb_expected[name][n] == (mlb_opponent[n] + 2) % configuration.signs:
+            elif mlb_expected[name][n] == (mlb_history['opponent'][n] + 2) % configuration.signs:
                 win_loss_scores[name][1] += step_reward
 
 
     # Update predictions for next turn
     for name, agent_fn in list(mlb_agents.items()):
         try:
-            agent_action        = agent_fn(observation, configuration)
-            agent_expected      = (agent_action - 1) % configuration.signs
-            mlb_expected[name] += [ agent_expected ]
+            with contextlib.redirect_stdout(None):  # disable stdout for child agents
+                agent_action        = agent_fn(observation, configuration)
+                agent_expected      = (agent_action - 1) % configuration.signs
+                mlb_expected[name] += [ agent_expected ]
         except Exception as exception:
             print('Exception:', name, agent_fn, exception)
 
@@ -114,12 +126,17 @@ def multi_armed_bandit_agent(observation, configuration, warmup=1, step_reward=3
     action = (expected + 1) % configuration.signs
 
 
-    time_taken = time.perf_counter() - time_start
-    print(f'opponent        = ', mlb_opponent)
-    print(f'expected        = ', dict(mlb_expected),    '\n')
-    print(f'win_loss_scores = ', dict(win_loss_scores), '\n')
-    print(f'beta_scores     = ', dict(beta_scores),     '\n')
-    print(f'action          =  {action} | agent = {agent_name} | step = {observation.step} | {time_taken:.3f}s')
-    print('-'*20, '\n')
+    if verbose:
+        best_score    = beta_scores.get(agent_name,0)
+        last_opponent = (mlb_history['opponent'] or [0])[-1]
+        win_symbol    = (
+            ' ' if observation.step == 0 else
+            '+' if mlb_history['actions'][-1] == (mlb_history['opponent'][-1] + 1) % 3 else
+            '|' if mlb_history['actions'][-1] == (mlb_history['opponent'][-1] + 0) % 3 else
+            '-'
+        )
+        time_taken    = time.perf_counter() - time_start
+        print(f'{observation.step:4d} | {time_taken:0.2f}s | {last_opponent}{win_symbol} -> action = {expected} -> {action} | {best_score*100:3.0f}% {agent_name}')
 
+    mlb_history['actions'] += [ action ]
     return int(action)

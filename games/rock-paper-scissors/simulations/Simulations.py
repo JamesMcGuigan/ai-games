@@ -48,13 +48,14 @@ class Simulations():
         'naive_bayes':   naive_bayes_agent,
     }
 
-    def __init__(self, decay=0.95, warmup=10, confidence=0.33, first_action=1, verbose=True):
+    def __init__(self, decay=0.95, warmup=10, confidence=0.5, use_agent_scores=False, verbose=True):
         self.verbose      = bool(verbose)
         self.decay        = float(decay)
         self.confidence   = float(confidence)
-        self.first_action = int(first_action)
         self.warmup       = int(warmup)
+        self.use_agent_scores = bool(use_agent_scores)
 
+        self.first_action = 1
         self.step    = 0
         self.history = {
             "opponent": [],
@@ -166,7 +167,7 @@ class Simulations():
         return best_score
 
     def prediction_scores(self) -> Dict[str, float]:
-        agent_scores = self.agent_scores()  # TODO: question if this helps
+        agent_scores = self.agent_scores() if self.use_agent_scores else {}
         scores  = {
             agent_name: (
                 self.prediction_score(predictions, agent_name)

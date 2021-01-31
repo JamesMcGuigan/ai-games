@@ -27,29 +27,12 @@ class IrrationalSearchAgent(IrrationalAgent):
     """
 
     def __init__(self, name='irrational', irrational=None, search: List[Union[str, mp.mpf]]=None, verbose=True):
-        super().__init__(name=name, irrational=irrational, verbose=verbose)
-
         search = {
             f'irrational#{n}': self.encode_irrational(number)
             for n, number in enumerate(search)
         } if search is not None else {}
         self.irrationals = { **self.__class__.irrationals, **search }
-        self.history = {
-            "action":   [],
-            "opponent": []
-        }
-
-
-    def agent(self, obs, conf):
-        """ Wrapper function for setting state """
-        if obs.step > 0:
-            self.history['opponent'].append(obs.lastOpponentAction)
-
-        action = self.action(obs, conf)
-        action = int(action) % conf.signs
-
-        self.history['action'].append(action)
-        return action
+        super().__init__(name=name, irrational=irrational, verbose=verbose)
 
 
     def action(self, obs, conf):
@@ -58,38 +41,31 @@ class IrrationalSearchAgent(IrrationalAgent):
             action   = (expected + 1) % conf.signs
             opponent = ( self.history['opponent'] or [None] )[-1]
             if self.verbose:
-                print(f"{obs.step:4d} | Found Irrational: {irrational_name} | "
-                      f"{opponent}{self.win_symbol()} > action {expected} -> {action}")
+                print(f"{obs.step:4d} | {opponent}{self.win_symbol()} > action {expected} -> {action} | " +
+                      f"Found Irrational: {irrational_name}")
         else:
             action = super().action(obs, conf)  # play our own irrational number sequence
         return action
 
 
-    @classmethod
-    def search_irrationals(cls, sequence: List[int]) -> Tuple[int, str]:
+    def search_irrationals(self, sequence: List[int]) -> Tuple[int, str]:
         """
         Search through list of named irrational sequences
         if found, return the next expected number in the sequence along with the name
         """
         expected, irrational_name = None, None
-        for irrational_name, irrational in cls.irrationals.items():
-            if irrational[:len(sequence)] == sequence:
-                expected = irrational[len(sequence)+1]
+        if len(sequence):
+            for offset in [0,1,2]:
+                for irrational_name, irrational in self.irrationals.items():
+                    irrational = [ (n + offset) % 3 for n in irrational[:len(sequence)+1] ]
+                    if irrational[:len(sequence)] == sequence:
+                        expected = irrational[len(sequence)]
+                        break
+                else: continue
                 break
         return expected, irrational_name
 
 
-    ### Utility
-
-    def win_symbol(self):
-        """ Symbol representing the reward from the previous turn """
-        action   = ( self.history['action']   or [None] )[-1]
-        opponent = ( self.history['opponent'] or [None] )[-1]
-        if isinstance(action, int) and isinstance(opponent, int):
-            if action % 3 == (opponent + 1) % 3: return '+'  # win
-            if action % 3 == (opponent + 0) % 3: return '|'  # draw
-            if action % 3 == (opponent - 1) % 3: return '-'  # loss
-        return ' '
 
 
 

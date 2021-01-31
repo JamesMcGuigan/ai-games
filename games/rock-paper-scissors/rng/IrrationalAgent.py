@@ -16,6 +16,9 @@ def encode_irrational(irrational: Union[str,mp.mpf], offset=0) -> List[int]:
     The irrational is converted to a string, "0"s are removed
     Then each of the digits is converted to an integer % 3 and added the to sequence
     """
+    if isinstance(irrational, list) and all([ 0 <= n <= 2 for n in irrational ]):
+        return irrational  # prevent double encoding
+
     string   = re.sub('[^1-9]', '', str(irrational))
     sequence = [
         ( int(c) + int(offset) ) % 3
@@ -47,8 +50,7 @@ class IrrationalAgent():
     """
 
     irrationals = {
-        (f'{name}+{offset}' if offset else name): encode_irrational(irrational, offset=offset)
-        for offset in [0,1,2]
+        name: encode_irrational(irrational)
         for name, irrational in {
             'pi':       mp.pi(),
             'phi':      mp.phi(),
@@ -68,35 +70,65 @@ class IrrationalAgent():
 
     def __init__(self, name='irrational', irrational: Union[str,mp.mpf] = None, offset=0, verbose=True):
         # Irrational numbers are pure random sequences that are immune to random seed search
-        # DOCS: https://mpmath.org/doc/current/functions/constants.html
-        name = name or 'irrational'
-        if irrational is None:
-            if name == 'irrational':
-                irrational = self.generate_secure_irrational()
-            else:
-                assert name in self.irrationals.keys()
-                irrational = self.irrationals[name]
+        # Using name == 'irrational' causes the number to be reset each new game
+        if irrational is not None and ( name == 'irrational' or name in self.irrationals.keys() ):
+            name = 'secret'
+        if name in self.irrationals.keys():
+            irrational = self.irrationals[name]
+        self.irrational = self.encode_irrational(irrational, offset=offset)
 
         self.name       = name
         self.offset     = offset
-        self.irrational = self.encode_irrational(irrational, offset=offset)
         self.verbose    = verbose
+        self.reset()
+
+
+    def reset(self):
+        """
+        Reset on the first turn of every new game
+        This allows a single instance to be run in a loop for testing
+        """
+        self.history = {
+            "action":   [],
+            "opponent": []
+        }
+        if self.name == 'irrational':
+            self.irrational = self.encode_irrational(None, offset=self.offset)
+
 
 
     def __call__(self, obs, conf):
         return self.agent(obs, conf)
 
-
     def agent(self, obs, conf):
         """ Wrapper function for setting state in child classes """
-        return self.action(obs, conf)
+
+        # Generate a new history and irrational seed for each new game
+        if obs.step == 0:
+            self.reset()
+
+        # Keep a record of opponent and action state
+        if obs.step > 0:
+            self.history['opponent'].append(obs.lastOpponentAction)
+
+        # This is where the subclassable agent logic happens
+        action = self.action(obs, conf)
+
+        # Keep a record of opponent and action state
+        self.history['action'].append(action)
+        return action
 
 
     def action(self, obs, conf):
         """ Play the next digit in a fixed irrational sequence """
-        action = int(self.irrational[ obs.step % len(self.irrational) ]) % conf.signs
+        action = int(self.irrational[ obs.step % len(self.irrational) ])
+        action = (action + self.offset) % conf.signs
         if self.verbose:
-            print(f'{obs.step:4d} | {self.__class__.__name__} {self.name}[{obs.step}] = {action}')
+            name = self.__class__.__name__ + ':' + self.name + (f'+{self.offset}' if self.offset else '')
+            opponent = ( self.history['opponent'] or [None] )[-1]
+            expected = ( action - 1 ) % 3
+            print(f"{obs.step:4d} | {opponent}{self.win_symbol()} > action {action} | " +
+                  f"{name}")
         return action
 
 
@@ -112,9 +144,25 @@ class IrrationalAgent():
         return irrational
 
 
-    @staticmethod
-    def encode_irrational(irrational: Union[str,mp.mpf], offset=0) -> List[int]:
+    @classmethod
+    def encode_irrational(cls, irrational: Union[str,mp.mpf], offset=0) -> List[int]:
+        if irrational is None:
+            irrational = cls.generate_secure_irrational()
         return encode_irrational(irrational, offset)
+
+
+
+    ### Logging
+
+    def win_symbol(self):
+        """ Symbol representing the reward from the previous turn """
+        action   = ( self.history['action']   or [None] )[-1]
+        opponent = ( self.history['opponent'] or [None] )[-1]
+        if isinstance(action, int) and isinstance(opponent, int):
+            if action % 3 == (opponent + 1) % 3: return '+'  # win
+            if action % 3 == (opponent + 0) % 3: return '|'  # draw
+            if action % 3 == (opponent - 1) % 3: return '-'  # loss
+        return ' '
 
 
 irrational_instance = IrrationalAgent(name='pi', offset=0)

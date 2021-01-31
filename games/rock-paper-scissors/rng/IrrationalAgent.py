@@ -73,6 +73,8 @@ class IrrationalAgent():
         # Using name == 'irrational' causes the number to be reset each new game
         if irrational is not None and ( name == 'irrational' or name in self.irrationals.keys() ):
             name = 'secret'
+        if name == 'irrational':
+            irrational = self.generate_secure_irrational()
         if name in self.irrationals.keys():
             irrational = self.irrationals[name]
         self.irrational = self.encode_irrational(irrational, offset=offset)
@@ -93,7 +95,8 @@ class IrrationalAgent():
             "opponent": []
         }
         if self.name == 'irrational':
-            self.irrational = self.encode_irrational(None, offset=self.offset)
+            irrational      = self.generate_secure_irrational()
+            self.irrational = self.encode_irrational(irrational, offset=self.offset)
 
 
 

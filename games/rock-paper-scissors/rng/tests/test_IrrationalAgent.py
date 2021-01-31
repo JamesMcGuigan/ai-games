@@ -11,23 +11,30 @@ def test_Irrational_new_seed_each_game():
         and that it will generate a new irrational number for each game """
 
     episodeSteps = 10
+    agents = [
+        IrrationalAgent(),
+        IrrationalAgent()
+    ]
+    irrationals = [
+        agents[0].irrational,
+        agents[1].irrational
+    ]
+    assert agents[0].irrational != agents[1].irrational
+
     results = evaluate(
         "rps",
-        [
-            IrrationalAgent(),
-            IrrationalAgent()
-        ],
+        agents,
         configuration={
             "episodeSteps": episodeSteps,
             # "actTimeout":   1000,
         },
-        num_episodes=100,
+        num_episodes=1,
         # debug=True  # pull request
     )
-    results = np.array(results).reshape((-1,2))
-    assert len(np.unique(results[:,0])) >= 3, results
-    assert len(np.unique(results[:,1])) >= 3, results
-
+    assert agents[0].irrational != agents[1].irrational
+    assert agents[0].irrational != irrationals[0]
+    assert agents[0].irrational != irrationals[1]
+    assert agents[1].irrational != irrationals[1]
 
 
 @pytest.mark.parametrize("name",   IrrationalAgent.irrationals.keys())

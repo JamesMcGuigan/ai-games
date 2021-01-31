@@ -1,4 +1,4 @@
-# %%writefile test_irrational.py
+# %%writefile test_IrrationalAgent.py
 import numpy as np
 import pytest
 from kaggle_environments import evaluate
@@ -22,7 +22,7 @@ def test_Irrational_new_seed_each_game():
             # "actTimeout":   1000,
         },
         num_episodes=100,
-        debug=True
+        # debug=True  # pull request
     )
     results = np.array(results).reshape((-1,2))
     assert len(np.unique(results[:,0])) >= 3, results
@@ -45,7 +45,7 @@ def test_Irrational_vs_offset(name, offset):
             "episodeSteps": episodeSteps,
             # "actTimeout":   1000,
         },
-        debug=True
+        # debug=True  # pull request
     )
     assert (results[0][0] + episodeSteps/2.1) < results[0][1], results
 
@@ -65,7 +65,7 @@ def test_Irrational_vs_Irrational():
             # "actTimeout":   1000,
         },
         num_episodes=100,
-        debug=True,
+        # debug=True,  # pull request
     )
     results = np.array(results).reshape((-1,2))
     totals  = np.mean(results, axis=0)

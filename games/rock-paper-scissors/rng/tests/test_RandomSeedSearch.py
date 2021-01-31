@@ -1,4 +1,4 @@
-# %%writefile test_random_seed_search.py
+# %%writefile test_RandomSeedSearch.py
 import numpy as np
 import pytest
 from kaggle_environments import evaluate
@@ -25,7 +25,7 @@ def test_RandomSeedSearch_vs_named_irrational(name, offset):
             "episodeSteps": episodeSteps,
             # "actTimeout":   1000,
         },
-        debug=True
+        # debug=True  # pull request
     )
     assert (results[0][0] + episodeSteps/2.1) < results[0][1]
 
@@ -44,7 +44,7 @@ def test_RandomSeedSearch_vs_seeded_rng():
             "episodeSteps": episodeSteps,
             # "actTimeout":   1000,
         },
-        debug=True
+        # debug=True  # pull request
     )
     assert (results[0][0] + episodeSteps/2.1) < results[0][1], results
 
@@ -65,7 +65,7 @@ def test_RandomSeedSearch_vs_Irrational():
             # "actTimeout":   1000,  # Prevent Multiprocessing TimeoutError
         },
         num_episodes=10,
-        debug=True,
+        # debug=True,  # pull request
     )
     results = np.array(results).reshape((-1,2))
     totals  = np.mean(results, axis=0)
@@ -101,7 +101,7 @@ def test_RandomSeedSearch_vs_unseeded_RNG():
             # "actTimeout":   1000,  # Prevent Multiprocessing TimeoutError
         },
         num_episodes=10,
-        debug=True,
+        # debug=True,  # pull request
     )
     results = np.array(results).reshape((-1,2))
     totals  = np.mean(results, axis=0)

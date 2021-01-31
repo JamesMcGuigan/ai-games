@@ -1,4 +1,4 @@
-# %%writefile irrational_search.py
+# %%writefile IrrationalSearchAgent.py
 # Source: https://www.kaggle.com/jamesmcguigan/random-seed-search-irrational-search-agent/
 # Source: https://github.com/JamesMcGuigan/ai-games/blob/master/games/rock-paper-scissors/rng/IrrationalSearchAgent.py
 from typing import List, Tuple, Union

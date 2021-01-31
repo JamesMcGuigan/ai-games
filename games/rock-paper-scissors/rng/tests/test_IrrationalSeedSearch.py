@@ -1,4 +1,4 @@
-# %%writefile test_irrational_search.py
+# %%writefile test_IrrationalSeedSearch.py
 import pytest
 from kaggle_environments import evaluate
 
@@ -39,7 +39,7 @@ def test_IrrationalSearchAgent_vs_Irrational():
             # "actTimeout":   1000,
         },
         num_episodes=100,
-        debug=True,
+        # debug=True, # pull request
     )
     results = np.array(results).reshape((-1,2))
     totals  = np.mean(results, axis=0)

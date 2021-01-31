@@ -95,5 +95,5 @@ class IrrationalSearchAgent(IrrationalAgent):
 
 
 irrational_search_instance = IrrationalSearchAgent()
-def irrational_agent(obs, conf):
+def irrational_search_agent(obs, conf):
     return irrational_search_instance.agent(obs, conf)

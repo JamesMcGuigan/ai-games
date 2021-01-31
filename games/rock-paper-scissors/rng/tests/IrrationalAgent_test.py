@@ -4,7 +4,6 @@ import pytest
 from kaggle_environments import evaluate
 
 from rng.IrrationalAgent import IrrationalAgent
-from rng.IrrationalSearchAgent import IrrationalSearchAgent
 
 
 def test_Irrational_new_seed_each_game():
@@ -31,7 +30,7 @@ def test_Irrational_new_seed_each_game():
 
 
 
-@pytest.mark.parametrize("name",   IrrationalSearchAgent.irrationals.keys())
+@pytest.mark.parametrize("name",   IrrationalAgent.irrationals.keys())
 @pytest.mark.parametrize("offset", [0,1,2])
 def test_Irrational_vs_offset(name, offset):
     """ Assert we can find the full irrational sequence every time """

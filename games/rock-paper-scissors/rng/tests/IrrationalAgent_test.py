@@ -1,3 +1,4 @@
+# %%writefile test_irrational.py
 import numpy as np
 import pytest
 from kaggle_environments import evaluate

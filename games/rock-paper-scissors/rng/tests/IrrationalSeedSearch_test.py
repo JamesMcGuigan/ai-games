@@ -1,3 +1,4 @@
+# %%writefile test_irrational_search.py
 import pytest
 from kaggle_environments import evaluate
 

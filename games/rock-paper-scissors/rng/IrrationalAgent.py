@@ -1,4 +1,4 @@
-# %%writefile main.py
+# %%writefile irrational.py
 # Source: https://www.kaggle.com/jamesmcguigan/random-seed-search-irrational-agent/
 # Source: https://github.com/JamesMcGuigan/ai-games/blob/master/games/rock-paper-scissors/rng/IrrationalAgent.py
 

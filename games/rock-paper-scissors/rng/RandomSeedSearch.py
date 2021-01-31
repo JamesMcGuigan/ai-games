@@ -1,4 +1,4 @@
-# %%writefile main.py
+# %%writefile random_seed_search.py
 # Source: https://www.kaggle.com/jamesmcguigan/random-seed-search-nash-equilibrium-opening-book/
 # Source: https://github.com/JamesMcGuigan/ai-games/blob/master/games/rock-paper-scissors/rng/RandomSeedSearch.py
 

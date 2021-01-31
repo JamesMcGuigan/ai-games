@@ -1,6 +1,8 @@
 # %%writefile main.py
 # Source: https://www.kaggle.com/jamesmcguigan/rock-paper-scissors-random-seed-search/
 # Source: https://github.com/JamesMcGuigan/ai-games/blob/master/games/rock-paper-scissors/rng/random_seed_search.py
+# NOTE: this is the old implementation written as a single function
+#       see RandomSeedSearch() for a refactored class based implementation
 
 import os
 import random
@@ -25,11 +27,11 @@ tf.random.set_seed(opponent_seed)
 # DOCS: https://mpmath.org/doc/current/functions/constants.html
 mp.dps      = 1234  # slightly more than 1000 as 10%+ of chars will be dropped
 irrationals = {
-    f'{name}+{n}': list(map(
-        lambda c: (int(c)+n) % 3,
-        re.sub('[^1-9]', '', str(irrational))
-    ))[:1000]
-    for n in [0,1,2]
+    (f'{name}+{offset}' if offset else name): [
+        ( int(c) + int(offset) ) % 3
+        for c in re.sub('[^1-9]', '', str(irrational))
+    ]
+    for offset in [0,1,2]
     for name, irrational in {
         'pi':        mp.pi(),
         'phi':       mp.phi(),
@@ -71,30 +73,30 @@ cache = {
 def get_rng_sequence(seed, length, method='random', use_cache=True) -> List[int]:
     # Use cached results to avoid interfering with opponents RNG
     # Avoid using the RNG during runtime, to prevent affecting opponents RNG
-    guess = []
+    sequence = []
     if ( use_cache
      and method in cache.keys()
      and seed   < cache[method].shape[0]
      and length < cache[method].shape[1]
     ):
-        guess = cache[method][seed][:length]
+        sequence = cache[method][seed][:length]
     else:
         # If the results are not in the cache
         # then ensure we save and restore the random seed state to avoid affecting opponent's RNG
         if method == 'random':
             seed_state = random.getstate()
             random.seed(seed)
-            guess = [ random.randint(0,2) for n in range(length) ]
+            sequence = [ random.randint(0,2) for _ in range(length) ]
             random.setstate(seed_state)
         elif method == 'np':
             seed_state = np.random.get_state()
             np.random.seed(seed)
-            guess = np.random.randint(0,2, length)
+            sequence = np.random.randint(0,2, length)
             np.random.set_state(seed_state)
         elif method == 'tf':
             generator = tf.random.Generator.from_seed(seed)
-            guess = generator.uniform((length,), minval=0, maxval=3, dtype=tf.dtypes.int32).numpy()
-    return list(guess)
+            sequence = generator.uniform((length,), minval=0, maxval=3, dtype=tf.dtypes.int32).numpy()
+    return list(sequence)
 
 
 def random_seed_search(history: List[int], method='random', min_sequence=5) -> Tuple[int, int]:
@@ -195,52 +197,51 @@ def random_seed_search_agent(observation, configuration, warmup=0, seeds_per_tur
                 best_solution = (seed, method, offset, spin)
                 print(f'Reused Seed: {best_solution} | {opponent_action}{win_symbol(opponent_action)} > action = {prediction} -> {action} | {solutions}')
                 return int(action)
-        else:
-            # BUG: not finding seed 42 | TODO: debug
-            # Perform the search as a vectorized operation inside the numpy loop
-            for method in methods:
-                seed, expected = random_seed_search(history, method)
-                min_seed       = cache_seeds
-                if expected is not None:
-                    prediction = expected
-                    action     = (prediction + 1) % configuration.signs
-                    offset     = 0
-                    spin       = 0
-                    solution   = (seed, method, offset, spin)
-                    solutions += [ solution ]
 
-                    print(f'Found Seed: {seed} | {opponent_action}{win_symbol(opponent_action)} > action = {prediction} -> {action} | {solutions}')
-                    return int(action)
+        # Perform the search as a vectorized operation inside the numpy loop
+        for method in methods:
+            seed, expected = random_seed_search(history, method)
+            min_seed       = cache_seeds
+            if expected is not None:
+                prediction = expected
+                action     = (prediction + 1) % configuration.signs
+                offset     = 0
+                spin       = 0
+                solution   = (seed, method, offset, spin)
+                solutions += [ solution ]
+
+                print(f'Found Seed: {seed} | {opponent_action}{win_symbol(opponent_action)} > action = {prediction} -> {action} | {solutions}')
+                return int(action)
 
 
-            # # This is the old slow way of doing the search
-            # # Continue search for seeds until timeout
-            # # loop_count = int( seeds_per_turn / len(methods) / len(history) )
-            # loop_count  = cache_seeds
-            # spin        = 0  # disable slows things down
-            # max_offset  = 0  # disable slows things down
-            # max_history = min( len(history), cache_steps )
-            # for seed in range(min_seed, min_seed + loop_count):
-            #     for method in methods:
-            #         guess      = get_rng_sequence(length=len(history)+1, seed=seed, method=method)
-            #         prediction = guess[-1]
-            #         for offset in range(0, max_offset+1):  # Check for off by one sequences
-            #             if guess[:max_history-offset] == history[offset:offset+max_history]:
-            #                 solution   = (seed, method, offset, spin)
-            #                 solutions += [ solution ]
-            #                 action     = (prediction + 1) % configuration.signs
-            #                 print(f'Found Seed: {best_solution} | {opponent_action}{win_symbol(opponent_action)} > action = {prediction} -> {action}')
-            #                 return int(action)
-            #                 break
-            # min_seed += 1
-            #
-            # # Only loop over the seeds within the cache
-            # # This avoids touching the opponents RNG at runtime
-            # # The cache is sufficently large that this will take a while
-            # if seed >= cache_seeds:
-            #     min_seed = 0
-            #     break
-            # if time.perf_counter() > time_end: break
+        # # This is the old slow way of doing the search
+        # # Continue search for seeds until timeout
+        # # loop_count = int( seeds_per_turn / len(methods) / len(history) )
+        # loop_count  = cache_seeds
+        # spin        = 0  # disable slows things down
+        # max_offset  = 0  # disable slows things down
+        # max_history = min( len(history), cache_steps )
+        # for seed in range(min_seed, min_seed + loop_count):
+        #     for method in methods:
+        #         guess      = get_rng_sequence(length=len(history)+1, seed=seed, method=method)
+        #         prediction = guess[-1]
+        #         for offset in range(0, max_offset+1):  # Check for off by one sequences
+        #             if guess[:max_history-offset] == history[offset:offset+max_history]:
+        #                 solution   = (seed, method, offset, spin)
+        #                 solutions += [ solution ]
+        #                 action     = (prediction + 1) % configuration.signs
+        #                 print(f'Found Seed: {best_solution} | {opponent_action}{win_symbol(opponent_action)} > action = {prediction} -> {action}')
+        #                 return int(action)
+        #                 break
+        # min_seed += 1
+        #
+        # # Only loop over the seeds within the cache
+        # # This avoids touching the opponents RNG at runtime
+        # # The cache is sufficently large that this will take a while
+        # if seed >= cache_seeds:
+        #     min_seed = 0
+        #     break
+        # if time.perf_counter() > time_end: break
 
     except Exception as exception:
         print(exception)

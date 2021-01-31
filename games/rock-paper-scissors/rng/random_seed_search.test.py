@@ -8,7 +8,7 @@ results = evaluate(
     [random_agent_seeded, random_seed_search_agent],
     configuration={
         "episodeSteps": 1000,
-        "actTimeout":   10,
+        "actTimeout":   100,
     },
     num_episodes=1,
     debug=True

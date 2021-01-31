@@ -6,6 +6,7 @@
 #
 absl-py==0.11.0           # via tensorboard, tensorflow
 astunparse==1.6.3         # via tensorflow
+attrs==20.3.0             # via pytest
 cachetools==4.2.1         # via google-auth
 certifi==2020.12.5        # via kaggle, requests
 chardet==4.0.0            # via requests
@@ -18,6 +19,7 @@ grpcio==1.32.0            # via tensorboard, tensorflow
 h5py==2.10.0              # via tensorflow
 humanize==3.2.0           # via -r requirements.in
 idna==2.10                # via requests
+iniconfig==1.1.1          # via pytest
 joblib==1.0.0             # via -r requirements.in, scikit-learn
 kaggle==1.5.10            # via -r requirements.in
 keras-preprocessing==1.1.2  # via tensorflow
@@ -26,10 +28,15 @@ mpmath==1.1.0             # via -r requirements.in
 numpy==1.19.5             # via -r requirements.in, h5py, keras-preprocessing, opt-einsum, scikit-learn, scipy, tensorboard, tensorflow, torch, xgboost
 oauthlib==3.1.0           # via requests-oauthlib
 opt-einsum==3.3.0         # via tensorflow
+packaging==20.9           # via pytest
+pluggy==0.13.1            # via pytest
 protobuf==3.14.0          # via tensorboard, tensorflow
+py==1.10.0                # via pytest
 pyasn1-modules==0.2.8     # via google-auth
 pyasn1==0.4.8             # via pyasn1-modules, rsa
 pydash==4.9.2             # via -r requirements.in
+pyparsing==2.4.7          # via packaging
+pytest==6.2.2             # via -r requirements.in
 python-dateutil==2.8.1    # via kaggle
 python-slugify==4.0.1     # via kaggle
 requests-oauthlib==1.3.0  # via google-auth-oauthlib
@@ -46,6 +53,7 @@ tensorflow==2.4.1         # via -r requirements.in
 termcolor==1.1.0          # via tensorflow
 text-unidecode==1.3       # via python-slugify
 threadpoolctl==2.1.0      # via scikit-learn
+toml==0.10.2              # via pytest
 torch==1.7.1              # via -r requirements.in
 tqdm==4.56.0              # via kaggle
 typing-extensions==3.7.4.3  # via tensorflow, torch

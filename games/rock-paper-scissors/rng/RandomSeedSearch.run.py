@@ -7,6 +7,7 @@ from joblib import delayed, Parallel
 from kaggle_environments import evaluate
 
 from rng.IrrationalAgent import IrrationalAgent
+from rng.IrrationalSearchAgent import IrrationalSearchAgent
 from rng.random_agent_unseeded import random_agent_unseeded
 from rng.RandomSeedSearch import RandomSeedSearch
 
@@ -14,6 +15,7 @@ time_start = time.perf_counter()
 
 
 agents = [ RandomSeedSearch(verbose=2), random_agent_unseeded ]
+# agents = [ RandomSeedSearch(verbose=2), IrrationalAgent(name='pi') ]
 # agents = [ IrrationalSearchAgent, IrrationalAgent(name='pi') ]
 # agents = [ IrrationalAgent(name='pi'), IrrationalAgent(name='pi', offset=1) ]
 # agents = [ IrrationalSearchAgent(), IrrationalAgent(),  ]

@@ -19,6 +19,10 @@ from humanize import naturalsize
 
 from rng.IrrationalSearchAgent import IrrationalSearchAgent
 
+# BUGFIX: Kaggle Submission Environment os.getcwd() == "/kaggle/working/"
+if os.environ.get('GFOOTBALL_DATA_DIR', ''):
+    os.chdir('/kaggle_simulations/agent/')
+
 
 class RandomSeedSearch(IrrationalSearchAgent):
     """
@@ -83,11 +87,16 @@ class RandomSeedSearch(IrrationalSearchAgent):
         if self.cheat:
             self.set_global_seed()
 
+
     # obs  {'step': 168, 'lastOpponentAction': 0}
     # conf {'episodeSteps': 1000, 'actTimeout': 1000, 'agentTimeout': 15, 'runTimeout': 1200, 'isProduction': False, 'signs': 3}
     def action(self, obs, conf):
         # NOTE: self.history state is managed in the parent class
         self.conf = conf
+
+        # This allows testing of the agent without actually submitting to the competition
+        if obs.step > 900:
+            raise Exception("Don't Submit To Competition")
 
         # This is a short circuit to speed up unit tests
         irrational, irrational_name = self.search_irrationals(self.history['opponent'])

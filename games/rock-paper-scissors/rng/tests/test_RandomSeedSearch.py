@@ -14,7 +14,7 @@ from rng.RandomSeedSearch import RandomSeedSearch
 def test_RandomSeedSearch_vs_named_irrational(name, offset):
     """ Assert we can find the full irrational sequence every time """
     assert len(RandomSeedSearch.cache)  # check cache filepath can be found
-    episodeSteps = 1000
+    episodeSteps = 100
     results = evaluate(
         "rps",
         [
@@ -33,7 +33,7 @@ def test_RandomSeedSearch_vs_named_irrational(name, offset):
 def test_RandomSeedSearch_vs_seeded_rng():
     """ Assert we can find the full irrational sequence every time """
     assert len(RandomSeedSearch.cache)  # check cache filepath can be found
-    episodeSteps = 1000
+    episodeSteps = 100
     results = evaluate(
         "rps",
         [

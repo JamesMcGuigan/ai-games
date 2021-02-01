@@ -90,16 +90,20 @@ class RandomSeedSearch(IrrationalSearchAgent):
         self.conf = conf
 
         # This is a short circuit to speed up unit tests
-        # A random sequence of 20 numbers has 3e-10 probability
-        if obs.step >= self.cache_steps:
-            irrational, irrational_name = self.search_irrationals(self.history['opponent'])
-            if irrational is not None:
-                return super().action(obs, conf)
+        irrational, irrational_name = self.search_irrationals(self.history['opponent'])
+        min_length = self.min_length or self.cache_steps * 2
+        if irrational is not None and obs.step >= min_length:
+            return super().action(obs, conf)
 
         # Search the Random Seed Cache
         # Important to do this each turn as it reduces self.candidate_seeds[offset] by 1/3
         expected, seed, method = self.search_cache(self.history['opponent'])
-        if expected is not None:
+
+        # If have multiple or zero seed matches, but also an irrational, then use that
+        if seed is None and irrational is not None:
+            action = super().action(obs, conf)
+
+        elif expected is not None:
             action   = (expected + 1) % conf.signs
             opponent = ( self.history['opponent'] or [None] )[-1]
             if seed is None: seed = -1
@@ -109,6 +113,7 @@ class RandomSeedSearch(IrrationalSearchAgent):
                     f"Found RNG Seed: {method} {seed:8d} |",
                     self.log_repeating_seeds()
                 )
+
         else:
             # Default to parent class to return a secure Irrational sequence
             action = super().action(obs, conf)

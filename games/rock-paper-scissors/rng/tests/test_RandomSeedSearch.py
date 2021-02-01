@@ -87,8 +87,8 @@ def test_RandomSeedSearch_vs_Irrational():
 
 
 def test_RandomSeedSearch_vs_unseeded_RNG():
-    """ Show we have a statistical advantage inside the opening book vs RNG """
-    episodeSteps = RandomSeedSearch.cache_steps * 2
+    """ Show we have a statistical advantage vs RNG """
+    # episodeSteps = RandomSeedSearch.cache_steps * 2
 
     results = evaluate(
         "rps",
@@ -97,14 +97,14 @@ def test_RandomSeedSearch_vs_unseeded_RNG():
             RandomSeedSearch()
         ],
         configuration={
-            "episodeSteps": episodeSteps,
+            # "episodeSteps": episodeSteps,
             # "actTimeout":   1000,  # Prevent Multiprocessing TimeoutError
         },
-        num_episodes=10,
+        num_episodes=1,
         # debug=True,  # pull request
     )
     results = np.array(results).reshape((-1,2))
-    totals  = np.mean(results, axis=0)
+    totals  = np.sum(results, axis=0)
     std     = np.std(results, axis=0).round(2)
     winrate = [ np.sum(results[:,0]-20 > results[:,1]),
                 np.sum(results[:,0]+20 < results[:,1]) ]

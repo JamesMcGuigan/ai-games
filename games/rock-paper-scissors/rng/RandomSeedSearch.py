@@ -57,10 +57,17 @@ class RandomSeedSearch(IrrationalSearchAgent):
         if os.path.exists(f'{method}.npy')
     }
 
-    def __init__(self, use_stats=False, verbose=True, cheat=False):
-        self.use_stats = use_stats
-        self.cheat     = cheat   # needs to be set before super()
-        self.conf      = {'episodeSteps': 1000, 'actTimeout': 1000, 'agentTimeout': 15, 'runTimeout': 1200, 'isProduction': False, 'signs': 3}
+    def __init__(self, min_length=4, use_stats=True, cheat=False, verbose=True):
+        """
+        :param min_length:  minimum sequence length for a match 3^4 == 1/81 probability
+        :param use_stats:   if True pick the most probable continuation rather than minimum seed
+        :param cheat:       set the opponents seed - only works on localhost
+        :param verbose:     log output to console
+        """
+        self.use_stats  = use_stats
+        self.cheat      = cheat   # needs to be set before super()
+        self.min_length = min_length
+        self.conf       = {'episodeSteps': 1000, 'actTimeout': 1000, 'agentTimeout': 15, 'runTimeout': 1200, 'isProduction': False, 'signs': 3}
         super().__init__(verbose=verbose)
         self.print_cache_size()
 
@@ -95,6 +102,7 @@ class RandomSeedSearch(IrrationalSearchAgent):
         if expected is not None:
             action   = (expected + 1) % conf.signs
             opponent = ( self.history['opponent'] or [None] )[-1]
+            if seed is None: seed = -1
             if self.verbose:
                 print(
                     f"{obs.step:4d} | {opponent}{self.win_symbol()} > action {expected} -> {action} | " +
@@ -145,6 +153,8 @@ class RandomSeedSearch(IrrationalSearchAgent):
                 seed     = None
                 stats    = np.bincount(self.cache[method][seeds,len(sequence)])
                 expected = np.argmax(stats)
+                if np.count_nonzero(stats) == 1:  # all seeds agree
+                    seed = np.min(seeds)
 
             elif len(seeds):
                 # Pick the first matching seed, and play out the full sequence
@@ -186,6 +196,7 @@ class RandomSeedSearch(IrrationalSearchAgent):
         for offset in range(len(history)):
             sequence = history[offset:]
             size     = np.min([len(sequence), self.cache[method].shape[1]])
+            if size < self.min_length: continue  # reduce the noise of matching sequences
 
             # Have we already searched for this offset and excluded possibilities
             if offset in self.candidate_seeds[method]:
@@ -286,19 +297,21 @@ class RandomSeedSearch(IrrationalSearchAgent):
 
     ### Logging
 
-    def log_repeating_seeds(self, min_value=6) -> dict:
+    def log_repeating_seeds(self) -> dict:
         """
         Format self.repeating_seeds for logging
 
-        3^6 = 1 in 729 chance, which in theory should happen once per game
-        If we see values higher than this, then it means we have a statistical advantage
+        3^4 = 1 in 81   chance, which is the default minimum sequence length
+        3^5 = 1 in 243  chance
+        3^6 = 1 in 729  chance, which in theory should happen once per game
+        3^7 = 1 in 2187 chance, which is a statistical advantage
         """
         repeating_seeds = {}
         for method in self.repeating_seeds.keys():
             repeating_seeds[method] = {
                 key: value
                 for key, value in self.repeating_seeds[method].items()
-                if value >= min_value
+                if value >= self.min_length
             }
             repeating_seeds[method] = dict(sorted(repeating_seeds[method].items(), key=itemgetter(1), reverse=True))
             if len(repeating_seeds[method]) == 0:

@@ -1,7 +1,9 @@
+# %%writefile -a main.py
 # %%writefile RandomSeedSearch.py
 # Source: https://www.kaggle.com/jamesmcguigan/random-seed-search-nash-equilibrium-opening-book/
 # Source: https://github.com/JamesMcGuigan/ai-games/blob/master/games/rock-paper-scissors/rng/RandomSeedSearch.py
 
+import glob
 import os
 import random
 import time
@@ -14,7 +16,6 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # disable tensorflow logging
 import numpy as np
 import tensorflow as tf
 from humanize import naturalsize
-from joblib import delayed, Parallel
 
 from rng.IrrationalSearchAgent import IrrationalSearchAgent
 
@@ -74,6 +75,9 @@ class RandomSeedSearch(IrrationalSearchAgent):
 
         if self.verbose:
             # Log the cache size
+            filenames = [ (filename + ' = ' + naturalsize(os.path.getsize(filename))) for filename in glob.glob('*') ]
+            print('tar.gz =', filenames)
+            print(f'{self.__class__.__name__}::cache.keys()', self.cache.keys())
             for name, cache in self.cache.items():
                 print(f'{self.__class__.__name__}::cache[{name}] = {cache.shape}' )
 
@@ -210,13 +214,16 @@ class RandomSeedSearch(IrrationalSearchAgent):
     ### Precaching
 
     def precache(self) -> List[str]:
-        return Parallel(-1)(delayed(self.precache_method)(method) for method in self.methods)
+        # BUGFIX: Kaggle joblib PicklingError: Could not pickle the task to send it to the workers
+        return [ self.precache_method(method) for method in self.methods ]
 
     def precache_method(self, method='random') -> str:
         """
         Compute all the random.random() Mersenne Twister RNG sequences
-        for the first 8.5 million seeds.
-        Only the first 50 numbers from each sequence are returned.
+        for the first 17 million seeds.
+        Only the first 25 numbers from each sequence are returned,
+        but we rarely find cache hits or hash collisions after the first 15 moves.
+
         These numbers are configurable via cls.cache_steps and cls.cache_seeds
 
         This takes about 23 minutes of runtime and generates 425Mb of int8 data
@@ -259,6 +266,8 @@ class RandomSeedSearch(IrrationalSearchAgent):
             if len(repeating_seeds[method]) == 0:
                 del repeating_seeds[method]
         return repeating_seeds
+
+
 
     ### Cheats
 

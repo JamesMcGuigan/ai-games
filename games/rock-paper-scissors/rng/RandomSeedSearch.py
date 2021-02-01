@@ -186,20 +186,17 @@ class RandomSeedSearch(IrrationalSearchAgent):
             seeds, offset = self.find_candidate_seeds(history, method)
             sequence      = history[offset:]
 
-            if len(seeds) >= 2:
+            if self.use_stats and len(seeds) >= 2:
                 # the most common early-game case is a hash collision
                 # we can compute stats on the distribution of next numbers
                 # the list of matching seeds will exponentially decrease as history gets longer
-                # Without use_stats, we return an irrational when multiple seeds are found
-                seed  = None
-                stats = np.bincount(self.cache[method][seeds,len(sequence)])
+                seed     = None
+                stats    = np.bincount(self.cache[method][seeds,len(sequence)])
+                expected = np.argmax(stats)
                 if np.count_nonzero(stats) == 1:  # all seeds agree
-                    seed     = np.min(seeds)
-                    expected = np.argmax(stats)
-                elif self.use_stats:              # predict using statistics
-                    expected = np.argmax(stats)
+                    seed = np.min(seeds)
 
-            elif len(seeds) == 1:
+            elif len(seeds):
                 # Pick the first matching seed, and play out the full sequence
                 seed = np.min(seeds)
                 size = len(sequence)
@@ -311,7 +308,7 @@ class RandomSeedSearch(IrrationalSearchAgent):
     ### Precaching
 
     def precache(self) -> List[str]:
-        # BUGFIX: Kaggle PicklingError: Could not pickle the task to send it to the workers
+        # BUGFIX: joblib PicklingError: Could not pickle the task to send it to the workers
         return [ self.precache_method(method) for method in self.methods ]
 
     def precache_method(self, method='random') -> str:

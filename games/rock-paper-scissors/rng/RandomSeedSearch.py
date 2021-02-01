@@ -287,7 +287,7 @@ class RandomSeedSearch(IrrationalSearchAgent):
         if self.verbose:
             filenames = [ (filename + ' = ' + naturalsize(os.path.getsize(filename))) for filename in glob.glob('*') ]
             print('tar.gz =', filenames)
-            print(f'{self.__class__.__name__}::cache.keys()', self.cache.keys())
+            print(f'{self.__class__.__name__}::cache.keys()', list(self.cache.keys()))
             for name, cache in self.cache.items():
                 print(f'{self.__class__.__name__}::cache[{name}] = {cache.shape}' )
 

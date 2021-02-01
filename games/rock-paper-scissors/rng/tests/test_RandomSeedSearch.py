@@ -23,7 +23,7 @@ def test_RandomSeedSearch_vs_named_irrational(name, offset):
         ],
         configuration={
             "episodeSteps": episodeSteps,
-            # "actTimeout":   1000,
+            "actTimeout":   1000,  # Prevent Multiprocessing TimeoutError
         },
         # debug=True  # pull request
     )
@@ -42,7 +42,7 @@ def test_RandomSeedSearch_vs_seeded_rng():
         ],
         configuration={
             "episodeSteps": episodeSteps,
-            # "actTimeout":   1000,
+            "actTimeout":   1000,  # Prevent Multiprocessing TimeoutError
         },
         # debug=True  # pull request
     )
@@ -62,7 +62,7 @@ def test_RandomSeedSearch_vs_Irrational():
         ],
         configuration={
             "episodeSteps": episodeSteps,
-            # "actTimeout":   1000,  # Prevent Multiprocessing TimeoutError
+            "actTimeout":   1000,  # Prevent Multiprocessing TimeoutError
         },
         num_episodes=10,
         # debug=True,  # pull request
@@ -98,7 +98,7 @@ def test_RandomSeedSearch_vs_unseeded_RNG():
         ],
         configuration={
             # "episodeSteps": episodeSteps,
-            # "actTimeout":   1000,  # Prevent Multiprocessing TimeoutError
+            "actTimeout":   1000,  # Prevent Multiprocessing TimeoutError
         },
         num_episodes=1,
         # debug=True,  # pull request

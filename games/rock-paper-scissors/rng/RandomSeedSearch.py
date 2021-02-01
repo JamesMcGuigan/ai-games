@@ -186,39 +186,43 @@ class RandomSeedSearch(IrrationalSearchAgent):
             seeds, offset = self.find_candidate_seeds(history, method)
             sequence      = history[offset:]
 
-            if self.use_stats and len(seeds) >= 2:
+            if len(seeds) >= 2:
                 # the most common early-game case is a hash collision
                 # we can compute stats on the distribution of next numbers
                 # the list of matching seeds will exponentially decrease as history gets longer
-                seed     = None
-                stats    = np.bincount(self.cache[method][seeds,len(sequence)])
-                expected = np.argmax(stats)
+                # Without use_stats, we return an irrational when multiple seeds are found
+                seed  = None
+                stats = np.bincount(self.cache[method][seeds,len(sequence)])
                 if np.count_nonzero(stats) == 1:  # all seeds agree
-                    seed = np.min(seeds)
+                    seed     = np.min(seeds)
+                    expected = np.argmax(stats)
+                elif self.use_stats:              # predict using statistics
+                    expected = np.argmax(stats)
 
-            elif len(seeds):
+            elif len(seeds) == 1:
                 # Pick the first matching seed, and play out the full sequence
                 seed = np.min(seeds)
+                size = len(sequence)
 
-                if self.cache[method].shape[1] > len(sequence):
+                if self.cache[method].shape[1] > size:
                     # Lookup the next number from the cache
-                    expected = self.cache[method][seed,len(sequence)]
+                    expected = self.cache[method][seed,size]
                 else:
                     # Compute the remainder of the Mersenne Twister sequence
-                    expected = self.get_rng_sequence(seed, length=len(sequence) + 1, method=method)[-1]
+                    expected = self.get_rng_sequence(seed, length=size + 1, method=method)[-1]
 
             # This is a log of how much statistical advantage we gained
             if seed is not None:
                 self.repeating_seeds[method][seed + offset/1000] += 1
 
         if self.verbose >= 2:
-            time_taken = time.perf_counter() - time_start
-            print(f'{self.__class__.__name__} | search_cache({method}): {time_taken*1000:.3f}ms')
+            time_taken = (time.perf_counter() - time_start) * 1000
+            print(f'{self.__class__.__name__} | search_cache({method}): {time_taken:.3f}ms')
 
         return seed, expected, offset
 
 
-    def find_candidate_seeds(self, history, method: str, timeout=0.5) -> Tuple[np.ndarray, int]:
+    def find_candidate_seeds(self, history, method: str) -> Tuple[np.ndarray, int]:
         """
         Find a list of candidate seeds for a given sequence
         This makes searching through the cache very fast
@@ -274,7 +278,8 @@ class RandomSeedSearch(IrrationalSearchAgent):
 
         Results may potentially be cached, though careful attention is paid to
         save and restore the internal state of random.random() to prevent us
-        from affecting the opponent's RNG sequence, and accidentally stealing numbers from their sequence
+        from affecting the opponent's RNG sequence,
+        and accidentally stealing numbers from their sequence
         """
         sequence = []
         if ( use_cache
@@ -285,7 +290,7 @@ class RandomSeedSearch(IrrationalSearchAgent):
             sequence = self.cache[method][seed][:length]
         else:
             # If the results are not in the cache
-            # then ensure we save and restore the random seed state to avoid affecting opponent's RNG
+            # ensure we save and restore random seed state to avoid affecting opponent's RNG
             if method == 'random':
                 seed_state = random.getstate()
                 random.seed(seed)
@@ -306,7 +311,7 @@ class RandomSeedSearch(IrrationalSearchAgent):
     ### Precaching
 
     def precache(self) -> List[str]:
-        # BUGFIX: Kaggle joblib PicklingError: Could not pickle the task to send it to the workers
+        # BUGFIX: Kaggle PicklingError: Could not pickle the task to send it to the workers
         return [ self.precache_method(method) for method in self.methods ]
 
     def precache_method(self, method='random') -> str:
@@ -363,7 +368,8 @@ class RandomSeedSearch(IrrationalSearchAgent):
     def print_cache_size(self):
         """ Mostly for debugging purposes, log the contents of the cache """
         if self.verbose:
-            filenames = [ (filename + ' = ' + naturalsize(os.path.getsize(filename))) for filename in glob.glob('*') ]
+            filenames = [ (filename + ' = ' + naturalsize(os.path.getsize(filename)))
+                          for filename in glob.glob('*') ]
             print('tar.gz =', filenames)
             print(f'{self.__class__.__name__}::cache.keys()', list(self.cache.keys()))
             for name, cache in self.cache.items():

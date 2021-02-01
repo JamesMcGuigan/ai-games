@@ -49,7 +49,7 @@ class RandomSeedSearch(IrrationalSearchAgent):
     """
 
     methods     = [ 'random' ]  # [ 'np', 'tf' ]  # just use random
-    cache_steps = 25  # seeds are rarely found after move 15
+    cache_steps = 20  # seeds are rarely found after move 15
     cache_seeds = int(4.25 * 100_000_000 / len(methods) / cache_steps)  # 100Mb x 4.25x tar.gz compression
     cache = {
         method: np.load(f'{method}.npy')
@@ -59,7 +59,8 @@ class RandomSeedSearch(IrrationalSearchAgent):
 
     def __init__(self, use_stats=False, verbose=True, cheat=False):
         self.use_stats = use_stats
-        self.cheat     = cheat             # needs to be set before super()
+        self.cheat     = cheat   # needs to be set before super()
+        self.conf      = {'episodeSteps': 1000, 'actTimeout': 1000, 'agentTimeout': 15, 'runTimeout': 1200, 'isProduction': False, 'signs': 3}
         super().__init__(verbose=verbose)
         self.print_cache_size()
 
@@ -69,19 +70,27 @@ class RandomSeedSearch(IrrationalSearchAgent):
         super().reset()
 
         # SPEC: self.candidate_seeds[method][offset] = list(seeds)
-        self.candidate_seeds     = defaultdict(lambda: defaultdict(dict))
+        self.candidate_seeds = defaultdict(lambda: defaultdict(dict))
         # SPEC: self.repeating_seeds[method] = count
         self.repeating_seeds = defaultdict(lambda: defaultdict(int))
-        self.no_more_seeds   = False             # short circuit if we reach the end of the cache
-
         if self.cheat:
             self.set_global_seed()
 
-
+    # obs  {'step': 168, 'lastOpponentAction': 0}
+    # conf {'episodeSteps': 1000, 'actTimeout': 1000, 'agentTimeout': 15, 'runTimeout': 1200, 'isProduction': False, 'signs': 3}
     def action(self, obs, conf):
         # NOTE: self.history state is managed in the parent class
+        self.conf = conf
+
+        # This is a short circuit to speed up unit tests
+        # A random sequence of 20 numbers has 3e-10 probability
+        if obs.step >= self.cache_steps:
+            irrational, irrational_name = self.search_irrationals(self.history['opponent'])
+            if irrational is not None:
+                return super().action(obs, conf)
 
         # Search the Random Seed Cache
+        # Important to do this each turn as it reduces self.candidate_seeds[offset] by 1/3
         expected, seed, method = self.search_cache(self.history['opponent'])
         if expected is not None:
             action   = (expected + 1) % conf.signs
@@ -123,12 +132,11 @@ class RandomSeedSearch(IrrationalSearchAgent):
         time_start = time.perf_counter()
         seed     = None
         expected = None
-        if method in self.cache.keys() and len(history) and not self.no_more_seeds:
+        if method in self.cache.keys() and len(history):
 
             # Keep track of sequences we have already excluded, to improve performance
-            offset   = 0  # TODO: make into a loop
-            sequence = history[offset:]
-            seeds    = self.find_candidate_seeds(sequence, method, offset)
+            seeds, offset = self.find_candidate_seeds(history, method)
+            sequence      = history[offset:]
 
             if self.use_stats and len(seeds) >= 2:
                 # the most common early-game case is a hash collision
@@ -149,14 +157,9 @@ class RandomSeedSearch(IrrationalSearchAgent):
                     # Compute the remainder of the Mersenne Twister sequence
                     expected = self.get_rng_sequence(seed, length=len(sequence) + 1, method=method)[-1]
 
-            # else:
-            #     # Shot circuit for the rest of the game if we didn't find anything
-            #     # Search takes upto 800ms, so don't waste overage time during the endgame
-            #     self.no_more_seeds = True
-
-        # This is a log of how much statistical advantage we gained
-        if seed is not None:
-            self.repeating_seeds[method][seed] += 1
+            # This is a log of how much statistical advantage we gained
+            if seed is not None:
+                self.repeating_seeds[method][seed + offset/1000] += 1
 
         if self.verbose >= 2:
             time_taken = time.perf_counter() - time_start
@@ -165,29 +168,52 @@ class RandomSeedSearch(IrrationalSearchAgent):
         return seed, expected
 
 
-    def find_candidate_seeds(self, sequence, method: str, offset: int) -> np.ndarray:
+    def find_candidate_seeds(self, history, method: str, timeout=0.5) -> Tuple[np.ndarray, int]:
         """
         Find a list of candidate seeds for a given sequence
         This makes searching through the cache very fast
         We can effectively exclude a third of the cache on ever iteration
 
-        sequence = history[offset:]
-        method and offset are simply used as keys for state management
-        """
-        size = np.min([len(sequence), self.cache[method].shape[1]])
+        This now also implements offset search to find more candidates
+        Despite using a loop here, the search time is somewhat stable around 600ms
+        As we can exclude 1/3 of the dataset for each offset at each turn
 
-        if offset in self.candidate_seeds[method]:
-            candidates = self.candidate_seeds[method][offset]
-            seeds_idx  = np.where( np.all(
-                self.cache[method][ candidates, :size ] == sequence[ :size ]
-            , axis=1))[0]
-            seeds = candidates[seeds_idx]
+        By implementing offset search we constantly find seeds throughout the match
+        and RandomSeedSearch stops being just an opening book
+        """
+
+        seeds_by_offset = {}
+        for offset in range(len(history)):
+            sequence = history[offset:]
+            size     = np.min([len(sequence), self.cache[method].shape[1]])
+
+            # Have we already searched for this offset and excluded possibilities
+            if offset in self.candidate_seeds[method]:
+                candidates = self.candidate_seeds[method][offset]
+                if len(candidates) == 0:
+                    seeds = candidates  # we found an empty list
+                else:
+                    seeds_idx  = np.where( np.all(
+                        self.cache[method][ candidates, :size ] == sequence[ :size ]
+                    , axis=1))[0]
+                    seeds = candidates[seeds_idx]
+            else:
+                seeds = np.where( np.all(
+                    self.cache[method][ : , :size ] == sequence[ :size ]
+                , axis=1))[0]
+
+            self.candidate_seeds[method][offset] = seeds
+            if len(seeds):
+                seeds_by_offset[offset] = seeds
+
+        # Return the search that returned the shortest list
+        if len(seeds_by_offset) == 0:
+            seeds  = np.array([])
+            offset = 0
         else:
-            seeds = np.where( np.all(
-                self.cache[method][ : , :size ] == sequence[ :size ]
-            , axis=1))[0]
-        self.candidate_seeds[method][offset] = seeds
-        return seeds
+            offset = sorted(seeds_by_offset.items(), key=lambda pair: len(pair[1]))[0][0]
+            seeds  = seeds_by_offset[offset]
+        return seeds, offset
 
 
     def get_rng_sequence(self, seed, length, method='random', use_cache=True) -> List[int]:
@@ -260,14 +286,12 @@ class RandomSeedSearch(IrrationalSearchAgent):
 
     ### Logging
 
-    def log_repeating_seeds(self, min_value=3) -> dict:
+    def log_repeating_seeds(self, min_value=6) -> dict:
         """
         Format self.repeating_seeds for logging
 
-        "Once is happenstance. Twice is coincidence. The third time it's enemy action"
-        A sequence that has repeats once  is a 1/3 chance, so ignore
-        A sequence that has repeats twice is a 1/9 chance, so ignore
-        A sequence that has repeats three is a 1/27 chance, is a statistical advantage!
+        3^6 = 1 in 729 chance, which in theory should happen once per game
+        If we see values higher than this, then it means we have a statistical advantage
         """
         repeating_seeds = {}
         for method in self.repeating_seeds.keys():

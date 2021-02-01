@@ -61,9 +61,10 @@ class RandomSeedSearch(IrrationalSearchAgent):
         if os.path.exists(f'{method}.npy')
     }
 
-    def __init__(self, min_length=4, use_stats=True, cheat=False, verbose=True):
+    def __init__(self, min_length=4, max_offset=1000, use_stats=True, cheat=False, verbose=True):
         """
         :param min_length:  minimum sequence length for a match 3^4 == 1/81 probability
+        :param max_offset:  maximum offset to search for from start of history
         :param use_stats:   if True pick the most probable continuation rather than minimum seed
         :param cheat:       set the opponents seed - only works on localhost
         :param verbose:     log output to console
@@ -71,6 +72,7 @@ class RandomSeedSearch(IrrationalSearchAgent):
         self.use_stats  = use_stats
         self.cheat      = cheat   # needs to be set before super()
         self.min_length = min_length
+        self.max_offset = max_offset
         self.conf       = {'episodeSteps': 1000, 'actTimeout': 1000, 'agentTimeout': 15, 'runTimeout': 1200, 'isProduction': False, 'signs': 3}
         super().__init__(verbose=verbose)
         self.print_cache_size()
@@ -206,7 +208,8 @@ class RandomSeedSearch(IrrationalSearchAgent):
         """
 
         seeds_by_offset = {}
-        for offset in range(len(history)):
+        max_offset = min(self.max_offset, len(history))
+        for offset in range(max_offset):
             sequence = history[offset:]
             size     = np.min([len(sequence), self.cache[method].shape[1]])
             if size < self.min_length: continue  # reduce the noise of matching sequences

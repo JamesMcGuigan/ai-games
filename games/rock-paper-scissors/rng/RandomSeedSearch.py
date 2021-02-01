@@ -73,11 +73,19 @@ class RandomSeedSearch(IrrationalSearchAgent):
         if os.path.exists(f'{method}.npy')
     }
 
-    def __init__(self, min_length=4, max_offset=1000, use_stats=True, cheat=False, verbose=True):
+    def __init__(self,
+                 min_length=4,
+                 max_offset=1000,
+                 use_stats=True,
+                 cheat=False,
+                 no_submit=False,
+                 verbose=True
+    ):
         """
         :param min_length:  minimum sequence length for a match 3^4 == 1/81 probability
         :param max_offset:  maximum offset to search for from start of history
-        :param use_stats:   if True pick the most probable continuation rather than minimum seed
+        :param use_stats:   pick the most probable continuation rather than minimum seed
+        :param no_submit:   throw exception mid-game, to allow testing  submission environment
         :param cheat:       set the opponents seed - only works on localhost
         :param verbose:     log output to console
         """
@@ -85,6 +93,7 @@ class RandomSeedSearch(IrrationalSearchAgent):
         self.cheat      = cheat   # needs to be set before super()
         self.min_length = min_length
         self.max_offset = max_offset
+        self.no_submit  = no_submit
         self.conf       = {'episodeSteps': 1000, 'actTimeout': 1000, 'agentTimeout': 15, 'runTimeout': 1200, 'isProduction': False, 'signs': 3}
         super().__init__(verbose=verbose)
         self.print_cache_size()
@@ -109,7 +118,7 @@ class RandomSeedSearch(IrrationalSearchAgent):
         self.conf = conf
 
         # This allows testing of the agent without actually submitting to the competition
-        if obs.step > 900:
+        if self.no_submit and obs.step > 900:
             raise Exception("Don't Submit To Competition")
 
         # This is a short circuit to speed up unit tests

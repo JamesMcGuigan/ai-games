@@ -61,50 +61,40 @@ class RandomSeedSearch(IrrationalSearchAgent):
         self.use_stats = use_stats
         self.cheat     = cheat             # needs to be set before super()
         super().__init__(verbose=verbose)
+        self.print_cache_size()
 
     def reset(self):
         """ This gets called at the beginning of every game """
         if self.verbose >= 2: print(f'{self.__class__.__name__} | reset()')
         super().reset()
-        self.min_seed        = { name: 0 for name in self.cache.keys() }  # must start at zero
-        self.repeating_seeds = defaultdict(lambda: defaultdict(int))      # count the number repeating seed sequences
+
+        # SPEC: self.candidate_seeds[method][offset] = list(seeds)
+        self.candidate_seeds     = defaultdict(lambda: defaultdict(dict))
+        # SPEC: self.repeating_seeds[method] = count
+        self.repeating_seeds = defaultdict(lambda: defaultdict(int))
         self.no_more_seeds   = False             # short circuit if we reach the end of the cache
 
         if self.cheat:
             self.set_global_seed()
 
-        if self.verbose:
-            # Log the cache size
-            filenames = [ (filename + ' = ' + naturalsize(os.path.getsize(filename))) for filename in glob.glob('*') ]
-            print('tar.gz =', filenames)
-            print(f'{self.__class__.__name__}::cache.keys()', self.cache.keys())
-            for name, cache in self.cache.items():
-                print(f'{self.__class__.__name__}::cache[{name}] = {cache.shape}' )
-
 
     def action(self, obs, conf):
-        # self.history state is managed in the parent class
+        # NOTE: self.history state is managed in the parent class
 
-        # Check for irrationals first, and if so use parent class for logging
-        # This also speeds up unit tests
-        expected, irrational_name = self.search_irrationals(self.history['opponent'])
+        # Search the Random Seed Cache
+        expected, seed, method = self.search_cache(self.history['opponent'])
         if expected is not None:
-            action = super().action(obs, conf)
+            action   = (expected + 1) % conf.signs
+            opponent = ( self.history['opponent'] or [None] )[-1]
+            if self.verbose:
+                print(
+                    f"{obs.step:4d} | {opponent}{self.win_symbol()} > action {expected} -> {action} | " +
+                    f"Found RNG Seed: {method} {seed:8d} |",
+                    self.log_repeating_seeds()
+                )
         else:
-            # Search the Random Seed Cache
-            expected, seed, method = self.search_cache(self.history['opponent'])
-            if expected is not None:
-                action   = (expected + 1) % conf.signs
-                opponent = ( self.history['opponent'] or [None] )[-1]
-                if self.verbose:
-                    print(
-                        f"{obs.step:4d} | {opponent}{self.win_symbol()} > action {expected} -> {action} | " +
-                        f"Found RNG Seed: {method} {seed:8d} |",
-                        self.log_repeating_seeds()
-                    )
-            else:
-                # Default to parent class to return a secure Irrational sequence
-                action = super().action(obs, conf)
+            # Default to parent class to return a secure Irrational sequence
+            action = super().action(obs, conf)
 
         return int(action) % conf.signs
 
@@ -134,46 +124,70 @@ class RandomSeedSearch(IrrationalSearchAgent):
         seed     = None
         expected = None
         if method in self.cache.keys() and len(history) and not self.no_more_seeds:
-            min_seed = self.min_seed[method]
-            size  = np.min([len(history), self.cache[method].shape[1]])
-            seeds = np.where( np.all(
-                self.cache[method][ min_seed: , :size ] == history[ :size ]
-            , axis=1))[0] + min_seed
+
+            # Keep track of sequences we have already excluded, to improve performance
+            offset   = 0  # TODO: make into a loop
+            sequence = history[offset:]
+            seeds    = self.find_candidate_seeds(sequence, method, offset)
 
             if self.use_stats and len(seeds) >= 2:
                 # the most common early-game case is a hash collision
                 # we can compute stats on the distribution of next numbers
                 # the list of matching seeds will exponentially decrease as history gets longer
                 seed     = None
-                stats    = np.bincount(self.cache[method][seeds,len(history)])
+                stats    = np.bincount(self.cache[method][seeds,len(sequence)])
                 expected = np.argmax(stats)
 
             elif len(seeds):
                 # Pick the first matching seed, and play out the full sequence
-                # Also log the seed to reduce search time during subsequent turns
                 seed = np.min(seeds)
-                if seed == self.min_seed[method]:
-                    # This is a log of how much statistical advantage we gained
-                    self.repeating_seeds[method][seed] += 1
-                self.min_seed[method] = seed
 
-                if self.cache[method].shape[1] > len(history):
+                if self.cache[method].shape[1] > len(sequence):
                     # Lookup the next number from the cache
-                    expected = self.cache[method][seed,len(history)]
+                    expected = self.cache[method][seed,len(sequence)]
                 else:
                     # Compute the remainder of the Mersenne Twister sequence
-                    expected = self.get_rng_sequence(seed, length=len(history) + 1, method=method)[-1]
+                    expected = self.get_rng_sequence(seed, length=len(sequence) + 1, method=method)[-1]
 
-            else:
-                # Shot circuit for the rest of the game if we didn't find anything
-                # Search takes upto 800ms, so don't waste overage time during the endgame
-                self.no_more_seeds = True
+            # else:
+            #     # Shot circuit for the rest of the game if we didn't find anything
+            #     # Search takes upto 800ms, so don't waste overage time during the endgame
+            #     self.no_more_seeds = True
+
+        # This is a log of how much statistical advantage we gained
+        if seed is not None:
+            self.repeating_seeds[method][seed] += 1
 
         if self.verbose >= 2:
             time_taken = time.perf_counter() - time_start
             print(f'{self.__class__.__name__} | search_cache({method}): {time_taken*1000:.3f}ms')
 
         return seed, expected
+
+
+    def find_candidate_seeds(self, sequence, method: str, offset: int) -> np.ndarray:
+        """
+        Find a list of candidate seeds for a given sequence
+        This makes searching through the cache very fast
+        We can effectively exclude a third of the cache on ever iteration
+
+        sequence = history[offset:]
+        method and offset are simply used as keys for state management
+        """
+        size = np.min([len(sequence), self.cache[method].shape[1]])
+
+        if offset in self.candidate_seeds[method]:
+            candidates = self.candidate_seeds[method][offset]
+            seeds_idx  = np.where( np.all(
+                self.cache[method][ candidates, :size ] == sequence[ :size ]
+            , axis=1))[0]
+            seeds = candidates[seeds_idx]
+        else:
+            seeds = np.where( np.all(
+                self.cache[method][ : , :size ] == sequence[ :size ]
+            , axis=1))[0]
+        self.candidate_seeds[method][offset] = seeds
+        return seeds
 
 
     def get_rng_sequence(self, seed, length, method='random', use_cache=True) -> List[int]:
@@ -246,7 +260,7 @@ class RandomSeedSearch(IrrationalSearchAgent):
 
     ### Logging
 
-    def log_repeating_seeds(self, min_value=3):
+    def log_repeating_seeds(self, min_value=3) -> dict:
         """
         Format self.repeating_seeds for logging
 
@@ -267,6 +281,15 @@ class RandomSeedSearch(IrrationalSearchAgent):
                 del repeating_seeds[method]
         return repeating_seeds
 
+
+    def print_cache_size(self):
+        """ Mostly for debugging purposes, log the contents of the cache """
+        if self.verbose:
+            filenames = [ (filename + ' = ' + naturalsize(os.path.getsize(filename))) for filename in glob.glob('*') ]
+            print('tar.gz =', filenames)
+            print(f'{self.__class__.__name__}::cache.keys()', self.cache.keys())
+            for name, cache in self.cache.items():
+                print(f'{self.__class__.__name__}::cache[{name}] = {cache.shape}' )
 
 
     ### Cheats

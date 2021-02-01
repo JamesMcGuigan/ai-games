@@ -26,28 +26,40 @@ if os.environ.get('GFOOTBALL_DATA_DIR', ''):
 
 class RandomSeedSearch(IrrationalSearchAgent):
     """
-    The Random Seed Search algorithm takes the default RNG random.random(seed),
-    and generates RNG sequences (length 50) for as many seeds as can fit in the 100Mb submission filesize limit.
-    This happens to be 8,500,000 seeds. Numpy.size = (8500000, 50)int8 = 425.0 MB = 94Mb tar.gz.
-    Compression offers a ~4.5x space saving, mostly due to the first 6 bits in every int8 being zero for trinary numbers.
-    Pre-caching costs 23 minutes of compile time, but at runtime a numpy vectorized search takes only 0.2ms
-    for everything compared to ~10,000 seeds per second searching using a python loop.
+    The Random Seed Search algorithm takes the default RNG `random.random(seed)`,
+    and generates RNG sequences (length 20) for as many seeds as can fit in the
+    100Mb submission filesize limit. This happens to be 20 million seeds.
+    Numpy.size = `(20,000,000, 20) x int8` = 425.0 MB = 94Mb tar.gz.
+    Compression offers a ~4.5x space saving,
+    mostly due to the first 6 bits in every int8 being zero for trinary numbers.
 
-    If a seed is found, the next number in the sequence can be predicted without violating apparent randomness.
+    Pre-caching costs 27 minutes of compile time.
+    By careful use of excluding previously rejected seeds,
+    we can search this array very quickly and even implement
+    offset search for the opponents history without the 1s timelimit.
+    Each turn we can reduce the remaining search space by a factor of 3.
+    This is compared to the previous implemention which could
+    only search about ~10,000 seeds per turn using a python loop.
+
+    If a seed is found, the next number in the sequence can be predicted
+    without violating apparent randomness.
     This effectively acts as an opening book against Mersenne Twister RNG agents.
-    What is observed in practice is the Random Seed Search is only occasionally
-    able to find a small sequence of 2-3 numbers, often during the other agent's random warmup period.
+    What is observed in practice is the Random Seed Search is only occasionally able to
+    find a small sequences numbers, often during the other agent's random warmup period.
     I have not yet seen a +500 score against an unseeded random agent.
-
     I suspect these partial matching sequences represent hash collisions
     of repeating sequences within the Mersenne Twister number.
+
     As the history gets longer, hash collisions become exponentially rarer.
-    This is the game-winning difference between using a repeating number vs and irrational number
-    for your source of randomness. The effect is quite small,
-    but the standard deviation for a random draw is in this game is only 20.
-    A statistical 2-3 point advantage shifts the probability distribution of endgame score,
-    a -21 score gets converted into a draw and a +19 score gets converted into a win.
-    This is equivalent to the statistical effect that causes Black Holes to slowly lose mass via Hawking Radiation.
+    This is the game-winning difference between using a repeating number and irrational number
+    for your source of randomness.
+    The effect is quite small, but the 50% standard deviation for a random draw
+    is in this game is only 20. A statistical 2-3 point advantage shifts
+    the probability distribution of endgame score, a -21 score gets converted into a draw
+    and a +19 score gets converted into a win.
+
+    This is equivalent to the statistical effect that causes
+    Black Holes to slowly lose mass via Hawking Radiation.
 
     Achievement Unlocked: Beat the unbeatable Nash Equilibrium RNG bot!
     """
@@ -107,7 +119,7 @@ class RandomSeedSearch(IrrationalSearchAgent):
 
         # Search the Random Seed Cache
         # Important to do this each turn as it reduces self.candidate_seeds[offset] by 1/3
-        expected, seed, method = self.search_cache(self.history['opponent'])
+        expected, seed, offset, method = self.search_cache(self.history['opponent'])
 
         # If have multiple or zero seed matches, but also an irrational, then use that
         if seed is None and irrational is not None:
@@ -116,11 +128,12 @@ class RandomSeedSearch(IrrationalSearchAgent):
         elif expected is not None:
             action   = (expected + 1) % conf.signs
             opponent = ( self.history['opponent'] or [None] )[-1]
-            if seed is None: seed = -1
+            if seed is None: seed = f"{'many':>12s}"
+            else:            seed = f"{seed + (offset or 0)/1000:12.3f}"
             if self.verbose:
                 print(
                     f"{obs.step:4d} | {opponent}{self.win_symbol()} > action {expected} -> {action} | " +
-                    f"Found RNG Seed: {method} {seed:8d} |",
+                    f"Found RNG Seed: {method:6s} {seed} |",
                     self.log_repeating_seeds()
                 )
 
@@ -134,19 +147,21 @@ class RandomSeedSearch(IrrationalSearchAgent):
 
     ### Searching
 
-    def search_cache(self, history: List[int]) -> Tuple[int, int, str]:
+    def search_cache(self, history: List[int]) \
+            -> Tuple[Optional[int], Optional[int], Optional[int], Optional[str]]:
         """
         Search though the range of different pre-cached numpy arrays for a seed sequence match
         """
-        expected, seed, method = None, None, None
+        expected, seed, offset, method = None, None, None, None
         for method in self.methods:
-            seed, expected = self.search_cache_method(history, method=method)
+            seed, expected, offset = self.search_cache_method(history, method=method)
             if expected is not None:
                 break
-        return expected, seed, method
+        return expected, seed, offset, method
 
 
-    def search_cache_method(self, history: List[int], method='random') -> Tuple[Optional[int], Optional[int]]:
+    def search_cache_method(self, history: List[int], method='random') \
+            -> Tuple[Optional[int], Optional[int], Optional[int]]:
         """
         Perform a vectorized numpy search for the opponent's RNG sequence
         This allows 8.5 million records to be searched in about 0.2ms
@@ -155,6 +170,7 @@ class RandomSeedSearch(IrrationalSearchAgent):
         time_start = time.perf_counter()
         seed     = None
         expected = None
+        offset   = None
         if method in self.cache.keys() and len(history):
 
             # Keep track of sequences we have already excluded, to improve performance
@@ -190,7 +206,7 @@ class RandomSeedSearch(IrrationalSearchAgent):
             time_taken = time.perf_counter() - time_start
             print(f'{self.__class__.__name__} | search_cache({method}): {time_taken*1000:.3f}ms')
 
-        return seed, expected
+        return seed, expected, offset
 
 
     def find_candidate_seeds(self, history, method: str, timeout=0.5) -> Tuple[np.ndarray, int]:

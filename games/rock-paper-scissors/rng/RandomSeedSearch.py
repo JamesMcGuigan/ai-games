@@ -91,7 +91,7 @@ class RandomSeedSearch(IrrationalSearchAgent):
 
         # This is a short circuit to speed up unit tests
         irrational, irrational_name = self.search_irrationals(self.history['opponent'])
-        if irrational is not None and obs.step >= self.min_length + 2:
+        if irrational is not None and obs.step > self.min_length + 2:
             return super().action(obs, conf)
 
         # Search the Random Seed Cache

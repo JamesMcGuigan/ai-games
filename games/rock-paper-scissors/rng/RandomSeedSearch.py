@@ -54,7 +54,7 @@ class RandomSeedSearch(IrrationalSearchAgent):
 
     methods     = [ 'random' ]  # [ 'np', 'tf' ]  # just use random
     cache_steps = 20  # seeds are rarely found after move 15
-    cache_seeds = int(4.25 * 100_000_000 / len(methods) / cache_steps)  # 100Mb x 4.25x tar.gz compression
+    cache_seeds = int(4 * 100_000_000 / len(methods) / cache_steps)  # 100Mb x 4.25x tar.gz compression
     cache = {
         method: np.load(f'{method}.npy')
         for method in methods

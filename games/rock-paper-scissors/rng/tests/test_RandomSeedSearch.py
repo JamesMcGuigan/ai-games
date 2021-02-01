@@ -1,6 +1,7 @@
 # %%writefile test_RandomSeedSearch.py
 import numpy as np
 import pytest
+from joblib import delayed, Parallel
 from kaggle_environments import evaluate
 
 from rng.IrrationalAgent import IrrationalAgent
@@ -23,7 +24,8 @@ def test_RandomSeedSearch_vs_named_irrational(name, offset):
         ],
         configuration={
             "episodeSteps": episodeSteps,
-            "actTimeout":   1000,  # Prevent Multiprocessing TimeoutError
+            "tieRewardThreshold":  1,     # Disable draws
+            "actTimeout":          1000,  # Prevent TimeoutError
         },
         # debug=True  # pull request
     )
@@ -42,7 +44,8 @@ def test_RandomSeedSearch_vs_seeded_rng():
         ],
         configuration={
             "episodeSteps": episodeSteps,
-            "actTimeout":   1000,  # Prevent Multiprocessing TimeoutError
+            "tieRewardThreshold":  1,     # Disable draws
+            "actTimeout":          1000,  # Prevent TimeoutError
         },
         # debug=True  # pull request
     )
@@ -52,9 +55,8 @@ def test_RandomSeedSearch_vs_seeded_rng():
 
 def test_RandomSeedSearch_vs_Irrational():
     """ Show we don't have a statistical advantage inside the opening book vs irrational """
-    episodeSteps = RandomSeedSearch.cache_steps * 2
-
-    results = evaluate(
+    episodeSteps = 100
+    results = Parallel(-1)( delayed(evaluate)(
         "rps",
         [
             IrrationalAgent(),
@@ -62,52 +64,55 @@ def test_RandomSeedSearch_vs_Irrational():
         ],
         configuration={
             "episodeSteps": episodeSteps,
-            "actTimeout":   1000,  # Prevent Multiprocessing TimeoutError
+            "tieRewardThreshold":  1,     # Disable draws
+            "actTimeout":          1000,  # Prevent TimeoutError
         },
-        num_episodes=10,
+        num_episodes=1
         # debug=True,  # pull request
-    )
+    ) for _ in range(int(1000/episodeSteps)) )
+
     results = np.array(results).reshape((-1,2))
     totals  = np.mean(results, axis=0)
     std     = np.std(results, axis=0).round(2)
-    winrate = [ np.sum(results[:,0]-20 > results[:,1]),
-                np.sum(results[:,0]+20 < results[:,1]) ]
+    winrate = [ np.sum(results[:,0] > results[:,1]),
+                np.sum(results[:,0] < results[:,1]) ]
 
     print('results', results)
     print('totals',  totals)
     print('std',     std)
     print('winrate', winrate)
 
-    assert len(results[ results == None ]) == 0       # No errored matches
-    assert np.abs(totals[0])    < 0.2 * episodeSteps  # scores are within 20%
-    assert np.abs(totals[1])    < 0.2 * episodeSteps  # scores are within 20%
-    assert np.abs(std[0]) < 0.2 * episodeSteps        # std  within 20%
-    assert np.abs(std[1]) < 0.2 * episodeSteps        # std  within 20%
+    assert len(results[ results == None ]) == 0    # No errored matches
+    assert np.abs(totals[0]) < 0.2 * episodeSteps  # scores are within 20%
+    assert np.abs(totals[1]) < 0.2 * episodeSteps  # scores are within 20%
+    assert np.abs(std[0])    < 0.2 * episodeSteps  # std  within 20%
+    assert np.abs(std[1])    < 0.2 * episodeSteps  # std  within 20%
 
 
 
 def test_RandomSeedSearch_vs_unseeded_RNG():
     """ Show we have a statistical advantage vs RNG """
-    # episodeSteps = RandomSeedSearch.cache_steps * 2
-
-    results = evaluate(
+    episodeSteps = 100
+    results = Parallel(-1)( delayed(evaluate)(
         "rps",
         [
             "rng/random_agent_unseeded.py",
             RandomSeedSearch()
         ],
         configuration={
-            # "episodeSteps": episodeSteps,
-            "actTimeout":   1000,  # Prevent Multiprocessing TimeoutError
+            "episodeSteps": episodeSteps,
+            "tieRewardThreshold":  1,     # Disable draws
+            "actTimeout":          1000,  # Prevent TimeoutError
         },
-        num_episodes=1,
+        num_episodes=1
         # debug=True,  # pull request
-    )
+    ) for _ in range(int(1000/episodeSteps)) )
+
     results = np.array(results).reshape((-1,2))
     totals  = np.sum(results, axis=0)
     std     = np.std(results, axis=0).round(2)
-    winrate = [ np.sum(results[:,0]-20 > results[:,1]),
-                np.sum(results[:,0]+20 < results[:,1]) ]
+    winrate = [ np.sum(results[:,0] > results[:,1]),
+                np.sum(results[:,0] < results[:,1]) ]
 
     print('results', results)
     print('totals',  totals)
@@ -115,7 +120,7 @@ def test_RandomSeedSearch_vs_unseeded_RNG():
     print('winrate', winrate)
 
     assert len(results[ results == None ]) == 0   # No errored matches
-    assert winrate[0] <= winrate[1], results      # We have a winrate advantage or draw
+    assert winrate[0] <= winrate[1], winrate      # We have a winrate advantage or draw
     assert totals[0]  <  totals[1],  totals       # We have a statistical advantage
     # assert np.abs(std[0]) < 0.2 * episodeSteps  # std within 20%
     # assert np.abs(std[1]) < 0.2 * episodeSteps  # std within 20%

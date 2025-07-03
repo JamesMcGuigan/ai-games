@@ -1,0 +1,16 @@
+# https://chatgpt.com/c/6866ca65-6c94-8004-b19f-0ca449984947
+import gymnasium as gym
+import numpy as np
+
+env = gym.make("CartPole-v1", render_mode="human")  # remove render_mode for speed
+obs, info = env.reset(seed=42)
+done, total_reward = False, 0
+
+while not done:
+    action = env.action_space.sample()              # 0 or 1 uniformly
+    obs, reward, terminated, truncated, info = env.step(action)
+    done = terminated or truncated
+    total_reward += reward
+
+print(f"Episode length = {total_reward} time-steps")
+env.close()

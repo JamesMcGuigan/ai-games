@@ -1,4 +1,5 @@
-# https://chatgpt.com/c/6866ca65-6c94-8004-b19f-0ca449984947
+# DOCS: https://gymnasium.farama.org/environments/classic_control/cart_pole/
+# ChatGPT: https://chatgpt.com/c/6866ca65-6c94-8004-b19f-0ca449984947
 import gymnasium as gym
 import numpy as np
 
@@ -10,6 +11,7 @@ while not done:
     action = env.action_space.sample()              # 0 or 1 uniformly
     obs, reward, terminated, truncated, info = env.step(action)
     done = terminated or truncated
+    print(obs, reward, terminated, truncated, info, done)
     total_reward += reward
 
 print(f"Episode length = {total_reward} time-steps")

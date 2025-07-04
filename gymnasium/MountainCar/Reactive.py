@@ -29,10 +29,12 @@ while not done:
     elif pos >= -0.5 and velocity < 0: action = 0  # accelerate downhill to the left
     elif pos <= -0.5 and velocity < 0: action = 0  # accelerate uphill to the left
     elif pos <= -0.5 and velocity > 0: action = 2  # accelerate downhill to the right
-    elif pos >= -1.0:                  action = 2  # Don't accelerate past left edge of board
+    # elif pos >= -1.0:                action = 2  # Donon't accelerate past left edge of board
     elif pos >= 0.5 and velocity == 0: action = 1  # STOP
-    elif pos >= 0.5 and velocity > 0:  action = 2  # decelerate to stop down after flag
+    elif pos >= 0.5 and velocity > 0:  action = 0  # decelerate to stop down after flag
     else: action = 2                               # if in doubt accelerate right towards flag
+
+    # if pos >= 0: action = 0  # attempt to escape off left side
 
     obs, reward, terminated, truncated, info = env.step(action)
     done = terminated or truncated

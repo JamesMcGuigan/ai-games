@@ -2,7 +2,7 @@
 
 import gymnasium as gym
 
-from stable_baselines3 import DQN
+from stable_baselines3 import DQN, PPO
 from stable_baselines3.common.evaluation import evaluate_policy
 
 
@@ -15,10 +15,21 @@ try:
     # NOTE: if you have loading issue, you can pass `print_system_info=True`
     # to compare the system on which the model was trained vs the current one
     # model = DQN.load("dqn_lunar", env=env, print_system_info=True)
-    model = DQN.load("StableBaselines", env=env)
+    # model = DQN.load("StableBaselines", env=env)
+    model = PPO.load("StableBaselines", env=env)
 except FileNotFoundError:
     # Instantiate the agent
-    model = DQN("MlpPolicy", env, verbose=1)
+    # model = DQN("MlpPolicy", env, verbose=1)
+    model = PPO(
+        policy='MlpPolicy',
+        env=env,
+        n_steps=1024,
+        batch_size=64,
+        n_epochs=4,
+        gamma=0.999,
+        gae_lambda=0.98,
+        ent_coef=0.01,
+        verbose=1)
     # Train the agent and display a progress bar
     model.learn(total_timesteps=int(2e5), progress_bar=True)
     # Save the agent

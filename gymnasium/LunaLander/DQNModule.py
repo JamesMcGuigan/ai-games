@@ -1,6 +1,4 @@
-# https://grok.com/chat/91aceab9-0be9-4165-ba4b-697f4a642787
-
-# LunarLander-v2 with DQN (Deep Q-Network)
+# LunarLander-v3 with DQN (Deep Q-Network) - GPU Enabled
 # Goal: Train to land softly (reward > 200 average)
 # DOCS: https://gymnasium.farama.org/environments/box2d/lunar_lander/
 # Based on standard DQN implementation for discrete actions
@@ -12,6 +10,12 @@ import torch.nn as nn
 import torch.optim as optim
 import collections
 import random
+
+# Add device for GPU/MPS/CPU
+device = torch.device(     "mps"  if torch.backends.mps.is_available()
+                      else "cuda" if torch.cuda.is_available()
+                      else "cpu" )
+print(f"Using device: {device}")  # Verify GPU detection
 
 # Hyperparameters
 GAMMA = 0.99          # Discount factor
@@ -38,7 +42,7 @@ class DQN(nn.Module):
         x = torch.relu(self.fc2(x))
         return self.fc3(x)
 
-# Replay Buffer
+# Replay Buffer (stores tensors on CPU for simplicity)
 class ReplayBuffer:
     def __init__(self, capacity):
         self.buffer = collections.deque(maxlen=capacity)
@@ -63,8 +67,8 @@ def train_dqn():
     state_size = env.observation_space.shape[0]  # 8
     action_size = env.action_space.n             # 4
 
-    policy_net = DQN(state_size, action_size)
-    target_net = DQN(state_size, action_size)
+    policy_net = DQN(state_size, action_size).to(device)  # Move to device
+    target_net = DQN(state_size, action_size).to(device)  # Move to device
     target_net.load_state_dict(policy_net.state_dict())
     target_net.eval()
 
@@ -75,7 +79,7 @@ def train_dqn():
 
     for episode in range(NUM_EPISODES):
         state, _ = env.reset()
-        state = torch.tensor(state, dtype=torch.float32).unsqueeze(0)
+        state = torch.tensor(state, dtype=torch.float32).unsqueeze(0).to(device)  # To device
         total_reward = 0
         done = False
         steps = 0
@@ -91,21 +95,22 @@ def train_dqn():
             next_state, reward, terminated, truncated, _ = env.step(action)
             done = terminated or truncated
             total_reward += reward
-            next_state = torch.tensor(next_state, dtype=torch.float32).unsqueeze(0)
+            next_state_tensor = torch.tensor(next_state, dtype=torch.float32).unsqueeze(0).to(device)  # To device
 
-            replay_buffer.push(state, action, reward, next_state, done)
-            state = next_state
+            # Store in buffer (keep on CPU to save GPU memory)
+            replay_buffer.push(state.cpu(), action, reward, next_state_tensor.cpu(), done)
+            state = next_state_tensor
             steps += 1
 
             # Train if buffer is full enough
             if len(replay_buffer) >= BATCH_SIZE:
                 batch = replay_buffer.sample(BATCH_SIZE)
                 states, actions, rewards, next_states, dones = zip(*batch)
-                states = torch.cat(states)
-                actions = torch.tensor(actions).unsqueeze(1)
-                rewards = torch.tensor(rewards)
-                next_states = torch.cat(next_states)
-                dones = torch.tensor(dones, dtype=torch.float32)
+                states = torch.cat(states).to(device)  # Move batch to device
+                actions = torch.tensor(actions, device=device).unsqueeze(1)
+                rewards = torch.tensor(rewards, device=device)
+                next_states = torch.cat(next_states).to(device)  # Move batch to device
+                dones = torch.tensor(dones, dtype=torch.float32, device=device)
 
                 # Compute Q values
                 current_q = policy_net(states).gather(1, actions).squeeze()
@@ -134,11 +139,11 @@ def train_dqn():
     torch.save(policy_net.state_dict(), "DQNModule.pth")
     return policy_net
 
-# Evaluation Function (Load and Run)
+# Evaluation Function (Load and Run) - Also GPU-enabled
 def evaluate_dqn(policy_net):
     env = gym.make("LunarLander-v3", render_mode="human")
     state, _ = env.reset(seed=SEED)
-    state = torch.tensor(state, dtype=torch.float32).unsqueeze(0)
+    state = torch.tensor(state, dtype=torch.float32).unsqueeze(0).to(device)  # To device
     done = False
     total_reward = 0
     steps = 0
@@ -150,15 +155,15 @@ def evaluate_dqn(policy_net):
         done = terminated or truncated
         total_reward += reward
         steps += 1
-        next_state = torch.tensor(next_state, dtype=torch.float32).unsqueeze(0)
+        next_state = torch.tensor(next_state, dtype=torch.float32).unsqueeze(0).to(device)  # To device
         state = next_state
 
     print(f"Evaluation: Total reward = {total_reward}, Episode length = {steps} steps")
     env.close()
 
 try:
-    policy_net = DQN(8, 4)
-    policy_net.load_state_dict(torch.load("DQNModule.pth"))
+    policy_net = DQN(8, 4).to(device)  # Move to device
+    policy_net.load_state_dict(torch.load("DQNModule.pth", map_location=device))
 except FileNotFoundError:
     policy_net = train_dqn()
 evaluate_dqn(policy_net)

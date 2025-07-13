@@ -1,6 +1,8 @@
 pip-tools
 numpy
+torch
 swig  # brew install swig
 gymnasium
 gymnasium[classic-control]
 gymnasium[box2d]
+stable-baselines3[extra]

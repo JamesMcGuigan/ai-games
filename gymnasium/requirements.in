@@ -1,4 +1,6 @@
 pip-tools
 numpy
+swig  # brew install swig
 gymnasium
 gymnasium[classic-control]
+gymnasium[box2d]

@@ -156,6 +156,9 @@ def evaluate_dqn(policy_net):
     print(f"Evaluation: Total reward = {total_reward}, Episode length = {steps} steps")
     env.close()
 
-# Run training and evaluation
-policy_net = train_dqn()
+try:
+    policy_net = DQN(8, 4)
+    policy_net.load_state_dict(torch.load("DQNModule.pth"))
+except FileNotFoundError:
+    policy_net = train_dqn()
 evaluate_dqn(policy_net)

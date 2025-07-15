@@ -117,26 +117,3 @@ for episode in range(max_episodes):
             break
 
 env.close()
-
-
-# Evaluation Function (Load and Run) - Also GPU-enabled
-def evaluate_dqn(policy_net):
-    env = gym.make("LunarLander-v3", render_mode="human")
-    state, _ = env.reset(seed=SEED)
-    state = torch.tensor(state, dtype=torch.float32).unsqueeze(0).to(device)  # To device
-    done = False
-    total_reward = 0
-    steps = 0
-
-    while not done:
-        with torch.no_grad():
-            action = policy_net(state).argmax().item()
-        next_state, reward, terminated, truncated, _ = env.step(action)
-        done = terminated or truncated
-        total_reward += reward
-        steps += 1
-        next_state = torch.tensor(next_state, dtype=torch.float32).unsqueeze(0).to(device)  # To device
-        state = next_state
-
-    print(f"Evaluation: Total reward = {total_reward}, Episode length = {steps} steps")
-    env.close()

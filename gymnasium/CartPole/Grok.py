@@ -20,11 +20,14 @@ class DQN(nn.Module):
     def __init__(self):
         super(DQN, self).__init__()
         self.fc1 = nn.Linear(state_size, 24)
-        self.fc2 = nn.Linear(24, action_size)
+        self.fc2 = nn.Linear(24, 24)
+        self.fc3 = nn.Linear(24, action_size)
 
     def forward(self, x):
         x = torch.relu(self.fc1(x))
-        return self.fc2(x)
+        x = torch.relu(self.fc2(x))
+        x = self.fc3(x)
+        return x
 
 
 # Hyperparameters
@@ -45,6 +48,7 @@ target_net.load_state_dict(policy_net.state_dict())
 optimizer = optim.Adam(policy_net.parameters(), lr=learning_rate)
 memory = deque(maxlen=buffer_size)
 criterion = nn.MSELoss()
+episode_rewards = deque(maxlen=100)  # Store rewards for last 100 episodes
 
 # Training Loop
 for episode in range(max_episodes):
@@ -94,6 +98,8 @@ for episode in range(max_episodes):
         if done or truncated:
             break
 
+    episode_rewards.append(total_reward)
+
     # Update epsilon
     epsilon = max(epsilon_min, epsilon * epsilon_decay)
 
@@ -105,7 +111,7 @@ for episode in range(max_episodes):
 
     # Check if solved (average reward > 195 over 100 episodes)
     if episode > 100:
-        avg_reward = np.mean([memory[i][2] for i in range(len(memory)) if memory[i][2] for _ in range(100)])
+        avg_reward = np.mean(episode_rewards)
         if avg_reward > 195:
             print("CartPole solved! ", avg_reward)
             break

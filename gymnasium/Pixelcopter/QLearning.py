@@ -29,10 +29,10 @@ ple_env = PLE(env, fps=30, display_screen=True)
 ple_env.init()
 
 # Discretize state space
-player_y_bins = np.linspace(0, 256, 10)      # 10 bins for helicopter y-position
-player_vel_bins = np.linspace(-10, 10, 5)    # 5 bins for helicopter velocity
+player_y_bins      = np.linspace(0, 256, 10)      # 10 bins for helicopter y-position
+player_vel_bins    = np.linspace(-10, 10, 5)    # 5 bins for helicopter velocity
 gate_distance_bins = np.linspace(0, 256, 10)  # 10 bins for distance to next gate
-gate_top_y_bins = np.linspace(0, 256, 10)    # 10 bins for top of next gate
+gate_top_y_bins    = np.linspace(0, 256, 10)    # 10 bins for top of next gate
 
 # Initialize Q-table
 state_space_shape = (len(player_y_bins), len(player_vel_bins), len(gate_distance_bins), len(gate_top_y_bins))

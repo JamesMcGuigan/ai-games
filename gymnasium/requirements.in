@@ -1,3 +1,8 @@
+# conda activate gymnasium
+# git clone https://github.com/ntasfi/PyGame-Learning-Environment.git
+# cd PyGame-Learning-Environment/
+# pip install -e .
+
 pip-tools
 numpy
 torch
@@ -6,3 +11,4 @@ gymnasium
 gymnasium[classic-control]
 gymnasium[box2d]
 stable-baselines3[extra]
+pygame

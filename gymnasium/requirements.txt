@@ -125,6 +125,7 @@ psutil==7.0.0
     # via stable-baselines3
 pygame==2.6.1
     # via
+    #   -r requirements.in
     #   gymnasium
     #   stable-baselines3
 pygments==2.19.2

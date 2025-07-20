@@ -1,5 +1,4 @@
 # https://learn.udacity.com/nanodegrees/nd893/parts/cd1763/lessons/22cf8ac3-5823-404c-b825-5dcda25a736a/concepts/2b715c20-cfb5-4fac-8a51-c55cfa3edd85?lesson_tab=lesson
-# BUG: AttributeError: module 'numpy' has no attribute 'bool8'. Did you mean: 'bool'?
 
 import gymnasium as gym
 import numpy as np

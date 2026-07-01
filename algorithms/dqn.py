@@ -228,7 +228,10 @@ def train(
             next_state, reward, terminated, truncated, _ = env.step(action)
             done = terminated or truncated
 
-            agent.store_transition(state, action, reward, next_state, float(done))
+            # Only a genuine termination zeroes the bootstrap target. A
+            # time-limit truncation (e.g. surviving CartPole's 500-step cap)
+            # is not a terminal state, so we keep bootstrapping from next_state.
+            agent.store_transition(state, action, reward, next_state, float(terminated))
             agent.update()
 
             state = next_state

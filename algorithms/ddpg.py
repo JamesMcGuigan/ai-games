@@ -281,6 +281,7 @@ def train(
 ):
     env = gym.make(env_name)
     env.reset(seed=seed)
+    env.action_space.seed(seed)   # so the warmup's action_space.sample() is reproducible
     torch.manual_seed(seed)
     np.random.seed(seed)
     random.seed(seed)
@@ -318,7 +319,10 @@ def train(
             next_state, reward, terminated, truncated, _ = env.step(action)
             done = terminated or truncated
 
-            agent.store_transition(state, action, reward, next_state, float(done))
+            # Pendulum-v1 only ever truncates (200-step limit), never
+            # terminates, so masking on `terminated` keeps the bootstrap
+            # instead of wrongly zeroing it at every episode's last transition.
+            agent.store_transition(state, action, reward, next_state, float(terminated))
             agent.update()
 
             state = next_state

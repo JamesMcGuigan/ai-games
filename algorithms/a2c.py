@@ -7,9 +7,10 @@ release: https://blog.openai.com/baselines-acktr-a2c/
 (A2C is the synchronous, deterministic variant of A3C from
 Mnih et al., "Asynchronous Methods for Deep Reinforcement Learning", 2016.)
 
-Applied here to CartPole-v1 with a single environment for clarity; the
-"synchronous batch of environments" trick from the blog post is included
-as an optional --num-envs flag using Gymnasium's vectorized envs.
+Applied here to CartPole-v1 with a single environment for clarity. The
+"synchronous batch of environments" trick from the blog post (stepping
+several envs in lockstep and batching their transitions) is deliberately
+left out to keep this a single-threaded reference implementation.
 
 Core idea
 ---------
@@ -36,7 +37,7 @@ A2C combines two ideas from REINFORCE and DQN:
 Total loss (single network with two heads, weights shared up to the
 final layers):
 
-    L = L_actor + c1 * L_critic - c2 * H[pi_theta]
+  L = L_actor + c1 * L_critic - c2 * H[pi_theta]
 
   L_actor  = -log pi(a_t|s_t) * A_t.detach()   (advantage is NOT
              backpropagated through the critic here)
@@ -125,20 +126,21 @@ class A2CAgent:
         self.entropies.append(dist.entropy().squeeze(0))
         return action.item()
 
-    def store_step(self, reward: float, done: bool) -> None:
+    def store_step(self, reward: float, terminated: bool) -> None:
         self.rewards.append(reward)
-        self.dones.append(done)
+        self.dones.append(terminated)
 
     @torch.no_grad()
-    def _bootstrap_value(self, next_state: np.ndarray, done: bool) -> float:
-        """V(s_{t+n}) used to bootstrap the n-step return; 0 if the episode ended."""
-        if done:
+    def _bootstrap_value(self, next_state: np.ndarray, terminated: bool) -> float:
+        """V(s_{t+n}) used to bootstrap the n-step return; 0 only on a genuine
+        termination (a time-limit truncation still bootstraps from next_state)."""
+        if terminated:
             return 0.0
         state_t = torch.from_numpy(next_state).float().unsqueeze(0).to(self.device)
         _, value = self.model(state_t)
         return value.item()
 
-    def update(self, next_state: np.ndarray, done: bool) -> dict:
+    def update(self, next_state: np.ndarray, terminated: bool) -> dict:
         """
         Perform one n-step A2C update.
 
@@ -147,7 +149,7 @@ class A2CAgent:
         then forms the advantage A_t = G_t - V(s_t), and combines the
         actor, critic, and entropy losses into a single backward pass.
         """
-        bootstrap = self._bootstrap_value(next_state, done)
+        bootstrap = self._bootstrap_value(next_state, terminated)
 
         returns = []
         G = bootstrap
@@ -227,7 +229,10 @@ def train(
             next_state, reward, terminated, truncated, _ = env.step(action)
             done = terminated or truncated
 
-            agent.store_step(reward, done)
+            # Store `terminated` (not `done`) as the bootstrap mask: a
+            # time-limit truncation cuts the rollout short but isn't a true
+            # terminal, so the n-step return should still bootstrap next_state.
+            agent.store_step(reward, terminated)
             episode_reward += reward
             step_in_rollout += 1
             state = next_state
@@ -237,7 +242,7 @@ def train(
             # n-step rollouts, as opposed to REINFORCE's full-episode
             # wait or DQN's single-transition updates.
             if step_in_rollout == n_steps or done:
-                agent.update(next_state, done)
+                agent.update(next_state, terminated)
                 step_in_rollout = 0
 
         scores.append(episode_reward)

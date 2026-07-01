@@ -157,7 +157,7 @@ class PPOAgent:
         self.buffer.add(state, action, reward, done, log_prob, value)
 
     @torch.no_grad()
-    def _compute_gae(self, last_value: float, last_done: bool):
+    def _compute_gae(self, last_value: float):
         """Generalized Advantage Estimation, computed backward over the rollout."""
         rewards = self.buffer.rewards
         values = self.buffer.values + [last_value]
@@ -166,7 +166,9 @@ class PPOAgent:
         advantages = [0.0] * len(rewards)
         gae = 0.0
         for t in reversed(range(len(rewards))):
-            next_non_terminal = 1.0 - (dones[t] if t < len(dones) else float(last_done))
+            # dones[t] already marks whether s_{t+1} starts a fresh episode,
+            # so it doubles as the mask for the final (bootstrap) step too.
+            next_non_terminal = 1.0 - dones[t]
             delta = rewards[t] + self.gamma * values[t + 1] * next_non_terminal - values[t]
             gae = delta + self.gamma * self.gae_lambda * next_non_terminal * gae
             advantages[t] = gae
@@ -175,12 +177,12 @@ class PPOAgent:
         returns = advantages + torch.tensor(values[:-1], dtype=torch.float32, device=self.device)
         return advantages, returns
 
-    def update(self, last_value: float, last_done: bool) -> dict:
+    def update(self, last_value: float) -> dict:
         """
         PPO-Clip update: run n_epochs of minibatch SGD over the rollout,
         using the clipped surrogate objective + value loss + entropy bonus.
         """
-        advantages, returns = self._compute_gae(last_value, last_done)
+        advantages, returns = self._compute_gae(last_value)
         # Advantage normalization: another standard PPO variance-reduction
         # trick, applied once per rollout (not per minibatch).
         advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
@@ -290,8 +292,21 @@ def train(
             next_state, reward, terminated, truncated, _ = env.step(action)
             done = terminated or truncated
 
-            agent.store_step(state, action, reward, done, log_prob, value)
-            episode_reward += reward
+            episode_reward += reward   # logged return uses the raw env reward
+
+            # GAE resets across `done` either way (a new episode follows in the
+            # buffer). On a time-limit *truncation* the episode isn't truly over,
+            # so fold the lost future return into the stored reward by
+            # bootstrapping V(next_state); otherwise the cutoff would be treated
+            # as a real terminal state and bias the value targets.
+            stored_reward = reward
+            if truncated and not terminated:
+                with torch.no_grad():
+                    next_t = torch.from_numpy(next_state).float().unsqueeze(0).to(agent.device)
+                    _, next_value = agent.model(next_t)
+                stored_reward = reward + agent.gamma * next_value.item()
+
+            agent.store_step(state, action, stored_reward, done, log_prob, value)
             state = next_state
             timestep += 1
 
@@ -303,12 +318,12 @@ def train(
 
         # Bootstrap value for the (possibly mid-episode) final state.
         with torch.no_grad():
-            last_state_t = torch.from_numpy(state).float().unsqueeze(0)
+            last_state_t = torch.from_numpy(state).float().unsqueeze(0).to(agent.device)
             _, last_value_t = agent.model(last_state_t)
         last_value = last_value_t.item()
 
         # --- Update the policy on the collected rollout ---
-        stats = agent.update(last_value, done)
+        stats = agent.update(last_value)
         update_count += 1
 
         avg_score = np.mean(recent_scores) if recent_scores else 0.0

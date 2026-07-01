@@ -94,7 +94,7 @@ class DQNAgent:
         eps_end: float = 0.05,
         eps_decay_steps: int = 10_000,
         target_update_freq: int = 500,
-        device: str = "cpu",
+        device: str = ("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"),
     ):
         self.action_dim = action_dim
         self.gamma = gamma

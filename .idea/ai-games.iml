@@ -6,6 +6,12 @@
       <excludeFolder url="file://$MODULE_DIR$/games/connectx/agents/old" />
       <excludeFolder url="file://$MODULE_DIR$/games/connectx/submissions" />
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
+      <excludeFolder url="file://$MODULE_DIR$/.idea/inspectionProfiles" />
+      <excludeFolder url="file://$MODULE_DIR$/gymnasium/.idea" />
+      <excludeFolder url="file://$MODULE_DIR$/gymnasium/.venv/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/gymnasium/.venv/include" />
+      <excludeFolder url="file://$MODULE_DIR$/gymnasium/.venv/lib" />
+      <excludeFolder url="file://$MODULE_DIR$/gymnasium/PyGame-Learning-Environment/ple.egg-info" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.12 virtualenv at ~/code/ai-games/.venv" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
